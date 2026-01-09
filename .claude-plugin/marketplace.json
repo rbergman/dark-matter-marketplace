@@ -28,6 +28,72 @@
       },
       "source": "./justfile",
       "category": "development"
+    },
+    {
+      "name": "data-oriented-architecture",
+      "description": "Apply data-oriented architecture patterns when designing systems with polymorphic entities - registry-based dispatch, capability composition, and infrastructure-first development",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./data-oriented-architecture",
+      "category": "development"
+    },
+    {
+      "name": "dialectical-refinement",
+      "description": "Transform ambiguous specs into implementable work items through adversarial refinement - use /breakdown for spec decomposition, /refine for sharpening items",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./dialectical-refinement",
+      "category": "development"
+    },
+    {
+      "name": "game-perf",
+      "description": "Optimize game code for per-frame performance and GC pressure - identifies allocation anti-patterns and provides zero-allocation alternatives",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./game-perf",
+      "category": "development"
+    },
+    {
+      "name": "rust-pro",
+      "description": "Expert Rust developer specializing in ownership semantics, zero-cost abstractions, and idiomatic patterns",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./rust-pro",
+      "category": "development"
+    },
+    {
+      "name": "solid-architecture",
+      "description": "SOLID principles, composition patterns, module organization, and side-effect boundary guidelines for writing, reviewing, or refactoring code",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./solid-architecture",
+      "category": "development"
+    },
+    {
+      "name": "typescript-pro",
+      "description": "Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./typescript-pro",
+      "category": "development"
     }
   ]
 }

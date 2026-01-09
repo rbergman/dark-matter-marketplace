@@ -1,0 +1,9 @@
+{
+  "name": "solid-architecture",
+  "version": "0.1.0",
+  "description": "SOLID principles, composition patterns, module organization, and side-effect boundary guidelines for writing, reviewing, or refactoring code",
+  "author": {
+    "name": "Dark Matter",
+    "email": "dark-matter@example.com"
+  }
+}

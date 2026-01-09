@@ -1,0 +1,9 @@
+{
+  "name": "rust-pro",
+  "version": "0.1.0",
+  "description": "Expert Rust developer specializing in ownership semantics, zero-cost abstractions, and idiomatic patterns",
+  "author": {
+    "name": "Dark Matter",
+    "email": "dark-matter@example.com"
+  }
+}
