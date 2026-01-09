@@ -17,6 +17,17 @@
       },
       "source": "./go-pro",
       "category": "development"
+    },
+    {
+      "name": "justfile",
+      "description": "Patterns for setting up just (command runner) in projects - covers simple repos and monorepos with hierarchical modules",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./justfile",
+      "category": "development"
     }
   ]
 }

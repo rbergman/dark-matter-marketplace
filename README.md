@@ -7,6 +7,7 @@ A Claude Code plugin marketplace for skills, agents, and tools.
 ```bash
 claude plugin marketplace add https://github.com/YOUR_USERNAME/dark-matter-marketplace
 claude plugin install go-pro@dark-matter-marketplace
+claude plugin install justfile@dark-matter-marketplace
 ```
 
 ## Plugins
@@ -14,6 +15,7 @@ claude plugin install go-pro@dark-matter-marketplace
 | Plugin | Description |
 |--------|-------------|
 | **go-pro** | Expert Go development with idiomatic patterns, concurrency, error handling, and golangci-lint v2 config |
+| **justfile** | Patterns for setting up just (command runner) - simple repos and monorepos with hierarchical modules |
 
 ## Adding Plugins
 
