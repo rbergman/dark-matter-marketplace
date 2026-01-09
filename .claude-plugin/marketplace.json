@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "dark-matter-marketplace",
+  "description": "Claude Code plugins for Go development, architecture, and productivity",
+  "owner": {
+    "name": "Dark Matter",
+    "email": "dark-matter@example.com"
+  },
+  "plugins": [
+    {
+      "name": "go-pro",
+      "description": "Expert Go development skill with idiomatic patterns, concurrency, error handling, and golangci-lint v2 configuration",
+      "version": "0.1.0",
+      "author": {
+        "name": "Dark Matter",
+        "email": "dark-matter@example.com"
+      },
+      "source": "./go-pro",
+      "category": "development"
+    }
+  ]
+}

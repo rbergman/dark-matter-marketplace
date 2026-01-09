@@ -1,0 +1,149 @@
+# golangci-lint v2 Configuration Template
+# Copy to project root as .golangci.yml
+# Requires: golangci-lint v2+ (go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest)
+#
+# Usage: go tool golangci-lint run
+# Auto-fix: go tool golangci-lint run --fix
+
+version: "2"
+
+run:
+  go: "1.25"
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    # --- Structural & Complexity ---
+    - funlen         # Limits function length
+    - gocognit       # Cognitive complexity
+    - gocyclo        # Cyclomatic complexity
+    - cyclop         # Stricter cyclomatic
+    - lll            # Line length
+    - revive         # Style & convention
+    - interfacebloat # Large interfaces
+    - nestif         # Deep nesting
+
+    # --- Safety & Error Handling ---
+    - errcheck       # Unchecked errors
+    - errorlint      # Go 1.13+ error wrapping
+    - gosec          # Security
+    - wrapcheck      # Error wrapping from external pkgs
+    - forcetypeassert # Type assertions without ok
+    - makezero       # Slice append bugs
+    - nilerr         # Returns nil when err not nil
+    - nilnil         # Returns (nil, nil)
+    - noctx          # Missing context in HTTP
+    - bodyclose      # HTTP body close
+    - fatcontext     # Context in loops
+    - sqlclosecheck  # SQL close checks
+
+    # --- Maintenance & Logic ---
+    - govet          # Compiler checks
+    - staticcheck    # Advanced logic (includes gosimple)
+    - unused         # Dead code
+    - ineffassign    # Useless assignments
+    - unparam        # Unused parameters
+    - exhaustive     # Enum completeness
+    - dogsled        # Too many blanks
+    - unconvert      # Unnecessary conversions
+    - wastedassign   # Wasted assignments
+    - predeclared    # Shadowing builtins
+
+    # --- Style & Cleanliness ---
+    - gocritic       # Style checks
+    - misspell       # Typos
+    - dupword        # Duplicate words
+    - whitespace     # Spacing
+    - varnamelen     # Variable name length
+    - prealloc       # Slice preallocation
+    - usestdlibvars  # Use http.StatusOK
+
+    # --- Performance ---
+    - perfsprint     # Faster sprintf alternatives
+
+    # --- Testing ---
+    - testifylint    # Testify best practices
+
+    # --- Modernization ---
+    - modernize      # Modern Go idioms
+    - copyloopvar    # Loop variable issues
+    - intrange       # Integer ranges
+    - exptostd       # Replace x/exp
+    - mirror         # bytes/strings patterns
+
+  settings:
+    funlen:
+      lines: 60
+      statements: 40
+    gocognit:
+      min-complexity: 15
+    cyclop:
+      max-complexity: 10
+    varnamelen:
+      max-distance: 5
+      min-name-length: 3
+      ignore-names: [err, ok, ctx, tt, tc, w, r, b, d, id]
+      ignore-decls:
+        - t testing.T
+        - i int
+        - T any
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+      # Customize this for your module path:
+      # ignore-package-globs:
+      #   - github.com/yourorg/yourproject/internal/*
+    lll:
+      line-length: 140
+    revive:
+      severity: error
+      rules:
+        - name: file-length-limit
+          arguments: [{max: 350}]
+        - name: exported
+        - name: package-comments
+        - name: var-naming
+        - name: indent-error-flow
+        - name: cognitive-complexity
+          arguments: [15]
+    gosec:
+      excludes: [G304, G301]  # File paths, dir perms (for CLI tools)
+    exhaustive:
+      default-signifies-exhaustive: false
+    govet:
+      enable-all: true
+      disable: [fieldalignment]
+    testifylint:
+      disable:
+        - require-error  # Style preference
+
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters: [revive]
+        text: file-length-limit
+      - path: _test\.go
+        linters: [revive]
+        text: cognitive-complexity
+      - path: _test\.go
+        linters: [gocognit, gocyclo, cyclop, funlen, nestif]
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        # Customize this for your module path:
+        # - prefix(github.com/yourorg/yourproject)

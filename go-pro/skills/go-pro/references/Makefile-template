@@ -1,0 +1,50 @@
+# Go Project Makefile Template
+# Copy to project root as 'Makefile'
+# Fallback for systems without just
+#
+# Usage: make help
+
+.PHONY: help setup fmt lint fix test coverage build check
+
+# Default target
+help:
+	@echo "Available targets:"
+	@echo "  setup     - Download dependencies and tools"
+	@echo "  fmt       - Format Go code"
+	@echo "  lint      - Run golangci-lint"
+	@echo "  fix       - Auto-fix lint issues"
+	@echo "  test      - Run tests with race detection"
+	@echo "  coverage  - Run tests with coverage report"
+	@echo "  build     - Build binary"
+	@echo "  check     - Run all checks (fmt, lint, test)"
+
+# Setup
+setup:
+	go mod download
+	@echo "Tools available via 'go tool <name>'"
+
+# Development
+fmt:
+	go fmt ./...
+
+lint:
+	go tool golangci-lint run
+
+fix:
+	go tool golangci-lint run --fix
+	go tool goimports -w .
+
+test:
+	go test -race ./...
+
+coverage:
+	go test -race -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out
+
+# Build
+build:
+	go build -o ./bin/app ./cmd/server
+
+# Quality gates
+check: fmt lint test
+	@echo "All checks passed"
