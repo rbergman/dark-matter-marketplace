@@ -34,7 +34,7 @@ If you are a **subagent** (delegated by an orchestrator), activate `dm:subagent`
 
 ## Beads
 
-Use [beads](https://github.com/rbergman/beads) (`bd` CLI) for external state that survives sessions:
+Use [beads](https://github.com/steveyegge/beads) (`bd` CLI) for external state that survives sessions:
 - `bd ready` — list ready work
 - `bd claim <id>` — mark in-progress
 - `bd close <id>` — mark complete

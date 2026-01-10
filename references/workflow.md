@@ -12,7 +12,7 @@ In Claude Code settings, disable automatic compaction. This gives you control ov
 
 ### Install Beads
 
-[Beads](https://github.com/rbergman/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
+[Beads](https://github.com/steveyegge/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
 
 ```bash
 # Install beads
