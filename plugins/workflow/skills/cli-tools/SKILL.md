@@ -1,6 +1,6 @@
 ---
 name: cli-tools
-description: Power CLI tools (fd, rg, jq) for when built-in tools are insufficient. Use when you need complex file finding, advanced grep features, or JSON manipulation.
+description: Power CLI tools (fd, rg, jq, yq, sd, xargs, bat, delta) for when built-in tools are insufficient. Use for complex file ops, data manipulation, or parallel execution.
 ---
 
 # CLI Power Tools
@@ -111,6 +111,194 @@ jq '[.items[].category] | unique' data.json
 
 ---
 
+## yq (YAML processor)
+
+**When to use:** YAML manipulation - CI configs, k8s manifests, docker-compose, GitHub Actions.
+
+```bash
+# Extract field
+yq '.services.web.image' docker-compose.yml
+
+# Update value
+yq -i '.version = "2.0.0"' config.yml
+
+# Add to array
+yq -i '.steps += [{"name": "test", "run": "npm test"}]' .github/workflows/ci.yml
+
+# Convert YAML to JSON
+yq -o json config.yml
+
+# Convert JSON to YAML
+yq -P config.json
+
+# Merge files
+yq '. * load("override.yml")' base.yml
+
+# Query multiple docs (---)
+yq 'select(.kind == "Deployment")' k8s-manifests.yml
+```
+
+**Common CI/k8s patterns:**
+```bash
+# Get all image references in k8s
+yq '.spec.containers[].image' deployment.yml
+
+# Update image tag
+yq -i '.spec.containers[0].image = "app:v2"' deployment.yml
+
+# Add env var to GitHub Action
+yq -i '.env.NODE_ENV = "test"' .github/workflows/ci.yml
+```
+
+---
+
+## sd (sed replacement)
+
+**When to use:** Find/replace in files. Much simpler syntax than sed.
+
+```bash
+# Simple replace (stdout)
+sd 'oldName' 'newName' file.ts
+
+# In-place replace
+sd -i 'oldName' 'newName' file.ts
+
+# Regex with capture groups
+sd 'fn (\w+)\(' 'function $1(' file.js
+
+# Replace across multiple files
+fd -e ts | xargs sd -i 'oldImport' 'newImport'
+
+# Multiline (use -s for string mode)
+sd -s 'line1\nline2' 'replacement' file.txt
+
+# Preview changes (no -i flag)
+sd 'pattern' 'replacement' file.ts
+```
+
+**vs sed:**
+```bash
+# sed (arcane)
+sed -i 's/old/new/g' file.txt
+sed -i 's/\(capture\)/\1_suffix/g' file.txt
+
+# sd (readable)
+sd -i 'old' 'new' file.txt
+sd -i '(capture)' '${1}_suffix' file.txt
+```
+
+---
+
+## xargs (parallel execution)
+
+**When to use:** Run commands on multiple inputs, especially in parallel.
+
+```bash
+# Basic usage
+fd -e ts | xargs eslint
+
+# Parallel execution (-P = processes)
+fd -e ts | xargs -P4 -I{} eslint {}
+
+# With placeholder
+fd -e test.ts | xargs -I{} npm test -- {}
+
+# Null-delimited (handles spaces in names)
+fd -0 -e ts | xargs -0 wc -l
+
+# Limit batch size (-n)
+fd -e ts | xargs -n10 eslint
+
+# Prompt before each (interactive)
+fd -e log | xargs -p rm
+```
+
+**Common patterns:**
+```bash
+# Parallel type check
+fd -e ts | xargs -P$(nproc) -I{} tsc --noEmit {}
+
+# Batch git add
+fd -e ts --changed-within 1h | xargs git add
+
+# Parallel image optimization
+fd -e png | xargs -P4 -I{} optipng {}
+```
+
+---
+
+## bat (better cat)
+
+**When to use:** Quick file preview with syntax highlighting and line numbers.
+
+```bash
+# View file with syntax highlighting
+bat src/index.ts
+
+# Show line range
+bat -r 50:100 src/index.ts
+
+# Show non-printable characters
+bat -A file.txt
+
+# Plain output (no decorations)
+bat -p file.ts
+
+# Diff two files
+bat --diff file1.ts file2.ts
+
+# As pager for other commands
+git diff | bat
+
+# Multiple files
+bat src/*.ts
+```
+
+**Note:** Read tool covers most needs, but bat useful for quick multi-file preview with highlighting.
+
+---
+
+## delta (better git diff)
+
+**When to use:** Readable git diffs with syntax highlighting and side-by-side view.
+
+```bash
+# Use as git pager (add to ~/.gitconfig)
+# [core]
+#   pager = delta
+# [delta]
+#   side-by-side = true
+
+# Or one-off
+git diff | delta
+
+# Side by side
+git diff | delta -s
+
+# With line numbers
+git diff | delta -n
+
+# Compare files directly
+delta file1.ts file2.ts
+
+# Show only file names
+git diff --name-only | delta
+```
+
+**Config (~/.gitconfig):**
+```ini
+[core]
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+```
+
+---
+
 ## Decision Guide
 
 | Need | Tool |
@@ -118,10 +306,14 @@ jq '[.items[].category] | unique' data.json
 | Find files by name/pattern | Glob first, fd if complex |
 | Search file contents | Grep first, rg if multiline/pcre2 |
 | Read/edit files | Read/Edit/Write always |
-| Parse JSON config | jq |
-| Transform JSON data | jq |
+| JSON manipulation | jq |
+| YAML manipulation | yq |
+| Find/replace in files | Edit first, sd for bulk/regex |
 | Find + action | fd -x |
-| Search + replace preview | rg -r |
+| Parallel execution | xargs -P |
+| Search + replace preview | rg -r or sd (no -i) |
+| File preview with highlighting | bat |
+| Readable git diffs | delta |
 
 ---
 
@@ -129,12 +321,14 @@ jq '[.items[].category] | unique' data.json
 
 ```bash
 # macOS
-brew install fd ripgrep jq
+brew install fd ripgrep jq yq sd bat git-delta
 
 # Ubuntu/Debian
-apt install fd-find ripgrep jq
+apt install fd-find ripgrep jq bat
+# yq, sd, delta: install via cargo, npm, or download binaries
 # Note: fd is 'fdfind' on Debian, alias it: alias fd=fdfind
 
-# With mise
-mise use -g fd ripgrep jq
+# With mise/cargo
+mise use -g fd ripgrep jq yq
+cargo install sd
 ```
