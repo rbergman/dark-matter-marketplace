@@ -125,8 +125,14 @@ See `references/workflow.md` for the full workflow, but the core ideas:
 
 1. **Orchestrator model** — You strategize, Claude orchestrates, subagents implement
 2. **Context is precious** — Delegate to preserve it; precompact to manage it
-3. **External state** — Use beads/issues to track work outside the conversation
+3. **External state** — Use beads to track work outside the conversation
 4. **One compaction max** — Multiple compactions compound information loss
+
+### Beads
+
+[Beads](https://github.com/rbergman/beads) is my issue tracking CLI that appears throughout these plugins. It's a critical part of my workflow — providing external state that survives session boundaries, enabling orchestrators to track progress across compactions, and giving subagents clear work items to implement.
+
+References to `bd` CLI, bead IDs (like `whiteout-4eed`), and bead states (`ready`, `claimed`, `done`) appear in many skills and agents. If you're not using beads, you can substitute your own issue tracking system or ignore those references.
 
 ---
 

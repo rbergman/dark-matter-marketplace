@@ -15,6 +15,33 @@ A practical workflow for maintaining productive, context-aware sessions with Cla
 
 ---
 
+## Beads: External State
+
+[Beads](https://github.com/rbergman/beads) is a lightweight issue tracking CLI that provides **external state** — the critical ingredient that makes this workflow possible.
+
+**Why beads matter:**
+- **Survives sessions** — Bead state persists when context is cleared or sessions end
+- **Enables handoffs** — New sessions can read bead state to understand what's done and what's next
+- **Tracks dependencies** — Beads can block on other beads, enabling parallel work planning
+- **Gives subagents clarity** — Each bead is a clear, atomic work item
+
+**Core commands:**
+```bash
+bd ready          # List beads ready to work
+bd show <id>      # View bead details
+bd claim <id>     # Mark as in-progress
+bd update <id>    # Add notes/progress
+bd close <id>     # Mark complete
+```
+
+**Bead IDs** look like `whiteout-4eed` — a memorable word plus short hash.
+
+**Bead states:** `draft` → `ready` → `claimed` → `done` (with `blocked` for dependencies)
+
+If you're not using beads, substitute your own issue tracker. The key is having **external state that outlives conversation context**.
+
+---
+
 ## The Orchestrator Model
 
 You are the strategist. Claude is the orchestrator. Subagents are implementers.
