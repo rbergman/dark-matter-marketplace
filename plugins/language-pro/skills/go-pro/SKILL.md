@@ -70,8 +70,14 @@ just check   # Or: go tool golangci-lint run
 
 ```bash
 git clone <repo> && cd <repo>
-go mod download    # Gets all tools automatically
-just check         # Standard entry point
+just setup         # Runs mise trust/install + go mod download
+just check         # Verify everything works
+```
+
+Or manually:
+```bash
+mise trust && mise install  # Get pinned Go version
+go mod download             # Get dependencies
 ```
 
 **Why `go get -tool`?** Tools versioned in go.mod = reproducible builds, same versions for all devs, no separate installation needed.

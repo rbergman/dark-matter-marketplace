@@ -92,7 +92,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
 | `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
 | `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
-| `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq) for when built-ins are insufficient |
+| `dm-work:mise` | Skill | Modern dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
+| `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
@@ -173,6 +174,18 @@ See `references/workflow.md` for the full workflow, but the core ideas:
 2. **Context is precious** — Delegate to preserve it; precompact to manage it
 3. **External state** — Use beads to track work outside the conversation
 4. **One compaction max** — Multiple compactions compound information loss
+
+### Developer Experience (DX)
+
+The plugins include opinionated DX tooling that works together:
+
+| Tool | Skill | Purpose |
+|------|-------|---------|
+| [mise](https://mise.jdx.dev) | `dm-work:mise` | Version management for all languages/tools — replaces nvm, pyenv, goenv |
+| [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
+| CLI tools | `dm-work:cli-tools` | fd, rg, jq, yq, sd, bat, delta — power tools when built-ins aren't enough |
+
+**The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.
 
 ### Beads
 

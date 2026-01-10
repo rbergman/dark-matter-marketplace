@@ -81,8 +81,14 @@ npm run check
 
 ```bash
 git clone <repo> && cd <repo>
-npm install              # Gets all tools automatically
-npm run check            # Or: just check
+just setup               # Runs mise trust/install + npm ci
+just check               # Verify everything works
+```
+
+Or manually:
+```bash
+mise trust && mise install  # Get pinned Node version
+npm ci                      # Get dependencies
 ```
 
 **Why strict configs?** Type errors caught at compile time are 10x cheaper than runtime bugs. Strict linting prevents `any` from leaking through the codebase.

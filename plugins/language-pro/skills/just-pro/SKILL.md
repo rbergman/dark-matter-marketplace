@@ -7,9 +7,16 @@ description: This skill provides patterns for setting up just (command runner) i
 
 Build system configuration using [just](https://just.systems), a modern command runner.
 
+**Related skills:**
+- **mise** - Tool version management (includes just+mise integration patterns)
+- **go-pro**, **rust-pro**, **typescript-pro** - Language-specific templates
+
 ## Installation
 
 ```bash
+# Via mise (recommended - version pinned per-project)
+mise use just
+
 # macOS
 brew install just
 
@@ -245,6 +252,74 @@ lint:
 test:
     cargo test
 ```
+
+## Mise Integration
+
+When a project uses [mise](https://mise.jdx.dev) for tool version management, just recipes should use `mise exec` to ensure pinned versions are used regardless of developer shell setup.
+
+**See the `mise` skill** for full mise setup including shell config, direnv integration, and project `.mise.toml` patterns.
+
+### Shell Override (Recommended)
+
+```just
+# All recipes automatically use mise-pinned tools
+set shell := ["mise", "exec", "--", "bash", "-c"]
+
+build:
+    npm run build
+
+test:
+    go test ./...
+```
+
+### Graceful Degradation
+
+For repos where mise is optional:
+
+```just
+set shell := ["bash", "-c"]
+
+# Use mise if available, otherwise fall back to PATH
+_exec cmd:
+    #!/usr/bin/env bash
+    if command -v mise &>/dev/null; then
+        mise exec -- {{cmd}}
+    else
+        {{cmd}}
+    fi
+
+build: (_exec "npm run build")
+test: (_exec "go test ./...")
+lint: (_exec "golangci-lint run")
+```
+
+Note: No `.mise.toml` check needed - mise traverses parent directories automatically.
+
+### Why This Matters
+
+| Developer Setup | Without mise exec | With mise exec |
+|-----------------|-------------------|----------------|
+| Has direnv + mise | Correct versions | Correct versions |
+| Has mise activate | Correct versions | Correct versions |
+| Fresh clone, no setup | System tools (wrong version) | Pinned versions |
+| CI/CD | Needs activation step | Just works |
+
+**Recommendation**: Use the shell override for team repos. Use graceful degradation for open source where mise adoption varies.
+
+### Caveats
+
+**Failure mode**: Shell override + mise not installed = cryptic "could not find shell" error. Use graceful degradation for open source.
+
+**First clone**: Contributors must run `mise trust` to allow the repo's config:
+
+```just
+setup:
+    mise trust
+    mise install
+    @echo "Toolchain ready"
+```
+
+---
 
 ## Reference Templates
 

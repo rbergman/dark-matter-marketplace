@@ -3,6 +3,9 @@
 #
 # Usage: just --list
 
+# Uncomment to ensure mise-pinned tool versions are used:
+# set shell := ["mise", "exec", "--", "bash", "-c"]
+
 # === Default ===
 
 default:
@@ -10,8 +13,10 @@ default:
 
 # === Setup ===
 
-# Install toolchain dependencies
+# Install toolchain dependencies (run once after clone)
 setup:
+    -mise trust 2>/dev/null  # Allow .mise.toml config (ignore if mise absent)
+    -mise install 2>/dev/null
     go mod download
     @echo "Toolchain ready"
 

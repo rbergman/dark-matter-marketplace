@@ -135,8 +135,14 @@ just check   # Or: cargo clippy && cargo test
 
 ```bash
 git clone <repo> && cd <repo>
-cargo build              # Gets all deps
-just check               # Standard entry point
+just setup               # Runs mise trust/install + cargo build
+just check               # Verify everything works
+```
+
+Or manually:
+```bash
+mise trust && mise install  # Get pinned Rust toolchain
+cargo build                 # Get dependencies
 ```
 
 **Why Boring Rust?** Agent-generated code that compiles is usually correct. Complex patterns cause agents to produce incorrect or unmaintainable code.

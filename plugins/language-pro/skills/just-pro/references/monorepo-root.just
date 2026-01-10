@@ -6,6 +6,9 @@
 # Usage: just web <recipe>   # Web frontend commands
 # Usage: just ops <recipe>   # DevOps commands
 
+# Uncomment to ensure mise-pinned tool versions are used:
+# set shell := ["mise", "exec", "--", "bash", "-c"]
+
 # === Module Imports ===
 # Package justfiles are imported as namespaced modules
 
@@ -23,8 +26,12 @@ default:
 
 # === Setup ===
 
-# Install all toolchain dependencies
-setup: (go::setup) (web::setup)
+# Install all toolchain dependencies (run once after clone)
+setup:
+    -mise trust 2>/dev/null  # Allow .mise.toml config (ignore if mise absent)
+    -mise install 2>/dev/null
+    just go::setup
+    just web::setup
     @echo "All toolchains ready"
 
 # === Quality Gates ===

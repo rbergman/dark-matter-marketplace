@@ -11,8 +11,10 @@ default:
 
 # === Setup ===
 
-# Install Go toolchain dependencies
+# Install Go toolchain dependencies (run once after clone)
 setup:
+    -mise trust 2>/dev/null  # Allow .mise.toml config (ignore if mise absent)
+    -mise install 2>/dev/null
     go mod download
     @echo "Go toolchain ready. Tools available via 'go tool <name>'"
 

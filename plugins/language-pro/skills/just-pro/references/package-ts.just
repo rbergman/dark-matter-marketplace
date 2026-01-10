@@ -11,8 +11,10 @@ default:
 
 # === Setup ===
 
-# Install Node.js dependencies
+# Install Node.js dependencies (run once after clone)
 setup:
+    -mise trust 2>/dev/null  # Allow .mise.toml config (ignore if mise absent)
+    -mise install 2>/dev/null
     npm ci
     @echo "Node.js dependencies installed"
 
