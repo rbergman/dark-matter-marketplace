@@ -24,6 +24,13 @@ Senior-level TypeScript expertise for production projects. Focuses on strict typ
 - ESLint strict-type-checked passes with project configuration
 - Table-driven tests for multiple cases
 
+**Foundational Principles:**
+- **Single Responsibility**: One module = one purpose, one function = one job
+- **No God Objects**: Split large classes/objects; if it has 10+ methods or properties, decompose
+- **Dependency Injection**: Pass dependencies via constructor/params, don't instantiate internally
+- **Small Interfaces**: Prefer many small types over few large ones; compose with intersection types
+- **Composition over Inheritance**: Use object composition and mixins, not deep class hierarchies
+
 ---
 
 ## Project Setup (TypeScript 5.5+)
@@ -175,6 +182,9 @@ project/
 - Over-complicated generic signatures
 - `!` non-null assertions instead of proper narrowing
 - Truthy/falsy checks on non-booleans
+- God classes/objects with 10+ methods or properties
+- Deep inheritance hierarchies (prefer composition)
+- Barrel files that re-export everything (causes circular deps)
 
 ---
 
