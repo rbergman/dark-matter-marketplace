@@ -5,15 +5,15 @@
   "owner": {"name": "Dark Matter", "email": "dark-matter@example.com"},
   "plugins": [
     {
-      "name": "language-pro",
-      "description": "Expert language skills: Go, Rust, TypeScript, just-pro - idiomatic patterns, type systems, and build tools",
+      "name": "dm-lang",
+      "description": "Expert language skills: Go, Rust, TypeScript, just - idiomatic patterns, type systems, and build tools",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/language-pro",
       "category": "development"
     },
     {
-      "name": "architecture",
+      "name": "dm-arch",
       "description": "Architecture patterns: SOLID principles, composition, data-oriented design, and module organization",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
@@ -21,23 +21,23 @@
       "category": "development"
     },
     {
-      "name": "game-dev",
-      "description": "Game development: design, engine programming, graphics optimization, and per-frame performance",
+      "name": "dm-game",
+      "description": "Game development: 5-component design framework and per-frame performance optimization",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/game-dev",
       "category": "development"
     },
     {
-      "name": "dm",
-      "description": "Workflow tools: spec refinement, compression, peer review, and subagent delegation",
+      "name": "dm-work",
+      "description": "Workflow tools: orchestration, spec refinement, compression, peer review, and subagent delegation",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/workflow",
       "category": "development"
     },
     {
-      "name": "drivers",
+      "name": "dm-drvr",
       "description": "AI drivers: delegate to Codex CLI or leverage Gemini's 1M token context",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
