@@ -92,6 +92,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
 | `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
 | `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
+| `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq) for when built-ins are insufficient |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
