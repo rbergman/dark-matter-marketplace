@@ -15,6 +15,18 @@ If something here is useful to you, great. If not, no worries.
 
 ---
 
+## Naming Convention
+
+All skills, agents, and commands use the `dm:` prefix (for "dark matter"):
+
+- Skills: `dm:typescript-pro`, `dm:orchestrator`, `dm:game-design`
+- Agents: `dm:codex-driver`, `dm:gemini-driver`
+- Commands: `/dm:breakdown`, `/dm:precompact`, `/dm:subagents`
+
+Plugins retain semantic directory names for organization.
+
+---
+
 ## Repository Structure
 
 ```
@@ -41,8 +53,8 @@ SOLID principles and data-oriented design patterns.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `solid-architecture` | Skill | SOLID principles, composition patterns, module organization, side-effect boundaries |
-| `data-oriented-architecture` | Skill | Registry-based dispatch, capability composition, infrastructure-first development |
+| `dm:solid-architecture` | Skill | SOLID principles, composition patterns, module organization, side-effect boundaries |
+| `dm:data-oriented-architecture` | Skill | Registry-based dispatch, capability composition, infrastructure-first development |
 
 ### dm
 
@@ -50,9 +62,9 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
-| `subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
-| `dialectical-refinement` | Skill | Transform ambiguous specs into implementable work items through adversarial refinement |
+| `dm:orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
+| `dm:subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
+| `dm:dialectical-refinement` | Skill | Transform ambiguous specs into implementable work items through adversarial refinement |
 | `/dm:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm:refine` | Command | Sharpen individual work items |
 | `/dm:compress` | Command | Compress documents for token-efficient agent consumption |
@@ -68,8 +80,8 @@ Agents for delegating work to external AI systems.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `codex-driver` | Agent | Delegate bead implementation to Codex CLI with quality gates |
-| `gemini-driver` | Agent | Leverage Gemini's 1M context for planning, research, and deep analysis |
+| `dm:codex-driver` | Agent | Delegate bead implementation to Codex CLI with quality gates |
+| `dm:gemini-driver` | Agent | Leverage Gemini's 1M context for planning, research, and deep analysis |
 
 ### game-dev
 
@@ -77,8 +89,8 @@ Game design methodology and performance optimization.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
-| `game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
+| `dm:game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
+| `dm:game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
 
 ### language-pro
 
@@ -86,10 +98,10 @@ Language-specific expertise with strict, opinionated standards.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `go-pro` | Skill | Idiomatic Go: error handling, concurrency, slog, generics, table-driven tests |
-| `rust-pro` | Skill | "Boring Rust" philosophy: clone freely, for loops over iterators, strict lints |
-| `typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
-| `just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
+| `dm:go-pro` | Skill | Idiomatic Go: error handling, concurrency, slog, generics, table-driven tests |
+| `dm:rust-pro` | Skill | "Boring Rust" philosophy: clone freely, for loops over iterators, strict lints |
+| `dm:typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
+| `dm:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
 
 ---
 
@@ -99,7 +111,7 @@ Non-installable materials for reference and sharing.
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `orchestrator` skill |
+| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm:orchestrator` skill |
 | `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
 
 ---

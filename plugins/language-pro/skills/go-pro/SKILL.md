@@ -1,5 +1,5 @@
 ---
-name: go-pro
+name: dm:go-pro
 description: Expert Go developer specializing in idiomatic patterns, concurrency, error handling, and clean package design. This skill should be used PROACTIVELY when working on any Go code - implementing features, designing APIs, debugging issues, or reviewing code quality. Use unless a more specific subagent role applies.
 ---
 

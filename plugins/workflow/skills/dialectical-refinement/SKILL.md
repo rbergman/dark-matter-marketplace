@@ -1,5 +1,5 @@
 ---
-name: dialectical-refinement
+name: dm:dialectical-refinement
 description: Transform ambiguous specs into implementable work items through adversarial refinement. This skill should be used PROACTIVELY when receiving specs, claiming epics, or starting work on complex (l/xl) tasks. Use /breakdown for spec→tasks decomposition, /refine for sharpening individual items.
 ---
 

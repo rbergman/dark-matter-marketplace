@@ -1,5 +1,5 @@
 ---
-name: gemini-driver
+name: dm:gemini-driver
 description: Use this agent to leverage Gemini's 1M token context for high-comprehension tasks like reading large beads sets, planning epics, feature inventory, codebase research, and UX analysis. This agent is the architect of the successful design-v2 spec implementation and excels at deep analysis.\n\n**Usage Patterns:**\n\n**Pattern 1: Epic Planning & Decomposition**\n- Invoke gemini-driver to expand draft epics into granular tasks
 - Uses spec-kit-lite workflow (Specification → Clarification → Planning → Decomposition → Analysis)
 - Returns complete task breakdown with beads migration commands
