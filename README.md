@@ -69,7 +69,9 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
 | `dm-work:subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
 | `dm-work:dialectical-refinement` | Skill | Transform ambiguous specs into implementable work items through adversarial refinement |
-| `dm-work:worktrees` | Skill | Git worktrees for isolated workspaces — smart directory selection and safety verification |
+| `dm-work:worktrees` | Skill | Git worktrees for isolated workspaces — bd worktree commands with beads integration |
+| `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
+| `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
