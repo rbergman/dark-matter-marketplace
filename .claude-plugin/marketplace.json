@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "language-pro",
-      "description": "Expert language skills: Go, Rust, TypeScript - idiomatic patterns, type systems, and best practices",
+      "description": "Expert language skills: Go, Rust, TypeScript, just-pro - idiomatic patterns, type systems, and build tools",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/language-pro",
@@ -30,7 +30,7 @@
     },
     {
       "name": "workflow",
-      "description": "Workflow tools: spec refinement, justfile patterns, compression, peer review, and subagent delegation",
+      "description": "Workflow tools: spec refinement, compression, peer review, and subagent delegation",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/workflow",

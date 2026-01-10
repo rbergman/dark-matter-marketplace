@@ -10,7 +10,7 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 ## When Invoked
 
 1. Review `go.mod` and `.golangci.yml` for project conventions
-2. For build system setup, invoke the **justfile** skill (covers just vs make)
+2. For build system setup, invoke the **just-pro** skill (covers just vs make)
 3. Apply Go idioms and established project patterns
 
 ## Core Standards
@@ -40,7 +40,7 @@ go get -tool golang.org/x/tools/cmd/goimports@latest
 
 # Copy linter config from this skill's references/ directory:
 #   references/golangci-v2.yml    → .golangci.yml
-# For build system, invoke justfile skill or use references/Makefile-template
+# For build system, invoke just-pro skill or use references/Makefile-template
 
 # Verify
 go tool golangci-lint run
@@ -60,7 +60,7 @@ just check         # Or: go tool golangci-lint run
 
 ## Build System
 
-**Invoke the `justfile` skill** for build system setup. It covers:
+**Invoke the `just-pro` skill** for build system setup. It covers:
 - Simple repos vs monorepos
 - Hierarchical justfile modules
 - Go-specific templates (`references/package-go.just`)
