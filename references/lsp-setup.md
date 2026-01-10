@@ -2,6 +2,10 @@
 
 Language Server Protocol integration provides Claude with code intelligence: go-to-definition, find references, diagnostics, and more.
 
+## Why You Should Care
+
+Without LSP, Claude reads files as plain text and infers types, definitions, and relationships from patterns. With LSP, Claude gets the same real-time intelligence your IDE uses: actual type information, precise symbol locations, compiler diagnostics before you run the build. This means fewer hallucinated function signatures, faster navigation through unfamiliar code, and catching type errors immediately instead of after a failed build. The difference is subtle but cumulative—LSP makes Claude meaningfully more accurate on typed codebases.
+
 ---
 
 ## Quick Status Check
