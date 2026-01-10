@@ -1,124 +1,209 @@
 ---
 name: typescript-pro
-description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. This skill should be used PROACTIVELY when working on any TypeScript code - analyzing types, implementing features, reviewing configurations, or debugging type errors. Use unless a more specific subagent role applies.
+description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. This skill should be used PROACTIVELY when working on any TypeScript code - implementing features, reviewing configurations, or debugging type errors. Use unless a more specific subagent role applies.
 ---
 
 # TypeScript Pro
 
-## Overview
-
-This skill provides senior-level TypeScript expertise for TypeScript 5.0+ projects, covering advanced type system features, full-stack type safety, and modern build tooling. It enables type-safe patterns for frontend frameworks, Node.js backends, and cross-platform development.
+Senior-level TypeScript expertise for production projects. Focuses on strict type safety, zero-any tolerance, and TypeScript's full type system capabilities.
 
 ## When Invoked
 
-1. Review tsconfig.json, package.json, and build configurations
-2. Analyze existing type patterns, test coverage, and compilation targets
-3. Implement solutions leveraging TypeScript's full type system capabilities
+1. Review `tsconfig.json` and `eslint.config.js` for project conventions
+2. For build system setup, invoke the **just-pro** skill (covers just vs make)
+3. Apply type-first development and established project patterns
 
-## Core Requirements
+## Core Standards
 
-**Non-Negotiable Standards:**
+**Non-Negotiable:**
 - Strict mode enabled with all compiler flags
-- **NO explicit `any` usage**
-- **NO type assertion abuse to circumvent proper typing**
-- 100% type coverage for public APIs
-- ESLint and Prettier configured
-- Source maps properly configured
-- Declaration files generated for libraries
+- **NO explicit or implicit `any`** - use `unknown` and narrow
+- **NO type assertions to circumvent the type system** (`as any`, `as unknown as T`)
+- **NO dangling promises** - await, return, or void explicitly
+- All exported functions have explicit return types
+- ESLint strict-type-checked passes with project configuration
+- Table-driven tests for multiple cases
 
-## Development Workflow
+---
 
-### 1. Type Architecture Analysis
+## Project Setup (TypeScript 5.5+)
 
-Before implementation, assess the type system:
-- Type coverage and safety gaps
-- Generic usage patterns and constraints
-- Union/intersection complexity
-- Build performance metrics
-- Declaration file quality
+### New Project Quick Start
 
-### 2. Implementation Phase
+```bash
+# Initialize
+npm init -y
+npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments vitest husky
 
-Apply type-driven development:
-- Start with type definitions before implementation
-- Design type-first APIs with branded types for domains
-- Use discriminated unions for state machines
-- Implement type guards and predicates
-- Leverage the compiler for correctness validation
-- Optimize for inference over explicit annotations
+# Copy configs from this skill's references/ directory:
+#   references/tsconfig.strict.json  → tsconfig.json
+#   references/eslint.config.js      → eslint.config.js
 
-### 3. Type Quality Assurance
+# Add scripts to package.json:
+npm pkg set scripts.typecheck="tsc --noEmit"
+npm pkg set scripts.lint="eslint src/"
+npm pkg set scripts.test="vitest run"
+npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
+npm pkg set scripts.prepare="husky"
 
-Verify before completion:
-- Type coverage analysis
-- Strict mode compliance
-- Build time within acceptable range
-- Bundle size verification
-- Error message clarity
-- IDE performance with types
+# Set up pre-commit hook
+npm run prepare
+echo "npm run check" > .husky/pre-commit
+chmod +x .husky/pre-commit
+
+# Verify
+npm run check
+```
+
+### Developer Onboarding
+
+```bash
+git clone <repo> && cd <repo>
+npm install              # Gets all tools automatically
+npm run check            # Or: just check
+```
+
+**Why strict configs?** Type errors caught at compile time are 10x cheaper than runtime bugs. Strict linting prevents `any` from leaking through the codebase.
+
+---
+
+## Build System
+
+**Invoke the `just-pro` skill** for build system setup. It covers:
+- Simple repos vs monorepos
+- Hierarchical justfile modules
+- TypeScript-specific templates (`references/package-ts.just`)
+
+**Alternative**: Use npm scripts directly if just is unavailable.
+
+---
+
+## Quality Assurance
+
+**Auto-Fix First** - Always try auto-fix before manual fixes:
+
+```bash
+npx eslint src/ --fix        # Fixes style, imports, etc.
+npx tsc --noEmit             # Type check without emit
+```
+
+**Verification:**
+```bash
+npm run check                # typecheck + lint + test
+```
+
+**Pre-commit Hook** (automatic if husky configured):
+- Runs `npm run check` before every commit
+- Blocks commits with type errors, lint violations, or failing tests
+
+---
+
+## Linting Configuration
+
+For new projects, copy the ESLint strict config:
+```bash
+# references/eslint.config.js → eslint.config.js
+```
+
+**Key rule categories:**
+
+| Category | Purpose |
+|----------|---------|
+| Type Safety | no-explicit-any, no-unsafe-*, no-non-null-assertion |
+| Promises | no-floating-promises, no-misused-promises, require-await |
+| Assertions | no-unsafe-type-assertion, consistent-type-assertions |
+| Complexity | complexity, max-depth, max-lines-per-function |
+| Comments | ban-ts-comment (requires @ts-expect-error with description) |
+
+---
 
 ## Quick Reference
 
-### Advanced Type Patterns
+### Type Safety Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| Conditional types | Flexible APIs that adapt based on input |
-| Mapped types | Transform existing types systematically |
-| Template literal types | String manipulation at type level |
+| Pattern | Use |
+|---------|-----|
+| `unknown` over `any` | Safe default for unknown types |
+| Type guards | Runtime narrowing with type safety |
 | Discriminated unions | State machines, tagged unions |
-| Type predicates/guards | Runtime narrowing with type safety |
 | Branded types | Domain modeling (UserId vs string) |
-| Const assertions | Literal types from values |
-| Satisfies operator | Validate types without widening |
+| `satisfies` operator | Validate without widening |
+| `as const` | Literal types from values |
+
+### Error Handling
+
+| Pattern | Use |
+|---------|-----|
+| `Result<T, E>` type | Explicit success/failure |
+| `never` exhaustive check | Catch unhandled cases |
+| Custom error classes | Typed error discrimination |
+| Zod validation | Runtime + compile-time safety |
 
 ### Type System Techniques
 
 - Generic constraints and variance
-- Recursive type definitions
-- `infer` keyword for extraction
-- Distributive conditional types
+- Conditional types with `infer`
+- Mapped types with modifiers
+- Template literal types
 - Index access types (`T[K]`)
-- Utility type creation
 
-### Error Handling Patterns
+### Project Organization
 
-- Result types (`Result<T, E>`) for explicit errors
-- `never` type for exhaustive checking
-- Custom error classes with type discrimination
-- Type-safe try-catch wrappers
-- Validation error aggregation
+```
+project/
+├── src/
+│   ├── index.ts          # Entry point / exports
+│   ├── types/            # Shared type definitions
+│   └── lib/              # Implementation
+├── tsconfig.json
+├── eslint.config.js
+├── package.json
+└── justfile
+```
 
-## Build & Tooling Checklist
+**Rules:** One module = one purpose. Use barrel exports sparingly. Avoid circular dependencies.
 
-- [ ] tsconfig.json optimized for project type
-- [ ] Project references for monorepos
-- [ ] Incremental compilation enabled
-- [ ] Path mapping configured
-- [ ] Module resolution correct for target
-- [ ] Source maps for debugging
-- [ ] Declaration bundling for libraries
-- [ ] Tree shaking optimization verified
+---
 
-## Framework-Specific Guidance
-
-**React 19+**: Use proper component typing, avoid `FC` in favor of explicit props, leverage `satisfies` for config objects.
-
-**Next.js**: Type server components, use `Metadata` types, type API routes with `NextRequest`/`NextResponse`.
-
-**Express/Fastify**: Type request handlers, use generic route parameters, type middleware chains.
-
-## Resources
-
-For detailed type patterns, code generation workflows, and integration guidance, see:
-- `references/patterns.md` - Comprehensive type pattern examples
-- `references/integration.md` - Framework and tooling integration details
-
-## Anti-Patterns to Avoid
+## Anti-Patterns
 
 - `as any` or `as unknown as T` type assertions
+- `@ts-ignore` instead of `@ts-expect-error` with reason
 - Disabling strict checks to fix errors
+- Implicit any in function parameters
+- Dangling promises without await/void
 - Over-complicated generic signatures
-- Type assertions instead of type guards
-- Ignoring inference in favor of explicit types
-- `@ts-ignore` without documented reason
+- `!` non-null assertions instead of proper narrowing
+- Truthy/falsy checks on non-booleans
+
+---
+
+## Framework-Specific
+
+**React 19+**: Explicit props typing (avoid `FC`), use `satisfies` for configs.
+
+**Next.js**: Type server components, use `Metadata` types, type API routes.
+
+**Express/Fastify**: Type request handlers, use generic route parameters.
+
+See `references/integration.md` for detailed framework patterns.
+
+---
+
+## AI Agent Guidelines
+
+**Before writing code:**
+1. Read `tsconfig.json` for compiler options and strict settings
+2. Check `eslint.config.js` for project-specific lint rules
+3. Identify existing type patterns in the codebase to follow
+
+**When writing code:**
+1. Start with type definitions before implementation
+2. Use `unknown` and narrow with type guards - never `any`
+3. Handle all promise returns explicitly
+4. Add explicit return types to exported functions
+
+**Before committing:**
+1. Check for `just check` or `npm run check` and use those (project-specific)
+2. Fallback: `npx eslint src/ --fix && npx tsc --noEmit`
+3. Fallback: `npm test` to catch regressions

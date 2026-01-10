@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // --- Type Checking: Maximum Strictness ---
+    "strict": true,                           // Enable all strict checks
+    "noUncheckedIndexedAccess": true,         // Require undefined checks on index access
+    "exactOptionalPropertyTypes": true,       // Distinguish undefined from optional
+    "noImplicitReturns": true,                // All code paths must return
+    "noFallthroughCasesInSwitch": true,       // Require break/return in switch
+    "noImplicitOverride": true,               // Require override keyword
+    "noPropertyAccessFromIndexSignature": true, // Require bracket notation for index sigs
+    "allowUnreachableCode": false,            // Error on unreachable code
+    "allowUnusedLabels": false,               // Error on unused labels
+
+    // --- Module Resolution ---
+    "module": "NodeNext",                     // Node.js ESM resolution
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,                  // Required for esbuild/swc
+
+    // --- Emit ---
+    "target": "ES2022",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+
+    // --- Performance ---
+    "incremental": true,
+    "skipLibCheck": true,                     // Skip .d.ts checking for speed
+
+    // --- Quality ---
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true              // Enforce type-only imports/exports
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.spec.ts"]
+}

@@ -147,19 +147,6 @@ generates:
       - typescript-react-apollo
 ```
 
-### Database Schema Types (Prisma)
-```typescript
-// Prisma generates types automatically
-import { User, Post } from '@prisma/client';
-
-// Type-safe queries
-const user = await prisma.user.findUnique({
-  where: { id: userId },
-  include: { posts: true }
-});
-// user is typed as User & { posts: Post[] }
-```
-
 ## JavaScript Interop
 
 ### Third-Party Types
