@@ -1,0 +1,140 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BORING RUST: Rustfmt Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Optimized for:
+# - Readable diffs (agent-generated code changes frequently)
+# - Consistent tokenization (LLMs see consistent patterns)  
+# - Vertical clarity (easier to reason about line-by-line)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+edition = "2024"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# LINE WIDTH & WRAPPING
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Match clippy.toml line length
+max_width = 120
+
+# When to wrap function arguments
+fn_call_width = 80            # Wrap calls wider than this
+fn_params_layout = "Tall"     # One argument per line when wrapped
+
+# When to wrap struct literals  
+struct_lit_width = 40         # Wrap struct literals wider than this
+
+# When to wrap array literals
+array_width = 60
+
+# When to wrap chain calls
+chain_width = 80              # .method().method() chains
+
+# Single-line where clauses
+single_line_where_clause_threshold = 0  # Always multi-line where clauses
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# IMPORTS
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Group imports: std, external, crate
+imports_granularity = "Module"  # use foo::{bar, baz} not individual lines
+group_imports = "StdExternalCrate"
+imports_layout = "HorizontalVertical"
+
+# Reorder imports alphabetically
+reorder_imports = true
+reorder_modules = true
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# FORMATTING CHOICES
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Use block indent (not visual indent) for cleaner diffs
+indent_style = "Block"
+
+# Tabs vs spaces
+hard_tabs = false
+tab_spaces = 4
+
+# Newline style (native = OS default, Unix = LF, Windows = CRLF)
+newline_style = "Unix"
+
+# Trailing commas help with diffs
+trailing_comma = "Vertical"   # Add trailing comma when items are on separate lines
+trailing_semicolon = true     # Keep trailing semicolons in blocks
+match_arm_trailing_comma = true
+
+# Brace positions
+brace_style = "SameLineWhere" # Opening brace on same line, but where clause gets its own line
+control_brace_style = "AlwaysSameLine"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# ALIGNMENT (Disabled - causes noisy diffs)
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Don't align struct field assignments
+# let foo = Struct {
+#     short:       1,  // BAD - aligned
+#     much_longer: 2,
+# };
+# let foo = Struct {
+#     short: 1,        // GOOD - not aligned  
+#     much_longer: 2,
+# };
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# COMMENTS & DOCUMENTATION
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Wrap comments at max_width
+wrap_comments = true
+comment_width = 100           # Slightly shorter than code for readability
+
+# Format doc comments
+format_code_in_doc_comments = true
+doc_comment_code_block_width = 80
+
+# Normalize doc comments to ///
+normalize_doc_attributes = true
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# MACRO FORMATTING
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Format macro bodies
+format_macro_matchers = true
+format_macro_bodies = true
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# MISC
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Use field init shorthand: Foo { bar } not Foo { bar: bar }
+use_field_init_shorthand = true
+
+# Use try shorthand: ? not try!
+use_try_shorthand = true
+
+# Force multiline closures for readability
+fn_single_line = false        # Never put fn body on single line
+where_single_line = false     # Never put where clause on single line
+
+# Empty function bodies
+empty_item_single_line = true # fn foo() {} is fine
+
+# Hex literal case
+hex_literal_case = "Lower"    # 0xff not 0xFF
+
+# Overflow behavior
+overflow_delimited_expr = true
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# UNSTABLE FEATURES (require nightly rustfmt)
+# ─────────────────────────────────────────────────────────────────────────────────
+# Uncomment these if using nightly rustfmt
+
+# version = "Two"              # Use rustfmt 2.0 style
+# format_strings = true        # Format string literals
+# imports_indent = "Block"     # Block indent for imports
+# imports_layout = "Vertical"  # One import per line

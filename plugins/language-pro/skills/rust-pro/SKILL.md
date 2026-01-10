@@ -5,209 +5,382 @@ description: Expert Rust developer specializing in ownership semantics, zero-cos
 
 # Rust Pro
 
-## Overview
-
-This skill provides senior-level Rust expertise for production Rust projects, covering ownership and borrowing, idiomatic patterns, performance optimization, and strict code quality standards. It enables safe, performant systems programming with a focus on zero-cost abstractions and compiler-driven correctness.
+Senior-level Rust expertise following "Boring Rust" principles. Correctness over cleverness. One way to do things. Local reasoning.
 
 ## When Invoked
 
-1. Review Cargo.toml, clippy.toml, and rustfmt.toml configurations
-2. Analyze existing patterns, module organization, and compilation targets
-3. Implement solutions leveraging Rust's ownership system and type safety
+1. Review `Cargo.toml`, `clippy.toml`, and `rustfmt.toml` for project conventions
+2. For build system setup, invoke the **just-pro** skill (covers just vs make)
+3. Apply Boring Rust patterns and established project conventions
 
-## Core Requirements
+## Core Standards
 
-**Non-Negotiable Standards:**
-- All warnings treated as errors (`#![deny(warnings)]`)
-- Clippy pedantic lints enabled project-wide
-- **NO `unwrap()` or `expect()` in production code** - use `?` or explicit error handling
-- **NO `unsafe` without documented safety invariants and justification**
-- Zero `#[allow(...)]` without inline justification comment
+**Non-Negotiable:**
+- All clippy warnings treated as errors
+- **NO `unwrap()` or `expect()` in production code** — use `.context("...")?`
+- **NO `unsafe` without `#[human_authored]` designation**
+- **NO panic paths** — indexing, unreachable, todo, unimplemented all banned
+- Exhaustive match — no wildcard `_` on enums you control
 - rustfmt enforced on all code
 - Documentation on all public APIs
-- Tests for all non-trivial logic
 
-## Development Workflow
+**Foundational Principles:**
+- **Single Responsibility**: One module = one purpose, one function = one job
+- **No God Objects**: Split large structs; if it has 10+ fields or methods, decompose
+- **Dependency Injection**: Pass dependencies, don't create them internally
+- **Clone Freely**: Prefer correctness over premature optimization; clone to satisfy borrow checker
+- **Explicit Over Clever**: If you need complex lifetimes, restructure instead
 
-### 1. Ownership & Borrowing Analysis
+---
 
-Before implementation, assess the data flow:
-- Ownership transfer vs borrowing needs
-- Lifetime requirements and annotations
-- Interior mutability patterns (Cell, RefCell, Mutex)
-- Reference counting needs (Rc, Arc)
-- Clone costs and when to accept them
+## The Three Tiers
 
-### 2. Implementation Phase
+### Tier 1: Default (Strict)
 
-Apply Rust-first development:
-- Start with types and traits before implementation
-- Design with composition over inheritance (no inheritance in Rust anyway)
-- Use enums + match for exhaustive state handling
-- Leverage the compiler for correctness - if it compiles, it should work
-- Prefer iterators over manual loops
-- Use type state pattern for compile-time state machines
-- Minimize allocations where performance matters
+All agent-generated code. Maximum guardrails.
 
-### 3. Quality Assurance
+```rust
+// Complexity limits enforced:
+// - Cognitive complexity: 15 max
+// - Function lines: 50 max
+// - Arguments: 5 max
 
-Verify before completion:
-- `cargo clippy --all-targets --all-features -- -D warnings`
-- `cargo fmt --check`
-- `cargo test`
-- `cargo doc --no-deps` (ensure docs build)
-- No compiler warnings
-- Profile for hot paths if performance-critical
+// Error handling: Always with context
+let config = load_config(path)
+    .context("failed to load configuration")?;
+
+// Iteration: for loops by default (not iterator chains)
+for item in collection {
+    process(item)?;
+}
+
+// Matching: Exhaustive, no wildcards
+match state {
+    State::Active => handle_active()?,
+    State::Pending => handle_pending()?,
+    State::Done => handle_done()?,
+    // NO: _ => unreachable!()
+}
+```
+
+### Tier 2: `#[hot_path]` (Relaxed)
+
+Performance-critical code. Flagged for human review.
+
+```rust
+#[hot_path]
+pub fn process_batch(records: &[Record]) -> Result<Summary, Error> {
+    // Allowed: iterators, borrowing, fewer clones
+    records.iter()
+        .filter(|r| r.is_valid())
+        .try_fold(Summary::default(), |mut acc, r| {
+            acc.add(r)?;
+            Ok(acc)
+        })
+}
+```
+
+**Relaxations:** Cognitive complexity 20, function lines 75, iterator chains allowed.
+
+### Tier 3: `#[human_authored]` (Unrestricted)
+
+Agent cannot modify, only call. For unsafe, SIMD, complex generics.
+
+```rust
+#[human_authored]
+pub fn simd_normalize(vectors: &mut [f32x8]) {
+    // Agent treats as black box
+}
+```
+
+---
+
+## Project Setup (Rust 1.83+)
+
+### New Project Quick Start
+
+```bash
+# Initialize
+cargo new project-name && cd project-name
+
+# Copy configs from this skill's references/ directory:
+#   references/clippy.toml      → clippy.toml
+#   references/cargo_lints.toml → merge into Cargo.toml [lints] section
+#   references/rustfmt.toml     → rustfmt.toml
+
+# For build system, invoke just-pro skill
+
+# Verify
+just check   # Or: cargo clippy && cargo test
+```
+
+### Developer Onboarding
+
+```bash
+git clone <repo> && cd <repo>
+cargo build              # Gets all deps
+just check               # Standard entry point
+```
+
+**Why Boring Rust?** Agent-generated code that compiles is usually correct. Complex patterns cause agents to produce incorrect or unmaintainable code.
+
+---
+
+## Build System
+
+**Invoke the `just-pro` skill** for build system setup. It covers:
+- Simple repos vs monorepos
+- Hierarchical justfile modules
+- Rust-specific templates
+
+**Why just?** Consistent toolchain frontend between agents and humans.
+
+---
+
+## Quality Assurance
+
+**Auto-Fix First:**
+
+```bash
+just fix             # Or: cargo clippy --fix && cargo fmt
+```
+
+**Verification:**
+```bash
+just check           # Or: cargo clippy -- -D warnings && cargo test
+```
+
+---
 
 ## Quick Reference
 
-### Ownership Patterns
-
-| Pattern | Use Case |
-|---------|----------|
-| Move semantics | Transfer ownership, prevent use-after-move |
-| Borrowing (`&T`, `&mut T`) | Temporary access without ownership |
-| `Cow<T>` | Clone-on-write for conditional ownership |
-| `Box<T>` | Heap allocation, recursive types |
-| `Rc<T>` / `Arc<T>` | Shared ownership (single/multi-threaded) |
-| `Cell<T>` / `RefCell<T>` | Interior mutability (single-threaded) |
-| `Mutex<T>` / `RwLock<T>` | Interior mutability (multi-threaded) |
-
-### Error Handling Patterns
-
-- `Result<T, E>` for recoverable errors - propagate with `?`
-- Custom error types implementing `std::error::Error`
-- `thiserror` crate for derive-based error types
-- `anyhow` for application-level error handling
-- Never panic in library code - return `Result`
-- Use `#[must_use]` on functions returning important values
-
-### Idiomatic Patterns
-
-| Pattern | Description |
-|---------|-------------|
-| Builder pattern | Complex construction with fluent API |
-| Newtype pattern | Type safety via wrapper structs |
-| Type state pattern | Compile-time state machine enforcement |
-| RAII | Resource management via Drop trait |
-| Deref coercion | Smart pointer ergonomics |
-| From/Into traits | Type conversion ergonomics |
-| Iterator chains | Functional data transformation |
-| Match exhaustiveness | Compiler-enforced case handling |
-
-### Trait Design
-
-- Small, focused traits (Interface Segregation)
-- Blanket implementations where appropriate
-- Associated types vs generics (choose based on "one impl per type")
-- Default implementations for convenience
-- Marker traits for compile-time properties
-- Extension traits for adding methods to foreign types
-
-## Project Configuration
-
-### Cargo.toml Lints Section
-
-```toml
-[lints.rust]
-unsafe_code = "deny"
-missing_docs = "warn"
-
-[lints.clippy]
-all = "deny"
-pedantic = "warn"
-nursery = "warn"
-unwrap_used = "deny"
-expect_used = "deny"
-panic = "deny"
-```
-
-### clippy.toml
-
-```toml
-cognitive-complexity-threshold = 15
-too-many-arguments-threshold = 5
-type-complexity-threshold = 250
-```
-
-### Source File Header (lib.rs/main.rs)
+### Error Handling
 
 ```rust
-#![deny(warnings)]
-#![deny(clippy::all)]
-#![warn(clippy::pedantic)]
-#![warn(clippy::nursery)]
-#![deny(clippy::unwrap_used)]
-#![deny(clippy::expect_used)]
-// Allow specific pedantic lints with justification
-#![allow(clippy::module_name_repetitions)] // Common in domain modeling
+// Libraries: thiserror for typed errors
+#[derive(Debug, thiserror::Error)]
+pub enum ConfigError {
+    #[error("missing field: {field}")]
+    MissingField { field: &'static str },
+
+    #[error("failed to read file")]
+    Io(#[from] std::io::Error),
+}
+
+// Applications: anyhow with context
+pub fn load_config(path: &Path) -> anyhow::Result<Config> {
+    let content = fs::read_to_string(path)
+        .context("failed to read config file")?;
+
+    toml::from_str(&content)
+        .context("failed to parse config")
+}
+
+// Option handling: explicit, never silent
+let user = users.get(&id)
+    .ok_or_else(|| Error::NotFound { id: id.clone() })?;
 ```
 
-## Performance Patterns
+### State Machines
 
-### Zero-Cost Abstractions
-- Iterators compile to loops
-- Traits monomorphize at compile time
-- Generics create specialized code
-- Inline hints for hot paths (`#[inline]`)
+```rust
+pub enum ConnectionState {
+    Disconnected,
+    Connecting { attempt: u32, started: Instant },
+    Connected { session: Session },
+}
 
-### Allocation Awareness
-- Prefer stack allocation for small, fixed-size data
-- Use `SmallVec` for usually-small collections
-- Pool allocations for frequently created/destroyed objects
-- Avoid `clone()` in hot paths - use references
-- Pre-allocate with `Vec::with_capacity`
+impl ConnectionState {
+    pub fn connect(&mut self) -> Result<(), Error> {
+        match self {
+            Self::Disconnected => {
+                *self = Self::Connecting {
+                    attempt: 1,
+                    started: Instant::now(),
+                };
+                Ok(())
+            }
+            Self::Connecting { .. } => Err(Error::AlreadyConnecting),
+            Self::Connected { .. } => Err(Error::AlreadyConnected),
+        }
+    }
+}
+```
 
-### Concurrency
-- Prefer message passing (channels) over shared state
-- Use `rayon` for data parallelism
-- `Send` and `Sync` for thread safety guarantees
-- Atomic types for lock-free data structures
-- Scope threads with `std::thread::scope` or `crossbeam`
+### Builder Pattern (bon crate)
 
-## Anti-Patterns to Avoid
+```rust
+use bon::Builder;
 
-- `unwrap()` / `expect()` in production code
-- `unsafe` without documented invariants
-- `clone()` to satisfy borrow checker without understanding why
-- Fighting the borrow checker - redesign data flow instead
-- Over-generic code that hurts compile times
-- Deep trait hierarchies mimicking OOP inheritance
-- Stringly-typed APIs - use enums and newtypes
-- `#[allow(...)]` without justification comment
-- Ignoring clippy suggestions without understanding them
+#[derive(Debug, Builder)]
+pub struct ServerConfig {
+    #[builder(default = 8080)]
+    port: u16,
+    host: String,  // Required
+    #[builder(default)]
+    timeout: Option<Duration>,
+}
 
-## Bevy-Specific (Game Development)
+let config = ServerConfig::builder()
+    .host("localhost".to_string())
+    .build();
+```
 
-When working with Bevy ECS:
-- Components are data, Systems are behavior
-- Use `Query<&T>` for read, `Query<&mut T>` for write
-- Prefer `Commands` for entity/component changes over direct World access
-- Use `Res<T>` for shared resources, `ResMut<T>` for mutable
-- Events for decoupled system communication
-- Use `#[derive(Component)]`, `#[derive(Resource)]` macros
-- Leverage Bevy's change detection (`Changed<T>`, `Added<T>`)
-- Organize systems into plugins for modularity
+### Newtype Pattern
 
-## AI Agent Collaboration Guidelines
+```rust
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UserId(String);
 
-When working with AI coding assistants on Rust code:
+impl UserId {
+    pub fn new(raw: impl Into<String>) -> Result<Self, ValidationError> {
+        let s = raw.into();
+        if s.is_empty() {
+            return Err(ValidationError::Empty("user_id"));
+        }
+        Ok(Self(s))
+    }
 
-**Prompting Best Practices:**
-- Provide explicit constraints: "Use `?` for error propagation, no `unwrap()`"
-- Share relevant type signatures and trait bounds
-- Explain ownership requirements: "This needs to own the data" vs "borrow is fine"
-- Iterate on borrow checker issues: "Here's the error, propose a minimal fix"
+    pub fn as_str(&self) -> &str { &self.0 }
+}
+```
 
-**Quality Gates for AI-Generated Code:**
-- Run `cargo clippy` before accepting suggestions
-- Verify ownership model makes sense for the use case
-- Check for unnecessary `clone()` calls
-- Ensure error handling follows project patterns
-- Validate that tests cover the new code
+### Async (Blessed Subset)
 
-## Resources
+```rust
+// GOOD: Owned data in, owned data out
+pub async fn fetch_user(client: &Client, id: UserId) -> Result<User, Error> {
+    let response = client
+        .get(format!("/users/{}", id.as_str()))
+        .send()
+        .await
+        .context("request failed")?;
 
-For detailed patterns and examples, see:
-- `references/patterns.md` - Comprehensive Rust patterns
-- `references/bevy.md` - Bevy ECS patterns (if working on games)
+    response.json::<User>().await
+        .context("failed to parse response")
+}
+
+// GOOD: Structured concurrency
+pub async fn fetch_all(client: &Client, ids: Vec<UserId>) -> Result<Vec<User>, Error> {
+    futures::future::try_join_all(
+        ids.into_iter().map(|id| fetch_user(client, id))
+    ).await
+}
+
+// BANNED: Complex lifetime bounds in async
+async fn bad<'a>(data: &'a [u8]) -> &'a str { ... }
+
+// BANNED: select!, manual Poll
+```
+
+### Test File Separation
+
+```rust
+// src/parser.rs - production code only, keeps file small
+#[cfg(test)]
+#[path = "parser_tests.rs"]
+mod tests;
+
+// src/parser_tests.rs - can have test relaxations
+#![allow(clippy::unwrap_used, clippy::expect_used)]
+use super::*;
+
+#[test]
+fn test_parser() {
+    let result = parse("input").unwrap();
+    assert_eq!(result, expected);
+}
+```
+
+### Project Organization
+
+```
+project/
+├── src/
+│   ├── lib.rs            # Crate root
+│   ├── error.rs          # Error types
+│   ├── config.rs         # Production code
+│   ├── config_tests.rs   # Tests (if config.rs > 200 lines)
+│   └── external/         # Wrappers around external crates
+├── Cargo.toml
+├── clippy.toml
+├── rustfmt.toml
+└── justfile
+```
+
+**File size targets:** Production < 300 LOC, Tests < 500 LOC.
+
+---
+
+## Banned Patterns
+
+| Banned | Why | Alternative |
+|--------|-----|-------------|
+| `.unwrap()` | Panics | `.context("...")?` |
+| `.expect("msg")` | Panics | `.context("msg")?` |
+| `array[i]` | Panics | `.get(i).ok_or(Error::Index)?` |
+| `unsafe { }` | Correctness | `#[human_authored]` module |
+| `impl Trait` in params | Hides types | `<T: Trait>` explicit |
+| `macro_rules!` | Complexity | Functions or generics |
+| `RefCell<T>` | Runtime borrow | Restructure with `&mut` |
+| Complex lifetimes | Agent confusion | Clone or restructure |
+| `select!` | Cancellation bugs | Structured concurrency |
+| Wildcard `_` match | Silent failures | Explicit variants |
+| Iterator chains (Tier 1) | Harder to debug | `for` loops |
+
+---
+
+## Anti-Patterns
+
+- `clone()` to silence borrow checker without understanding why
+- Fighting the borrow checker — redesign data flow instead
+- Deep trait hierarchies mimicking OOP
+- Over-generic code hurting compile times
+- `#[allow(...)]` without `// JUSTIFICATION:` comment
+- Stringly-typed APIs — use enums and newtypes
+- Interior mutability (`RefCell`, `Cell`) in agent code
+
+---
+
+## Blessed Crates
+
+| Category | Crate | Notes |
+|----------|-------|-------|
+| Errors (lib) | `thiserror` | Derive-based |
+| Errors (app) | `anyhow` | With `.context()` |
+| Builder | `bon` | Derive-based |
+| Serialization | `serde` | Standard |
+| Async runtime | `tokio` | Blessed subset only |
+| HTTP client | `reqwest` | High-level |
+| Logging | `tracing` | Structured |
+| CLI | `clap` | Derive mode |
+
+---
+
+## AI Agent Guidelines
+
+**Before writing code:**
+1. Read `Cargo.toml` for dependencies and lint configuration
+2. Check `clippy.toml` for complexity thresholds
+3. Identify existing patterns in the codebase to follow
+
+**When writing code:**
+1. Handle all errors with `.context("what you were doing")?`
+2. Use `for` loops, not iterator chains (unless `#[hot_path]`)
+3. Clone freely to satisfy borrow checker — optimize later
+4. Match exhaustively — no wildcard `_` on your own enums
+
+**Before committing:**
+1. Run `just check` (standard for projects using just)
+2. Fallback: `cargo clippy -- -D warnings && cargo test`
+3. Ensure no `#[allow]` without justification comment
+
+---
+
+## References
+
+- `references/clippy.toml` — Boring Rust clippy configuration
+- `references/cargo_lints.toml` — Cargo.toml [lints] section
+- `references/rustfmt.toml` — Formatting rules
+- `references/patterns.md` — Additional Rust patterns
+- `references/bevy.md` — Bevy ECS patterns (game development)

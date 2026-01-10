@@ -1,0 +1,125 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BORING RUST: Clippy Configuration for Agent-Friendly Development
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Philosophy: Correctness over cleverness. One way to do things. Local reasoning.
+#
+# This config enforces strict complexity limits, explicit error handling, and
+# bans patterns that cause agents to produce incorrect or unmaintainable code.
+#
+# Tiers:
+#   - Default code: Strict rules, agent-generated
+#   - #[hot_path]: Relaxed complexity, flagged for review
+#   - #[human_authored]: Skipped entirely (agent cannot modify)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# COMPLEXITY CEILINGS (Do not increase - these are maximums, not targets)
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Cognitive complexity: measures how difficult code is to understand
+# 15 is strict but achievable; anything higher indicates need for decomposition
+cognitive-complexity-threshold = 15
+
+# Function length: Rust is more verbose than Go, allow slightly more
+# 50 lines is ~equivalent to Go's 40 statements given Rust's syntax
+too-many-lines-threshold = 50
+
+# Arguments: more than 5 parameters = use a config struct
+too-many-arguments-threshold = 5
+
+# Struct fields: large structs should be decomposed
+# (Not directly configurable in clippy, enforced via code review)
+
+# Type complexity: deeply nested generics are unreadable
+type-complexity-threshold = 250
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# NAMING & STYLE
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Single-char names only for these well-known patterns
+single-char-binding-names-threshold = 4
+allowed-idents-below-min-chars = [
+    "i", "j", "k", "n",     # loop indices, counts
+    "x", "y", "z",          # coordinates
+    "w", "h",               # width, height
+    "r", "g", "b", "a",     # color channels
+    "t",                    # time, or test in test contexts
+    "s",                    # string slice in simple contexts
+    "f",                    # file, or function in higher-order contexts
+    "e",                    # error in catch contexts
+    "_",                    # explicitly ignored
+]
+
+# Minimum identifier length (prevents lazy naming)
+min-ident-chars-threshold = 3
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# ERROR HANDLING
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# These are configured via allow/warn/deny in lib.rs, not here
+# See the lib.rs template below for:
+# - unwrap_used (deny outside tests)
+# - expect_used (deny outside tests)
+# - panic (deny)
+# - unwrap_in_result (deny)
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# LINE LENGTH
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# 120 is reasonable for modern displays while keeping diffs readable
+# Slightly shorter than Go's 140 because Rust benefits from more vertical space
+single-line-string-threshold = 120
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# DOCUMENTATION
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Public items must be documented (enforced in lib.rs via #![warn(missing_docs)])
+# Private items: optional but encouraged for complex logic
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# MSRV (Minimum Supported Rust Version)
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Set to current stable to allow modern idioms
+# Update this when you update your toolchain
+msrv = "1.83.0"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# MACRO & DERIVE CONFIGURATION
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Standard derive macros are always allowed
+# Custom derives must be from blessed crates (see documentation)
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# ASYNC CONFIGURATION
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Future size limit before boxing is recommended
+# Large futures on the stack cause performance issues
+future-size-threshold = 16384
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# ADDITIONAL THRESHOLDS
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Maximum enum variants before considering alternative designs
+enum-variant-name-threshold = 3
+enum-variant-size-threshold = 200
+
+# Trivial copy size (types this size or smaller should impl Copy if possible)
+trivial-copy-size-limit = 16
+
+# Pass by value threshold (larger = always pass by reference)
+pass-by-value-size-limit = 256
+
+# Vector initialization: suggest with_capacity if allocating more than this
+vec-box-size-threshold = 4096
+
+# Literal suffixes: require explicit type suffixes on ambiguous literals
+literal-representation-threshold = 16384

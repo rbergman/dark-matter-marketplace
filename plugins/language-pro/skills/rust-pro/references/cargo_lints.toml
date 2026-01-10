@@ -1,0 +1,163 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BORING RUST: Cargo.toml [lints] Section
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Add this to your Cargo.toml. This is an alternative to putting lint attributes
+# in lib.rs - it's cleaner for workspaces and easier to audit.
+#
+# For workspaces, put this in the root Cargo.toml under [workspace.lints],
+# then add `[lints] workspace = true` to each member's Cargo.toml.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+[lints.rust]
+# ─────────────────────────────────────────────────────────────────────────────────
+# SAFETY & CORRECTNESS
+# ─────────────────────────────────────────────────────────────────────────────────
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+unused_results = "deny"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# FUTURE COMPATIBILITY
+# ─────────────────────────────────────────────────────────────────────────────────
+future_incompatible = { level = "deny", priority = -1 }
+rust_2024_compatibility = { level = "warn", priority = -1 }
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# DOCUMENTATION & DEBUG IMPLS
+# ─────────────────────────────────────────────────────────────────────────────────
+missing_docs = "warn"
+missing_debug_implementations = "deny"
+missing_copy_implementations = "warn"
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# STYLE & MAINTENANCE
+# ─────────────────────────────────────────────────────────────────────────────────
+elided_lifetimes_in_paths = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+unreachable_pub = "warn"
+
+[lints.clippy]
+# ─────────────────────────────────────────────────────────────────────────────────
+# LINT GROUPS (priority -1 means individual settings override these)
+# ─────────────────────────────────────────────────────────────────────────────────
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DENY: Hard errors - these patterns are forbidden
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# --- Panic Prevention (The core of Boring Rust) ---
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+panic_in_result_fn = "deny"
+unwrap_in_result = "deny"
+indexing_slicing = "deny"
+unreachable = "deny"
+todo = "deny"
+unimplemented = "deny"
+
+# --- Error Handling ---
+map_err_ignore = "deny"
+try_err = "deny"
+let_underscore_must_use = "deny"
+let_underscore_future = "deny"
+let_underscore_lock = "deny"
+
+# --- Match Exhaustiveness ---
+wildcard_enum_match_arm = "deny"
+match_wildcard_for_single_variants = "deny"
+rest_pat_in_fully_bound_structs = "deny"
+
+# --- Type Safety ---
+as_conversions = "deny"
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_precision_loss = "deny"
+cast_sign_loss = "deny"
+fn_to_numeric_cast_any = "deny"
+ptr_as_ptr = "deny"
+lossy_float_literal = "deny"
+
+# --- Complexity ---
+cognitive_complexity = "deny"
+too_many_lines = "deny"
+too_many_arguments = "deny"
+
+# --- Async ---
+future_not_send = "deny"
+large_futures = "deny"
+
+# --- Debug Code ---
+dbg_macro = "deny"
+print_stdout = "deny"
+print_stderr = "deny"
+use_debug = "deny"
+
+# --- Clarity ---
+implicit_clone = "deny"
+implicit_hasher = "deny"
+default_numeric_fallback = "deny"
+shadow_unrelated = "deny"
+string_slice = "deny"
+mixed_read_write_in_expression = "deny"
+
+# --- Banned Patterns ---
+impl_trait_in_params = "deny"
+wildcard_imports = "deny"
+same_name_method = "deny"
+multiple_inherent_impl = "deny"
+exit = "deny"
+mem_forget = "deny"
+rc_buffer = "deny"
+rc_mutex = "deny"
+mutex_atomic = "deny"
+clone_on_ref_ptr = "deny"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WARN: Should fix, but don't block iteration
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# --- Performance ---
+inefficient_to_string = "warn"
+trivially_copy_pass_by_ref = "warn"
+unnecessary_box_returns = "warn"
+vec_init_then_push = "warn"
+manual_string_new = "warn"
+
+# --- Style ---
+semicolon_if_nothing_returned = "warn"
+separated_literal_suffix = "warn"
+unseparated_literal_suffix = "warn"
+string_add = "warn"
+string_add_assign = "warn"
+verbose_file_reads = "warn"
+
+# --- Naming ---
+module_name_repetitions = "warn"
+similar_names = "warn"
+
+# --- Documentation ---
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+missing_safety_doc = "warn"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ALLOW: Explicitly permitted (pedantic/nursery overrides)
+# ═══════════════════════════════════════════════════════════════════════════════
+module_inception = "allow"
+must_use_candidate = "allow"
+return_self_not_must_use = "allow"
+missing_const_for_fn = "allow"
+redundant_pub_crate = "allow"
+significant_drop_tightening = "allow"
+option_if_let_else = "allow"
+significant_drop_in_scrutinee = "allow"
+multiple_crate_versions = "allow"
