@@ -1,6 +1,6 @@
 {
   "name": "dm-lang",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Expert language skills: Go, Rust, TypeScript, just-pro - idiomatic patterns, type systems, and build tools",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

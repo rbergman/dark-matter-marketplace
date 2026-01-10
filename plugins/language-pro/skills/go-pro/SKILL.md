@@ -10,7 +10,7 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 ## When Invoked
 
 1. Review `go.mod` and `.golangci.yml` for project conventions
-2. For build system setup, invoke the **just-pro** skill (covers just vs make)
+2. For build system setup, invoke the **just-pro** skill
 3. Apply Go idioms and established project patterns
 
 ## Core Standards

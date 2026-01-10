@@ -36,8 +36,6 @@ cargo install just
 | CI/CD porcelain | **just** - Single entry point for all operations |
 | Simple scripts | **just** - Better than shell scripts |
 
-**just vs make**: Prefer just. Simpler syntax, better errors, no tabs-vs-spaces issues.
-
 ## Project Patterns
 
 ### Simple Repo (Single Package)
