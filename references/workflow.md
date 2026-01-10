@@ -22,6 +22,23 @@ cargo install beads
 bd init
 ```
 
+### MCPs: Stay Lean
+
+I keep MCP usage minimal to preserve context. My always-on MCPs:
+
+| MCP | Purpose |
+|-----|---------|
+| **Context7** | Up-to-date library documentation. Invaluable when working with frameworks — Claude queries current docs instead of relying on training data that may be outdated. |
+| **Bright Data** | Web scraping and search. Unlocks any webpage even with bot detection/CAPTCHA. Useful for research, fetching current information, and accessing paywalled docs. |
+
+**On-demand MCPs:**
+
+| MCP | Purpose | Why not always-on |
+|-----|---------|-------------------|
+| **Chrome DevTools** | Browser automation, debugging, DOM inspection | Heavy context usage — enable only when actively debugging frontend issues |
+
+There's currently no way to enable an MCP only for a subagent or skill, so context-heavy MCPs need manual enable/disable.
+
 ---
 
 ## The Development Loop

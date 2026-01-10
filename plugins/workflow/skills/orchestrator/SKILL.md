@@ -43,6 +43,36 @@ Delegate to subagents if ANY apply:
 
 ---
 
+## Proactive Skill Selection
+
+Before launching a subagent, **proactively determine all applicable skills**. Don't rely on subagents to discover them — tell them explicitly.
+
+**Evaluate the task against:**
+
+| Domain | Skills |
+|--------|--------|
+| TypeScript code | `typescript-pro` |
+| Go code | `go-pro` |
+| Rust code | `rust-pro` |
+| Build systems | `just-pro` |
+| Architecture decisions | `solid-architecture`, `data-oriented-architecture` |
+| Game mechanics | `game-design` |
+| Game hot paths (JS/TS) | `game-perf` |
+| Spec refinement | `dialectical-refinement` |
+
+**Rules:**
+- Include ALL skills that apply — more is better than fewer
+- Language skills (`typescript-pro`, etc.) should almost always be included for code tasks
+- Architecture skills apply to any structural decisions
+- Subagents activate skills at start, so missing skills means suboptimal work
+
+**Example:** A task to "implement a new TypeScript service with caching" should include:
+- `typescript-pro` (language)
+- `solid-architecture` (service design)
+- Possibly `data-oriented-architecture` (if polymorphic entities involved)
+
+---
+
 ## Subagent Launch Template
 
 When delegating, include:
