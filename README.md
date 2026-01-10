@@ -43,7 +43,9 @@ dark-matter-marketplace/
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
 │   ├── CLAUDE.md      # Global Claude instructions
-│   └── workflow.md    # Human guide to the dev loop
+│   ├── workflow.md    # Human guide to the dev loop
+│   ├── official-plugins.md  # Official Anthropic plugins guide
+│   └── lsp-setup.md   # LSP configuration and troubleshooting
 └── README.md
 ```
 
@@ -72,6 +74,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:worktrees` | Skill | Git worktrees for isolated workspaces — bd worktree commands with beads integration |
 | `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
 | `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
+| `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
@@ -120,6 +123,8 @@ Non-installable materials for reference and sharing.
 |------|---------|
 | `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm-work:orchestrator` skill |
 | `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
+| `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
+| `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 
 ---
 
