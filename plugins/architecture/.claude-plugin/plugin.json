@@ -1,6 +1,6 @@
 {
   "name": "dm-arch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Architecture patterns: SOLID principles, composition, data-oriented design, and module organization",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

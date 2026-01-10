@@ -1,6 +1,6 @@
 {
   "name": "dm-game",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Game development skills: design methodology (5-component framework) and per-frame performance optimization",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }
