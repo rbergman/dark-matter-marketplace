@@ -18,10 +18,15 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 **Non-Negotiable:**
 - All exported identifiers have doc comments
 - All errors checked and handled (no `_ = err`)
-- NO naked returns in functions > 5 lines
 - NO `panic()` for recoverable errors
 - golangci-lint passes with project configuration
 - Table-driven tests for multiple cases
+
+**Foundational Principles:**
+- **Single Responsibility**: One package = one purpose, one function = one job
+- **No God Objects**: Split large structs; if it has 10+ fields or methods, decompose
+- **Dependency Injection**: Pass dependencies, don't create them internally
+- **Small Interfaces**: 1-3 methods max; compose larger behaviors from small interfaces
 
 ---
 
@@ -38,12 +43,12 @@ go mod edit -go=1.25
 go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 go get -tool golang.org/x/tools/cmd/goimports@latest
 
-# Copy linter config from this skill's references/ directory:
+# Copy configs from this skill's references/ directory:
 #   references/golangci-v2.yml    → .golangci.yml
-# For build system, invoke just-pro skill or use references/Makefile-template
+# For build system, invoke just-pro skill
 
 # Verify
-go tool golangci-lint run
+just check   # Or: go tool golangci-lint run
 ```
 
 ### Developer Onboarding
@@ -51,7 +56,7 @@ go tool golangci-lint run
 ```bash
 git clone <repo> && cd <repo>
 go mod download    # Gets all tools automatically
-just check         # Or: go tool golangci-lint run
+just check         # Standard entry point
 ```
 
 **Why `go get -tool`?** Tools versioned in go.mod = reproducible builds, same versions for all devs, no separate installation needed.
@@ -65,7 +70,7 @@ just check         # Or: go tool golangci-lint run
 - Hierarchical justfile modules
 - Go-specific templates (`references/package-go.just`)
 
-**Fallback**: Use `references/Makefile-template` if just unavailable.
+**Why just?** Consistent toolchain frontend between agents and humans. Instead of remembering `go tool golangci-lint run --fix`, use `just fix`.
 
 ---
 
@@ -74,34 +79,13 @@ just check         # Or: go tool golangci-lint run
 **Auto-Fix First** - Always try auto-fix before manual fixes:
 
 ```bash
-go tool golangci-lint run --fix   # Fixes modernize, misspell, etc.
-go tool goimports -w .            # Fixes imports
+just fix             # Or: go tool golangci-lint run --fix && go tool goimports -w .
 ```
 
 **Verification:**
 ```bash
-go tool golangci-lint run
-go test -race ./...
+just check           # Or: go tool golangci-lint run && go test -race ./...
 ```
-
----
-
-## Linting Configuration
-
-For new projects, copy the golangci-lint v2 config:
-```bash
-# references/golangci-v2.yml → .golangci.yml (filename unchanged in v2)
-```
-
-**Key linter categories:**
-
-| Category | Purpose |
-|----------|---------|
-| Safety | errcheck, errorlint, gosec, wrapcheck |
-| Complexity | funlen, gocognit, cyclop, nestif |
-| Modernization | modernize, intrange, exptostd |
-| Performance | perfsprint, prealloc |
-| Testing | testifylint, thelper |
 
 ---
 
@@ -111,10 +95,98 @@ For new projects, copy the golangci-lint v2 config:
 
 | Pattern | Use |
 |---------|-----|
-| `return err` | Propagate unchanged |
-| `fmt.Errorf("context: %w", err)` | Wrap with context |
+| `return err` | Propagate unchanged (internal errors) |
+| `fmt.Errorf("context: %w", err)` | Wrap with context (cross-boundary) |
 | `errors.Is(err, target)` | Check specific error |
 | `errors.As(err, &target)` | Extract typed error |
+
+**Sentinel Errors** - Define package-level errors for expected conditions:
+```go
+var ErrNotFound = errors.New("not found")
+var ErrInvalidInput = errors.New("invalid input")
+```
+
+### Generics
+
+```go
+// Constrained generics - prefer specific constraints
+func Map[T, U any](items []T, fn func(T) U) []U {
+    result := make([]U, len(items))
+    for i, item := range items {
+        result[i] = fn(item)
+    }
+    return result
+}
+
+// Type constraints - use interfaces
+type Ordered interface {
+    ~int | ~int64 | ~float64 | ~string
+}
+
+func Max[T Ordered](a, b T) T {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+// Avoid: overly generic signatures that lose type safety
+// Prefer: concrete types until generics are clearly needed
+```
+
+### Structured Logging (slog)
+
+```go
+import "log/slog"
+
+// Package-level logger with context
+func NewService(logger *slog.Logger) *Service {
+    return &Service{
+        log: logger.With("component", "service"),
+    }
+}
+
+// Structured logging with levels
+s.log.Info("request processed",
+    "method", r.Method,
+    "path", r.URL.Path,
+    "duration", time.Since(start),
+)
+
+s.log.Error("operation failed",
+    "err", err,
+    "user_id", userID,
+)
+```
+
+### Iterators (Go 1.23+)
+
+```go
+import "iter"
+
+// Return iterators for large collections
+func (db *DB) Users() iter.Seq[User] {
+    return func(yield func(User) bool) {
+        rows, _ := db.Query("SELECT * FROM users")
+        defer rows.Close()
+        for rows.Next() {
+            var u User
+            rows.Scan(&u.ID, &u.Name)
+            if !yield(u) {
+                return
+            }
+        }
+    }
+}
+
+// Consume with range
+for user := range db.Users() {
+    process(user)
+}
+
+// Seq2 for key-value pairs
+func (m *Map[K, V]) All() iter.Seq2[K, V]
+```
 
 ### Concurrency
 
@@ -123,15 +195,76 @@ For new projects, copy the golangci-lint v2 config:
 | `sync.WaitGroup` | Wait for goroutines |
 | `sync.Mutex` / `RWMutex` | Protect shared state |
 | `context.Context` | Cancellation/timeouts |
-| `errgroup.Group` | Concurrent with errors |
+| `errgroup.Group` | Concurrent with error collection |
 
-### Idiomatic Patterns
+```go
+// Context-aware work
+func DoWork(ctx context.Context, arg string) error {
+    select {
+    case <-ctx.Done():
+        return ctx.Err()
+    default:
+    }
+    // ... work
+}
+```
 
-- **Functional options**: Flexible configuration
-- **Accept interfaces, return structs**: Flexibility at boundaries
-- **Constructor functions**: `NewFoo()` over struct literals
-- **Table-driven tests**: Parameterized test cases
-- **Dependency injection**: Pass dependencies, don't create
+### Testing
+
+```go
+// Table-driven tests with subtests
+func TestParse(t *testing.T) {
+    tests := []struct {
+        name    string
+        input   string
+        want    Result
+        wantErr bool
+    }{
+        {name: "valid", input: "foo", want: Result{Value: "foo"}},
+        {name: "empty", input: "", wantErr: true},
+        {name: "special", input: "a@b", want: Result{Value: "a@b"}},
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got, err := Parse(tt.input)
+            if (err != nil) != tt.wantErr {
+                t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
+                return
+            }
+            if got != tt.want {
+                t.Errorf("Parse() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+// Testify for complex assertions
+import "github.com/stretchr/testify/assert"
+import "github.com/stretchr/testify/require"
+
+func TestService(t *testing.T) {
+    require.NoError(t, err)           // Fail fast
+    assert.Equal(t, expected, actual) // Continue on failure
+    assert.Len(t, items, 3)
+    assert.Contains(t, items, target)
+}
+```
+
+### Pointer vs Value Receivers
+
+```go
+// Use pointer receivers when:
+// - Method modifies the receiver
+// - Receiver is large (avoid copy)
+// - Consistency: if any method needs pointer, use pointer for all
+func (s *Service) UpdateConfig(cfg Config) { s.cfg = cfg }
+
+// Use value receivers when:
+// - Receiver is small (int, string, small struct)
+// - Method is read-only and receiver is immutable
+func (p Point) Distance(other Point) float64 { ... }
+```
 
 ### Package Organization
 
@@ -146,34 +279,21 @@ project/
 └── justfile
 ```
 
-**Rules:** One package = one purpose. Use `internal/` for implementation. Avoid `util`, `common` packages.
+**Rules:** One package = one purpose. Use `internal/` for implementation. Avoid `util`, `common`, `helpers` packages.
 
 ---
 
 ## Anti-Patterns
 
-- `panic()` for errors (use `return err`)
-- Naked returns in long functions
+- `panic()` for recoverable errors (use `return err`)
 - Ignoring errors with `_`
-- Exported package-level variables
+- Exported package-level mutable variables
 - Channels when mutex suffices
 - Getter/setter methods (Go isn't Java)
 - `init()` with side effects
-
----
-
-## Context Usage
-
-```go
-func DoWork(ctx context.Context, arg string) error {
-    select {
-    case <-ctx.Done():
-        return ctx.Err()
-    default:
-    }
-    // ... work
-}
-```
+- God structs with 10+ fields/methods
+- `interface{}` or `any` when specific types work
+- Premature generics (concrete types first)
 
 ---
 
@@ -188,8 +308,9 @@ func DoWork(ctx context.Context, arg string) error {
 1. Handle all errors explicitly - never use `_ = err`
 2. Add doc comments to exported identifiers immediately
 3. Use existing project abstractions over creating new ones
+4. Prefer concrete types; add generics only when pattern repeats 3+ times
 
 **Before committing:**
-1. Check for `just check` or `make check` and use those (project-specific)
+1. Run `just check` (standard for projects using just)
 2. Fallback: `go tool golangci-lint run --fix && go tool golangci-lint run`
 3. Fallback: `go test -race ./...` to catch race conditions
