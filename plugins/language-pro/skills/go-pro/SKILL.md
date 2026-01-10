@@ -304,6 +304,72 @@ project/
 
 ---
 
+## DX Patterns
+
+### Doctor Recipe with Version Validation
+
+Doctor scripts should validate that toolchain versions meet requirements, not just check existence:
+
+```just
+# Validate toolchain versions meet requirements
+doctor:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Checking toolchain..."
+
+    # Validate Go version (requires 1.25+)
+    GO_VERSION=$(go version | grep -oE 'go[0-9]+\.[0-9]+' | sed 's/go//')
+    if [[ "$(printf '%s\n' "1.25" "$GO_VERSION" | sort -V | head -1)" != "1.25" ]]; then
+        echo "FAIL: Go $GO_VERSION < 1.25 required"
+        exit 1
+    fi
+    echo "✓ Go $GO_VERSION"
+
+    # Add more version checks as needed
+    echo "All checks passed"
+```
+
+### Port Conflict Detection
+
+For services that bind ports, check availability before starting:
+
+```just
+# Check if required ports are available before starting
+check-ports:
+    #!/usr/bin/env bash
+    for port in 8080 5432; do
+        if lsof -i :$port >/dev/null 2>&1; then
+            echo "FAIL: Port $port already in use"
+            exit 1
+        fi
+    done
+    echo "All ports available"
+```
+
+### First-Run Detection
+
+Avoid redundant setup work with first-run detection:
+
+```just
+# Setup with first-run detection
+setup:
+    #!/usr/bin/env bash
+    if [[ -f .setup-complete ]]; then
+        echo "Already set up. Run 'just setup-force' to reinstall."
+        exit 0
+    fi
+    mise trust && mise install
+    go mod download
+    touch .setup-complete
+    echo "Setup complete"
+
+setup-force:
+    rm -f .setup-complete
+    @just setup
+```
+
+---
+
 ## Anti-Patterns
 
 - `panic()` for recoverable errors (use `return err`)

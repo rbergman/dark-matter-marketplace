@@ -39,14 +39,16 @@ curl https://mise.run | sh
 
 ### Shell Setup
 
-Add to your shell rc file:
+Add to your shell rc file. If using both mise and direnv (recommended), load mise first:
 
 ```bash
-# ~/.zshrc
+# ~/.zshrc - recommended order
 eval "$(mise activate zsh)"
+eval "$(direnv hook zsh)"
 
-# ~/.config/fish/config.fish
+# fish: ~/.config/fish/config.fish
 mise activate fish | source
+direnv hook fish | source
 ```
 
 For faster startup, use shims instead of (or with) activation:
@@ -54,9 +56,13 @@ For faster startup, use shims instead of (or with) activation:
 ```bash
 # zsh: add to ~/.zshrc
 export PATH="$HOME/.local/share/mise/shims:$PATH"
+eval "$(mise activate zsh)"
+eval "$(direnv hook zsh)"
 
 # fish: add to ~/.config/fish/config.fish
 fish_add_path -p ~/.local/share/mise/shims
+mise activate fish | source
+direnv hook fish | source
 ```
 
 ### Install Tools
@@ -153,6 +159,12 @@ auto_install = true
 - **Mise** → tool versions (node, go, python)
 - **Direnv** → environment variables (DATABASE_URL, API keys)
 
+> **Best Practice:** Keep a single source of truth:
+> - `.mise.toml` → tool versions only (node, go, python)
+> - `.envrc` → environment variables (DATABASE_URL, API_KEY, etc.)
+>
+> Don't use `[env]` section in `.mise.toml` - it creates confusion about where vars come from.
+
 ### Setup
 
 1. Install direnv via mise:
@@ -229,9 +241,17 @@ build: (_exec "npm run build")
 
 ```just
 setup:
-    mise trust
-    mise install
-    @echo "Toolchain ready"
+    #!/usr/bin/env bash
+    mise trust && mise install
+
+    # Create .envrc from example if missing
+    if [[ ! -f .envrc ]] && [[ -f .envrc.example ]]; then
+        cp .envrc.example .envrc
+        echo "Created .envrc from example - edit with your values"
+        direnv allow
+    fi
+
+    echo "Toolchain ready"
 ```
 
 ---

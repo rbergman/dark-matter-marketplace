@@ -123,6 +123,36 @@ check: fmt lint test coverage-check
     @echo "All checks passed"
 ```
 
+### Quick Check (Dev Iteration)
+
+Fast feedback loop for development - essential checks only:
+
+```just
+# Quick feedback loop - essential checks only
+check-quick: lint test
+    @echo "Quick checks passed"
+```
+
+### Clean Recipe
+
+Standard cleanup for build artifacts and caches:
+
+```just
+# Remove build artifacts and caches
+clean:
+    rm -rf build/ coverage.out node_modules/.cache
+```
+
+### Parallel Check Execution (CI)
+
+Run package checks in parallel for faster CI:
+
+```just
+# Run all package checks in parallel (CI optimization)
+check-parallel:
+    @just api check & just web check & wait
+```
+
 ### Coverage Enforcement
 
 Use shebang for multi-line shell logic:
@@ -188,6 +218,8 @@ just --list           # Root recipes + module names
 just --list go        # Recipes in 'go' module
 just --list-submodules # All recipes including submodules
 ```
+
+**Important**: Use `just --list <module>` not `just <module> --list`. The flag must come before the module name.
 
 ### Calling Module Recipes
 
