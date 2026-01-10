@@ -180,7 +180,7 @@ project/
 - Implicit any in function parameters
 - Dangling promises without await/void
 - Over-complicated generic signatures
-- `!` non-null assertions instead of proper narrowing
+- Non-null assertions (the `x!` operator) instead of proper narrowing
 - Truthy/falsy checks on non-booleans
 - God classes/objects with 10+ methods or properties
 - Deep inheritance hierarchies (prefer composition)
