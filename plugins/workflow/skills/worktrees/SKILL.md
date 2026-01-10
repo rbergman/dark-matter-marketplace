@@ -1,13 +1,13 @@
 ---
 name: worktrees
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification
+description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with beads integration via bd worktree commands
 ---
 
 # Git Worktrees
 
 Git worktrees create isolated workspaces sharing the same repository, allowing work on multiple branches simultaneously without switching.
 
-**Core principle:** Systematic directory selection + safety verification = reliable isolation.
+**Primary tool:** `bd worktree` — handles git worktree + beads integration automatically.
 
 ---
 
@@ -20,60 +20,40 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 ---
 
-## Directory Selection
+## Creating a Worktree
 
-### Priority Order
-
-1. **Existing directory** — Check for `.worktrees/` or `worktrees/`
-2. **CLAUDE.md preference** — Check for documented convention
-3. **Ask user** — If neither exists
+Use `bd worktree create` — it handles everything:
 
 ```bash
-# Check existing
-ls -d .worktrees 2>/dev/null     # Preferred (hidden)
-ls -d worktrees 2>/dev/null      # Alternative
+bd worktree create feature-auth
 ```
 
-If both exist, `.worktrees/` wins.
+**What it does automatically:**
+1. Creates git worktree at `./<name>` (or `.worktrees/<name>` if configured)
+2. Sets up `.beads/redirect` pointing to main repo's database
+3. Adds worktree path to `.gitignore`
+
+**With custom branch name:**
+```bash
+bd worktree create bugfix --branch fix-123
+```
+
+**At specific path:**
+```bash
+bd worktree create .worktrees/feature-auth
+```
 
 ---
 
-## Safety Verification
+## After Creation
 
-**MUST verify directory is ignored before creating worktree:**
-
-```bash
-git check-ignore -q .worktrees 2>/dev/null
-```
-
-**If NOT ignored:**
-1. Add to `.gitignore`
-2. Commit the change
-3. Then proceed
-
-**Why:** Prevents accidentally committing worktree contents.
-
----
-
-## Creation Steps
-
-### 1. Detect Project Name
+### 1. Enter Worktree
 
 ```bash
-project=$(basename "$(git rev-parse --show-toplevel)")
+cd feature-auth  # or .worktrees/feature-auth
 ```
 
-### 2. Create Worktree
-
-```bash
-# Create with new branch
-git worktree add .worktrees/$BRANCH_NAME -b $BRANCH_NAME
-cd .worktrees/$BRANCH_NAME
-```
-
-### 3. Run Project Setup
-
-Auto-detect and run:
+### 2. Run Project Setup
 
 ```bash
 # Node.js
@@ -84,99 +64,128 @@ Auto-detect and run:
 
 # Go
 [ -f go.mod ] && go mod download
-
-# Python
-[ -f requirements.txt ] && pip install -r requirements.txt
-[ -f pyproject.toml ] && poetry install
 ```
 
-### 4. Verify Clean Baseline
+### 3. Verify Baseline
 
 ```bash
-npm test        # or cargo test, go test ./..., pytest
+npm test  # or cargo test, go test ./...
 ```
 
 **If tests fail:** Report failures, ask whether to proceed.
-**If tests pass:** Report ready.
 
-### 5. Report Location
+### 4. Verify Beads Shared
 
-```
-Worktree ready at <full-path>
-Tests passing (<N> tests, 0 failures)
-Ready to implement <feature-name>
+```bash
+bd ready  # Should show same beads as main workspace
 ```
 
 ---
 
-## Beads Integration
-
-For parallel work with beads:
+## Listing Worktrees
 
 ```bash
-# In worktree, beads state is shared via sync-branch
-bd ready        # Shows same beads as main workspace
-bd claim <id>   # Claims in shared state
+bd worktree list
 ```
 
-**sync-branch:** `beads-sync` shares issue state across worktrees.
+Or standard git:
+```bash
+git worktree list
+```
+
+---
+
+## Removing a Worktree
+
+Use `bd worktree remove` — includes safety checks:
+
+```bash
+bd worktree remove feature-auth
+```
+
+**Safety checks (automatic):**
+- Uncommitted changes
+- Unpushed commits
+- Stashes
+
+**Skip checks (not recommended):**
+```bash
+bd worktree remove feature-auth --force
+```
+
+---
+
+## Worktree Info
+
+Check current worktree status:
+
+```bash
+bd worktree info
+```
 
 ---
 
 ## Quick Reference
 
-| Situation | Action |
-|-----------|--------|
-| `.worktrees/` exists | Use it (verify ignored) |
-| `worktrees/` exists | Use it (verify ignored) |
-| Both exist | Use `.worktrees/` |
-| Neither exists | Check CLAUDE.md → Ask user |
-| Directory not ignored | Add to .gitignore + commit |
-| Tests fail during baseline | Report + ask before proceeding |
+| Task | Command |
+|------|---------|
+| Create worktree | `bd worktree create <name>` |
+| Create with branch | `bd worktree create <name> --branch <branch>` |
+| List worktrees | `bd worktree list` |
+| Remove worktree | `bd worktree remove <name>` |
+| Check status | `bd worktree info` |
+| Verify beads sync | `bd ready` (in worktree) |
 
 ---
 
-## Cleanup
+## Why bd worktree?
 
-When done with worktree:
+| Manual git worktree | bd worktree |
+|---------------------|-------------|
+| Separate commands for git + beads | Single command |
+| Manual .gitignore management | Automatic |
+| No beads redirect setup | Automatic redirect to main DB |
+| No safety checks on remove | Checks for uncommitted/unpushed |
+
+---
+
+## Example Workflow
 
 ```bash
-cd ..                              # Exit worktree
-git worktree remove .worktrees/$BRANCH_NAME
-git branch -d $BRANCH_NAME         # If merged
+# Create isolated workspace
+bd worktree create .worktrees/feature-auth
+
+# Enter and setup
+cd .worktrees/feature-auth
+npm install
+npm test  # ✓ 47 passing
+
+# Verify beads shared
+bd ready  # Shows same issues as main
+
+# Work on feature...
+bd claim auth-001
+
+# When done
+cd ../..
+bd worktree remove .worktrees/feature-auth
 ```
 
-Or use `dm-work:finishing-branch` skill for guided cleanup.
-
 ---
 
-## Anti-Patterns
+## Fallback (No Beads)
 
-| Don't | Why |
-|-------|-----|
-| Skip ignore verification | Worktree contents pollute git status |
-| Assume directory location | Violates project conventions |
-| Proceed with failing baseline tests | Can't distinguish new bugs from existing |
-| Skip project setup | Missing deps cause confusing failures |
-
----
-
-## Example
+If beads isn't installed, use manual git worktree:
 
 ```bash
 # Verify ignored
-git check-ignore -q .worktrees || (echo '.worktrees/' >> .gitignore && git add .gitignore && git commit -m "Ignore worktrees directory")
+git check-ignore -q .worktrees || echo '.worktrees/' >> .gitignore
 
-# Create worktree
+# Create
 git worktree add .worktrees/feature-auth -b feature-auth
-cd .worktrees/feature-auth
 
-# Setup
-npm install
-
-# Verify baseline
-npm test
-# ✓ 47 tests passing
-
-# Ready to work
+# Remove
+git worktree remove .worktrees/feature-auth
 ```
+
+But you lose: automatic gitignore, beads sync, and safety checks.

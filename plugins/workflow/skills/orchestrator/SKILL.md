@@ -141,8 +141,8 @@ When launching parallel subagents:
 Use when parallel subagents need filesystem isolation (conflicting files, separate builds/servers).
 
 **Skill:** `dm-work:worktrees`
-**Directory:** `.worktrees/` (gitignored)
-**Beads:** `sync-branch: beads-sync` shares issue state across worktrees
+**Command:** `bd worktree create <name>` — handles git + beads integration automatically
+**Beads:** Automatic redirect to main repo's database (shared issue state)
 
 ---
 
