@@ -1,22 +1,6 @@
 ---
 name: gemini-driver
-description: Use this agent to leverage Gemini's 1M token context for high-comprehension tasks like reading large beads sets, planning epics, feature inventory, codebase research, and UX analysis. This agent is the architect of the successful design-v2 spec implementation and excels at deep analysis.\n\n**Usage Patterns:**\n\n**Pattern 1: Epic Planning & Decomposition**\n- Invoke gemini-driver to expand draft epics into granular tasks
-- Uses spec-kit-lite workflow (Specification → Clarification → Planning → Decomposition → Analysis)
-- Returns complete task breakdown with beads migration commands
-
-**Pattern 2: Feature Inventory & Analysis**\n- Compare legacy (apps/legacy) vs production (apps/web) implementations
-- Identify feature gaps, categorize by criticality (MVP vs Post-MVP vs Not Needed)
-- Generate comprehensive reports for migration planning
-
-**Pattern 3: Codebase Research & Documentation**\n- Read large codebases with 1M context window
-- Generate architecture documentation, component inventories
-- Answer complex questions requiring whole-codebase understanding
-
-**Pattern 4: UX Analysis & Specification**\n- Deep UX evaluations (gemini authored the apps/web specification)
-- Multi-screen user journey analysis
-- Design system compliance audits
-
-**Examples:**\n\n<example>\nContext: Orchestrator needs to expand a draft epic into actionable tasks.\n\nuser: "Phase 0 needs feature inventory and categorization. Can gemini handle the analysis?"\n\nassistant: "I'll use the gemini-driver agent to analyze the entire codebase, compare apps/legacy vs apps/web, and generate a comprehensive feature inventory with MVP categorization."\n\n<uses Task tool with subagent_type=gemini-driver, passing task description and project context>\n\nassistant: "Gemini has completed the analysis. Here's the feature inventory: [summary]. Full report in docs/FEATURE_INVENTORY.md"\n</example>\n\n<example>\nContext: Orchestrator needs to understand a complex subsystem before planning changes.\n\nuser: "How does the Socket.IO state sync work across the codebase?"\n\nassistant: "I'll use gemini-driver to research the Socket.IO integration across all packages and generate a comprehensive analysis."\n\n<uses Task tool with subagent_type=gemini-driver>\n\nassistant: "Gemini found 47 Socket.IO integration points across 12 files. Full analysis shows: [key findings]. Documentation generated."\n</example>\n\n<example>\nContext: Need to decompose a complex epic using spec-kit-lite.\n\nuser: "Expand Phase 2 (monorepo integration) using spec-kit-lite workflow"\n\nassistant: "I'll invoke gemini-driver to execute the spec-kit-lite phases and generate a complete task breakdown."\n\n<uses Task tool with subagent_type=gemini-driver>\n\nassistant: "Gemini completed spec-kit-lite analysis. Phase 2 decomposed into 8 tasks with dependencies. Ready to create beads."\n</example>
+description: Leverage Gemini 1M context for epic planning, feature inventory, codebase research, and deep analysis tasks
 model: haiku
 ---
 

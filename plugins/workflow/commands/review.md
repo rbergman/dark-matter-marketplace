@@ -299,7 +299,7 @@ Verdict emojis:
 
 Only create if findings are extensive (>20 issues OR reviewers provided detailed code examples):
 
-**Path:** `history/peer-reviews/<YYYY-MM-DD>-<scope-slug>.md`
+**Path:** `history/dm-work:reviews/<YYYY-MM-DD>-<scope-slug>.md`
 
 **Contents:**
 - Full reviewer outputs
@@ -309,7 +309,7 @@ Only create if findings are extensive (>20 issues OR reviewers provided detailed
 
 **Inline note when history file created:**
 ```
-📄 Detailed report: history/peer-reviews/2026-01-02-feature-branch.md
+📄 Detailed report: history/dm-work:reviews/2026-01-02-feature-branch.md
 ```
 
 ---
@@ -318,30 +318,30 @@ Only create if findings are extensive (>20 issues OR reviewers provided detailed
 
 **On feature branch/worktree:**
 ```
-/peer-review
+/dm-work:review
 ```
 → Auto-detects scope as all work since diverging from main
 
 **On main with recent work:**
 ```
-/peer-review
+/dm-work:review
 ```
 → Checks conversation context for beads/commits discussed, asks if unclear
 
 **Specific epic:**
 ```
-/peer-review --epic redshifted-abc1
+/dm-work:review --epic redshifted-abc1
 ```
 → Reviews epic + all discovered issues
 
 **Custom range:**
 ```
-/peer-review --commits HEAD~5..HEAD
+/dm-work:review --commits HEAD~5..HEAD
 ```
 → Reviews specific commit range
 
 **Skip bead creation (rare):**
 ```
-/peer-review --skip-beads
+/dm-work:review --skip-beads
 ```
 → Review only, no tracking (for exploratory reviews)
