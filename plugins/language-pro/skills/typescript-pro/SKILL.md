@@ -204,6 +204,6 @@ See `references/integration.md` for detailed framework patterns.
 4. Add explicit return types to exported functions
 
 **Before committing:**
-1. Check for `just check` or `npm run check` and use those (project-specific)
-2. Fallback: `npx eslint src/ --fix && npx tsc --noEmit`
-3. Fallback: `npm test` to catch regressions
+1. Run `npm run check` (standard for single packages)
+2. For monorepos at repo root: `just check` or `turbo run check`
+3. Fallback: `npx eslint src/ --fix && npx tsc --noEmit && npm test`
