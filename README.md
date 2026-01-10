@@ -50,6 +50,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
+| `orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
+| `subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
 | `dialectical-refinement` | Skill | Transform ambiguous specs into implementable work items through adversarial refinement |
 | `/dm:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm:refine` | Command | Sharpen individual work items |
@@ -97,8 +99,8 @@ Non-installable materials for reference and sharing.
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | My global Claude instructions (orchestrator model, prime directive) |
-| `workflow.md` | Context-preserving development workflow (the 80k rule, precompact loop) |
+| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm:orchestrator` skill |
+| `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
 
 ---
 

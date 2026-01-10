@@ -1,72 +1,26 @@
 # Claude Code Workflow Guide
 
-A practical workflow for maintaining productive, context-aware sessions with Claude Code.
+A practical guide for humans working with Claude Code. This documents my personal development loop — how I structure sessions, manage context, and get reliable results.
 
 ---
 
-## Core Philosophy
+## Prerequisites
 
-**Grow complexity from a simple system that already works.**
+### Disable Auto-Compaction
 
-- Prefer minimal working slices over grand designs
-- Avoid speculative architecture and premature abstraction
-- Make only small, verifiable changes
-- Begin → Learn → Succeed → *then* add complexity
+In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Without this, Claude will compact automatically and you lose the ability to use the precompact workflow.
 
----
+### Install Beads
 
-## Beads: External State
+[Beads](https://github.com/rbergman/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
 
-[Beads](https://github.com/rbergman/beads) is a lightweight issue tracking CLI that provides **external state** — the critical ingredient that makes this workflow possible.
-
-**Why beads matter:**
-- **Survives sessions** — Bead state persists when context is cleared or sessions end
-- **Enables handoffs** — New sessions can read bead state to understand what's done and what's next
-- **Tracks dependencies** — Beads can block on other beads, enabling parallel work planning
-- **Gives subagents clarity** — Each bead is a clear, atomic work item
-
-**Core commands:**
 ```bash
-bd ready          # List beads ready to work
-bd show <id>      # View bead details
-bd claim <id>     # Mark as in-progress
-bd update <id>    # Add notes/progress
-bd close <id>     # Mark complete
+# Install beads
+cargo install beads
+
+# Initialize in your project
+bd init
 ```
-
-**Bead IDs** look like `whiteout-4eed` — a memorable word plus short hash.
-
-**Bead states:** `draft` → `ready` → `claimed` → `done` (with `blocked` for dependencies)
-
-If you're not using beads, substitute your own issue tracker. The key is having **external state that outlives conversation context**.
-
----
-
-## The Orchestrator Model
-
-You are the strategist. Claude is the orchestrator. Subagents are implementers.
-
-**Orchestrator responsibilities:**
-- Understand tasks and break them into delegatable units
-- Launch subagents with clear prompts, skills, and tool awareness
-- Review subagent output and commit when satisfied
-- Track big-picture progress across beads/issues
-- *Preserve context for orchestration, not implementation*
-
-**Delegation threshold:** If a task involves more than 2 file edits, more than 30 lines of new code, or creating new modules — delegate to a subagent.
-
-**What orchestrators do directly:**
-- Read files to understand scope
-- Use Explore agent for codebase research
-- Claim/update/close beads
-- Review and commit subagent work
-- Ask clarifying questions
-
-**What orchestrators delegate:**
-- Writing new code/tests
-- Editing existing code
-- Implementing features/fixes
-- Debugging complex issues
 
 ---
 
@@ -74,81 +28,71 @@ You are the strategist. Claude is the orchestrator. Subagents are implementers.
 
 ### Phase 1: Convergence
 
-Start with an idea, spec, or well-defined task. Iterate with the agent until you have clarity.
+Start with an idea, spec, or task. Talk with Claude until you're aligned on what to build.
 
-1. **Conversation to convergence** — Discuss the idea or spec until aligned
-2. **Activate skills** — Instruct the agent to use specific skills if appropriate (e.g., `typescript-pro`, `game-design`, `solid-architecture`)
-3. **Dialectical refinement** (optional) — Use `/dm:breakdown` or `/dm:refine` if confidence in the spec is low
+1. **Discuss until clear** — Don't rush to implementation. Make sure you and Claude agree on the goal.
+2. **Point to skills** — If the work involves specific domains (TypeScript, game design, etc.), tell Claude to activate relevant skills.
+3. **Refine if needed** — For complex or ambiguous specs, use `/dm:breakdown` or `/dm:refine` to sharpen the requirements.
 
 ### Phase 2: Task Breakdown
 
-Convert the converged spec into trackable work items.
+Convert the spec into trackable work items.
 
-1. **Create beads** — Use bead epics or tasks depending on scope
-2. **Verify dependencies** — Ensure beads are ordered correctly
-3. **Identify parallelism** — Mark beads that can be worked concurrently
+1. **Create beads** — Break work into atomic tasks. Each bead should be completable by a single subagent.
+2. **Set dependencies** — If bead B requires bead A, mark it. Beads handles this with `blocked_by`.
+3. **Identify parallelism** — Independent beads can be worked concurrently.
 
 ### Phase 3: Execution
 
-Delegate implementation to subagents to preserve orchestrator context.
+Let Claude orchestrate while subagents implement.
 
-1. **Launch subagents** — Use `/dm:subagents` (preferred) or `/dm:subagent`
-   - `/dm:subagents` handles multiple beads with dependency awareness
-   - It degrades gracefully to single-subagent mode when appropriate
-2. **Review results** — Verify subagent work before committing
-3. **Commit incrementally** — Don't batch; commit after each completed unit
+1. **Use `/dm:subagents`** — This handles multiple beads with dependency awareness. It degrades to single-subagent mode when appropriate.
+2. **Review results** — Check what subagents produced before committing.
+3. **Commit incrementally** — One commit per completed unit. Don't batch.
 
 ---
 
-## Context Preservation
+## Context Management
 
-Context is your most valuable resource. Protect it aggressively.
-
-### One-Time Setup
-
-**Disable auto-compaction in Claude settings.** This gives you control over when and how context is managed.
+Context is your most valuable resource. Protect it.
 
 ### The 80k Rule
 
-When context reaches 80-150k tokens (out of ~200k limit), start looking for a natural pause point.
+When context reaches **80-150k tokens** (out of ~200k limit), start looking for a pause point. Don't wait until you're nearly out.
 
-### Precompact Before Crisis
-
-**Target:** Run `/dm:precompact` before reaching 10% remaining context.
-**Acceptable:** As late as 50% remaining, but don't push it.
-
-`/dm:precompact` is a lightweight alternative to `/compact` that:
-- Explicitly summarizes work completed
-- Documents the roadmap and next steps
-- Points to beads for task tracking
-- Produces portable output you control
+Good pause points:
+- Bead completed
+- Phase transition (convergence → breakdown, breakdown → execution)
+- Natural stopping point in discussion
 
 ### The Precompact Workflow
 
+When you're ready to pause:
+
 ```
-1. Recognize context is growing (80-100k+)
-2. Find a natural pause point (bead complete, phase transition)
-3. Run /dm:precompact
-4. Copy the output
-5. Run /clear
-6. Paste the precompaction
-7. Add any additional context on next steps
-8. Continue with fresh context
+1. Run /dm:precompact
+2. Copy the output
+3. Run /clear
+4. Paste the precompaction as your first message
+5. Add any additional context about next steps
+6. Continue with fresh context
 ```
+
+`/dm:precompact` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
 
 ### Emergency Recovery
 
-If context runs out before you can precompact:
+If you run out of context before you can precompact:
 
-1. **If you can still `/compact`:** Do so, then run `/dm:precompact` afterward — it usually still works. Then `/clear` and paste to recover.
+1. **If `/compact` still works:** Run it, then run `/dm:precompact` — it usually still works. Then `/clear` and paste to recover.
 
-2. **If you can't even `/compact`:** Take desperate measures (manual session notes, start fresh with bead state). This is rare if you follow the 80% rule.
+2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
 ### The Cardinal Rule
 
-**Never let a session exceed 1 built-in compaction.**
+**Never let a session exceed one built-in compaction.**
 
-Multiple compactions compound information loss. Each compaction is lossy; stacking them is the highway to hell. The precompact workflow ensures you never need more than one.
+Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The precompact workflow ensures you never need more than one.
 
 ---
 
@@ -158,22 +102,31 @@ Multiple compactions compound information loss. Each compaction is lossy; stacki
 |---------|----------|
 | Context exhaustion mid-task | Proactive precompact at 80k |
 | Lost context after compaction | Explicit summaries you control |
-| Orchestrator doing implementation | Subagent delegation |
+| Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
 | Compaction information loss | Never exceed 1 compaction |
 
-The key insight: **external state (beads) + explicit summaries (precompact) + delegation (subagents) = sessions that can pause and resume reliably.**
+The key insight: **external state (beads) + explicit summaries (precompact) + delegation (subagents) = sessions that pause and resume reliably.**
 
 ---
 
 ## Quick Reference
 
-| Trigger | Action |
-|---------|--------|
+| Situation | Action |
+|-----------|--------|
 | New idea or vague spec | Conversation to convergence |
 | Low confidence in spec | `/dm:breakdown` or `/dm:refine` |
 | Ready to implement | Create beads, then `/dm:subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Natural pause point | `/dm:precompact` → copy → `/clear` → paste |
-| Context critical (<10%) | Emergency precompact or compact+precompact |
+| Ready to pause | `/dm:precompact` → copy → `/clear` → paste |
+| Context critical | Emergency: compact then precompact |
 | Task complete | Review, commit, close bead |
+| Starting new session | Paste last precompact + `bd ready` |
+
+---
+
+## Related
+
+- **`dm:orchestrator` skill** — Claude's instructions for being an orchestrator
+- **`dm:subagent` skill** — Claude's instructions for being a subagent
+- **`CLAUDE.md`** — Minimal global instructions pointing to these skills
