@@ -1,0 +1,6 @@
+{
+  "name": "game-dev",
+  "version": "0.1.0",
+  "description": "Game development: design, engine programming, graphics optimization, and per-frame performance",
+  "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
+}

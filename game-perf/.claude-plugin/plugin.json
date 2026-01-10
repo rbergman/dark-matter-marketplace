@@ -1,9 +1,0 @@
-{
-  "name": "game-perf",
-  "version": "0.1.0",
-  "description": "Optimize game code for per-frame performance and GC pressure - identifies allocation anti-patterns and provides zero-allocation alternatives",
-  "author": {
-    "name": "Dark Matter",
-    "email": "dark-matter@example.com"
-  }
-}

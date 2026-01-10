@@ -1,9 +1,0 @@
-{
-  "name": "data-oriented-architecture",
-  "version": "0.1.0",
-  "description": "Apply data-oriented architecture patterns when designing systems with polymorphic entities - registry-based dispatch, capability composition, and infrastructure-first development",
-  "author": {
-    "name": "Dark Matter",
-    "email": "dark-matter@example.com"
-  }
-}

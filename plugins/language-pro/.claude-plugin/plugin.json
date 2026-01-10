@@ -1,0 +1,6 @@
+{
+  "name": "language-pro",
+  "version": "0.1.0",
+  "description": "Expert language skills: Go, Rust, TypeScript - idiomatic patterns, type systems, and best practices",
+  "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
+}

@@ -1,9 +1,0 @@
-{
-  "name": "go-pro",
-  "version": "0.1.0",
-  "description": "Expert Go development skill with idiomatic patterns, concurrency, error handling, and golangci-lint v2 configuration",
-  "author": {
-    "name": "Dark Matter",
-    "email": "dark-matter@example.com"
-  }
-}

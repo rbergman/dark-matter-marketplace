@@ -1,9 +1,0 @@
-{
-  "name": "dialectical-refinement",
-  "version": "0.1.0",
-  "description": "Transform ambiguous specs into implementable work items through adversarial refinement - use /breakdown for spec decomposition, /refine for sharpening items",
-  "author": {
-    "name": "Dark Matter",
-    "email": "dark-matter@example.com"
-  }
-}

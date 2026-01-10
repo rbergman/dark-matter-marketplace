@@ -1,98 +1,47 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "dark-matter-marketplace",
-  "description": "Claude Code plugins for Go development, architecture, and productivity",
-  "owner": {
-    "name": "Dark Matter",
-    "email": "dark-matter@example.com"
-  },
+  "description": "Claude Code plugins for development skills, agents, and productivity",
+  "owner": {"name": "Dark Matter", "email": "dark-matter@example.com"},
   "plugins": [
     {
-      "name": "go-pro",
-      "description": "Expert Go development skill with idiomatic patterns, concurrency, error handling, and golangci-lint v2 configuration",
+      "name": "language-pro",
+      "description": "Expert language skills: Go, Rust, TypeScript - idiomatic patterns, type systems, and best practices",
       "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./go-pro",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/language-pro",
       "category": "development"
     },
     {
-      "name": "justfile",
-      "description": "Patterns for setting up just (command runner) in projects - covers simple repos and monorepos with hierarchical modules",
+      "name": "architecture",
+      "description": "Architecture patterns: SOLID principles, composition, data-oriented design, and module organization",
       "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./justfile",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/architecture",
       "category": "development"
     },
     {
-      "name": "data-oriented-architecture",
-      "description": "Apply data-oriented architecture patterns when designing systems with polymorphic entities - registry-based dispatch, capability composition, and infrastructure-first development",
+      "name": "game-dev",
+      "description": "Game development: design, engine programming, graphics optimization, and per-frame performance",
       "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./data-oriented-architecture",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/game-dev",
       "category": "development"
     },
     {
-      "name": "dialectical-refinement",
-      "description": "Transform ambiguous specs into implementable work items through adversarial refinement - use /breakdown for spec decomposition, /refine for sharpening items",
+      "name": "workflow",
+      "description": "Workflow tools: spec refinement, justfile patterns, compression, peer review, and subagent delegation",
       "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./dialectical-refinement",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/workflow",
       "category": "development"
     },
     {
-      "name": "game-perf",
-      "description": "Optimize game code for per-frame performance and GC pressure - identifies allocation anti-patterns and provides zero-allocation alternatives",
+      "name": "drivers",
+      "description": "AI drivers: delegate to Codex CLI or leverage Gemini's 1M token context",
       "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./game-perf",
-      "category": "development"
-    },
-    {
-      "name": "rust-pro",
-      "description": "Expert Rust developer specializing in ownership semantics, zero-cost abstractions, and idiomatic patterns",
-      "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./rust-pro",
-      "category": "development"
-    },
-    {
-      "name": "solid-architecture",
-      "description": "SOLID principles, composition patterns, module organization, and side-effect boundary guidelines for writing, reviewing, or refactoring code",
-      "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./solid-architecture",
-      "category": "development"
-    },
-    {
-      "name": "typescript-pro",
-      "description": "Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization",
-      "version": "0.1.0",
-      "author": {
-        "name": "Dark Matter",
-        "email": "dark-matter@example.com"
-      },
-      "source": "./typescript-pro",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/drivers",
       "category": "development"
     }
   ]

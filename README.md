@@ -1,47 +1,41 @@
 # Dark Matter Marketplace
 
-A Claude Code plugin marketplace for development skills and productivity tools.
+Claude Code plugins for development skills, agents, and productivity.
 
 ## Installation
 
 ```bash
 claude plugin marketplace add https://github.com/YOUR_USERNAME/dark-matter-marketplace
+claude plugin install language-pro@dark-matter-marketplace
+claude plugin install workflow@dark-matter-marketplace
 ```
 
-Then install individual plugins:
+## Plugins (5)
 
-```bash
-claude plugin install go-pro@dark-matter-marketplace
-claude plugin install justfile@dark-matter-marketplace
-claude plugin install typescript-pro@dark-matter-marketplace
-# ... etc
-```
+| Plugin | Contents |
+|--------|----------|
+| **language-pro** | Skills: go-pro, rust-pro, typescript-pro |
+| **architecture** | Skills: solid-architecture, data-oriented-architecture |
+| **game-dev** | Agents: game-designer, game-developer · Skill: game-perf |
+| **workflow** | Skills: dialectical-refinement, justfile · Commands: /dm:breakdown, /dm:refine, /dm:compress, /dm:precompact, /dm:review, /dm:advice, /dm:subagent, /dm:subagents |
+| **drivers** | Agents: codex-driver, gemini-driver |
 
-## Plugins
-
-| Plugin | Description |
-|--------|-------------|
-| **go-pro** | Expert Go development with idiomatic patterns, concurrency, error handling, and golangci-lint v2 |
-| **justfile** | Patterns for just (command runner) - simple repos and monorepos with hierarchical modules |
-| **typescript-pro** | Expert TypeScript with advanced types, full-stack development, and build optimization |
-| **rust-pro** | Expert Rust with ownership semantics, zero-cost abstractions, and idiomatic patterns |
-| **solid-architecture** | SOLID principles, composition patterns, module organization, and side-effect boundaries |
-| **data-oriented-architecture** | Registry-based dispatch, capability composition, and infrastructure-first patterns |
-| **dialectical-refinement** | Transform ambiguous specs into implementable work items via adversarial refinement |
-| **game-perf** | Optimize game code for per-frame performance and GC pressure |
-
-## Adding Plugins
-
-Each plugin lives in its own directory:
+## Structure
 
 ```
-plugin-name/
-├── .claude-plugin/
-│   └── plugin.json
-└── skills/
-    └── skill-name/
-        ├── SKILL.md
-        └── references/
+plugins/
+├── language-pro/
+│   └── skills/{go-pro,rust-pro,typescript-pro}/
+├── architecture/
+│   └── skills/{solid-architecture,data-oriented-architecture}/
+├── game-dev/
+│   ├── agents/{game-designer,game-developer}.md
+│   └── skills/game-perf/
+├── workflow/
+│   ├── skills/{dialectical-refinement,justfile}/
+│   └── commands/dm:*.md
+└── drivers/
+    └── agents/{codex-driver,gemini-driver}.md
 ```
 
 ## License
