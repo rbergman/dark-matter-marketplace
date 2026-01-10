@@ -1,5 +1,5 @@
 ---
-name: dm:rust-pro
+name: rust-pro
 description: Expert Rust developer specializing in ownership semantics, zero-cost abstractions, and idiomatic patterns. This skill should be used PROACTIVELY when working on any Rust code - implementing features, debugging borrow checker issues, optimizing performance, or reviewing code quality. Use unless a more specific subagent role applies.
 ---
 

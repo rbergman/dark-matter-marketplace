@@ -144,6 +144,6 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 
 ## Related
 
-- **`dm:orchestrator` skill** — Claude's instructions for being an orchestrator
-- **`dm:subagent` skill** — Claude's instructions for being a subagent
+- **`dm-work:orchestrator` skill** — Claude's instructions for being an orchestrator
+- **`dm-work:subagent` skill** — Claude's instructions for being a subagent
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills

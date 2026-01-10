@@ -1,5 +1,5 @@
 ---
-name: dm:subagent
+name: subagent
 description: Activate when you are a delegated subagent (not the orchestrator). Establishes subagent protocol with terse returns, details to history/, file ownership boundaries, and escalation rules. You implement; orchestrator reviews and commits.
 ---
 

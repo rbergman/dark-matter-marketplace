@@ -1,5 +1,5 @@
 ---
-name: dm:orchestrator
+name: orchestrator
 description: Activate at session start when you are the primary Claude instance. Establishes orchestrator role with delegation protocols, subagent launch templates, token efficiency rules, and parallel safety constraints. You orchestrate; subagents implement.
 ---
 
@@ -51,25 +51,25 @@ Before launching a subagent, **proactively determine all applicable skills**. Do
 
 | Domain | Skills |
 |--------|--------|
-| TypeScript code | `dm:typescript-pro` |
-| Go code | `dm:go-pro` |
-| Rust code | `dm:rust-pro` |
-| Build systems | `dm:just-pro` |
-| Architecture decisions | `dm:solid-architecture`, `dm:data-oriented-architecture` |
-| Game mechanics | `dm:game-design` |
-| Game hot paths (JS/TS) | `dm:game-perf` |
-| Spec refinement | `dm:dialectical-refinement` |
+| TypeScript code | `dm-lang:typescript-pro` |
+| Go code | `dm-lang:go-pro` |
+| Rust code | `dm-lang:rust-pro` |
+| Build systems | `dm-lang:just-pro` |
+| Architecture decisions | `dm-arch:solid-architecture`, `dm-arch:data-oriented-architecture` |
+| Game mechanics | `dm-game:game-design` |
+| Game hot paths (JS/TS) | `dm-game:game-perf` |
+| Spec refinement | `dm-work:dialectical-refinement` |
 
 **Rules:**
 - Include ALL skills that apply — more is better than fewer
-- Language skills (`dm:typescript-pro`, etc.) should almost always be included for code tasks
+- Language skills (`dm-lang:typescript-pro`, etc.) should almost always be included for code tasks
 - Architecture skills apply to any structural decisions
 - Subagents activate skills at start, so missing skills means suboptimal work
 
 **Example:** A task to "implement a new TypeScript service with caching" should include:
-- `dm:typescript-pro` (language)
-- `dm:solid-architecture` (service design)
-- Possibly `dm:data-oriented-architecture` (if polymorphic entities involved)
+- `dm-lang:typescript-pro` (language)
+- `dm-arch:solid-architecture` (service design)
+- Possibly `dm-arch:data-oriented-architecture` (if polymorphic entities involved)
 
 ---
 

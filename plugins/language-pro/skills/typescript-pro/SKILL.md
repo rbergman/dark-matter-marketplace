@@ -1,5 +1,5 @@
 ---
-name: dm:typescript-pro
+name: typescript-pro
 description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. This skill should be used PROACTIVELY when working on any TypeScript code - implementing features, reviewing configurations, or debugging type errors. Use unless a more specific subagent role applies.
 ---
 

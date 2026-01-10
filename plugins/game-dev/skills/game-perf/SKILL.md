@@ -1,5 +1,5 @@
 ---
-name: dm:game-perf
+name: game-perf
 description: "Optimize game code for per-frame performance and GC pressure. Use PROACTIVELY when editing game loops, update functions, render code, or any code that runs every frame. Identifies allocation anti-patterns and provides zero-allocation alternatives."
 ---
 
