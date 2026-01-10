@@ -99,7 +99,7 @@ Non-installable materials for reference and sharing.
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm:orchestrator` skill |
+| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `orchestrator` skill |
 | `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
 
 ---

@@ -63,7 +63,7 @@ Convert the spec into trackable work items.
 
 Let Claude orchestrate while subagents implement.
 
-1. **Use `/dm:subagents`** — This handles multiple beads with dependency awareness. It degrades to single-subagent mode when appropriate.
+1. **Use `/subagents`** — This handles multiple beads with dependency awareness. It degrades to single-subagent mode when appropriate.
 2. **Review results** — Check what subagents produced before committing.
 3. **Commit incrementally** — One commit per completed unit. Don't batch.
 
@@ -133,7 +133,7 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 |-----------|--------|
 | New idea or vague spec | Conversation to convergence |
 | Low confidence in spec | `/dm:breakdown` or `/dm:refine` |
-| Ready to implement | Create beads, then `/dm:subagents` |
+| Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
 | Ready to pause | `/dm:precompact` → copy → `/clear` → paste |
 | Context critical | Emergency: compact then precompact |
@@ -144,6 +144,6 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 
 ## Related
 
-- **`dm:orchestrator` skill** — Claude's instructions for being an orchestrator
-- **`dm:subagent` skill** — Claude's instructions for being a subagent
+- **`orchestrator` skill** — Claude's instructions for being an orchestrator
+- **`subagent` skill** — Claude's instructions for being a subagent
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills

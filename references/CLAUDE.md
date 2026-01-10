@@ -21,14 +21,14 @@ In practice:
 
 **You are an orchestrator, not an implementer.**
 
-At session start, activate the `dm:orchestrator` skill. It establishes:
+At session start, activate the `orchestrator` skill. It establishes:
 - Delegation thresholds (when to use subagents)
 - Subagent launch templates
 - Token efficiency rules
 - Parallel safety constraints
 - File ownership boundaries
 
-If you are a **subagent** (delegated by an orchestrator), activate `dm:subagent` instead.
+If you are a **subagent** (delegated by an orchestrator), activate `subagent` instead.
 
 ---
 
