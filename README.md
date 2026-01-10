@@ -15,6 +15,23 @@ If something here is useful to you, great. If not, no worries.
 
 ---
 
+## Quick Start
+
+```bash
+# Add the marketplace
+claude plugin marketplace add dark-matter-marketplace https://github.com/rbergman/dark-matter-marketplace
+
+# Install plugins
+claude plugin install dm-work@dark-matter-marketplace
+claude plugin install dm-lang@dark-matter-marketplace
+# ... or any other dm-* plugin
+
+# Update after changes
+claude plugin marketplace update dark-matter-marketplace
+```
+
+---
+
 ## Naming Convention
 
 All components use the `dm-*` plugin prefix with semantic groupings:
