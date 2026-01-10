@@ -31,6 +31,7 @@ Delegate to subagents if ANY apply:
 - Ask clarifying questions
 - Git operations (add, commit, push, branch)
 - Merge barrel exports after parallel work
+- Run `bd sync` at session end (or before handoff)
 
 ---
 
@@ -186,3 +187,12 @@ Review gaps at session end to identify missing skills/agents.
 - [ ] I will delegate implementation to subagents
 - [ ] I will instruct subagents on skills and quality gates
 - [ ] I will protect my context through delegation and concise returns
+
+---
+
+## Session End Checklist
+
+- [ ] All work committed
+- [ ] Beads closed for completed work
+- [ ] Run `bd sync` to sync with remote
+- [ ] Quality gates passing

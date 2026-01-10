@@ -173,6 +173,50 @@ bd worktree remove .worktrees/feature-auth
 
 ---
 
+## Known Limitations
+
+### Daemon Mode
+
+Daemon mode does not work correctly with user-created git worktrees. Worktrees share the same `.git` directory and beads database, but the daemon doesn't track which branch each worktree has checked out.
+
+**Solution**: Use direct mode in worktrees:
+```bash
+bd --no-daemon <command>
+# Or set environment variable
+export BEADS_NO_DAEMON=1
+```
+
+### Two Types of Worktrees
+
+Don't confuse these:
+
+| Type | Location | Purpose |
+|------|----------|---------|
+| User worktrees | `.worktrees/<name>` | Parallel feature work (you create these) |
+| Beads internal | `.git/beads-worktrees/beads-sync` | Sync-branch commits (beads creates this) |
+
+The internal worktree is hidden and managed by beads for the sync-branch feature. Don't manually modify it.
+
+### SKIP_WORKTREE Issues
+
+If `git status` doesn't show changes to `.beads/*.jsonl` files, check for SKIP_WORKTREE flags:
+
+```bash
+git ls-files -v .beads/
+# 'h' prefix = SKIP_WORKTREE set (changes hidden)
+# 'H' prefix = normal tracking
+```
+
+**Fix**: Remove and re-add the files:
+```bash
+git rm --cached .beads/issues.jsonl
+git add .beads/issues.jsonl
+```
+
+Or run `bd sync` which sets the correct index flags.
+
+---
+
 ## Fallback (No Beads)
 
 If beads isn't installed, use manual git worktree:

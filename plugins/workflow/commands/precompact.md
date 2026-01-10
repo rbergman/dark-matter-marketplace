@@ -59,7 +59,7 @@ Progress: X/Y subtasks complete
 
 (...)
 
-### Beads commands (use BEADS_DIR prefix in worktree)
+### Beads commands
 
 (...)
 
