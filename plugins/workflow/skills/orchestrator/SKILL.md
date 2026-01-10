@@ -140,7 +140,7 @@ When launching parallel subagents:
 
 Use when parallel subagents need filesystem isolation (conflicting files, separate builds/servers).
 
-**Skill:** `superpowers:using-git-worktrees`
+**Skill:** `dm-work:worktrees`
 **Directory:** `.worktrees/` (gitignored)
 **Beads:** `sync-branch: beads-sync` shares issue state across worktrees
 
