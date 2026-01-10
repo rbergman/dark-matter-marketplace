@@ -35,6 +35,21 @@ Senior-level TypeScript expertise for production projects. Focuses on strict typ
 
 ## Project Setup (TypeScript 5.5+)
 
+### Version Management with mise
+
+[mise](https://mise.jdx.dev) manages language runtimes per-project. Ensures all contributors use the same Node version—no "works on my machine" issues.
+
+```bash
+# Install mise (once)
+curl https://mise.run | sh
+
+# In project root
+mise use node@22
+
+# Creates .mise.toml — commit it
+# Team members just run: mise install
+```
+
 ### New Project Quick Start
 
 ```bash

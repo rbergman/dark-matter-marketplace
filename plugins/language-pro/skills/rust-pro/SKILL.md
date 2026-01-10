@@ -97,6 +97,23 @@ pub fn simd_normalize(vectors: &mut [f32x8]) {
 
 ## Project Setup (Rust 1.83+)
 
+### Version Management with mise
+
+[mise](https://mise.jdx.dev) manages language runtimes per-project. For Rust, this complements rustup by pinning the exact toolchain version.
+
+```bash
+# Install mise (once)
+curl https://mise.run | sh
+
+# In project root
+mise use rust@1.83
+
+# Creates .mise.toml — commit it
+# Team members just run: mise install
+```
+
+Alternatively, use `rust-toolchain.toml` (rustup-native) if you prefer not to add mise as a dependency.
+
 ### New Project Quick Start
 
 ```bash
