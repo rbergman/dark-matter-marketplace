@@ -83,7 +83,7 @@ Context is your most valuable resource. Protect it aggressively.
 
 ### The 80k Rule
 
-When context grows above 80-100k tokens (out of ~200k limit), start looking for a natural pause point.
+When context reaches 80-150k tokens (out of ~200k limit), start looking for a natural pause point.
 
 ### Precompact Before Crisis
 
@@ -146,7 +146,7 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 | New idea or vague spec | Conversation to convergence |
 | Low confidence in spec | `/dm:breakdown` or `/dm:refine` |
 | Ready to implement | Create beads, then `/dm:subagents` |
-| Context at 80-100k | Start looking for pause point |
+| Context at 80-150k | Start looking for pause point |
 | Natural pause point | `/dm:precompact` → copy → `/clear` → paste |
 | Context critical (<10%) | Emergency precompact or compact+precompact |
 | Task complete | Review, commit, close bead |
