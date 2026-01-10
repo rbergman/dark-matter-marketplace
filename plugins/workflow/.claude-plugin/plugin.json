@@ -1,5 +1,5 @@
 {
-  "name": "workflow",
+  "name": "dm",
   "version": "0.1.0",
   "description": "Workflow tools: spec refinement, compression, peer review, and subagent delegation",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
