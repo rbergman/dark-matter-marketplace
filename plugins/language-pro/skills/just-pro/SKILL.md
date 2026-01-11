@@ -195,6 +195,28 @@ test:
     go test -race ./...
 ```
 
+**Module doc comments** - Comments above `mod` statements also appear in `just --list`:
+
+```just
+# Go API (GraphQL + Watermill)
+mod api "packages/api"
+
+# Next.js frontend
+mod web "packages/web"
+
+# PostgreSQL database
+mod db "packages/db"
+```
+
+Output of `just --list`:
+```
+api ...      # Go API (GraphQL + Watermill)
+db ...       # PostgreSQL database
+web ...      # Next.js frontend
+```
+
+Always add doc comments to module imports for discoverability.
+
 ## Module System Details
 
 ### Syntax
