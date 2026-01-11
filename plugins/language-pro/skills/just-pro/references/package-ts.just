@@ -64,6 +64,20 @@ dev:
 start:
     npm start
 
+# === Security ===
+
+# Check for vulnerabilities (informational)
+audit:
+    npm audit
+
+# Auto-fix vulnerabilities where possible
+audit-fix:
+    npm audit fix
+
+# CI-friendly audit (high severity only, production deps)
+audit-ci:
+    npm audit --omit=dev --audit-level=high
+
 # === Clean ===
 
 # Remove build artifacts and dependencies

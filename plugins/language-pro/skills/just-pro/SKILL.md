@@ -373,6 +373,26 @@ setup:
 
 ---
 
+## Security Auditing
+
+All language templates include consistent audit recipes:
+
+| Recipe | Purpose |
+|--------|---------|
+| `audit` | Check for vulnerabilities (informational) |
+| `audit-fix` | Auto-fix where possible (npm only) |
+| `audit-ci` | CI-friendly (strict, production deps only) |
+
+**Language tools:**
+
+| Language | Tool | Installation |
+|----------|------|--------------|
+| Node/npm | `npm audit` | Built-in |
+| Go | `govulncheck` | `go get -tool golang.org/x/vuln/cmd/govulncheck@latest` |
+| Rust | `cargo audit` | `cargo install cargo-audit` |
+
+---
+
 ## Reference Templates
 
 Load the appropriate template based on project structure:
@@ -383,5 +403,6 @@ Load the appropriate template based on project structure:
 | `references/monorepo-root.just` | Monorepo root router |
 | `references/package-go.just` | Go package in monorepo |
 | `references/package-ts.just` | TypeScript package in monorepo |
+| `references/package-rust.just` | Rust package in monorepo |
 
 **Note**: Reference files use `.just` extension for organization. Actual project files must be named `justfile` (no extension) or `.justfile`.

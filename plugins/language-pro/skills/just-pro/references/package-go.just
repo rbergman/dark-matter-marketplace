@@ -75,6 +75,16 @@ coverage-check:
     fi
     echo "PASS: Coverage ${COVERAGE}% meets minimum 70%"
 
+# === Security ===
+
+# Check for vulnerabilities (requires govulncheck in go.mod tools)
+audit:
+    go tool govulncheck ./...
+
+# CI-friendly audit (same as audit for Go - govulncheck is already strict)
+audit-ci:
+    go tool govulncheck ./...
+
 # === Quality Gates ===
 
 # Run all checks (fmt, lint, test, coverage) - use before commits
