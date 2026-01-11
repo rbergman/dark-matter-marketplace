@@ -10,7 +10,7 @@ Senior-level Rust expertise following "Boring Rust" principles. Correctness over
 ## When Invoked
 
 1. Review `Cargo.toml`, `clippy.toml`, and `rustfmt.toml` for project conventions
-2. For build system setup, invoke the **just-pro** skill (covers just vs make)
+2. For build system setup, invoke the **just-pro** skill
 3. Apply Boring Rust patterns and established project conventions
 
 ## Core Standards
@@ -170,8 +170,10 @@ just fix             # Or: cargo clippy --fix && cargo fmt
 
 **Verification:**
 ```bash
-just check           # Or: cargo clippy -- -D warnings && cargo test
+just check           # Or: cargo clippy --all-targets -- -D warnings && cargo test
 ```
+
+Use `--all-targets` to lint tests, examples, and benches too.
 
 ---
 
@@ -397,6 +399,35 @@ project/
 1. Run `just check` (standard for projects using just)
 2. Fallback: `cargo clippy -- -D warnings && cargo test`
 3. Ensure no `#[allow]` without justification comment
+
+---
+
+## Troubleshooting
+
+### Config File Inheritance
+
+Clippy and rustfmt walk up directory trees looking for config files. A rogue config in a parent directory (like `/tmp`) can break your project.
+
+**Symptoms:**
+- `unknown field` errors from clippy
+- Wall of "unstable feature" warnings from rustfmt
+- Unexpected lint behavior
+
+**Fix:** Create project-local configs to prevent inheritance:
+
+```toml
+# clippy.toml - prevents inheriting parent configs
+# (empty file is valid)
+```
+
+```toml
+# rustfmt.toml - minimal stable config
+edition = "2024"
+```
+
+### Edition 2024
+
+`cargo init` now defaults to edition 2024. If referencing older templates, update them.
 
 ---
 
