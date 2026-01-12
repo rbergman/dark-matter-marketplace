@@ -18,12 +18,16 @@ Two kinds of ergonomics matter:
 
 Language skills should match the scope of the reference skill (e.g., `dm-lang:go-pro`):
 
-- **Clean, maintainable code** following general best practices
+- **Clean, maintainable code** following specified idioms
 - **Strict automated quality gates** — lints, types, tests all pass
-- **Idiomatic patterns** for the language
+- **Idiomatic patterns** as defined by the skill
 - **Standard project structure** with just/mise where viable
 
-Specialized concerns (architecture patterns, frontend/backend specifics, domain logic) belong in auxiliary skills that layer on top. Instruct the implementing agent to apply relevant arch skills as appropriate to the challenge.
+**On idioms:** Not all languages have a single "correct" style. Older languages especially may have multiple valid idioms — Scala could target imperative style or pure FP with Cats/ZIO; JavaScript varies wildly by era and framework. The human specifies which idioms to encode at the outset. This may result in multiple lang-pro skills for different dialects or profiles of the same language.
+
+**On dependencies:** Some lang-pro skills make sense as standalone (general TypeScript), others are specialized to frameworks (React, Express) or ecosystems. Whether to split the core language skill from framework-specific concerns is the human's call when creating the skill. Sometimes a unified `react-typescript-pro` makes more sense than layering `typescript-pro` + `react-pro`.
+
+Specialized concerns (architecture patterns, domain logic) typically belong in auxiliary skills that layer on top. Instruct the implementing agent to apply relevant arch skills as appropriate to the challenge.
 
 ---
 
