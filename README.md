@@ -63,7 +63,8 @@ dark-matter-marketplace/
 │   ├── workflow.md    # Human guide to the dev loop
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lsp-setup.md   # LSP configuration and troubleshooting
-│   └── autonomous-runs.md   # srt for sandboxed autonomous Claude
+│   ├── autonomous-runs.md   # srt for sandboxed autonomous Claude
+│   └── lang-skill-adaptation.md  # Adapting skills + DX testing
 └── README.md
 ```
 
@@ -147,6 +148,7 @@ Non-installable materials for reference and sharing.
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandbox Runtime (srt) for safe autonomous Claude sessions |
+| `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
 
 ---
 
