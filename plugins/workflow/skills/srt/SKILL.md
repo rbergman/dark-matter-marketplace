@@ -41,6 +41,7 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 
 ```json
 {
+  "allowPty": false,
   "network": {
     "allowedDomains": ["api.anthropic.com", "github.com"],
     "deniedDomains": []
@@ -52,6 +53,13 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
   }
 }
 ```
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `allowPty` | `false` | Enable pseudo-terminal access for interactive tools |
+| `network.allowedDomains` | `[]` | Domains to allow network access |
+| `filesystem.allowWrite` | `[]` | Paths to allow write access |
+| `filesystem.denyRead` | `[]` | Paths to block read access |
 
 ### Network Allowlist Strategy
 
@@ -158,6 +166,61 @@ srt -s .srt.json -c 'claude --dangerously-skip-permissions \
 ```
 
 **Tradeoff:** Context7 gives better docs lookup than GitHub search, but requires MCP cache writes. For pure build/test tasks, skip MCP entirely.
+
+---
+
+## Interactive Mode (allowPty)
+
+**Key discovery:** Interactive CLI tools require pseudo-terminal access.
+
+### The Problem
+
+Running interactive tools (like Claude Code in interactive mode) fails with:
+```
+setRawMode failed with errno: 1
+```
+
+### Why It Happens
+
+On macOS, `sandbox-exec` blocks `/dev/ptmx` and `/dev/ttys*` by default. Interactive CLI tools need these for:
+- Raw terminal mode (keyboard input handling)
+- Terminal UI rendering
+- Signal handling (Ctrl+C, etc.)
+
+### The Solution
+
+Add `"allowPty": true` to your srt config:
+
+```json
+{
+  "allowPty": true,
+  "network": {
+    "allowedDomains": ["api.anthropic.com"]
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
+    "allowWrite": [".", "/tmp"]
+  }
+}
+```
+
+### When to Use
+
+| Mode | `allowPty` | Use Case |
+|------|------------|----------|
+| Interactive | `true` | Human-in-the-loop Claude sessions |
+| Batch/Autonomous | `false` (default) | CI/CD, one-shot prompts |
+
+**Security note:** PTY access is lower risk than network/filesystem—it only affects terminal I/O, not data exfiltration.
+
+### Documentation Gap
+
+The `allowPty` option is:
+- Not documented in the srt README
+- Not shown in `srt --help`
+- Only visible in source code (`sandbox-manager.ts`, `macos-sandbox-utils.ts`)
+
+This is a common gotcha when setting up interactive sessions.
 
 ---
 
@@ -323,16 +386,31 @@ srt -s /tmp/dx-test.srt.json -c 'claude --dangerously-skip-permissions \
 Add these recipes to a project's justfile for convenient access:
 
 ```just
-# Interactive Claude session
+# Interactive Claude session (unsandboxed)
 ai:
     claude
 
-# Autonomous Claude (sandboxed, no prompts)
-ai-auto:
-    srt -s .srt.json -c 'claude --dangerously-skip-permissions --no-session-persistence --strict-mcp-config --mcp-config "{\"mcpServers\":{}}"'
+# Interactive Claude session (sandboxed, needs allowPty: true in .srt.json)
+ai-sandboxed:
+    srt -s .srt.json -c 'claude --dangerously-skip-permissions'
+
+# Autonomous Claude (sandboxed, no prompts, batch mode)
+ai-auto prompt:
+    srt -s .srt.json -c 'claude --dangerously-skip-permissions \
+        --no-session-persistence \
+        --strict-mcp-config --mcp-config "{\"mcpServers\":{}}" \
+        -p "{{prompt}}"'
 ```
 
-**Note:** This is an optional pattern. Only add if the project needs autonomous Claude runs.
+**Recipe breakdown:**
+
+| Recipe | PTY needed | Use case |
+|--------|------------|----------|
+| `ai` | N/A (unsandboxed) | Normal interactive development |
+| `ai-sandboxed` | Yes | Interactive with network/fs restrictions |
+| `ai-auto` | No | CI/CD, automated tasks |
+
+**Note:** `ai-sandboxed` requires `"allowPty": true` in `.srt.json`. The `ai-auto` recipe doesn't need it because `-p` runs non-interactively.
 
 ---
 
@@ -374,6 +452,17 @@ For **beads integration**:
 ---
 
 ## Troubleshooting
+
+### "setRawMode failed with errno: 1"
+
+Interactive CLI tools need PTY access. Add to your config:
+```json
+{
+  "allowPty": true
+}
+```
+
+See [Interactive Mode (allowPty)](#interactive-mode-allowpty) for details.
 
 ### "EPERM: operation not permitted"
 
