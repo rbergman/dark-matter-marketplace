@@ -53,9 +53,38 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 }
 ```
 
-### Network Allowlists by Ecosystem
+### Network Allowlist Strategy
 
-**Rust development:**
+**The GitHub question:** Many examples include `github.com` by default. Understand why before blindly copying:
+
+| Reason to allow GitHub | When needed |
+|------------------------|-------------|
+| Git-based dependencies | Cargo git deps, Go modules, npm git refs |
+| Beads sync | `bd sync` pushes work state to remote |
+| Code search | Looking up OSS implementations |
+
+| Reason to block GitHub | Consideration |
+|------------------------|---------------|
+| Exfiltration surface | Domain fronting allows data to reach any GitHub-hosted endpoint |
+| Not always needed | Pure registry deps (crates.io, npm) don't need GitHub |
+| Context7 alternative | For docs/code lookup, Context7 is more focused |
+
+**Recommendation:** Start with minimal allowlist, add GitHub only if builds fail on git-based deps or you need beads sync.
+
+### Minimal vs Full Allowlists
+
+**Minimal (no GitHub) — prefer when possible:**
+
+```json
+"allowedDomains": [
+  "api.anthropic.com",
+  "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
+  "static.rust-lang.org"
+]
+```
+
+**With GitHub (when git deps or beads needed):**
+
 ```json
 "allowedDomains": [
   "api.anthropic.com",
@@ -66,33 +95,69 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 ]
 ```
 
-**Go development:**
+### Ecosystem-Specific Allowlists
+
+**Rust (minimal):**
+```json
+"allowedDomains": [
+  "api.anthropic.com",
+  "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
+  "static.rust-lang.org"
+]
+```
+
+**Go (minimal):**
 ```json
 "allowedDomains": [
   "api.anthropic.com",
   "proxy.golang.org", "sum.golang.org", "storage.googleapis.com",
-  "github.com", "*.github.com",
   "gopkg.in"
 ]
 ```
 
-**Node/TypeScript development:**
+**Node/TypeScript (minimal):**
 ```json
 "allowedDomains": [
   "api.anthropic.com",
-  "registry.npmjs.org", "*.npmjs.org",
-  "github.com", "*.github.com"
+  "registry.npmjs.org", "*.npmjs.org"
 ]
 ```
 
-**With MCP services (Context7, Brightdata):**
+**Add GitHub to any of the above if:**
+- Build fails fetching git-based dependencies
+- You need `bd sync` for beads state persistence
+
+### MCP in Sandbox (Context7, Brightdata)
+
+The official context7 plugin is an MCP wrapper (`npx @upstash/context7-mcp`), so it has the same requirements as any MCP:
+
+**To enable MCP in sandbox:**
 ```json
-"allowedDomains": [
-  "api.anthropic.com",
-  "context7.com", "*.context7.com",
-  "brightdata.com", "*.brightdata.com"
-]
+{
+  "network": {
+    "allowedDomains": [
+      "api.anthropic.com",
+      "context7.com", "*.context7.com",
+      "api.upstash.com"
+    ]
+  },
+  "filesystem": {
+    "allowWrite": [
+      ".",
+      "~/Library/Caches/claude-cli-nodejs"
+    ]
+  }
+}
 ```
+
+Then run **without** `--strict-mcp-config`:
+```bash
+srt -s .srt.json -c 'claude --dangerously-skip-permissions \
+  --no-session-persistence \
+  -p "prompt"'
+```
+
+**Tradeoff:** Context7 gives better docs lookup than GitHub search, but requires MCP cache writes. For pure build/test tasks, skip MCP entirely.
 
 ---
 
@@ -120,7 +185,7 @@ claude --dangerously-skip-permissions \
 
 ### Project-Specific `.srt.json`
 
-For a Rust project:
+For a Rust project (minimal — no GitHub):
 
 ```json
 {
@@ -128,8 +193,7 @@ For a Rust project:
     "allowedDomains": [
       "api.anthropic.com",
       "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
-      "github.com", "*.github.com",
-      "static.rust-lang.org", "*.cloudfront.net"
+      "static.rust-lang.org"
     ]
   },
   "filesystem": {
@@ -144,17 +208,48 @@ For a Rust project:
 }
 ```
 
-### DX Testing Config
+If builds fail on git-based deps, add: `"github.com", "*.github.com", "*.cloudfront.net"`
 
-For stress-testing skills in `/tmp`:
+### With Beads Sync
+
+If you need `bd sync` to push work state:
 
 ```json
 {
   "network": {
     "allowedDomains": [
       "api.anthropic.com",
-      "crates.io", "*.crates.io", "github.com", "*.github.com",
-      "registry.npmjs.org", "proxy.golang.org"
+      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
+      "static.rust-lang.org",
+      "github.com", "*.github.com"
+    ]
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
+    "allowWrite": [
+      ".",
+      "~/.cargo/registry", "~/.cargo/git",
+      "/tmp"
+    ]
+  }
+}
+```
+
+**Alternative:** Skip `bd sync` in autonomous runs and sync manually after review. This keeps GitHub out of the allowlist.
+
+### DX Testing Config
+
+For stress-testing skills in `/tmp` (multi-ecosystem):
+
+```json
+{
+  "network": {
+    "allowedDomains": [
+      "api.anthropic.com",
+      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
+      "static.rust-lang.org",
+      "registry.npmjs.org", "*.npmjs.org",
+      "proxy.golang.org", "sum.golang.org", "storage.googleapis.com"
     ]
   },
   "filesystem": {
@@ -167,6 +262,36 @@ For stress-testing skills in `/tmp`:
   }
 }
 ```
+
+Note: No GitHub in DX testing config. Add only if tests specifically need git-based deps.
+
+### With Context7 (MCP enabled)
+
+For tasks needing documentation lookup:
+
+```json
+{
+  "network": {
+    "allowedDomains": [
+      "api.anthropic.com",
+      "context7.com", "*.context7.com", "api.upstash.com",
+      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
+      "static.rust-lang.org"
+    ]
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
+    "allowWrite": [
+      ".",
+      "~/.cargo/registry", "~/.cargo/git",
+      "~/Library/Caches/claude-cli-nodejs",
+      "/tmp"
+    ]
+  }
+}
+```
+
+Run without `--strict-mcp-config` to enable Context7.
 
 ---
 
@@ -211,16 +336,40 @@ ai-auto:
 
 ---
 
-## Limitations
+## Limitations & Tradeoffs
 
 | Limitation | Impact |
 |------------|--------|
 | Domain fronting | Broad allowlists (github.com) have exfiltration surface |
 | Linux monitoring | No violation alerts (macOS has real-time notifications) |
 | Proxy bypass | Apps ignoring env vars can bypass network filtering |
-| MCP disabled | No Context7, Brightdata, etc. in sandboxed runs |
 
-For MCP in sandbox, you'd need to allow `~/Library/Caches/claude-cli-nodejs/` writes and add MCP endpoints to network allowlist.
+### Decision Matrix
+
+| Need | Allowlist | Notes |
+|------|-----------|-------|
+| Pure build/test | Minimal (no GitHub) | Prefer this when possible |
+| Git-based deps | Add GitHub | Only if builds fail without it |
+| Beads sync | Add GitHub | Or skip sync, review manually |
+| Docs lookup | Context7 + MCP cache | Better than GitHub search |
+| Web research | Brightdata + MCP cache | Or skip for autonomous builds |
+
+### The GitHub vs Context7 Question
+
+For **information gathering** (docs, code patterns):
+- Context7 is more focused and doesn't have exfiltration surface
+- Requires MCP cache writes (`~/Library/Caches/claude-cli-nodejs`)
+- Worth the tradeoff for research-heavy tasks
+
+For **pure execution** (build, test, lint):
+- Skip both GitHub and MCP
+- Minimal attack surface
+- Claude works from training data + local context
+
+For **beads integration**:
+- GitHub required for `bd sync`
+- Alternative: Skip sync during autonomous run, sync manually after
+- Consider: Is persisting work state during autonomous run worth the exfiltration risk?
 
 ---
 

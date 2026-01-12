@@ -139,6 +139,61 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 | Context critical | Emergency: compact then precompact |
 | Task complete | Review, commit, close bead |
 | Starting new session | Paste last precompact + `bd ready` |
+| Unattended execution | Configure `.srt.json`, run with srt |
+| CI/CD integration | Invoke `dm-work:srt` for config templates |
+
+---
+
+## Autonomous Runs with srt
+
+For unattended execution — CI/CD, batch processing, or DX testing — use [Sandbox Runtime (srt)](https://github.com/anthropic-experimental/sandbox-runtime) to run Claude with `--dangerously-skip-permissions` safely.
+
+### When to Use Autonomous Mode
+
+| Scenario | Why autonomous |
+|----------|----------------|
+| CI/CD code review | No human to click "allow" |
+| Batch repo updates | Process N repos without N interactions |
+| DX stress testing | Test skills in isolated `/tmp` environments |
+| Long-running tasks | Let Claude work overnight unattended |
+
+### Quick Setup
+
+```bash
+# Install srt
+npm install -g @anthropic-ai/sandbox-runtime
+
+# Create project config
+cat > .srt.json << 'EOF'
+{
+  "network": {
+    "allowedDomains": ["api.anthropic.com", "github.com", "*.github.com"]
+  },
+  "filesystem": {
+    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
+    "allowWrite": [".", "/tmp"]
+  }
+}
+EOF
+
+# Run sandboxed
+srt -s .srt.json -c 'claude --dangerously-skip-permissions \
+  --no-session-persistence \
+  --strict-mcp-config --mcp-config "{\"mcpServers\":{}}" \
+  -p "Build and test the project"'
+```
+
+### Combining with the Workflow
+
+Autonomous runs complement the interactive workflow:
+
+1. **Interactive**: Convergence, spec refinement, architecture decisions
+2. **Autonomous**: Execution of well-defined tasks via srt
+3. **Interactive**: Review results, commit, close beads
+
+For complex tasks, you might alternate — converge interactively, let Claude execute autonomously, review and refine interactively.
+
+See **autonomous-runs.md** for full configuration and the **`dm-work:srt` skill** for ecosystem-specific allowlists.
 
 ---
 
@@ -146,4 +201,6 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 
 - **`dm-work:orchestrator` skill** — Claude's instructions for being an orchestrator
 - **`dm-work:subagent` skill** — Claude's instructions for being a subagent
+- **`dm-work:srt` skill** — Sandbox Runtime configuration for autonomous runs
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills
+- **`autonomous-runs.md`** — Full guide to sandboxed autonomous Claude
