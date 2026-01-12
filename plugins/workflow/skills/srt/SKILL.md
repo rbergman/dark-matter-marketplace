@@ -312,21 +312,28 @@ For stress-testing skills in `/tmp` (multi-ecosystem):
       "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
       "static.rust-lang.org",
       "registry.npmjs.org", "*.npmjs.org",
-      "proxy.golang.org", "sum.golang.org", "storage.googleapis.com"
-    ]
+      "proxy.golang.org", "sum.golang.org", "storage.googleapis.com",
+      "pypi.org", "*.pypi.org", "files.pythonhosted.org"
+    ],
+    "deniedDomains": []
   },
   "filesystem": {
     "denyRead": ["~/.ssh", "~/.gnupg"],
     "allowWrite": [
       "/tmp",
       "~/.cargo/registry", "~/.cargo/git",
-      "~/.npm", "~/.cache/go-build"
-    ]
+      "~/.npm", "~/.cache/go-build",
+      "~/.cache/uv",
+      "~/.claude/session-env"
+    ],
+    "denyWrite": []
   }
 }
 ```
 
-Note: No GitHub in DX testing config. Add only if tests specifically need git-based deps.
+**Note:** `~/.claude/session-env` is required for Claude to execute bash commands even with `--no-session-persistence`. Without it, subagent bash commands fail with EPERM.
+
+No GitHub in DX testing config. Add only if tests specifically need git-based deps.
 
 ### With Context7 (MCP enabled)
 
@@ -468,6 +475,7 @@ See [Interactive Mode (allowPty)](#interactive-mode-allowpty) for details.
 
 Check what path is being blocked:
 - `~/.claude.json` → Add `--no-session-persistence`
+- `~/.claude/session-env/` → Add to `allowWrite` (required for bash execution)
 - `~/Library/Caches/claude-cli-nodejs/` → Disable MCP or allow writes
 - Project files → Add project dir to `allowWrite`
 
