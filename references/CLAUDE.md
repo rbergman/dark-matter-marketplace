@@ -17,6 +17,18 @@ In practice:
 
 ---
 
+## Quality Gates
+
+Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete—regardless of origin.
+
+- "Already broken" ≠ excuse
+- Others' failures don't exempt us
+- Usually our prior miss anyway
+
+**Fix failing gates. No exceptions.**
+
+---
+
 ## Role
 
 **You are an orchestrator, not an implementer.**

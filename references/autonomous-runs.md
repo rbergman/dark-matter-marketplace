@@ -1,10 +1,17 @@
 # Autonomous Claude Runs with srt
 
-Running Claude autonomously (with `--dangerously-skip-permissions`) requires careful safety controls. [Sandbox Runtime (srt)](https://github.com/anthropic-experimental/sandbox-runtime) provides OS-level sandboxing without containers.
+> **For interactive sessions**, use Claude Code's built-in `/sandbox` command instead. This guide covers CLI/autonomous runs with `-p` and `--dangerously-skip-permissions`.
+
+Running Claude autonomously requires careful safety controls. [Sandbox Runtime (srt)](https://github.com/anthropic-experimental/sandbox-runtime) provides OS-level sandboxing without containers.
 
 ---
 
-## Why srt?
+## Why srt (not `/sandbox`)?
+
+Claude Code's `/sandbox` is interactive-only. For CLI/autonomous runs, srt provides:
+- **No escape hatch** — commands cannot break out (unlike `/sandbox`)
+- **Per-project config** — `.srt.json` per repo vs global settings
+- **CLI-first** — wraps `claude -p` for batch/CI use
 
 | Concern | How srt helps |
 |---------|---------------|
@@ -151,16 +158,15 @@ done
 Add to your project's justfile:
 
 ```just
-# Interactive Claude session
-ai:
-    claude
-
 # Autonomous Claude (sandboxed, no prompts)
-ai-auto:
+ai-auto prompt:
     srt -s .srt.json -c 'claude --dangerously-skip-permissions \
       --no-session-persistence \
-      --strict-mcp-config --mcp-config "{\"mcpServers\":{}}"'
+      --strict-mcp-config --mcp-config "{\"mcpServers\":{}}" \
+      -p "{{prompt}}"'
 ```
+
+For interactive sandboxed sessions, use `/sandbox` in Claude Code instead.
 
 ---
 

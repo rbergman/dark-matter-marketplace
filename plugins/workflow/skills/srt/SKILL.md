@@ -1,6 +1,45 @@
 ---
 name: srt
-description: Sandbox Runtime (srt) patterns for running Claude with filesystem/network restrictions. Use when setting up sandboxed autonomous Claude sessions, DX testing, or CI/CD integration with constrained dangerous mode.
+description: Sandbox Runtime (srt) patterns for CLI/autonomous Claude runs. For interactive sandboxing, use Claude Code's built-in `/sandbox` command instead.
+---
+
+# Sandboxing Claude
+
+## Interactive vs Autonomous
+
+Claude Code now has **built-in sandboxing**. Choose the right approach:
+
+| Mode | Tool | When to Use |
+|------|------|-------------|
+| **Interactive** | `/sandbox` | Human-in-the-loop sessions with sandbox protection |
+| **CLI/Autonomous** | srt | `claude -p` with `--dangerously-skip-permissions` |
+
+### For Interactive Sessions: Use `/sandbox`
+
+Run `/sandbox` in Claude Code to enable native sandboxing. It uses the same OS primitives as srt (macOS seatbelt, Linux bubblewrap) but is simpler:
+
+- No installation required
+- Integrated with permission system (auto-allow mode reduces prompts by 84%)
+- Configure via `settings.json`
+
+**What `/sandbox` protects:**
+- Filesystem: Write access limited to CWD by default
+- Network: Domain allowlist with prompts for new domains
+- Subprocesses: Same restrictions apply to scripts Claude runs
+
+**What `/sandbox` does NOT protect:**
+- No CLI flag equivalent (Docker required for CLI sandbox)
+- Has escape hatch (`dangerouslyDisableSandbox`) - commands can break out
+- Config is global (`settings.json`), not per-project
+
+### For CLI/Autonomous: Use srt
+
+When running Claude with `-p` and `--dangerously-skip-permissions`, srt provides stricter control:
+
+- **No escape hatch** - commands cannot break out
+- **Per-project config** - `.srt.json` in each repo
+- **Explicit allowlists** - you specify exactly what's permitted
+
 ---
 
 # Sandbox Runtime (srt)
@@ -390,17 +429,9 @@ srt -s /tmp/dx-test.srt.json -c 'claude --dangerously-skip-permissions \
 
 ## Optional: Justfile Integration
 
-Add these recipes to a project's justfile for convenient access:
+Add this recipe to a project's justfile for autonomous runs:
 
 ```just
-# Interactive Claude session (unsandboxed)
-ai:
-    claude
-
-# Interactive Claude session (sandboxed, needs allowPty: true in .srt.json)
-ai-sandboxed:
-    srt -s .srt.json -c 'claude --dangerously-skip-permissions'
-
 # Autonomous Claude (sandboxed, no prompts, batch mode)
 ai-auto prompt:
     srt -s .srt.json -c 'claude --dangerously-skip-permissions \
@@ -409,15 +440,7 @@ ai-auto prompt:
         -p "{{prompt}}"'
 ```
 
-**Recipe breakdown:**
-
-| Recipe | PTY needed | Use case |
-|--------|------------|----------|
-| `ai` | N/A (unsandboxed) | Normal interactive development |
-| `ai-sandboxed` | Yes | Interactive with network/fs restrictions |
-| `ai-auto` | No | CI/CD, automated tasks |
-
-**Note:** `ai-sandboxed` requires `"allowPty": true` in `.srt.json`. The `ai-auto` recipe doesn't need it because `-p` runs non-interactively.
+**Note:** For interactive sandboxed sessions, use `/sandbox` in Claude Code instead of srt. The `ai-auto` recipe is for CLI/autonomous runs only.
 
 ---
 

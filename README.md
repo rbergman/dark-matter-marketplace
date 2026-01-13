@@ -63,7 +63,7 @@ dark-matter-marketplace/
 │   ├── workflow.md    # Human guide to the dev loop
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lsp-setup.md   # LSP configuration and troubleshooting
-│   ├── autonomous-runs.md   # srt for sandboxed autonomous Claude
+│   ├── autonomous-runs.md   # Sandboxing Claude (srt for CLI/autonomous runs)
 │   └── lang-skill-adaptation.md  # Adapting skills + DX testing
 └── README.md
 ```
@@ -96,7 +96,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
 | `dm-work:mise` | Skill | Modern dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
-| `dm-work:srt` | Skill | Sandbox Runtime for autonomous Claude runs — OS-level filesystem/network restrictions |
+| `dm-work:srt` | Skill | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous runs |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
@@ -147,7 +147,7 @@ Non-installable materials for reference and sharing.
 | `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
-| `autonomous-runs.md` | Sandbox Runtime (srt) for safe autonomous Claude sessions |
+| `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
 
 ---
@@ -189,7 +189,7 @@ The plugins include opinionated DX tooling that works together:
 | [mise](https://mise.jdx.dev) | `dm-work:mise` | Version management for all languages/tools — replaces nvm, pyenv, goenv |
 | [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
 | CLI tools | `dm-work:cli-tools` | fd, rg, jq, yq, sd, bat, delta — power tools when built-ins aren't enough |
-| [srt](https://github.com/anthropic-experimental/sandbox-runtime) | `dm-work:srt` | Sandbox Runtime — OS-level isolation for autonomous Claude runs |
+| [srt](https://github.com/anthropic-experimental/sandbox-runtime) | `dm-work:srt` | Sandbox Runtime — OS-level isolation for CLI/autonomous runs (use `/sandbox` for interactive) |
 
 **The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.
 

@@ -139,14 +139,56 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 | Context critical | Emergency: compact then precompact |
 | Task complete | Review, commit, close bead |
 | Starting new session | Paste last precompact + `bd ready` |
-| Unattended execution | Configure `.srt.json`, run with srt |
-| CI/CD integration | Invoke `dm-work:srt` for config templates |
+| Interactive sandboxing | Run `/sandbox` to enable native sandbox |
+| CLI/autonomous runs | Configure `.srt.json`, run with srt |
+
+---
+
+## Sandboxing Claude
+
+Claude Code has built-in sandboxing for safer execution. Choose the right approach based on your use case.
+
+### Interactive: `/sandbox`
+
+For human-in-the-loop sessions, use Claude Code's native sandbox:
+
+```
+/sandbox
+```
+
+This opens a menu to enable sandboxing. Once enabled:
+- **Filesystem**: Write access limited to current working directory
+- **Network**: Domain allowlist with prompts for new domains
+- **Prompts**: Auto-allow mode reduces permission prompts by 84%
+
+**What `/sandbox` protects against:**
+- Accidental writes outside your project
+- Unauthorized network access
+- Prompt injection attacks that try to exfiltrate data
+
+**Limitations:**
+- No CLI flag (only available interactively or via Docker)
+- Has escape hatch — commands can use `dangerouslyDisableSandbox` to break out
+- Global config (`settings.json`), not per-project
+
+### CLI/Autonomous: srt
+
+For unattended execution — CI/CD, batch processing, or `-p` prompts — use [srt](https://github.com/anthropic-experimental/sandbox-runtime):
+
+| Feature | `/sandbox` | srt |
+|---------|------------|-----|
+| Mode | Interactive only | CLI/autonomous |
+| Escape hatch | Yes | No (stricter) |
+| Config | Global settings.json | Per-project .srt.json |
+| Install | Built-in | `npm install -g @anthropic-ai/sandbox-runtime` |
+
+Both use the same OS primitives (macOS seatbelt, Linux bubblewrap), so security guarantees are equivalent when escape hatch isn't used.
 
 ---
 
 ## Autonomous Runs with srt
 
-For unattended execution — CI/CD, batch processing, or DX testing — use [Sandbox Runtime (srt)](https://github.com/anthropic-experimental/sandbox-runtime) to run Claude with `--dangerously-skip-permissions` safely.
+For unattended execution — CI/CD, batch processing, or DX testing — use srt to run Claude with `--dangerously-skip-permissions` safely.
 
 ### When to Use Autonomous Mode
 
@@ -199,8 +241,9 @@ See **autonomous-runs.md** for full configuration and the **`dm-work:srt` skill*
 
 ## Related
 
+- **`/sandbox`** — Claude Code's built-in sandbox for interactive sessions
 - **`dm-work:orchestrator` skill** — Claude's instructions for being an orchestrator
 - **`dm-work:subagent` skill** — Claude's instructions for being a subagent
-- **`dm-work:srt` skill** — Sandbox Runtime configuration for autonomous runs
+- **`dm-work:srt` skill** — Sandbox Runtime configuration for CLI/autonomous runs
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills
 - **`autonomous-runs.md`** — Full guide to sandboxed autonomous Claude
