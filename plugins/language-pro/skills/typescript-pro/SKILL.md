@@ -57,10 +57,6 @@ mise use node@22
 npm init -y
 npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments vitest husky
 
-# Copy configs from this skill's references/ directory:
-#   references/tsconfig.strict.json  → tsconfig.json
-#   references/eslint.config.js      → eslint.config.js
-
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
 npm pkg set scripts.lint="eslint src/"
@@ -76,6 +72,8 @@ chmod +x .husky/pre-commit
 # Verify
 npm run check
 ```
+
+**Required Config Files:** Create `tsconfig.json` and `eslint.config.js` per the templates below.
 
 ### Developer Onboarding
 
@@ -128,20 +126,103 @@ npm run check                # typecheck + lint + test
 
 ## Linting Configuration
 
-For new projects, copy the ESLint strict config:
-```bash
-# references/eslint.config.js → eslint.config.js
+### eslint.config.js Template
+
+**IMPORTANT:** When creating a new project, use this complete template. Do not omit rules.
+
+```javascript
+import tseslint from 'typescript-eslint';
+import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
+
+export default tseslint.config(
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+  {
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: {
+      '@eslint-community/eslint-comments': eslintComments,
+    },
+    rules: {
+      // === TYPE SAFETY (non-negotiable) ===
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/no-unsafe-type-assertion': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+
+      // === PROMISES ===
+      '@typescript-eslint/no-floating-promises': ['error', { ignoreVoid: true, ignoreIIFE: true }],
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/promise-function-async': 'error',
+
+      // === COMPLEXITY LIMITS (enforced) ===
+      'complexity': ['error', { max: 10 }],
+      'max-depth': ['error', 4],
+      'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
+      'max-params': ['error', 4],
+
+      // === BLOCK DISABLING CRITICAL RULES ===
+      '@eslint-community/eslint-comments/no-restricted-disable': ['error',
+        '@typescript-eslint/no-explicit-any',
+        '@typescript-eslint/no-unsafe-assignment',
+        '@typescript-eslint/no-unsafe-argument',
+        '@typescript-eslint/no-floating-promises',
+        'complexity', 'max-lines-per-function', 'max-lines',
+      ],
+      '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
+
+      // === COMMENTS ===
+      '@typescript-eslint/ban-ts-comment': ['error', {
+        'ts-expect-error': 'allow-with-description',
+        'ts-ignore': true,
+        'ts-nocheck': true,
+        minimumDescriptionLength: 10,
+      }],
+
+      // === CONSISTENCY ===
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
+  },
+  // Relax for tests
+  {
+    files: ['**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      'max-lines-per-function': 'off',
+      'max-lines': 'off',
+      'complexity': 'off',
+      '@eslint-community/eslint-comments/no-restricted-disable': 'off',
+    },
+  },
+  { ignores: ['dist/', 'node_modules/', 'coverage/', '*.js', '*.cjs', '*.mjs'] },
+);
 ```
 
-**Key rule categories:**
+### Enforced Limits Summary
 
-| Category | Purpose |
-|----------|---------|
-| Type Safety | no-explicit-any, no-unsafe-*, no-non-null-assertion |
-| Promises | no-floating-promises, no-misused-promises, require-await |
-| Assertions | no-unsafe-type-assertion, consistent-type-assertions |
-| Complexity | complexity, max-depth, max-lines-per-function |
-| Comments | ban-ts-comment (requires @ts-expect-error with description) |
+| Limit | Value | Purpose |
+|-------|-------|---------|
+| `max-lines` | 400 | Prevent god modules |
+| `max-lines-per-function` | 60 | Single responsibility |
+| `complexity` | 10 | Cyclomatic complexity cap |
+| `max-depth` | 4 | Avoid arrow code |
+| `max-params` | 4 | Use options objects |
+
+Critical rules **cannot be disabled via eslint-disable comments** - the config blocks it.
 
 ---
 
@@ -198,11 +279,13 @@ project/
 - `as any` or `as unknown as T` type assertions
 - `@ts-ignore` instead of `@ts-expect-error` with reason
 - Disabling strict checks to fix errors
+- **Using `eslint-disable` to bypass type safety or complexity rules** (blocked by config)
 - Implicit any in function parameters
 - Dangling promises without await/void
 - Over-complicated generic signatures
 - Non-null assertions (the `x!` operator) instead of proper narrowing
 - Truthy/falsy checks on non-booleans
+- Functions over 60 lines or files over 400 lines (refactor instead)
 - God classes/objects with 10+ methods or properties
 - Deep inheritance hierarchies (prefer composition)
 - Barrel files that re-export everything (causes circular deps)
