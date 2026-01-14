@@ -1,4 +1,8 @@
-Write up a pre-compaction handoff prompt that I can use to start a new session, with high fidelity, which includes:
+Write a pre-compaction handoff prompt directly to terminal output (NOT to a file).
+
+The user will copy your output, run /clear, then paste it into the fresh session.
+
+Include the following with high fidelity:
 
 - current status and next steps
 - any and all info about worktree and branch requirements
