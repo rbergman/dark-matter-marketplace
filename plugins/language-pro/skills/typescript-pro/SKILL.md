@@ -73,7 +73,7 @@ chmod +x .husky/pre-commit
 npm run check
 ```
 
-**Required Config Files:** Create `tsconfig.json` and `eslint.config.js` per the templates below.
+**Required Config Files:** Copy `references/gitignore` → `.gitignore`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
 
 ### Developer Onboarding
 

@@ -1,0 +1,71 @@
+# TypeScript .gitignore
+
+# =============================================================================
+# COMMON PATTERNS (all languages)
+# =============================================================================
+
+# Environment
+.env
+.env.local
+.env.*.local
+.envrc
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# =============================================================================
+# TYPESCRIPT / NODE-SPECIFIC
+# =============================================================================
+
+# Dependencies
+node_modules/
+/typings/
+
+# Build artifacts (adjust based on tsconfig.json outDir)
+/dist/
+/build/
+/output/
+*.js.map
+*.ts.map
+*.d.ts.map
+
+# Runtime files - uncomment if compiling to same directory
+# /*.js
+
+# Lockfiles - uncomment to ignore (not recommended)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Testing / Coverage
+/coverage/
+.nyc_output/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# Cache
+.cache/
+.eslintcache
+.turbo/
+.next/
+.nuxt/
+.vercel/
+
+# Misc
+*.tsbuildinfo

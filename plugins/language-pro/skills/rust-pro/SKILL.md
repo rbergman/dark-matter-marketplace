@@ -121,6 +121,7 @@ Alternatively, use `rust-toolchain.toml` (rustup-native) if you prefer not to ad
 cargo new project-name && cd project-name
 
 # Copy configs from this skill's references/ directory:
+#   references/gitignore        → .gitignore
 #   references/clippy.toml      → clippy.toml
 #   references/cargo_lints.toml → merge into Cargo.toml [lints] section
 #   references/rustfmt.toml     → rustfmt.toml

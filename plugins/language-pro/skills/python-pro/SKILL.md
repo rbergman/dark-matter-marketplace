@@ -71,6 +71,7 @@ mv *.py src/projectname/ 2>/dev/null || true
 touch src/projectname/__init__.py tests/__init__.py tests/conftest.py
 
 # Copy configs from this skill's references/ directory:
+#   references/gitignore               -> .gitignore
 #   references/pyproject-template.toml -> use as pyproject.toml base
 #   references/pyrightconfig.json      -> pyrightconfig.json
 # For build system, invoke just-pro skill

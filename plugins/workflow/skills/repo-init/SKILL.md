@@ -57,58 +57,45 @@ git init
 # Create .gitignore with common patterns
 ```
 
-### Base .gitignore Template
+### .gitignore Templates
+
+Each language skill provides a comprehensive `.gitignore` in its `references/` directory. These include common patterns (`.env`, `.envrc`, `.DS_Store`, `Thumbs.db`, IDE files) plus language-specific ignores.
+
+**Copy from the appropriate language skill:**
+
+| Language | Source |
+|----------|--------|
+| Go | `go-pro/references/gitignore` → `.gitignore` |
+| Rust | `rust-pro/references/gitignore` → `.gitignore` |
+| TypeScript | `typescript-pro/references/gitignore` → `.gitignore` |
+| Python | `python-pro/references/gitignore` → `.gitignore` |
+
+**For multi-language repos:** Start with the primary language's gitignore, then merge patterns from others as needed.
+
+**Minimal fallback** (if language skill unavailable):
 
 ```gitignore
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
+# Environment
+.env
+.env.local
+.env.*.local
+.envrc
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Environment
-.env
-.env.local
-.envrc
+# IDE
+.idea/
+.vscode/
 
-# Build artifacts (language-specific additions below)
+# Build (customize per language)
 dist/
 build/
-out/
-
-# Dependencies (language-specific)
-node_modules/
-vendor/
 target/
-
-# Logs
-*.log
-logs/
-
-# Test artifacts
-coverage/
-*.coverage
-.nyc_output/
-
-# Temporary
-tmp/
-temp/
-*.tmp
+node_modules/
+__pycache__/
 ```
-
-**Language additions:**
-
-| Language | Add to .gitignore |
-|----------|-------------------|
-| Go | `bin/`, `*.exe`, `coverage.out` |
-| Rust | `target/`, `Cargo.lock` (for libs) |
-| TypeScript | `node_modules/`, `dist/`, `.next/`, `.turbo/` |
-| Python | `__pycache__/`, `*.pyc`, `.venv/`, `*.egg-info/` |
 
 ---
 

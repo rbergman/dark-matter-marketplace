@@ -1,0 +1,58 @@
+# Go .gitignore
+# Allowlist-style: ignore everything, then explicitly allow Go files
+# Based on: https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+
+# =============================================================================
+# COMMON PATTERNS (all languages)
+# =============================================================================
+
+# Environment
+.env
+.env.local
+.env.*.local
+.envrc
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# =============================================================================
+# GO-SPECIFIC (Allowlist approach)
+# =============================================================================
+
+# Ignore everything
+*
+
+# But not these files...
+!/.gitignore
+
+# Go source and modules
+!*.go
+!go.sum
+!go.mod
+
+# Documentation
+!README.md
+!LICENSE
+!CLAUDE.md
+
+# Build system
+!justfile
+!Makefile
+
+# Config files
+!.golangci.yml
+!.mise.toml
+
+# Allow directories to be traversed
+!*/

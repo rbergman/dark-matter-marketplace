@@ -59,6 +59,7 @@ go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 go get -tool golang.org/x/tools/cmd/goimports@latest
 
 # Copy configs from this skill's references/ directory:
+#   references/gitignore          → .gitignore
 #   references/golangci-v2.yml    → .golangci.yml
 # For build system, invoke just-pro skill
 
