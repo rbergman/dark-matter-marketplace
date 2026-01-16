@@ -27,6 +27,12 @@ curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/insta
 
 # Initialize in your project
 bd init
+
+# Tell your agent
+echo "Use 'bd' for task tracking" >> AGENTS.md
+
+# Symlink so Claude Code picks it up too
+ln -s AGENTS.md CLAUDE.md
 ```
 
 ### MCPs: Stay Lean
