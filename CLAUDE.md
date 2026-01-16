@@ -42,7 +42,7 @@ Example: "See the **mise** skill for version management setup."
 
 ## Development Workflow
 
-Full workflow for creating and publishing skills:
+### Adding a skill to an existing plugin
 
 1. **Create the skill** in the appropriate plugin:
    ```
@@ -56,21 +56,39 @@ Full workflow for creating and publishing skills:
    plugins/<plugin-name>/.claude-plugin/plugin.json
    ```
 
-3. **Commit and push**:
+3. **Commit, push, update, reinstall**:
    ```bash
    git add -A && git commit -m "Add <skill-name> skill"
    git push
-   ```
-
-4. **Update the marketplace**:
-   ```bash
    claude plugin marketplace update dark-matter-marketplace
+   claude plugin uninstall <plugin-name> && claude plugin install <plugin-name>
    ```
 
-5. **Reinstall the plugin** to use the new skill:
+### Creating a new plugin
+
+Plugin names follow `dm-\w{4}` pattern (e.g., dm-tool, dm-work, dm-arch).
+
+1. **Create the plugin structure**:
+   ```
+   plugins/<dirname>/
+   ├── .claude-plugin/
+   │   └── plugin.json    # name, version, description, author
+   └── skills/
+       └── <skill-name>/
+           └── SKILL.md
+   ```
+
+2. **Register in marketplace.json**:
+   ```
+   .claude-plugin/marketplace.json  # Add entry to "plugins" array
+   ```
+
+3. **Commit, push, update, install**:
    ```bash
-   claude plugin uninstall dm-work  # or whichever plugin
-   claude plugin install dm-work
+   git add -A && git commit -m "Add <plugin-name> plugin"
+   git push
+   claude plugin marketplace update dark-matter-marketplace
+   claude plugin install <plugin-name>
    ```
 
 ## Conventions
