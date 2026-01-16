@@ -19,7 +19,7 @@ If something here is useful to you, great. If not, no worries.
 
 ```bash
 # Add the marketplace
-claude plugin marketplace add dark-matter-marketplace https://github.com/rbergman/dark-matter-marketplace
+claude plugin marketplace add rbergman/dark-matter-marketplace
 
 # Install plugins
 claude plugin install dm-work@dark-matter-marketplace
@@ -168,7 +168,7 @@ Non-installable materials for reference and sharing.
 
 ```bash
 # Add the marketplace
-claude plugin marketplace add dark-matter-marketplace https://github.com/rbergman/dark-matter-marketplace
+claude plugin marketplace add rbergman/dark-matter-marketplace
 
 # Update marketplace index
 claude plugin marketplace update dark-matter-marketplace
