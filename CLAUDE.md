@@ -40,6 +40,39 @@ When skills reference each other, use the format:
 
 Example: "See the **mise** skill for version management setup."
 
+## Development Workflow
+
+Full workflow for creating and publishing skills:
+
+1. **Create the skill** in the appropriate plugin:
+   ```
+   plugins/<plugin-name>/skills/<skill-name>/
+   ├── SKILL.md
+   └── references/  (optional)
+   ```
+
+2. **Bump the plugin version** (minor for new skills):
+   ```
+   plugins/<plugin-name>/.claude-plugin/plugin.json
+   ```
+
+3. **Commit and push**:
+   ```bash
+   git add -A && git commit -m "Add <skill-name> skill"
+   git push
+   ```
+
+4. **Update the marketplace**:
+   ```bash
+   claude plugin marketplace update dark-matter-marketplace
+   ```
+
+5. **Reinstall the plugin** to use the new skill:
+   ```bash
+   claude plugin uninstall dm-work  # or whichever plugin
+   claude plugin install dm-work
+   ```
+
 ## Conventions
 
 - Skills use SKILL.md with YAML frontmatter (`name`, `description`)
