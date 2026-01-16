@@ -88,26 +88,26 @@ Good pause points:
 - Phase transition (convergence → breakdown, breakdown → execution)
 - Natural stopping point in discussion
 
-### The Checkpoint Workflow
+### The Snapshot Workflow
 
 When you're ready to pause:
 
 ```
-1. Run /dm-work:checkpoint
+1. Run /dm-work:snapshot
 2. Copy the output
 3. Run /clear
-4. Paste the checkpoint as your first message
+4. Paste the snapshot as your first message
 5. Add any additional context about next steps
 6. Continue with fresh context
 ```
 
-`/dm-work:checkpoint` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
+`/dm-work:snapshot` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction. You can also use it post-`/compact` to recover a clean view of the session from the obscured internals.
 
 ### Emergency Recovery
 
-If you run out of context before you can checkpoint:
+If you run out of context before you can take a snapshot:
 
-1. **If `/compact` still works:** Run it, then run `/dm-work:checkpoint` — it usually still works. Then `/clear` and paste to recover.
+1. **If `/compact` still works:** Run it, then run `/dm-work:snapshot` — it usually still works. Then `/clear` and paste to recover.
 
 2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
@@ -115,7 +115,7 @@ If you run out of context before you can checkpoint:
 
 **Never let a session exceed one built-in compaction.**
 
-Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The checkpoint workflow ensures you never need more than one.
+Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The snapshot workflow ensures you never need more than one.
 
 ---
 
@@ -123,13 +123,13 @@ Multiple compactions compound information loss. Each is lossy; stacking them deg
 
 | Problem | Solution |
 |---------|----------|
-| Context exhaustion mid-task | Proactive checkpoint at 80k |
+| Context exhaustion mid-task | Proactive snapshot at 80k |
 | Lost context after compaction | Explicit summaries you control |
 | Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
 | Compaction information loss | Never exceed 1 compaction |
 
-The key insight: **external state (beads) + explicit summaries (checkpoint) + delegation (subagents) = sessions that pause and resume reliably.**
+The key insight: **external state (beads) + explicit summaries (snapshot) + delegation (subagents) = sessions that pause and resume reliably.**
 
 ---
 
@@ -141,10 +141,10 @@ The key insight: **external state (beads) + explicit summaries (checkpoint) + de
 | Low confidence in spec | `/dm-work:breakdown` or `/dm-work:refine` |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm-work:checkpoint` → copy → `/clear` → paste |
-| Context critical | Emergency: compact then checkpoint |
+| Ready to pause | `/dm-work:snapshot` → copy → `/clear` → paste |
+| Context critical | Emergency: compact then snapshot |
 | Task complete | Review, commit, close bead |
-| Starting new session | Paste last checkpoint + `bd ready` |
+| Starting new session | Paste last snapshot + `bd ready` |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
 

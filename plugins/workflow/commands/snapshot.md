@@ -1,4 +1,9 @@
-Write a session checkpoint directly to terminal output (NOT to a file).
+---
+description: Create a session snapshot for handoff, recovery, or reset
+argument-hint: (no arguments)
+---
+
+Write a session snapshot directly to terminal output (NOT to a file).
 
 The user will copy your output, run /clear, then paste it into the fresh session. This works for pre-compaction handoffs, post-compaction recovery, or session resets.
 
@@ -12,7 +17,7 @@ Use the following as a suitable template and level of detail.  If not working in
 
 ---
 
-# Session Checkpoint
+# Session Snapshot
 
 ## Critical Worktree Requirements
 

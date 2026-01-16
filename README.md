@@ -45,7 +45,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
 | dm-work | Workflow tools | `dm-work:orchestrator` |
 
-Commands use `/dm-work:command` format (e.g., `/dm-work:checkpoint`).
+Commands use `/dm-work:command` format (e.g., `/dm-work:snapshot`).
 
 ---
 
@@ -103,7 +103,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
-| `/dm-work:checkpoint` | Command | Session checkpoint for handoffs, recovery, or resets (see workflow.md) |
+| `/dm-work:snapshot` | Command | Session snapshot for handoffs, recovery, or resets (see workflow.md) |
 | `/dm-work:review` | Command | Parallel architecture + code review via subagents |
 | `/dm-work:advice` | Command | Get architectural guidance |
 | `/dm-work:subagent` | Command | Delegate work to a single subagent |
@@ -156,7 +156,7 @@ Non-installable materials for reference and sharing.
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm-work:orchestrator` skill |
-| `workflow.md` | Human guide to the development loop (80k rule, checkpoint workflow, beads) |
+| `workflow.md` | Human guide to the development loop (80k rule, snapshot workflow, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
