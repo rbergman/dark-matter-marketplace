@@ -42,6 +42,8 @@ Example: "See the **mise** skill for version management setup."
 
 ## Development Workflow
 
+**Always update README.md** when adding, moving, or removing plugins/skills.
+
 ### Adding a skill to an existing plugin
 
 1. **Create the skill** in the appropriate plugin:
@@ -51,12 +53,11 @@ Example: "See the **mise** skill for version management setup."
    └── references/  (optional)
    ```
 
-2. **Bump the plugin version** (minor for new skills):
-   ```
-   plugins/<plugin-name>/.claude-plugin/plugin.json
-   ```
+2. **Bump the plugin version** (minor for new skills)
 
-3. **Commit, push, update, reinstall**:
+3. **Update README.md** — add skill to the plugin's table
+
+4. **Commit, push, update, reinstall**:
    ```bash
    git add -A && git commit -m "Add <skill-name> skill"
    git push
@@ -78,16 +79,50 @@ Plugin names follow `dm-\w{4}` pattern (e.g., dm-tool, dm-work, dm-arch).
            └── SKILL.md
    ```
 
-2. **Register in marketplace.json**:
-   ```
-   .claude-plugin/marketplace.json  # Add entry to "plugins" array
-   ```
+2. **Register in marketplace.json** — add entry to "plugins" array
 
-3. **Commit, push, update, install**:
+3. **Update README.md** — add plugin section with skills table
+
+4. **Commit, push, update, install**:
    ```bash
    git add -A && git commit -m "Add <plugin-name> plugin"
    git push
    claude plugin marketplace update dark-matter-marketplace
+   claude plugin install <plugin-name>
+   ```
+
+### Moving a skill between plugins
+
+1. **Move the skill directory** to the new plugin
+
+2. **Bump both plugin versions** (minor for source and destination)
+
+3. **Update README.md** — move skill entry between tables
+
+4. **Commit, push, update, reinstall both**:
+   ```bash
+   git add -A && git commit -m "Move <skill-name> from <old> to <new>"
+   git push
+   claude plugin marketplace update dark-matter-marketplace
+   claude plugin uninstall <old-plugin> && claude plugin install <old-plugin>
+   claude plugin uninstall <new-plugin> && claude plugin install <new-plugin>
+   ```
+
+### Removing a skill or plugin
+
+1. **Delete the skill directory** (or entire plugin directory)
+
+2. **For plugins**: Remove entry from marketplace.json
+
+3. **Update README.md** — remove skill/plugin from tables
+
+4. **Commit, push, update, uninstall**:
+   ```bash
+   git add -A && git commit -m "Remove <skill-name> skill"
+   git push
+   claude plugin marketplace update dark-matter-marketplace
+   claude plugin uninstall <plugin-name>
+   # Reinstall only if plugin still exists with other content
    claude plugin install <plugin-name>
    ```
 

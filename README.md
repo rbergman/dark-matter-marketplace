@@ -38,11 +38,12 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 
 | Plugin | Prefix | Example |
 |--------|--------|---------|
-| dm-lang | Language expertise | `dm-lang:typescript-pro` |
-| dm-work | Workflow tools | `dm-work:orchestrator` |
-| dm-game | Game development | `dm-game:game-design` |
-| dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
+| dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
+| dm-game | Game development | `dm-game:game-design` |
+| dm-lang | Language expertise | `dm-lang:typescript-pro` |
+| dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
+| dm-work | Workflow tools | `dm-work:orchestrator` |
 
 Commands use `/dm-work:command` format (e.g., `/dm-work:checkpoint`).
 
@@ -56,7 +57,8 @@ dark-matter-marketplace/
 │   ├── architecture/  # dm-arch: SOLID, data-oriented patterns
 │   ├── drivers/       # dm-drvr: Codex, Gemini delegation
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
-│   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, just
+│   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
+│   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
 │   ├── CLAUDE.md      # Global Claude instructions
@@ -95,6 +97,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
 | `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
 | `dm-work:mise` | Skill | Modern dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
+| `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
 | `dm-work:srt` | Skill | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous runs |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
@@ -131,9 +134,18 @@ Language-specific expertise with strict, opinionated standards.
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-lang:go-pro` | Skill | Idiomatic Go: error handling, concurrency, slog, generics, table-driven tests |
+| `dm-lang:python-pro` | Skill | Modern Python: uv, ruff, pyright, type safety, clean module design |
 | `dm-lang:rust-pro` | Skill | "Boring Rust" philosophy: clone freely, for loops over iterators, strict lints |
 | `dm-lang:typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
+
+### dm-tool (tooling/)
+
+Patterns for designing tools that agents can use effectively.
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-tool:agent-dx-cli` | Skill | CLI design patterns: minimal ceremony, JSON output, context injection, batch ops, error handling |
 
 ---
 
@@ -162,11 +174,12 @@ claude plugin marketplace add dark-matter-marketplace https://github.com/rbergma
 claude plugin marketplace update dark-matter-marketplace
 
 # Install plugins
-claude plugin install dm-lang@dark-matter-marketplace
-claude plugin install dm-work@dark-matter-marketplace
 claude plugin install dm-arch@dark-matter-marketplace
-claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-drvr@dark-matter-marketplace
+claude plugin install dm-game@dark-matter-marketplace
+claude plugin install dm-lang@dark-matter-marketplace
+claude plugin install dm-tool@dark-matter-marketplace
+claude plugin install dm-work@dark-matter-marketplace
 ```
 
 ---
