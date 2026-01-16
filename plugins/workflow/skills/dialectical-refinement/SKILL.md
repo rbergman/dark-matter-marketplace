@@ -127,12 +127,44 @@ Before the Judge produces final output, verify:
 If 2+ indicators trigger, return to Phase 3 with guidance to restore scope.
 
 ### Phase 5: Synthesize (Judge)
-**Goal:** Produce actionable spec with quality gates.
+**Goal:** Produce actionable, externally-reviewable spec with quality gates.
 
 - Resolve remaining Proposer/Advocate debates
 - Write concrete implementation details
 - Define testable acceptance criteria
 - Document OUT OF SCOPE explicitly
+- **Ensure spec is standalone-reviewable** (see below)
+
+**Standalone Context Requirement:**
+
+The final spec must be reviewable by an external agent without access to conversation history. Include:
+
+1. **Introduction** — What this spec is and why it exists (2-3 sentences)
+2. **Context appendix** (if spec is part of larger system):
+   - Brief description of the parent project/system
+   - Where this spec fits in the bigger picture
+   - Key constraints inherited from the larger context
+   - Reference this appendix in the introduction
+
+Keep context token-efficient: enough for an external reviewer to assess readiness, not a full project overview.
+
+**Spec Structure:**
+```markdown
+## Introduction
+[What + Why in 2-3 sentences. If partial: "See Appendix A for project context."]
+
+## Scope
+[What's being built]
+
+## Acceptance Criteria
+[Testable outcomes]
+
+## Out of Scope
+[Explicit boundaries]
+
+## Appendix A: Project Context (if needed)
+[Token-efficient big picture: ~100-200 words max]
+```
 
 **Synthesis Quality Check:**
 
@@ -143,6 +175,7 @@ If 2+ indicators trigger, return to Phase 3 with guidance to restore scope.
 | Agent primitives present | ✅/❌ | Restore ranges, batching |
 | User requests addressed | ✅/❌ | Review with user |
 | Acceptance criteria testable | ✅/❌ | Add specifics |
+| Spec standalone-reviewable | ✅/❌ | Add intro/context |
 
 If 2+ indicators fail, output **REVISE** with specific gaps—don't ship a thin spec.
 
@@ -220,11 +253,12 @@ bd list --type epic --labels needs-breakdown
 ## Refined Spec Criteria
 
 A spec is refined when:
-1. **Concrete** — Files, functions, line estimates clear
-2. **Bounded** — OUT OF SCOPE section exists
-3. **Testable** — Acceptance criteria are observable
-4. **Sized** — Complexity reflects actual uncertainty
-5. **Unblocked** — Dependencies identified/tracked
+1. **Standalone** — Introduction + context sufficient for external review
+2. **Concrete** — Files, functions, line estimates clear
+3. **Bounded** — OUT OF SCOPE section exists
+4. **Testable** — Acceptance criteria are observable
+5. **Sized** — Complexity reflects actual uncertainty
+6. **Unblocked** — Dependencies identified/tracked
 
 ## Anti-Patterns
 
