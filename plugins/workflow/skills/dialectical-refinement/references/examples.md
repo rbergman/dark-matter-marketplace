@@ -67,11 +67,69 @@ Dependencies:
 
 ## The Dialectical Arc
 
-| Pass | Role | Cognitive Mode |
-|------|------|----------------|
-| 1. Formalize | Thesis | Analysis |
-| 2. Simplify | Antithesis | Criticism |
-| 3. Challenge | Antithesis to antithesis | Advocacy |
-| 4. Synthesize | Synthesis | Integration |
+| Phase | Role | Cognitive Mode |
+|-------|------|----------------|
+| 1. Formalize | Thesis | Analysis + Protection |
+| 2. Propose Cuts | Antithesis | Criticism (proposals only) |
+| 3. Challenge | Antithesis to antithesis | Advocacy (per-proposal) |
+| 4. Scope Lock | Checkpoint | Verification |
+| 5. Synthesize | Synthesis | Integration |
 
 This mirrors classical dialectical reasoning—structured tension that surfaces and resolves conflicts *before* code is written.
+
+## Example: Proposer/Advocate Exchange
+
+### Phase 2 Output (Proposer)
+
+```markdown
+## PROTECTED (never cut)
+- Core CRUD operations — essential workflow
+- `--json` output on all commands — agent primitives
+- `--range` flag — agent primitives, enables non-linear work
+- User authentication — explicitly requested
+
+## PROPOSED CUTS
+
+### Strong Cut Candidates (high confidence)
+- `--interactive` mode — Agents don't use TUI
+- `--template` flag — Premature abstraction
+
+### Moderate Cut Candidates (medium confidence)
+- `narrate` command — Closes feedback loop but adds LLM complexity
+- `--batch` mode — Could defer, but note token efficiency concerns
+
+### Weak Cut Candidates (low confidence, protect carefully)
+- `skill` meta-command — Meta-tooling, but user mentioned wanting it
+```
+
+### Phase 3 Output (Advocate)
+
+```markdown
+## ADVOCATE RESPONSES
+
+### Strong Cuts — Agreed
+- `--interactive` — Agree: agents don't use interactive modes
+- `--template` — Agree: YAGNI, can add later if pattern emerges
+
+### Moderate Cuts — Contested
+- `narrate` — Contest: feedback loop is core to agent DX; LLM call is cheap
+- `--batch` — Contest: token efficiency is protected category; keep
+
+### Weak Cuts — Recommendations
+- `skill` — Keep: user explicitly mentioned, low implementation cost
+
+### Cheap Additions Missed
+- `--dry-run` flag — Show what would happen without executing (low effort)
+```
+
+### Phase 4: Scope Lock
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Core workflow preserved | ✅ | CRUD intact |
+| Agent primitives preserved | ✅ | --json, --range kept |
+| User requests addressed | ✅ | Auth, skill included |
+| Structured output | ✅ | --json on all |
+| Token efficiency | ✅ | --batch preserved |
+
+**Too Thin Indicators:** 0 triggered. Proceed to Synthesize.

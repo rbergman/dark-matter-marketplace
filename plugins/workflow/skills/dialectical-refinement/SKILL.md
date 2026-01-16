@@ -18,62 +18,150 @@ Surface hidden complexity before implementation through adversarial tension. A s
 | Starting l/xl complexity task | `/refine <task-id>` |
 | Spec feels "clear but big" | Run refinement—hidden complexity likely |
 
-## The 4-Pass Process
+## Protected Categories
 
-### Pass 1: Formalize (Analyst)
-**Goal:** Surface ambiguity.
+Before any simplification, identify items that must NOT be cut:
+
+| Category | Description | Examples |
+|----------|-------------|----------|
+| **Core Workflow** | The minimal viable loop | CRUD operations, essential commands |
+| **Agent Primitives** | Flags/features enabling agent autonomy | `--json`, `--range`, `--auto`, structured output |
+| **User-Requested Features** | Explicitly requested by user | Items called out in original spec |
+| **Token Efficiency** | Batch operations, context injection | Bulk APIs, pagination, streaming |
+| **Structured Output** | Machine-parseable output | JSON on all commands, typed responses |
+
+Tag protected items early. The Proposer phase should not propose cutting them.
+
+## The 5-Phase Process
+
+### Phase 1: Formalize (Analyst)
+**Goal:** Surface ambiguity and tag protected items.
 - What terms are undefined?
 - What's the input/output contract?
 - What exists vs. genuinely new?
 - What are acceptance criteria?
 - What dependencies are implicit?
+- **Which items fall into protected categories?**
 
-**Output:** Detailed spec with gaps called out.
+**Output:** Detailed spec with gaps called out and protected items tagged.
 
 **Checkpoint:** If significant unknowns remain (scope, architecture, must-have vs nice-to-have), ask 1-3 focused questions before proceeding.
 
 **HITL Clarification Protocol:** When asking users, use `AskUserQuestion` with 2-4 concrete options and trade-offs (not open-ended). Structured questions prevent silent assumptions.
 
-### Pass 2: Simplify (Skeptic)
-**Goal:** Cut to minimum viable.
-- What can defer to future phase?
-- What's nice-to-have vs essential?
-- Can we hardcode now, parameterize later?
-- What's the smallest valuable change?
+### Phase 2: Propose Cuts (Proposer)
+**Goal:** Identify candidates for simplification—propose, don't execute.
 
-**Output:** Dramatically reduced spec. Should feel "too minimal."
+The Proposer suggests cuts with confidence levels. It does NOT produce a reduced spec; it produces a list of proposals for the Advocate to argue against.
 
-### Pass 3: Challenge (Advocate)
-**Goal:** Restore what was cut too aggressively.
-- Did Pass 2 cut something essential?
-- Are there cheap additions (small effort, high impact)?
-- Will deferred items be much harder to add later?
+**Output Format:**
 
-**Output:** Restored scope where cuts went too far.
+```markdown
+## PROTECTED (never cut)
+- [List items from protected categories with rationale]
 
-### Pass 4: Synthesize (Judge)
-**Goal:** Produce actionable spec.
-- Resolve remaining debates
+## PROPOSED CUTS
+
+### Strong Cut Candidates (high confidence)
+- `<item>` — [Rationale: clearly deferrable or unnecessary]
+
+### Moderate Cut Candidates (medium confidence)
+- `<item>` — [Rationale: could defer, but note trade-offs]
+
+### Weak Cut Candidates (low confidence, protect carefully)
+- `<item>` — [Rationale: seems optional, but may have hidden value]
+```
+
+**Key Constraint:** Proposer argues for cuts but does NOT execute them. The Advocate reviews each proposal.
+
+### Phase 3: Challenge (Advocate)
+**Goal:** Argue against proposed cuts, restore what matters.
+
+The Advocate receives the Proposer's proposals and responds to EACH one:
+
+**Output Format:**
+
+```markdown
+## ADVOCATE RESPONSES
+
+### Strong Cuts — Agreed
+- `<item>` — Agree: [brief reason]
+
+### Strong Cuts — Contested
+- `<item>` — Contest: [why this should stay]
+
+### Moderate Cuts — Agreed
+- `<item>` — Agree, defer to phase 2
+
+### Moderate Cuts — Contested
+- `<item>` — Contest: [hidden value / future cost of adding later]
+
+### Weak Cuts — Recommendations
+- `<item>` — [Keep/Cut with reasoning]
+
+### Cheap Additions Missed
+- [Items not in spec that are low-effort, high-impact]
+```
+
+**Key Constraint:** Advocate argues from the proposals, not from memory. Every proposal gets a response.
+
+### Phase 4: Scope Lock (Checkpoint)
+**Goal:** Verify essential scope before synthesis.
+
+Before the Judge produces final output, verify:
+
+| Check | Status | Action if Failed |
+|-------|--------|------------------|
+| Core workflow commands preserved | ✅/❌ | Restore from Phase 1 |
+| Agent primitives preserved | ✅/❌ | Restore `--json`, ranges, etc. |
+| User-requested features addressed | ✅/❌ | Review with user |
+| Structured output on all commands | ✅/❌ | Add missing |
+| Token efficiency considered | ✅/❌ | Review batch/bulk operations |
+
+**"Too Thin" Indicators:**
+- Fewer than 5 commands/features for a system? ⚠️
+- Removed structured output (`--json`)? ⚠️
+- Removed range/anchor/batch capabilities? ⚠️
+- All m+ tasks cut to xs/s? ⚠️
+
+If 2+ indicators trigger, return to Phase 3 with guidance to restore scope.
+
+### Phase 5: Synthesize (Judge)
+**Goal:** Produce actionable spec with quality gates.
+
+- Resolve remaining Proposer/Advocate debates
 - Write concrete implementation details
 - Define testable acceptance criteria
 - Document OUT OF SCOPE explicitly
 
+**Synthesis Quality Check:**
+
+| Indicator | Status | Action if Failed |
+|-----------|--------|------------------|
+| Commands/features ≥ minimum viable | ✅/❌ | Restore essentials |
+| All commands have structured output | ✅/❌ | Add `--json` flags |
+| Agent primitives present | ✅/❌ | Restore ranges, batching |
+| User requests addressed | ✅/❌ | Review with user |
+| Acceptance criteria testable | ✅/❌ | Add specifics |
+
+If 2+ indicators fail, output **REVISE** with specific gaps—don't ship a thin spec.
+
 **Quality Gate:**
 - **GO** — Ready to implement
 - **GO with caveats** — Workable with listed risks
-- **REVISE** — Too vague/large, needs another pass
+- **REVISE** — Too thin or too vague, needs another pass with specific guidance
 
 ## Early Exit Rules
 
-Not every spec needs 4 passes:
+Not every spec needs all 5 phases:
 
 | Complexity | Refinement |
 |------------|------------|
 | xs/s | Skip entirely |
-| m | 2-pass (Formalize → Synthesize) |
-| l/xl | Full 4-pass |
+| m | 2-phase (Formalize → Synthesize) |
+| l/xl | Full 5-phase |
 
-If Pass 2 and Pass 3 produce nearly identical output, skip to Pass 4.
+If the Proposer has no cuts and Advocate has no additions, skip Scope Lock and proceed to Synthesize.
 
 ## Complexity Estimation
 
@@ -81,18 +169,18 @@ If Pass 2 and Pass 3 produce nearly identical output, skip to Pass 4.
 |-------|-------------|-------------|
 | xs | Trivial, obvious | No |
 | s | Small, well-understood | No |
-| m | Some unknowns | 2-pass |
-| l | Significant unknowns | 4-pass |
-| xl | Many unknowns | 4-pass |
+| m | Some unknowns | 2-phase |
+| l | Significant unknowns | 5-phase |
+| xl | Many unknowns | 5-phase |
 
 **Rule of thumb:** If you can't describe implementation in 2-3 sentences, it's l or higher.
 
 ## Command Reference
 
 ### `/refine <target>`
-Runs 4-pass refinement on a bead or spec file.
+Runs 5-phase refinement on a bead or spec file.
 1. Reads target
-2. Runs 4 sequential passes (separate agents for adversarial tension)
+2. Runs 5 sequential phases (separate agents for adversarial tension)
 3. Presents synthesized spec
 4. Updates bead, adds `refined` label
 
@@ -140,14 +228,16 @@ A spec is refined when:
 
 ## Anti-Patterns
 
-- **Refinement theater** — Running passes without meaningful changes
+- **Refinement theater** — Running phases without meaningful changes
 - **Premature refinement** — Refining backlog items that may never be done
-- **Skipping Pass 3** — Minimalism can go too far
-- **One-person dialectic** — Use separate agents per pass for genuine tension
+- **Skipping Advocate** — Proposer cuts can go too far without challenge
+- **Executing cuts in Proposer** — Proposer proposes; Advocate + Judge decide
+- **One-person dialectic** — Use separate agents per phase for genuine tension
+- **Ignoring Scope Lock** — Too Thin indicators exist for a reason
 
-## Why Separate Agents Per Pass
+## Why Separate Agents Per Phase
 
-Each pass agent receives only previous output + goals, not internal reasoning. This prevents self-reinforcing mistakes. The Skeptic shouldn't remember why the Analyst included something—it should challenge from scratch.
+Each phase agent receives only previous output + goals, not internal reasoning. This prevents self-reinforcing mistakes. The Proposer shouldn't remember why the Analyst included something—it should propose cuts from scratch. The Advocate shouldn't remember the Proposer's reasoning—it should challenge each proposal independently.
 
 ## Resources
 
