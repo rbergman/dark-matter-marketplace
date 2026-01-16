@@ -1,6 +1,6 @@
-Write a pre-compaction handoff prompt directly to terminal output (NOT to a file).
+Write a session checkpoint directly to terminal output (NOT to a file).
 
-The user will copy your output, run /clear, then paste it into the fresh session.
+The user will copy your output, run /clear, then paste it into the fresh session. This works for pre-compaction handoffs, post-compaction recovery, or session resets.
 
 Include the following with high fidelity:
 
@@ -12,7 +12,7 @@ Use the following as a suitable template and level of detail.  If not working in
 
 ---
 
-# Session Handoff
+# Session Checkpoint
 
 ## Critical Worktree Requirements
 

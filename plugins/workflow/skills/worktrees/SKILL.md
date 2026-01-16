@@ -20,27 +20,40 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 ---
 
-## Creating a Worktree
+## Setup: Ensure .worktrees/ is Ignored
 
-Use `bd worktree create` — it handles everything:
+**Before creating any worktrees**, ensure `.worktrees/` is in `.gitignore`. This is a one-time setup that covers all future worktrees:
 
 ```bash
-bd worktree create feature-auth
+# Check if .worktrees/ is already ignored
+git check-ignore -q .worktrees/ || echo '.worktrees/' >> .gitignore
+```
+
+If you added the line, commit it:
+```bash
+git add .gitignore && git commit -m "Ignore .worktrees/ directory"
+```
+
+**Why this matters:** Without this, beads adds each worktree individually to `.gitignore`, creating noise. With `.worktrees/` ignored, all worktrees underneath are automatically covered.
+
+---
+
+## Creating a Worktree
+
+**All worktrees go under `.worktrees/` in the repo root.** This is the standard location.
+
+```bash
+bd worktree create .worktrees/feature-auth
 ```
 
 **What it does automatically:**
-1. Creates git worktree at `./<name>` (or `.worktrees/<name>` if configured)
+1. Creates git worktree at the specified path
 2. Sets up `.beads/redirect` pointing to main repo's database
-3. Adds worktree path to `.gitignore`
+3. Creates the branch (same name as the directory by default)
 
 **With custom branch name:**
 ```bash
-bd worktree create bugfix --branch fix-123
-```
-
-**At specific path:**
-```bash
-bd worktree create .worktrees/feature-auth
+bd worktree create .worktrees/bugfix --branch fix-123
 ```
 
 ---
@@ -50,7 +63,7 @@ bd worktree create .worktrees/feature-auth
 ### 1. Enter Worktree
 
 ```bash
-cd feature-auth  # or .worktrees/feature-auth
+cd .worktrees/feature-auth
 ```
 
 ### 2. Run Project Setup
@@ -129,10 +142,11 @@ bd worktree info
 
 | Task | Command |
 |------|---------|
-| Create worktree | `bd worktree create <name>` |
-| Create with branch | `bd worktree create <name> --branch <branch>` |
+| Ensure .worktrees/ ignored | `git check-ignore -q .worktrees/ \|\| echo '.worktrees/' >> .gitignore` |
+| Create worktree | `bd worktree create .worktrees/<name>` |
+| Create with branch | `bd worktree create .worktrees/<name> --branch <branch>` |
 | List worktrees | `bd worktree list` |
-| Remove worktree | `bd worktree remove <name>` |
+| Remove worktree | `bd worktree remove .worktrees/<name>` |
 | Check status | `bd worktree info` |
 | Verify beads sync | `bd ready` (in worktree) |
 
@@ -143,7 +157,6 @@ bd worktree info
 | Manual git worktree | bd worktree |
 |---------------------|-------------|
 | Separate commands for git + beads | Single command |
-| Manual .gitignore management | Automatic |
 | No beads redirect setup | Automatic redirect to main DB |
 | No safety checks on remove | Checks for uncommitted/unpushed |
 
@@ -152,6 +165,9 @@ bd worktree info
 ## Example Workflow
 
 ```bash
+# One-time: ensure .worktrees/ is ignored
+git check-ignore -q .worktrees/ || echo '.worktrees/' >> .gitignore
+
 # Create isolated workspace
 bd worktree create .worktrees/feature-auth
 
@@ -223,7 +239,7 @@ If beads isn't installed, use manual git worktree:
 
 ```bash
 # Verify ignored
-git check-ignore -q .worktrees || echo '.worktrees/' >> .gitignore
+git check-ignore -q .worktrees/ || echo '.worktrees/' >> .gitignore
 
 # Create
 git worktree add .worktrees/feature-auth -b feature-auth

@@ -8,7 +8,7 @@ A practical guide for humans working with Claude Code. This documents my persona
 
 ### Disable Auto-Compaction
 
-In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Without this, Claude will compact automatically and you lose the ability to use the precompact workflow.
+In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Without this, Claude will compact automatically and you lose the ability to use the checkpoint workflow.
 
 ### Install Beads
 
@@ -82,26 +82,26 @@ Good pause points:
 - Phase transition (convergence → breakdown, breakdown → execution)
 - Natural stopping point in discussion
 
-### The Precompact Workflow
+### The Checkpoint Workflow
 
 When you're ready to pause:
 
 ```
-1. Run /dm:precompact
+1. Run /dm:checkpoint
 2. Copy the output
 3. Run /clear
-4. Paste the precompaction as your first message
+4. Paste the checkpoint as your first message
 5. Add any additional context about next steps
 6. Continue with fresh context
 ```
 
-`/dm:precompact` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
+`/dm:checkpoint` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
 
 ### Emergency Recovery
 
-If you run out of context before you can precompact:
+If you run out of context before you can checkpoint:
 
-1. **If `/compact` still works:** Run it, then run `/dm:precompact` — it usually still works. Then `/clear` and paste to recover.
+1. **If `/compact` still works:** Run it, then run `/dm:checkpoint` — it usually still works. Then `/clear` and paste to recover.
 
 2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
@@ -109,7 +109,7 @@ If you run out of context before you can precompact:
 
 **Never let a session exceed one built-in compaction.**
 
-Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The precompact workflow ensures you never need more than one.
+Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The checkpoint workflow ensures you never need more than one.
 
 ---
 
@@ -117,13 +117,13 @@ Multiple compactions compound information loss. Each is lossy; stacking them deg
 
 | Problem | Solution |
 |---------|----------|
-| Context exhaustion mid-task | Proactive precompact at 80k |
+| Context exhaustion mid-task | Proactive checkpoint at 80k |
 | Lost context after compaction | Explicit summaries you control |
 | Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
 | Compaction information loss | Never exceed 1 compaction |
 
-The key insight: **external state (beads) + explicit summaries (precompact) + delegation (subagents) = sessions that pause and resume reliably.**
+The key insight: **external state (beads) + explicit summaries (checkpoint) + delegation (subagents) = sessions that pause and resume reliably.**
 
 ---
 
@@ -135,10 +135,10 @@ The key insight: **external state (beads) + explicit summaries (precompact) + de
 | Low confidence in spec | `/dm:breakdown` or `/dm:refine` |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm:precompact` → copy → `/clear` → paste |
-| Context critical | Emergency: compact then precompact |
+| Ready to pause | `/dm:checkpoint` → copy → `/clear` → paste |
+| Context critical | Emergency: compact then checkpoint |
 | Task complete | Review, commit, close bead |
-| Starting new session | Paste last precompact + `bd ready` |
+| Starting new session | Paste last checkpoint + `bd ready` |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
 

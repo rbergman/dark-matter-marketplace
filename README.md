@@ -44,7 +44,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
 
-Commands use `/dm-work:command` format (e.g., `/dm-work:precompact`).
+Commands use `/dm-work:command` format (e.g., `/dm-work:checkpoint`).
 
 ---
 
@@ -100,7 +100,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
-| `/dm-work:precompact` | Command | Lightweight context summary before session pause (see workflow.md) |
+| `/dm-work:checkpoint` | Command | Session checkpoint for handoffs, recovery, or resets (see workflow.md) |
 | `/dm-work:review` | Command | Parallel architecture + code review via subagents |
 | `/dm-work:advice` | Command | Get architectural guidance |
 | `/dm-work:subagent` | Command | Delegate work to a single subagent |
@@ -144,7 +144,7 @@ Non-installable materials for reference and sharing.
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm-work:orchestrator` skill |
-| `workflow.md` | Human guide to the development loop (80k rule, precompact workflow, beads) |
+| `workflow.md` | Human guide to the development loop (80k rule, checkpoint workflow, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
@@ -176,7 +176,7 @@ claude plugin install dm-drvr@dark-matter-marketplace
 See `references/workflow.md` for the full workflow, but the core ideas:
 
 1. **Orchestrator model** — You strategize, Claude orchestrates, subagents implement
-2. **Context is precious** — Delegate to preserve it; precompact to manage it
+2. **Context is precious** — Delegate to preserve it; checkpoint to manage it
 3. **External state** — Use beads to track work outside the conversation
 4. **One compaction max** — Multiple compactions compound information loss
 
