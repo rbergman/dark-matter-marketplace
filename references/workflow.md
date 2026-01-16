@@ -8,15 +8,22 @@ A practical guide for humans working with Claude Code. This documents my persona
 
 ### Disable Auto-Compaction
 
-In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Without this, Claude will compact automatically and you lose the ability to use the checkpoint workflow.
+In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Auto-compaction doesn't prevent checkpointing, but it complicates things from a transparency perspective and encourages lossier sessions overall.
+
+### Enable Context in Status Line
+
+In Claude Code settings, enable showing context usage in the status line. This makes it easy to see when you're approaching the 80k threshold without having to ask Claude or run commands.
 
 ### Install Beads
 
 [Beads](https://github.com/steveyegge/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
 
 ```bash
-# Install beads
-cargo install beads
+# Install beads (pick one)
+curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+# or: npm install -g @beads/bd
+# or: brew install steveyegge/beads/bd
+# or: go install github.com/steveyegge/beads/cmd/bd@latest
 
 # Initialize in your project
 bd init
@@ -29,7 +36,6 @@ I keep MCP usage minimal to preserve context. My always-on MCPs:
 | MCP | Purpose |
 |-----|---------|
 | **Context7** | Up-to-date library documentation. Invaluable when working with frameworks — Claude queries current docs instead of relying on training data that may be outdated. |
-| **Bright Data** | Web scraping and search. Unlocks any webpage even with bot detection/CAPTCHA. Useful for research, fetching current information, and accessing paywalled docs. |
 
 **On-demand MCPs:**
 
@@ -49,7 +55,7 @@ Start with an idea, spec, or task. Talk with Claude until you're aligned on what
 
 1. **Discuss until clear** — Don't rush to implementation. Make sure you and Claude agree on the goal.
 2. **Point to skills** — If the work involves specific domains (TypeScript, game design, etc.), tell Claude to activate relevant skills.
-3. **Refine if needed** — For complex or ambiguous specs, use `/dm:breakdown` or `/dm:refine` to sharpen the requirements.
+3. **Refine if needed** — For complex or ambiguous specs, use `/dm-work:breakdown` or `/dm-work:refine` to sharpen the requirements.
 
 ### Phase 2: Task Breakdown
 
@@ -87,7 +93,7 @@ Good pause points:
 When you're ready to pause:
 
 ```
-1. Run /dm:checkpoint
+1. Run /dm-work:checkpoint
 2. Copy the output
 3. Run /clear
 4. Paste the checkpoint as your first message
@@ -95,13 +101,13 @@ When you're ready to pause:
 6. Continue with fresh context
 ```
 
-`/dm:checkpoint` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
+`/dm-work:checkpoint` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction.
 
 ### Emergency Recovery
 
 If you run out of context before you can checkpoint:
 
-1. **If `/compact` still works:** Run it, then run `/dm:checkpoint` — it usually still works. Then `/clear` and paste to recover.
+1. **If `/compact` still works:** Run it, then run `/dm-work:checkpoint` — it usually still works. Then `/clear` and paste to recover.
 
 2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
@@ -132,10 +138,10 @@ The key insight: **external state (beads) + explicit summaries (checkpoint) + de
 | Situation | Action |
 |-----------|--------|
 | New idea or vague spec | Conversation to convergence |
-| Low confidence in spec | `/dm:breakdown` or `/dm:refine` |
+| Low confidence in spec | `/dm-work:breakdown` or `/dm-work:refine` |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm:checkpoint` → copy → `/clear` → paste |
+| Ready to pause | `/dm-work:checkpoint` → copy → `/clear` → paste |
 | Context critical | Emergency: compact then checkpoint |
 | Task complete | Review, commit, close bead |
 | Starting new session | Paste last checkpoint + `bd ready` |
