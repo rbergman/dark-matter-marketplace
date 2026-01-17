@@ -10,29 +10,57 @@ Scaffold a new or existing repository with standard project infrastructure.
 **Related skills:**
 - **just-pro** - Build system patterns and templates
 - **mise** - Tool version management
-- **go-pro**, **rust-pro**, **typescript-pro** - Language-specific setup (run after repo-init)
+- **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
-## What This Skill Does
+## Execution Modes
 
-Creates universal scaffolding that works across all project types:
+This skill supports two modes. **Prefer molecule mode** when beads is available.
 
-| File | Purpose |
-|------|---------|
-| `.gitignore` | Standard ignores + language-specific patterns |
-| `CLAUDE.md` | Project conventions for Claude Code |
-| `justfile` | Build system skeleton |
-| `.mise.toml` | Tool version pinning (empty, ready for `mise use`) |
-| `.beads/` | Issue tracking database |
-| `.envrc.example` | Environment variable template |
+### Molecule Mode (Preferred)
 
-## Flow
+Use beads molecules for tracked, closeable tasks. Each step becomes an issue you can close as you complete it.
 
-```
-1. Gather context (language, project type)
-2. Create scaffolding
-3. Initialize beads
-4. Point to language skill for next steps
-```
+**Prerequisites:** beads installed (`bd --version` works)
+
+**Steps:**
+
+1. Find the dm-work plugin install path:
+   ```bash
+   jq -r '.plugins["dm-work@dark-matter-marketplace"][0].installPath' ~/.claude/plugins/installed_plugins.json
+   ```
+
+2. Wisp the formula (ephemeral, no git pollution):
+   ```bash
+   bd mol wisp <install-path>/skills/repo-init/references/repo-init.formula.json \
+     --var lang=<language> --var name=<project-name> --var type=<project-type>
+   ```
+
+3. Work through tasks:
+   ```bash
+   bd ready              # See next task
+   # ... do the work ...
+   bd close <step-id>    # Mark complete
+   ```
+
+4. Clean up when done:
+   ```bash
+   bd mol burn <wisp-id>
+   ```
+
+**Variables:**
+| Variable | Required | Default | Values |
+|----------|----------|---------|--------|
+| `lang` | Yes | - | go, rust, typescript, python |
+| `name` | Yes | - | Project name |
+| `type` | No | cli | cli, lib, web, api |
+
+---
+
+### Manual Mode (Fallback)
+
+Use when beads is not installed or for quick setups without tracking.
+
+Follow the steps below in order. Steps 3-6 can run in parallel after git-init.
 
 ---
 
@@ -53,24 +81,20 @@ Use AskUserQuestion if unclear from context.
 ```bash
 # Initialize git if needed
 git init
-
-# Create .gitignore with common patterns
 ```
 
 ### .gitignore Templates
 
-Each language skill provides a comprehensive `.gitignore` in its `references/` directory. These include common patterns (`.env`, `.envrc`, `.DS_Store`, `Thumbs.db`, IDE files) plus language-specific ignores.
-
-**Copy from the appropriate language skill:**
+Copy from the appropriate language skill's `references/gitignore`:
 
 | Language | Source |
 |----------|--------|
-| Go | `go-pro/references/gitignore` → `.gitignore` |
-| Rust | `rust-pro/references/gitignore` → `.gitignore` |
-| TypeScript | `typescript-pro/references/gitignore` → `.gitignore` |
-| Python | `python-pro/references/gitignore` → `.gitignore` |
+| Go | `go-pro/references/gitignore` |
+| Rust | `rust-pro/references/gitignore` |
+| TypeScript | `typescript-pro/references/gitignore` |
+| Python | `python-pro/references/gitignore` |
 
-**For multi-language repos:** Start with the primary language's gitignore, then merge patterns from others as needed.
+**For multi-language repos:** Start with the primary language's gitignore, then merge patterns from others.
 
 **Minimal fallback** (if language skill unavailable):
 
@@ -101,7 +125,7 @@ __pycache__/
 
 ## Step 3: CLAUDE.md
 
-Create project conventions file for Claude Code:
+Create project conventions file:
 
 ```markdown
 # Project Name - Claude Instructions
@@ -120,12 +144,10 @@ just check    # Run all quality gates
 ## Conventions
 
 - [Add project-specific patterns here]
-- [Coding standards, naming conventions, etc.]
 
 ## Architecture
 
 - [Key directories and their purposes]
-- [Important abstractions]
 ```
 
 Keep it minimal initially. Add conventions as they emerge.
@@ -156,42 +178,27 @@ clean:
     @echo "Add clean commands"
 ```
 
-For language-specific recipes, see:
-- **just-pro** skill references (`package-go.just`, `package-rust.just`, etc.)
+See **just-pro** skill for language-specific recipes.
 
 ---
 
 ## Step 5: Mise Configuration
 
-Create empty `.mise.toml` ready for tool pinning:
+Create `.mise.toml`:
 
 ```toml
 [tools]
 # Add tools with: mise use <tool>@<version>
 # Examples:
 # node = "22"
-# go = "1.25"
+# go = "1.23"
 # rust = "1.83"
 # just = "latest"
 ```
 
 ---
 
-## Step 6: Beads Initialization
-
-```bash
-bd init -q
-```
-
-This creates `.beads/` directory with issue tracking database.
-
-For teams, consider:
-- `bd init --team` - Interactive team workflow setup
-- `bd init --stealth` - Personal use without affecting collaborators
-
----
-
-## Step 7: Environment Template
+## Step 6: Environment Template
 
 Create `.envrc.example` (committed) as template for `.envrc` (gitignored):
 
@@ -211,23 +218,38 @@ fi
 
 ---
 
+## Step 7: Beads Initialization
+
+```bash
+bd init -q
+```
+
+Add to CLAUDE.md:
+```markdown
+## Task Tracking
+
+Use `bd` for task tracking. Run `bd ready` to see available work.
+```
+
+---
+
 ## Step 8: Next Steps
 
-After scaffolding, point user to language-specific setup:
+Point user to language-specific setup:
 
 | Language | Next Step |
 |----------|-----------|
-| Go | Invoke **go-pro** skill, run `go mod init`, copy `.golangci.yml` |
-| Rust | Invoke **rust-pro** skill, run `cargo init`, copy `clippy.toml` |
+| Go | Invoke **go-pro** skill, run `go mod init` |
+| Rust | Invoke **rust-pro** skill, run `cargo init` |
 | TypeScript | Invoke **typescript-pro** skill, run `npm init` |
-| Multi-language | Follow each lang skill for respective packages |
+| Python | Invoke **python-pro** skill, run `uv init` |
 
 ---
 
 ## Quick Reference
 
 ```bash
-# Full init sequence
+# Full manual init sequence
 git init
 # Create .gitignore, CLAUDE.md, justfile, .mise.toml, .envrc.example
 bd init -q

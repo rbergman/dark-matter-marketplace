@@ -1,0 +1,77 @@
+{
+  "formula": "repo-init",
+  "description": "Initialize a new repository with standard scaffolding",
+  "phase": "liquid",
+  "variables": [
+    {
+      "name": "lang",
+      "description": "Primary language (go, rust, typescript, python)",
+      "required": true
+    },
+    {
+      "name": "name",
+      "description": "Project name",
+      "required": true
+    },
+    {
+      "name": "type",
+      "description": "Project type (cli, lib, web, api)",
+      "default": "cli"
+    }
+  ],
+  "steps": [
+    {
+      "id": "gather-context",
+      "title": "Gather project context",
+      "description": "Confirm language={{lang}}, project={{name}}, type={{type}}. Clarify any ambiguities with user."
+    },
+    {
+      "id": "git-init",
+      "title": "Initialize git repository",
+      "description": "Run `git init` if not already a git repo. Verify .git/ exists.",
+      "depends_on": ["gather-context"]
+    },
+    {
+      "id": "gitignore",
+      "title": "Create .gitignore for {{lang}}",
+      "description": "Copy .gitignore template from {{lang}}-pro/references/gitignore. Include common patterns (.env, .DS_Store, IDE files) plus language-specific ignores.",
+      "depends_on": ["git-init"]
+    },
+    {
+      "id": "claude-md",
+      "title": "Create CLAUDE.md",
+      "description": "Create project conventions file with: Overview, Development commands (just setup, just check), Conventions section, Architecture section. Keep minimal initially.",
+      "depends_on": ["git-init"]
+    },
+    {
+      "id": "justfile",
+      "title": "Create justfile skeleton",
+      "description": "Create justfile with: default (list), setup (mise trust && mise install), check (placeholder), clean (placeholder). See just-pro skill for language-specific recipes.",
+      "depends_on": ["git-init"]
+    },
+    {
+      "id": "mise-toml",
+      "title": "Create .mise.toml",
+      "description": "Create empty .mise.toml with commented examples. Run `mise use just@latest` and `mise use {{lang}}@latest` to pin versions.",
+      "depends_on": ["git-init"]
+    },
+    {
+      "id": "beads-init",
+      "title": "Initialize beads tracking",
+      "description": "Run `bd init -q` to create .beads/ directory. Add 'Use bd for task tracking' to CLAUDE.md.",
+      "depends_on": ["claude-md"]
+    },
+    {
+      "id": "envrc-example",
+      "title": "Create .envrc.example",
+      "description": "Create environment template with mise hook-env integration. This is committed; .envrc is gitignored.",
+      "depends_on": ["gitignore"]
+    },
+    {
+      "id": "lang-specific",
+      "title": "Language-specific setup for {{lang}}",
+      "description": "Point user to {{lang}}-pro skill for next steps. For Go: go mod init. For Rust: cargo init. For TypeScript: npm init. For Python: uv init.",
+      "depends_on": ["mise-toml", "justfile", "beads-init", "envrc-example"]
+    }
+  ]
+}
