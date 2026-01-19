@@ -1,11 +1,14 @@
 ---
-description: Run parallel architecture and code review subagents for comprehensive peer review of a scope of work
-argument-hint: "--epic <id>, --commits <range>, --skip-beads"
+description: Run parallel architecture, code, and security review with local beads or GitHub PR comments
+argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads"
 ---
 
-# Peer Review Command
+# Unified Code Review Command
 
-Run parallel architecture and code review subagents to perform comprehensive peer review before merging, continuing to new work, or at any checkpoint.
+Run parallel architecture, code, and security reviewers for comprehensive peer review. Supports two modes:
+
+- **Local mode** (default): Creates beads for findings + inline report
+- **PR mode** (`--pr N`): Posts findings as GitHub review comments
 
 ## Arguments
 
@@ -13,37 +16,62 @@ Run parallel architecture and code review subagents to perform comprehensive pee
 $ARGUMENTS
 ```
 
-| Arg | Description |
-|-----|-------------|
-| `--epic <id>` | Review epic + discovered issues (finds related commits) |
-| `--commits <range>` | Explicit git range (e.g., `HEAD~5..HEAD`) |
-| `--skip-beads` | Don't create beads for issues (exception case) |
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--pr <number>` | PR mode - post findings as GH review comments | (local mode) |
+| `--commits <range>` | Explicit commit range (e.g., `HEAD~5..HEAD`) | auto-detect |
+| `--only <letters>` | Filter reviewers: a=arch, c=code, s=security | `acs` (all) |
+| `--min-severity <level>` | Filter output: low\|medium\|high\|critical | all |
+| `--skip-beads` | Local mode only - don't create beads | create beads |
 
 ---
 
-## Phase 1: Determine Scope
+## Phase 1: Scope Detection
 
-**Priority order for scope detection:**
+Determine what code to review based on mode and arguments.
 
-1. **Worktree or feature branch**: If not on `main`/`master`, scope = all commits since diverging from main
+### PR Mode (`--pr N`)
+
+```bash
+# Get PR metadata
+gh pr view $PR_NUMBER --json title,headRefName,headRefOid,baseRefName,files
+
+# Check if on PR branch
+CURRENT_BRANCH=$(git branch --show-current)
+PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q '.headRefName')
+```
+
+**If not on PR branch:** Use AskUserQuestion to offer checkout:
+- "Checkout PR branch" - Run `gh pr checkout $PR_NUMBER`
+- "Review from current branch" - Continue without checkout
+- "Cancel" - Abort review
+
+```bash
+# Get diff for PR
+git diff $(gh pr view $PR_NUMBER --json baseRefName -q '.baseRefName')...HEAD
+```
+
+### Local Mode (default)
+
+**Priority order:**
+
+1. **Explicit `--commits <range>`**: Use provided range
    ```bash
-   git log --oneline main..HEAD
-   git diff --stat main...HEAD
+   git diff $RANGE
+   git log --oneline $RANGE
    ```
 
-2. **Explicit arguments**: If `--epic <id>` or `--commits <range>` provided, use that
+2. **Feature branch/worktree**: If not on `main`/`master`, scope = divergence from main
+   ```bash
+   BASE_BRANCH=$(git rev-parse --abbrev-ref main 2>/dev/null || echo master)
+   git log --oneline $BASE_BRANCH..HEAD
+   git diff --stat $BASE_BRANCH...HEAD
+   ```
 
-3. **Conversation context**: If on main, scan recent conversation for:
-   - Bead IDs mentioned (e.g., "completed redshifted-abc1, redshifted-abc2")
-   - Epic references or phase summaries
-   - "Next Ready Work" lists
-   - Recent commits discussed
-
-4. **Ask user**: If on main with unclear context, use AskUserQuestion:
-   - "What scope should I review?" with options:
-     - Recent commits (HEAD~N)
-     - Specific epic/beads
-     - Custom commit range
+3. **On main with unclear scope**: Use AskUserQuestion:
+   - "Recent commits (HEAD~5)" - Review last 5 commits
+   - "Custom range" - Prompt for range
+   - "Cancel" - Abort
 
 **Scope output needed:**
 - Commit range (BASE_SHA..HEAD_SHA)
@@ -53,23 +81,24 @@ $ARGUMENTS
 
 ---
 
-## Phase 2: Pre-Evaluation Scout (Quick)
+## Phase 2: Scout (Haiku, Fast)
 
-Before launching reviewers, run a **quick exploration** (haiku model) to analyze scope and generate focused guidance.
+Quick pre-analysis to route files and provide focused guidance to reviewers.
 
 ```
 Task(subagent_type="Explore", model="haiku", prompt="
-TASK: Analyze scope for peer review preparation
+TASK: Analyze scope for code review preparation
 
 COMMIT RANGE: <range>
 CHANGED FILES: <file list>
 
 ANALYZE:
-1. File types and languages present (TS, Go, Rust, etc.)
-2. Project type signals (game code, web app, API, CLI, library)
+1. File types and languages present
+2. Project type signals (game, web app, API, CLI, library)
 3. Architectural patterns visible (ECS, MVC, microservices, etc.)
-4. Key areas of change (rendering, physics, API, UI, data layer)
-5. Complexity hotspots (large files, many changes in one area)
+4. Key areas of change
+5. Complexity hotspots (large files, concentrated changes)
+6. Lint config for LOC limits (check eslint, golangci-lint, etc.)
 
 OUTPUT (structured):
 ```
@@ -78,43 +107,36 @@ LANGUAGES: <comma-separated>
 PATTERNS: <architectural patterns detected>
 CHANGE_AREAS: <key areas modified>
 HOTSPOTS: <files/areas needing extra scrutiny>
-SUGGESTED_SKILLS: <skills relevant to this repo - see examples below>
-REVIEW_FOCUS: <specific guidance for reviewers based on changes>
+LOC_LIMIT: <from lint config, or 500 default>
+REVIEW_FOCUS: <specific guidance for reviewers>
 ```
-
-SKILL EXAMPLES (adapt to detected project type):
-- TypeScript game: typescript-pro, game-perf, solid-architecture
-- Go API: go-pro, solid-architecture
-- React web: typescript-pro, frontend patterns
-- Rust CLI: rust-pro, solid-architecture
-- Python ML: python patterns, data-oriented-architecture
 ")
 ```
 
-**Use scout output to:**
-- Select appropriate skills for reviewers
-- Provide focused guidance (don't make reviewers rediscover scope)
-- Identify if scope is small enough for inline-only report
-
 ---
 
-## Phase 3: Launch Parallel Review Subagents
+## Phase 3: Parallel Reviewers
 
-Launch BOTH subagents in a SINGLE message (parallel execution):
+Launch reviewers based on `--only` filter. Default is all three (`acs`).
 
-### Architecture Reviewer
+**Parse `--only` flag:**
+- `a` → Architecture reviewer
+- `c` → Code reviewer
+- `s` → Security reviewer
+
+Launch selected reviewers in a SINGLE message (parallel execution).
+
+### Architecture Reviewer (a)
 
 ```
-Task(subagent_type="general-purpose", model="opus", description="Architecture review", prompt="
-You are a Senior Architecture Reviewer. Review the following scope of work for architectural quality.
+Task(subagent_type="general-purpose", model="sonnet", description="Architecture review", prompt="
+You are a Senior Architecture Reviewer. Review the following scope for architectural quality.
 
 SCOPE:
-- Commit range: <BASE_SHA>..<HEAD_SHA>
-- Files: <changed files list>
+- Commit range: <range>
+- Files: <arch-relevant files from scout>
 - Project type: <from scout>
 - Patterns: <from scout>
-
-SKILLS TO APPLY: <from scout, e.g., solid-architecture, data-oriented-architecture, typescript-pro>
 
 REVIEW CHECKLIST:
 1. **SOLID Principles**
@@ -123,225 +145,321 @@ REVIEW CHECKLIST:
    - Dependency Inversion: Are dependencies injected, not hard-coded?
 
 2. **God Object Detection**
-   - Flag any file approaching or exceeding 600 LOC
+   - LOC limit: <from scout, or 500 default>
+   - Flag files approaching or exceeding limit
    - Check for classes/modules with too many responsibilities
-   - Look for tight coupling (changes ripple across codebase)
 
 3. **Module Organization**
    - Clear dependency direction (core → domain → application → UI)
    - No circular dependencies
    - Proper separation of concerns
 
-4. **Project-Specific Rules**
-   - Read CLAUDE.md and AGENTS.md for project rules
-   - Check compliance with stated architectural guidelines
+4. **Project Rules**
+   - Read CLAUDE.md for project-specific guidelines
+   - Check compliance with stated architectural patterns
 
-FOCUS AREAS (from scout): <review focus>
-HOTSPOTS: <hotspots to scrutinize>
+FOCUS AREAS: <from scout>
+HOTSPOTS: <from scout>
 
-OUTPUT FORMAT:
+OUTPUT as JSON to stdout:
+```json
+{
+  \"reviewer\": \"architecture\",
+  \"summary\": \"1-2 sentence architectural assessment\",
+  \"findings\": [
+    {
+      \"path\": \"relative/path/to/file.go\",
+      \"line\": 45,
+      \"side\": \"RIGHT\",
+      \"severity\": \"medium\",
+      \"category\": \"SOLID:SRP\",
+      \"body\": \"[Architecture] **medium** - SOLID:SRP\\n\\nThis module handles both X and Y...\"
+    }
+  ]
+}
 ```
-ARCH_VERDICT: PASS | ISSUES_FOUND | CRITICAL_ISSUES
-ISSUE_COUNT: <N critical, M important, P minor>
 
-CRITICAL:
-- [file:line] <description> | SOLID:<principle> or GOD_OBJECT or COUPLING
-...
+Severity guide:
+- critical: Fundamental design flaw
+- high: Significant issue worth blocking
+- medium: Worth addressing, not blocking
+- low: Suggestion for improvement
 
-IMPORTANT:
-- [file:line] <description> | <category>
-...
-
-MINOR:
-- [file:line] <description> | <category>
-...
-
-STRENGTHS:
-- <what was done well architecturally>
-
-SUMMARY: <1-2 sentence architectural assessment>
-```
+Only flag genuine concerns. No nitpicks.
 ")
 ```
 
-### Code Reviewer
+### Code Reviewer (c)
 
 ```
-Task(subagent_type="feature-dev:code-reviewer", model="opus", description="Code quality review", prompt="
-Review the following scope of work for code quality, bugs, and project convention adherence.
+Task(subagent_type="feature-dev:code-reviewer", model="sonnet", description="Code quality review", prompt="
+You are a Senior Code Reviewer. Review the following scope for code quality, bugs, and conventions.
 
 SCOPE:
-- Commit range: <BASE_SHA>..<HEAD_SHA>
-- Files: <changed files list>
+- Commit range: <range>
+- Files: <all source + test files>
 - Project type: <from scout>
 
-SKILLS TO APPLY: <from scout, e.g., typescript-pro, game-perf, go-pro>
-
-REVIEW FOCUS:
+REVIEW CHECKLIST:
 1. **Bugs & Logic Errors** (confidence ≥ 80% only)
    - Null/undefined handling
    - Race conditions
    - Off-by-one errors
    - Resource leaks
 
-2. **Security Vulnerabilities**
-   - Injection risks
-   - Auth/authz issues
-   - Data exposure
+2. **Error Handling**
+   - Unchecked errors
+   - Missing error propagation
+   - Swallowed exceptions
 
-3. **Performance Issues**
-   - Allocations in hot paths (game loops, per-frame code)
-   - Inefficient algorithms
-   - Missing caching where appropriate
-
-4. **Test Coverage**
+3. **Test Coverage**
    - Changed code without corresponding test changes
    - Missing edge case coverage
    - Regression test gaps
 
+4. **Performance**
+   - Allocations in hot paths
+   - Inefficient algorithms
+   - Missing caching where appropriate
+
 5. **Project Conventions**
-   - Read CLAUDE.md and AGENTS.md for project rules
-   - Import patterns, naming, error handling per project standards
+   - Read CLAUDE.md for project rules
+   - Naming, imports, error handling per standards
 
-FOCUS AREAS (from scout): <review focus>
-HOTSPOTS: <hotspots to scrutinize>
+FOCUS AREAS: <from scout>
+HOTSPOTS: <from scout>
 
-OUTPUT FORMAT:
+OUTPUT as JSON to stdout:
+```json
+{
+  \"reviewer\": \"code\",
+  \"summary\": \"1-2 sentence code quality assessment\",
+  \"findings\": [
+    {
+      \"path\": \"relative/path/to/file.go\",
+      \"line\": 112,
+      \"side\": \"RIGHT\",
+      \"severity\": \"high\",
+      \"category\": \"bug\",
+      \"confidence\": 85,
+      \"body\": \"[Code] **high** - bug (85% confidence)\\n\\nError from DoThing() is not checked...\"
+    }
+  ]
+}
 ```
-CODE_VERDICT: PASS | ISSUES_FOUND | CRITICAL_ISSUES
-ISSUE_COUNT: <N critical, M important, P minor>
 
-CRITICAL (confidence ≥ 90%):
-- [file:line] <description> | confidence:<N>% | category:<bug|security|perf>
-...
+Severity guide:
+- critical: Will cause runtime failures
+- high: Likely bug or security issue
+- medium: Code smell or minor bug risk
+- low: Style or minor improvement
 
-IMPORTANT (confidence ≥ 80%):
-- [file:line] <description> | confidence:<N>% | category:<type>
-...
-
-MINOR (confidence ≥ 80%):
-- [file:line] <description> | confidence:<N>% | category:<type>
-...
-
-TEST_COVERAGE_GAPS:
-- <files with code changes but no test changes>
-
-STRENGTHS:
-- <what was done well>
-
-SUMMARY: <1-2 sentence code quality assessment>
+Only report findings with ≥80% confidence.
+")
 ```
+
+### Security Reviewer (s)
+
+```
+Task(subagent_type="general-purpose", model="sonnet", description="Security review", prompt="
+You are a Senior Security Reviewer. Review the following scope for security vulnerabilities.
+
+SCOPE:
+- Commit range: <range>
+- Files: <security-relevant files: auth, input handling, *.tf, *.sh, env>
+- Project type: <from scout>
+
+REVIEW CHECKLIST:
+1. **Secrets Handling**
+   - Hardcoded secrets, API keys, tokens
+   - Secrets in logs or error messages
+   - Insecure secret storage
+
+2. **Input Validation**
+   - SQL injection vectors
+   - Command injection
+   - Path traversal
+   - XSS (if web)
+
+3. **Authentication & Authorization**
+   - Auth bypass possibilities
+   - Missing authorization checks
+   - Session handling issues
+
+4. **Infrastructure (if *.tf files)**
+   - Overly permissive IAM
+   - Public exposure of resources
+   - Missing encryption
+
+5. **General**
+   - Insecure dependencies
+   - Debug code in production paths
+   - Information disclosure
+
+FOCUS AREAS: <from scout>
+
+OUTPUT as JSON to stdout:
+```json
+{
+  \"reviewer\": \"security\",
+  \"summary\": \"1-2 sentence security assessment\",
+  \"findings\": [
+    {
+      \"path\": \"relative/path/to/file.go\",
+      \"line\": 78,
+      \"side\": \"RIGHT\",
+      \"severity\": \"critical\",
+      \"category\": \"injection\",
+      \"body\": \"[Security] **critical** - injection\\n\\nSQL query built via string concatenation...\"
+    }
+  ]
+}
+```
+
+Severity guide:
+- critical: Exploitable vulnerability
+- high: Significant security risk
+- medium: Defense-in-depth issue
+- low: Hardening suggestion
+
+Flag anything exploitable. Be thorough but not paranoid.
 ")
 ```
 
 ---
 
-## Phase 4: Collect Results & Create Beads
+## Phase 4: Collect & Process Results
 
-After both subagents complete:
+After all reviewers complete:
 
-1. **Parse responses** - Extract issues from both reviewers
+1. **Parse JSON output** from each reviewer
 
-2. **Create beads for ALL issues** (unless `--skip-beads`):
-   ```bash
-   # For each issue:
-   bd create --title="<issue summary>" --type=bug --priority=<0-2 based on severity> --json
-   ```
+2. **Dedupe by file+line**
+   - Key: `${path}:${line}`
+   - Keep finding with higher severity
+   - Merge bodies if from different reviewers
 
-   Priority mapping:
-   - Critical → P0 or P1
-   - Important → P1 or P2
-   - Minor → P2 or P3
+3. **Apply `--min-severity` filter**
+   - If `--min-severity medium`: exclude `low`
+   - If `--min-severity high`: exclude `low`, `medium`
+   - If `--min-severity critical`: only keep `critical`
 
-3. **Track bead IDs** for inline report
+4. **Sort by severity** (critical → high → medium → low)
 
 ---
 
-## Phase 5: Generate Report
+## Phase 5: Output
 
-### Inline Report (Always)
+### Local Mode
 
-Token-efficient, human-friendly, actionable:
+**Create beads** (unless `--skip-beads`):
+```bash
+# For each finding:
+bd create --title="[<severity>] <short description>" --type=bug --priority=<0-2> --json
+```
+
+Priority mapping:
+- critical → P0
+- high → P1
+- medium → P2
+- low → P3
+
+**Generate inline report:**
 
 ```markdown
-## Peer Review: <scope description> (<N> commits, <LOC> across <M> files)
+## Review: <scope description> (<N> commits, <LOC> across <M> files)
 
 ### Verdict: <emoji> <summary>
 
 **Critical** (<count>)
 1. `file:line` - <description> → bead <id>
-2. ...
 
-**Important** (<count>)
-3. `file:line` - <description> → bead <id>
+**High** (<count>)
+2. `file:line` - <description> → bead <id>
 ...
 
-**Minor** (<count>)
+**Medium** (<count>)
 - `file:line` - <description> → bead <id>
 ...
 
-**Architecture**: <PASS/ISSUES verdict + 1-line summary>
-**Code Quality**: <PASS/ISSUES verdict + 1-line summary>
-**Test Coverage**: <gaps if any>
+**Low** (<count>)
+- `file:line` - <description> → bead <id>
+...
 
-### Next Steps
-- [ ] Address <N> critical issues before proceeding
-- [ ] Review <M> important issues
-- Run `bd ready` to see created issues
+**Architecture**: <PASS/ISSUES verdict + summary>
+**Code Quality**: <PASS/ISSUES verdict + summary>
+**Security**: <PASS/ISSUES verdict + summary>
+
+Run `bd ready` to see created issues.
 ```
 
 Verdict emojis:
 - ✅ PASS - No issues found
-- ⚠️ ISSUES FOUND - Has Important/Minor issues
-- 🚨 CRITICAL ISSUES - Has Critical issues, must address
+- ⚠️ ISSUES FOUND - Has important/minor issues
+- 🚨 CRITICAL ISSUES - Has critical issues
 
-### History File (Conditional)
+### PR Mode
 
-Only create if findings are extensive (>20 issues OR reviewers provided detailed code examples):
+**Step 1: Show preview** of what will be posted (same format as local inline report, without bead references)
 
-**Path:** `history/dm-work:reviews/<YYYY-MM-DD>-<scope-slug>.md`
+**Step 2: Confirm with AskUserQuestion:**
+- "Post to GitHub" - Proceed with posting
+- "Cancel" - Abort without posting
 
-**Contents:**
-- Full reviewer outputs
-- Detailed code examples
-- Extended recommendations
-- Reference material
+**Step 3: Post review via GitHub API:**
 
-**Inline note when history file created:**
+```bash
+# Get required info
+HEAD_SHA=$(gh pr view $PR_NUMBER --json headRefOid -q '.headRefOid')
+OWNER_REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner')
+
+# Build review body
+REVIEW_BODY="## Automated PR Review
+
+**Architecture:** <arch_summary>
+**Code Quality:** <code_summary>
+**Security:** <security_summary>
+
+---
+*<N> inline comments below*"
+
+# Build comments array
+COMMENTS='[
+  {"path": "file.go", "line": 45, "side": "RIGHT", "body": "..."},
+  ...
+]'
+
+# Post review
+gh api repos/$OWNER_REPO/pulls/$PR_NUMBER/reviews \
+  --method POST \
+  -f commit_id="$HEAD_SHA" \
+  -f body="$REVIEW_BODY" \
+  -f event="COMMENT" \
+  --input <(echo "{\"comments\": $COMMENTS}")
 ```
-📄 Detailed report: history/dm-work:reviews/2026-01-02-feature-branch.md
-```
+
+**Step 4: Confirm success** with link to the review.
 
 ---
 
 ## Quick Reference
 
-**On feature branch/worktree:**
-```
+```bash
+# Local review, auto-detect scope
 /dm-work:review
-```
-→ Auto-detects scope as all work since diverging from main
 
-**On main with recent work:**
-```
-/dm-work:review
-```
-→ Checks conversation context for beads/commits discussed, asks if unclear
+# Local, skip security reviewer
+/dm-work:review --only ac
 
-**Specific epic:**
-```
-/dm-work:review --epic redshifted-abc1
-```
-→ Reviews epic + all discovered issues
+# Local, specific commits, medium+ only
+/dm-work:review --commits HEAD~5..HEAD --min-severity medium
 
-**Custom range:**
-```
-/dm-work:review --commits HEAD~5..HEAD
-```
-→ Reviews specific commit range
-
-**Skip bead creation (rare):**
-```
+# Local, exploratory (no beads)
 /dm-work:review --skip-beads
+
+# PR review
+/dm-work:review --pr 123
+
+# PR review, security only
+/dm-work:review --pr 123 --only s
 ```
-→ Review only, no tracking (for exploratory reviews)
