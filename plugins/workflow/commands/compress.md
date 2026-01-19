@@ -1,6 +1,6 @@
 ---
 description: Compress a document or artifact for agent-optimized token density while preserving effectiveness
-argument-hint: [file path or artifact name to compress]
+argument-hint: "file path or artifact name to compress"
 ---
 
 # Agent-Optimized Compression

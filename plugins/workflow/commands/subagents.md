@@ -1,6 +1,6 @@
 ---
 description: Orchestrate multiple subagents in parallel or serial based on task dependencies and file ownership
-argument-hint: [optional: bead IDs, task list, or context for batch work]
+argument-hint: "bead IDs, task list, or context for batch work"
 ---
 
 # Multi-Subagent Orchestration

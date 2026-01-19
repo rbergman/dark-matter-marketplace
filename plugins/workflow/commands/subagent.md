@@ -1,6 +1,6 @@
 ---
 description: Delegate implementation work to a subagent with appropriate profile, skills, and boundaries
-argument-hint: [optional: task description, bead ID, or additional context]
+argument-hint: "task description, bead ID, or additional context"
 ---
 
 # Subagent Delegation

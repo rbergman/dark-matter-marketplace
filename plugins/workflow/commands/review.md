@@ -1,6 +1,6 @@
 ---
 description: Run parallel architecture and code review subagents for comprehensive peer review of a scope of work
-argument-hint: [--epic <id>] [--commits <range>] [--skip-beads]
+argument-hint: "--epic <id>, --commits <range>, --skip-beads"
 ---
 
 # Peer Review Command
