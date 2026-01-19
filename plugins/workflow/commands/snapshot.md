@@ -5,30 +5,7 @@ argument-hint: (no arguments)
 
 Write a session snapshot directly to terminal output (NOT to a file).
 
-After outputting the snapshot, attempt to copy it to the clipboard automatically. Use this pattern:
-
-```bash
-if command -v pbcopy >/dev/null 2>&1; then
-  cat <<'SNAPSHOT_EOF' | pbcopy
-[paste the exact snapshot content here]
-SNAPSHOT_EOF
-  echo "Snapshot copied to clipboard."
-elif command -v xclip >/dev/null 2>&1; then
-  cat <<'SNAPSHOT_EOF' | xclip -selection clipboard
-[paste the exact snapshot content here]
-SNAPSHOT_EOF
-  echo "Snapshot copied to clipboard."
-elif command -v wl-copy >/dev/null 2>&1; then
-  cat <<'SNAPSHOT_EOF' | wl-copy
-[paste the exact snapshot content here]
-SNAPSHOT_EOF
-  echo "Snapshot copied to clipboard."
-else
-  echo "Clipboard not available—copy the snapshot above manually."
-fi
-```
-
-The user can then run /clear and paste from clipboard into the fresh session. This works for pre-compaction handoffs, post-compaction recovery, or session resets.
+The user can copy the snapshot, run /clear, and paste into the fresh session. This works for pre-compaction handoffs, post-compaction recovery, or session resets.
 
 Include the following with high fidelity:
 
