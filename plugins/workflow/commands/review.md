@@ -85,7 +85,7 @@ git diff $(gh pr view $PR_NUMBER --json baseRefName -q '.baseRefName')...HEAD
 
 Quick pre-analysis to route files and provide focused guidance to reviewers.
 
-```
+````
 Task(subagent_type="Explore", model="haiku", prompt="
 TASK: Analyze scope for code review preparation
 
@@ -101,7 +101,6 @@ ANALYZE:
 6. Lint config for LOC limits (check eslint, golangci-lint, etc.)
 
 OUTPUT (structured):
-```
 PROJECT_TYPE: <e.g., TypeScript game, Go API, React web app>
 LANGUAGES: <comma-separated>
 PATTERNS: <architectural patterns detected>
@@ -109,9 +108,8 @@ CHANGE_AREAS: <key areas modified>
 HOTSPOTS: <files/areas needing extra scrutiny>
 LOC_LIMIT: <from lint config, or 500 default>
 REVIEW_FOCUS: <specific guidance for reviewers>
-```
 ")
-```
+````
 
 ---
 
@@ -128,7 +126,7 @@ Launch selected reviewers in a SINGLE message (parallel execution).
 
 ### Architecture Reviewer (a)
 
-```
+````
 Task(subagent_type="general-purpose", model="sonnet", description="Architecture review", prompt="
 You are a Senior Architecture Reviewer. Review the following scope for architectural quality.
 
@@ -164,16 +162,16 @@ HOTSPOTS: <from scout>
 OUTPUT as JSON to stdout:
 ```json
 {
-  \"reviewer\": \"architecture\",
-  \"summary\": \"1-2 sentence architectural assessment\",
-  \"findings\": [
+  "reviewer": "architecture",
+  "summary": "1-2 sentence architectural assessment",
+  "findings": [
     {
-      \"path\": \"relative/path/to/file.go\",
-      \"line\": 45,
-      \"side\": \"RIGHT\",
-      \"severity\": \"medium\",
-      \"category\": \"SOLID:SRP\",
-      \"body\": \"[Architecture] **medium** - SOLID:SRP\\n\\nThis module handles both X and Y...\"
+      "path": "relative/path/to/file.go",
+      "line": 45,
+      "side": "RIGHT",
+      "severity": "medium",
+      "category": "SOLID:SRP",
+      "body": "[Architecture] **medium** - SOLID:SRP\n\nThis module handles both X and Y..."
     }
   ]
 }
@@ -187,11 +185,11 @@ Severity guide:
 
 Only flag genuine concerns. No nitpicks.
 ")
-```
+````
 
 ### Code Reviewer (c)
 
-```
+````
 Task(subagent_type="feature-dev:code-reviewer", model="sonnet", description="Code quality review", prompt="
 You are a Senior Code Reviewer. Review the following scope for code quality, bugs, and conventions.
 
@@ -232,17 +230,17 @@ HOTSPOTS: <from scout>
 OUTPUT as JSON to stdout:
 ```json
 {
-  \"reviewer\": \"code\",
-  \"summary\": \"1-2 sentence code quality assessment\",
-  \"findings\": [
+  "reviewer": "code",
+  "summary": "1-2 sentence code quality assessment",
+  "findings": [
     {
-      \"path\": \"relative/path/to/file.go\",
-      \"line\": 112,
-      \"side\": \"RIGHT\",
-      \"severity\": \"high\",
-      \"category\": \"bug\",
-      \"confidence\": 85,
-      \"body\": \"[Code] **high** - bug (85% confidence)\\n\\nError from DoThing() is not checked...\"
+      "path": "relative/path/to/file.go",
+      "line": 112,
+      "side": "RIGHT",
+      "severity": "high",
+      "category": "bug",
+      "confidence": 85,
+      "body": "[Code] **high** - bug (85% confidence)\n\nError from DoThing() is not checked..."
     }
   ]
 }
@@ -256,11 +254,11 @@ Severity guide:
 
 Only report findings with ≥80% confidence.
 ")
-```
+````
 
 ### Security Reviewer (s)
 
-```
+````
 Task(subagent_type="general-purpose", model="sonnet", description="Security review", prompt="
 You are a Senior Security Reviewer. Review the following scope for security vulnerabilities.
 
@@ -301,16 +299,16 @@ FOCUS AREAS: <from scout>
 OUTPUT as JSON to stdout:
 ```json
 {
-  \"reviewer\": \"security\",
-  \"summary\": \"1-2 sentence security assessment\",
-  \"findings\": [
+  "reviewer": "security",
+  "summary": "1-2 sentence security assessment",
+  "findings": [
     {
-      \"path\": \"relative/path/to/file.go\",
-      \"line\": 78,
-      \"side\": \"RIGHT\",
-      \"severity\": \"critical\",
-      \"category\": \"injection\",
-      \"body\": \"[Security] **critical** - injection\\n\\nSQL query built via string concatenation...\"
+      "path": "relative/path/to/file.go",
+      "line": 78,
+      "side": "RIGHT",
+      "severity": "critical",
+      "category": "injection",
+      "body": "[Security] **critical** - injection\n\nSQL query built via string concatenation..."
     }
   ]
 }
@@ -324,7 +322,7 @@ Severity guide:
 
 Flag anything exploitable. Be thorough but not paranoid.
 ")
-```
+````
 
 ---
 
@@ -353,6 +351,7 @@ After all reviewers complete:
 ### Local Mode
 
 **Create beads** (unless `--skip-beads`):
+
 ```bash
 # For each finding:
 bd create --title="[<severity>] <short description>" --type=bug --priority=<0-2> --json
@@ -366,7 +365,7 @@ Priority mapping:
 
 **Generate inline report:**
 
-```markdown
+````markdown
 ## Review: <scope description> (<N> commits, <LOC> across <M> files)
 
 ### Verdict: <emoji> <summary>
@@ -391,7 +390,7 @@ Priority mapping:
 **Security**: <PASS/ISSUES verdict + summary>
 
 Run `bd ready` to see created issues.
-```
+````
 
 Verdict emojis:
 - ✅ PASS - No issues found
@@ -408,7 +407,7 @@ Verdict emojis:
 
 **Step 3: Post review via GitHub API:**
 
-```bash
+````bash
 # Get required info
 HEAD_SHA=$(gh pr view $PR_NUMBER --json headRefOid -q '.headRefOid')
 OWNER_REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner')
@@ -423,10 +422,9 @@ REVIEW_BODY="## Automated PR Review
 ---
 *<N> inline comments below*"
 
-# Build comments array
+# Build comments array (example)
 COMMENTS='[
-  {"path": "file.go", "line": 45, "side": "RIGHT", "body": "..."},
-  ...
+  {"path": "file.go", "line": 45, "side": "RIGHT", "body": "..."}
 ]'
 
 # Post review
@@ -436,7 +434,7 @@ gh api repos/$OWNER_REPO/pulls/$PR_NUMBER/reviews \
   -f body="$REVIEW_BODY" \
   -f event="COMMENT" \
   --input <(echo "{\"comments\": $COMMENTS}")
-```
+````
 
 **Step 4: Confirm success** with link to the review.
 
