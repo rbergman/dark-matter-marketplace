@@ -60,7 +60,9 @@ Patterns:
 
 ### Context Injection
 
-**Provide a `prime` command that outputs workflow state for session bootstrapping.**
+**Provide a `prime` command that outputs workflow state AND guidance for session bootstrapping.**
+
+Prime = State + Workflow Guidance, not just State.
 
 ```bash
 $ mytool prime
@@ -71,15 +73,29 @@ Branch: main
 
 Pending: 5 items need attention
 
-Quick commands:
+## Session Protocol
+- At session end: run `mytool pending` to check for undocumented work
+- Never skip: always log completed work before ending
+
+## Core Rules
+- Use CLI commands, not internal files
+- Trust --json output over manual parsing
+
+## Quick Commands
   mytool pending     # See pending items
   mytool show --last # View last action
 ```
 
+Patterns:
+- `--export` flag to dump default prime content for customization
+- Override file support (e.g., `.mytool/PRIME.md` replaces default)
+- Include session close protocol, not just current state
+- Essential rules and quick reference for agent context
+
 Why this matters:
 - Agents lose context on session boundaries
 - `/clear` and compaction wipe working memory
-- `prime` restores workflow state in one call
+- `prime` restores workflow state AND behavioral guidance in one call
 
 ### JSON Everywhere
 
@@ -151,6 +167,51 @@ Design commands that can be pre-approved:
 - Make destructive operations explicit: `mytool delete --confirm`
 - Support `--dry-run` for write operations
 
+### Time-based Filtering
+
+**Consistent temporal queries across commands.**
+
+```bash
+mytool query --since 7d        # Human-readable duration
+mytool export --since 24h      # Hours
+mytool query --since 2w        # Weeks
+mytool export --since 2026-01-15  # Date string
+mytool query --range main..HEAD   # Commit range
+```
+
+Patterns:
+- `--since` for duration-based filtering (24h, 7d, 2w)
+- `--range` for commit ranges
+- Accept ISO dates as well as relative durations
+- Consistent across query/export/prompt commands
+
+## LLM Piping
+
+**Provide a `prompt` command for rendering templates to pipe to LLMs.**
+
+Enable `mytool <data> | llm "<task>"` workflows:
+
+```bash
+mytool prompt changelog --since 7d | claude
+mytool prompt pr-description --range main..HEAD | llm
+mytool prompt devblog --last 10 --append "Focus on physics" | claude
+```
+
+Discovery and customization:
+```bash
+mytool prompt --list              # Discover available templates
+mytool prompt changelog --show    # Preview template without rendering
+```
+
+Patterns:
+- `--list` to discover available templates
+- `--show` to preview template content without rendering
+- `--append` to add extra instructions dynamically
+- Template resolution order: project-local → user global → built-in
+- Built-in templates for common use cases (changelog, pr-description, exec-summary)
+
+This complements `prime` (session state) with reusable prompts for common agent tasks.
+
 ## Error Handling
 
 ### Structured Errors
@@ -187,7 +248,9 @@ Use --replace to overwrite, or --anchor <sha> to target another commit.
 
 ## Self-Documentation
 
-### Help Text
+### Help Text with Command Grouping
+
+**Group commands by purpose in help output.**
 
 ```bash
 $ mytool --help
@@ -196,10 +259,29 @@ A development ledger for capturing what/why/how.
 Core Commands:
   log       Record work with what/why/how
   pending   Show items needing attention
-  prime     Output workflow context
+  status    Show repository state
+
+Query Commands:
+  export    Export entries in various formats
+  query     Search and filter entries
+  show      Display entry details
+
+Agent Commands:
+  prime     Output workflow context for agents
+  prompt    Render templates for LLM piping
+  skill     Output skill documentation
+
+Admin Commands:
+  clean     Remove artifacts from scope
+  init      Initialize repository
 
 All commands support --json for structured output.
 ```
+
+Patterns:
+- Group by purpose: Core, Query, Agent, Admin
+- Helps agents understand command purposes at a glance
+- Consistent ordering across related CLIs
 
 ### Skill Generation
 
@@ -236,6 +318,26 @@ After completing work:
 At session end:
   mytool pending    # Check for undocumented work
 ```
+
+## Artifact Cleanup
+
+**Provide a `clean` command to remove tool artifacts from a given scope.**
+
+```bash
+mytool clean                  # Remove artifacts from current project
+mytool clean --global         # Remove user-level artifacts
+mytool clean --dry-run        # Preview what would be removed
+mytool clean --force          # Skip confirmation
+```
+
+Patterns:
+- Scope-based cleanup: project, user global, or both
+- `--dry-run` to preview what would be removed
+- `--force` to skip confirmation prompts
+- List exactly what will be deleted before proceeding
+- Focus on tool-generated artifacts (caches, state files), not user data
+
+This helps agents understand cleanup options and manage tool state across projects.
 
 ## Anti-Patterns to Avoid
 

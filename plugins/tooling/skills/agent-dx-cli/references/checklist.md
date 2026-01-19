@@ -18,6 +18,8 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 - [ ] `skill` command for self-documentation
 - [ ] Suggested next commands in output
 - [ ] Recoverable error messages with hints
+- [ ] Command grouping in `--help` (Core, Query, Agent, Admin)
+- [ ] Consistent `--since` / `--range` for temporal filtering
 
 ## Bonus
 
@@ -25,6 +27,10 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 - [ ] Exit code conventions documented
 - [ ] Integration hooks documented
 - [ ] CLAUDE.md workflow snippet provided
+- [ ] `prompt` command for LLM piping templates
+- [ ] `prime --export` for customization
+- [ ] Override file support (e.g., `.mytool/PRIME.md`)
+- [ ] `clean` command for artifact removal
 
 ## Examples in the Wild
 
@@ -37,9 +43,14 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 
 ### Timbers (Development Ledger)
 
-- `timbers prime` — Context injection
+- `timbers prime` — Context injection with workflow guidance
+- `timbers prime --export` — Dump default for customization
 - `timbers pending` — Clear next action
 - `timbers log "what" --why "why" --how "how"` — Single command capture
+- `timbers prompt changelog --since 7d` — LLM piping templates
+- `timbers prompt --list` / `--show` — Template discovery
 - `timbers export --json | claude "..."` — Unix composability
+- `timbers export --since 7d` — Time-based filtering
 - `timbers skill` — Self-documentation
 - `--batch` mode for efficiency
+- Command grouping in help (Core, Query, Agent, Admin)
