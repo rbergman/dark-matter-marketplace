@@ -61,14 +61,32 @@ git diff $(gh pr view $PR_NUMBER --json baseRefName -q '.baseRefName')...HEAD
    git log --oneline $RANGE
    ```
 
-2. **Feature branch/worktree**: If not on `main`/`master`, scope = divergence from main
+2. **Review tag exists**: If a review tag exists for the current branch, scope = tag to HEAD
+   ```bash
+   BRANCH=$(git branch --show-current)
+   TAG="review/${BRANCH}/latest"
+   if git rev-parse "$TAG" >/dev/null 2>&1; then
+     TAG_SHA=$(git rev-parse "$TAG")
+     HEAD_SHA=$(git rev-parse HEAD)
+     if [ "$TAG_SHA" = "$HEAD_SHA" ]; then
+       # No changes since last review — report and exit
+       echo "No changes since last review at $(git log -1 --format=%h $TAG)."
+       exit
+     fi
+     git log --oneline $TAG_SHA..HEAD
+     git diff --stat $TAG_SHA...HEAD
+   fi
+   ```
+   > **Tip:** To re-review a full feature branch, use `--commits main..HEAD`.
+
+3. **Feature branch/worktree**: If not on `main`/`master`, scope = divergence from main
    ```bash
    BASE_BRANCH=$(git rev-parse --abbrev-ref main 2>/dev/null || echo master)
    git log --oneline $BASE_BRANCH..HEAD
    git diff --stat $BASE_BRANCH...HEAD
    ```
 
-3. **On main with unclear scope**: Use AskUserQuestion:
+4. **On main with unclear scope**: Use AskUserQuestion:
    - "Recent commits (HEAD~5)" - Review last 5 commits
    - "Custom range" - Prompt for range
    - "Cancel" - Abort
@@ -99,6 +117,23 @@ ANALYZE:
 4. Key areas of change
 5. Complexity hotspots (large files, concentrated changes)
 6. Lint config for LOC limits (check eslint, golangci-lint, etc.)
+7. Domain classification — group changed files into review domains and assign skills.
+   Only split into multiple domains when files span genuinely distinct areas (e.g.,
+   frontend components vs backend API handlers). Single-domain is correct when changes
+   are cohesive.
+
+   SKILL CATALOG (assign matching skills to each domain):
+   | Skill | When to assign |
+   |-------|----------------|
+   | frontend-design:frontend-design | React/Vue/Svelte components, CSS/HTML, UI logic |
+   | dm-lang:typescript-pro | TypeScript (.ts, .tsx) |
+   | dm-lang:go-pro | Go (.go) |
+   | dm-lang:python-pro | Python (.py) |
+   | dm-lang:rust-pro | Rust (.rs) |
+   | dm-game:game-perf | Game loops, update/render, per-frame code |
+   | dm-game:game-design | Game mechanics, player systems |
+   | dm-arch:solid-architecture | Module boundaries, dependency patterns |
+   | dm-arch:data-oriented-architecture | Polymorphic entities, type switches |
 
 OUTPUT (structured):
 PROJECT_TYPE: <e.g., TypeScript game, Go API, React web app>
@@ -108,6 +143,11 @@ CHANGE_AREAS: <key areas modified>
 HOTSPOTS: <files/areas needing extra scrutiny>
 LOC_LIMIT: <from lint config, or 500 default>
 REVIEW_FOCUS: <specific guidance for reviewers>
+REVIEW_DOMAINS:
+- name: <e.g., frontend, backend, game-logic, infra>
+  files: <comma-separated file list>
+  skills: <comma-separated skill names from catalog>
+  focus: <domain-specific review guidance>
 ")
 ````
 
@@ -187,16 +227,29 @@ Only flag genuine concerns. No nitpicks.
 ")
 ````
 
-### Code Reviewer (c)
+### Code Reviewer (c) — Domain-Aware
+
+Based on the scout's `REVIEW_DOMAINS` output, code review may split into specialized reviewers:
+
+- **Single domain** (or scout returns no domains): One code reviewer for all files, with that domain's skills injected.
+- **Multiple domains**: One code reviewer **per domain**, each scoped to its file subset. All domain reviewers launch in the SAME parallel message as other Phase 3 reviewers.
+
+**Skill injection:** Before constructing reviewer prompts, invoke each domain's listed skills using the Skill tool. Extract key review criteria, anti-patterns, and conventions from each skill. Include the extracted guidance in the corresponding reviewer's prompt under `DOMAIN-SPECIFIC CRITERIA`.
+
+Each domain reviewer uses:
 
 ````
-Task(subagent_type="feature-dev:code-reviewer", model="sonnet", description="Code quality review", prompt="
-You are a Senior Code Reviewer. Review the following scope for code quality, bugs, and conventions.
+Task(subagent_type="feature-dev:code-reviewer", model="sonnet", description="Code review: <domain>", prompt="
+You are a Senior Code Reviewer specializing in <domain name>.
 
 SCOPE:
 - Commit range: <range>
-- Files: <all source + test files>
+- Files: <this domain's files from scout — NOT all files>
 - Project type: <from scout>
+- Domain focus: <focus from scout's REVIEW_DOMAINS>
+
+DOMAIN-SPECIFIC CRITERIA:
+<key review criteria, anti-patterns, and conventions extracted from invoked skills>
 
 REVIEW CHECKLIST:
 1. **Bugs & Logic Errors** (confidence ≥ 80% only)
@@ -225,13 +278,14 @@ REVIEW CHECKLIST:
    - Naming, imports, error handling per standards
 
 FOCUS AREAS: <from scout>
-HOTSPOTS: <from scout>
+HOTSPOTS: <from scout, filtered to this domain's files>
 
 OUTPUT as JSON to stdout:
 ```json
 {
   "reviewer": "code",
-  "summary": "1-2 sentence code quality assessment",
+  "domain": "<domain name>",
+  "summary": "1-2 sentence code quality assessment for this domain",
   "findings": [
     {
       "path": "relative/path/to/file.go",
@@ -240,7 +294,7 @@ OUTPUT as JSON to stdout:
       "severity": "high",
       "category": "bug",
       "confidence": 85,
-      "body": "[Code] **high** - bug (85% confidence)\n\nError from DoThing() is not checked..."
+      "body": "[Code:<domain>] **high** - bug (85% confidence)\n\nError from DoThing() is not checked..."
     }
   ]
 }
@@ -328,14 +382,14 @@ Flag anything exploitable. Be thorough but not paranoid.
 
 ## Phase 4: Collect & Process Results
 
-After all reviewers complete:
+After all reviewers complete (including multiple domain code reviewers if split):
 
 1. **Parse JSON output** from each reviewer
 
 2. **Dedupe by file+line**
    - Key: `${path}:${line}`
    - Keep finding with higher severity
-   - Merge bodies if from different reviewers
+   - Merge bodies if from different reviewers or different domain code reviewers
 
 3. **Apply `--min-severity` filter**
    - If `--min-severity medium`: exclude `low`
@@ -387,6 +441,7 @@ Priority mapping:
 
 **Architecture**: <PASS/ISSUES verdict + summary>
 **Code Quality**: <PASS/ISSUES verdict + summary>
+  (if domain-split: one sub-line per domain, e.g., "  frontend: PASS", "  backend: ISSUES - ...")
 **Security**: <PASS/ISSUES verdict + summary>
 
 Run `bd ready` to see created issues.
@@ -396,6 +451,16 @@ Verdict emojis:
 - ✅ PASS - No issues found
 - ⚠️ ISSUES FOUND - Has important/minor issues
 - 🚨 CRITICAL ISSUES - Has critical issues
+
+**Tag checkpoint** (after report output):
+
+```bash
+BRANCH=$(git branch --show-current)
+TAG="review/${BRANCH}/latest"
+git tag -f "$TAG" HEAD
+```
+
+This moves (or creates) the review tag to HEAD so the next `/review` starts from here.
 
 ### PR Mode
 
@@ -443,8 +508,11 @@ gh api repos/$OWNER_REPO/pulls/$PR_NUMBER/reviews \
 ## Quick Reference
 
 ```bash
-# Local review, auto-detect scope
+# Local review, auto-detect scope (resumes from last review tag if present)
 /dm-work:review
+
+# Local, re-review full feature branch (bypass review tag)
+/dm-work:review --commits main..HEAD
 
 # Local, skip security reviewer
 /dm-work:review --only ac
