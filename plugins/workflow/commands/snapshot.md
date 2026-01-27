@@ -75,8 +75,7 @@ Progress: X/Y subtasks complete
 ## Pre-Merge Checklist
 
 Before merging to main, consider running:
-- [ ] `feature-dev:code-reviewer` - Code review for bugs, security, quality
-- [ ] `feature-dev:code-architect` - Architecture review for patterns, design
+- [ ] `/dm-work:review` - Parallel architecture, code, and security review
 
 ## Next Steps
 
