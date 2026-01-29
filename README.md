@@ -138,6 +138,7 @@ Language-specific expertise with strict, opinionated standards.
 | `dm-lang:python-pro` | Skill | Modern Python: uv, ruff, pyright, type safety, clean module design |
 | `dm-lang:rust-pro` | Skill | "Boring Rust" philosophy: clone freely, for loops over iterators, strict lints |
 | `dm-lang:typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
+| `dm-lang:rescript-pro` | Skill | Type-safe ReScript: exhaustive matching, typed FFI, React integration, pipe-first style |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
 
 ### dm-tool (tooling/)

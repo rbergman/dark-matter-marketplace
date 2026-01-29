@@ -1,0 +1,28 @@
+{
+  "name": "project-name",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "package-specs": [
+    {
+      "module": "esmodule",
+      "in-source": true
+    }
+  ],
+  "suffix": ".res.mjs",
+  "bs-dependencies": [
+    "@rescript/core",
+    "@rescript/react"
+  ],
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
+  },
+  "warnings": {
+    "number": "+a-48-30",
+    "error": "+a-3-44-102"
+  }
+}
