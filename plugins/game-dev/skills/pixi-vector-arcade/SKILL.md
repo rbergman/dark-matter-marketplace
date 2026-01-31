@@ -338,6 +338,39 @@ explosion.visible = true;
 pools.effects.release(explosion);
 ```
 
+### Viewport Culling
+
+Skip rendering for off-screen entities. Critical when world is larger than viewport.
+
+```typescript
+function isInViewport(x: number, y: number, radius: number, viewport: Rectangle): boolean {
+  return x + radius > viewport.x &&
+         x - radius < viewport.x + viewport.width &&
+         y + radius > viewport.y &&
+         y - radius < viewport.y + viewport.height;
+}
+
+// In render system
+for (const [entity, transform] of world.transform.entries()) {
+  const renderable = world.renderable.get(entity);
+  if (!renderable) continue;
+
+  // Cull off-screen entities
+  const inView = isInViewport(transform.x, transform.y, renderable.radius, viewport);
+  renderable.graphics.visible = inView;
+
+  if (inView) {
+    renderable.graphics.position.set(transform.x, transform.y);
+    renderable.graphics.rotation = transform.rotation;
+  }
+}
+```
+
+**Rules:**
+- Set `visible = false` for culled objects (GPU skips them entirely)
+- Include entity radius in bounds check to avoid popping
+- For wraparound worlds, check all wrapped positions
+
 ---
 
 ## Visual Design System
