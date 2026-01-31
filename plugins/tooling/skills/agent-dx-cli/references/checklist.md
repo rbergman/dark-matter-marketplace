@@ -31,6 +31,7 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 - [ ] `prime --export` for customization
 - [ ] Override file support (e.g., `.mytool/PRIME.md`)
 - [ ] `clean` command for artifact removal
+- [ ] `--out` flag for file output (separate from stdout)
 
 ## Examples in the Wild
 

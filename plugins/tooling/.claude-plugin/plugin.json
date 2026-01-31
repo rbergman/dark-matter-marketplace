@@ -1,6 +1,6 @@
 {
   "name": "dm-tool",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Tool design patterns: building CLIs, MCPs, and APIs that agents can use effectively",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

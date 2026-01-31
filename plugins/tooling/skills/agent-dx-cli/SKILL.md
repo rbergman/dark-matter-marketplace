@@ -16,6 +16,7 @@ A pattern language for designing command-line tools that agents can use effectiv
 Bad:
 ```bash
 mytool init --config ./config.yaml
+mytool start
 mytool create entry --type log
 mytool entry set-field --field title --value "Fixed bug"
 mytool entry commit
@@ -57,6 +58,7 @@ Patterns:
 - `pending` / `ready` commands that surface work
 - Include suggested next commands in output
 - JSON output includes `next_action` or `suggested_commands` fields
+- Exit messages guide toward logical next steps
 
 ### Context Injection
 
@@ -338,6 +340,43 @@ Patterns:
 - Focus on tool-generated artifacts (caches, state files), not user data
 
 This helps agents understand cleanup options and manage tool state across projects.
+
+## Unix Composability
+
+### Pipe-Friendly Output
+
+**Commands should compose with standard Unix tools.**
+
+```bash
+# Pipe to other CLIs
+mytool export --json | jq '.entries[]'
+mytool export --json | claude "Summarize this work"
+
+# Use in scripts
+for id in $(mytool query --ids-only); do
+  mytool show "$id" --json
+done
+```
+
+Guidelines:
+- JSON to stdout (not stderr) when `--json` specified
+- Human-readable to stdout, diagnostics to stderr
+- Support stdin for batch input where sensible
+- Exit codes follow conventions (0=success, 1=user error, 2=system error)
+
+### Output Destination Control
+
+**Separate stdout behavior from file output.**
+
+```bash
+# To stdout (for piping)
+mytool export --json
+
+# To files (for persistence)
+mytool export --json --out ./exports/
+```
+
+Don't conflate these—agents need both patterns.
 
 ## Anti-Patterns to Avoid
 
