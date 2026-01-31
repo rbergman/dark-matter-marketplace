@@ -121,12 +121,13 @@ Agents for delegating work to external AI systems.
 
 ### dm-game (game-dev/)
 
-Game design methodology and performance optimization.
+Game design methodology, performance optimization, and project bootstrapping.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-game:game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
 | `dm-game:game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
+| `dm-game:pixi-vector-arcade` | Skill | Bootstrap PixiJS 8 games with retro vector aesthetics, ECS-lite, pooling, spatial hashing |
 
 ### dm-lang (language-pro/)
 
