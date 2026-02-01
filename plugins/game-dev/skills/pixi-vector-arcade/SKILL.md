@@ -442,16 +442,177 @@ const MAX_ASPECT_RATIO = 21 / 9;
 const MIN_ASPECT_RATIO = 4 / 3;
 ```
 
-### HUD Layout
+---
 
-Use `@pixi/layout` for responsive positioning with max-width constraint:
+## UI System
+
+### Recommended Hybrid Approach
+
+Canvas UI is inherently "raw"—you're building from primitives. Use the right tool for each UI type:
+
+| UI Type | Approach | Rationale |
+|---------|----------|-----------|
+| **In-game HUD** (score, lives, health) | @pixi/ui + @pixi/layout | Benefits from canvas effects (glow, shake) |
+| **Pause screen** | @pixi/ui | Keeps visual consistency with game |
+| **Settings/keybinds menu** | HTML/DOM overlay | Forms are easier in DOM |
+| **Dev tools** | Tweakpane | Already in stack, tree-shakes from prod |
+
+### In-Game HUD with @pixi/ui
+
+Use `@pixi/layout` (Yoga-powered flexbox) for positioning:
 
 ```typescript
-const HudDesign = {
-  maxWidth: 1400,  // Prevents ultra-wide spreading
+import { Layout } from '@pixi/layout';
+import { FancyButton, ProgressBar } from '@pixi/ui';
+
+const hud = new Layout({
+  id: 'hud',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
   padding: 20,
-};
+  width: viewport.width,
+  maxWidth: 1400,  // Prevents ultra-wide spreading
+});
+
+hud.addChild(scoreText, healthBar, pauseButton);
+layers.ui.addChild(hud);
 ```
+
+### Theme System (Reduces Boilerplate)
+
+Create a centralized theme to avoid repetitive styling:
+
+```typescript
+// src/ui/theme.ts
+export const UITheme = {
+  colors: {
+    primary: 0x00ffff,
+    danger: 0xff0044,
+    success: 0x00ff00,
+    neutral: 0x888888,
+  },
+  fonts: {
+    hud: { fontFamily: 'monospace', fontSize: 24, fill: 0x00ffff },
+    title: { fontFamily: 'monospace', fontSize: 48, fill: 0xffffff },
+  },
+  button: {
+    padding: 12,
+    borderRadius: 4,
+    borderWidth: 2,
+  },
+} as const;
+```
+
+### Component Factory Pattern
+
+Build reusable UI factories to reduce repetition:
+
+```typescript
+// src/ui/factory.ts
+import { FancyButton, ProgressBar } from '@pixi/ui';
+import { Graphics, Text } from 'pixi.js';
+import { UITheme } from './theme';
+
+export function createButton(
+  label: string,
+  onClick: () => void,
+  variant: 'primary' | 'danger' = 'primary'
+): FancyButton {
+  const color = UITheme.colors[variant];
+  const { padding, borderRadius, borderWidth } = UITheme.button;
+
+  const makeView = (fill: number, stroke: number) =>
+    new Graphics()
+      .roundRect(0, 0, 120, 40, borderRadius)
+      .fill(fill)
+      .stroke({ width: borderWidth, color: stroke });
+
+  return new FancyButton({
+    defaultView: makeView(0x000000, color),
+    hoverView: makeView(color, color),
+    pressedView: makeView(color, 0xffffff),
+    text: new Text({ text: label, style: UITheme.fonts.hud }),
+    anchor: 0.5,
+  }).on('pointerup', onClick);
+}
+
+export function createHealthBar(maxHealth: number): ProgressBar {
+  return new ProgressBar({
+    bg: new Graphics().roundRect(0, 0, 200, 20, 4).fill(0x222222),
+    fill: new Graphics().roundRect(0, 0, 200, 20, 4).fill(UITheme.colors.success),
+    progress: 100,
+  });
+}
+
+export function createScoreText(): Text {
+  return new Text({ text: 'SCORE: 0', style: UITheme.fonts.hud });
+}
+```
+
+### DOM Overlay for Complex Menus
+
+For settings, keybinds, or form-heavy UI, use HTML overlay:
+
+```typescript
+// In your HTML
+// <div id="dom-ui" class="hidden">
+//   <div id="settings-menu">...</div>
+// </div>
+
+class Game {
+  private domUI = document.getElementById('dom-ui')!;
+
+  showSettings(): void {
+    this.pause();
+    this.domUI.classList.remove('hidden');
+  }
+
+  hideSettings(): void {
+    this.domUI.classList.add('hidden');
+    this.resume();
+  }
+}
+```
+
+```css
+#dom-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#dom-ui > * {
+  pointer-events: auto;
+}
+
+#dom-ui.hidden {
+  display: none;
+}
+```
+
+**DOM overlay caveats:**
+- DOM elements don't receive canvas post-processing (glow, shake)
+- Event coordination between DOM and canvas can be tricky
+- Best for UI that doesn't need to feel "in-world"
+
+### Available @pixi/ui Components
+
+| Component | Use Case |
+|-----------|----------|
+| `FancyButton` | Buttons with hover/pressed states |
+| `Button` | Simple button |
+| `CheckBox` | Toggle settings |
+| `Slider` / `DoubleSlider` | Volume, sensitivity |
+| `Input` | Text entry (limited—consider DOM for complex forms) |
+| `ScrollBox` | Scrollable lists (high scores, inventory) |
+| `Select` | Dropdowns |
+| `ProgressBar` / `CircularProgressBar` | Health, loading |
+| `RadioGroup` | Mutually exclusive options |
+| `List` | Arranged child elements |
 
 ---
 
