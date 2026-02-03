@@ -27,7 +27,6 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 - [ ] Exit code conventions documented
 - [ ] Integration hooks documented
 - [ ] CLAUDE.md workflow snippet provided
-- [ ] `prompt` command for LLM piping templates
 - [ ] `prime --export` for customization
 - [ ] Override file support (e.g., `.mytool/PRIME.md`)
 - [ ] `clean` command for artifact removal
@@ -48,8 +47,6 @@ Use this checklist when designing or reviewing agent-oriented CLIs.
 - `timbers prime --export` — Dump default for customization
 - `timbers pending` — Clear next action
 - `timbers log "what" --why "why" --how "how"` — Single command capture
-- `timbers prompt changelog --since 7d` — LLM piping templates
-- `timbers prompt --list` / `--show` — Template discovery
 - `timbers export --json | claude "..."` — Unix composability
 - `timbers export --since 7d` — Time-based filtering
 - `timbers skill` — Self-documentation

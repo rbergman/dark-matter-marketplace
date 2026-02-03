@@ -187,33 +187,6 @@ Patterns:
 - Accept ISO dates as well as relative durations
 - Consistent across query/export/prompt commands
 
-## LLM Piping
-
-**Provide a `prompt` command for rendering templates to pipe to LLMs.**
-
-Enable `mytool <data> | llm "<task>"` workflows:
-
-```bash
-mytool prompt changelog --since 7d | claude
-mytool prompt pr-description --range main..HEAD | llm
-mytool prompt devblog --last 10 --append "Focus on physics" | claude
-```
-
-Discovery and customization:
-```bash
-mytool prompt --list              # Discover available templates
-mytool prompt changelog --show    # Preview template without rendering
-```
-
-Patterns:
-- `--list` to discover available templates
-- `--show` to preview template content without rendering
-- `--append` to add extra instructions dynamically
-- Template resolution order: project-local → user global → built-in
-- Built-in templates for common use cases (changelog, pr-description, exec-summary)
-
-This complements `prime` (session state) with reusable prompts for common agent tasks.
-
 ## Error Handling
 
 ### Structured Errors
@@ -270,7 +243,6 @@ Query Commands:
 
 Agent Commands:
   prime     Output workflow context for agents
-  prompt    Render templates for LLM piping
   skill     Output skill documentation
 
 Admin Commands:

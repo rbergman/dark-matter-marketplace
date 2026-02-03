@@ -19,6 +19,8 @@ Use the following as a suitable template and level of detail.  If not working in
 
 # Session Snapshot
 
+**Worktree/Branch: `<branch-name>` in `<worktree-path>`** (or "main repo" if not in worktree)
+
 ## Critical Worktree Requirements
 
 You are working in a git worktree. DO NOT merge until user gives explicit sign-off.
