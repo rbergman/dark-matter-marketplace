@@ -156,7 +156,7 @@ With Agent Teams (experimental), some official plugin capabilities can be enhanc
 
 | Official Plugin | Enhancement with Agent Teams |
 |----------------|------------------------------|
-| `code-review` | Use `dm-team:team-review` for reviewers that discuss and challenge each other's findings |
+| `code-review` | Use `dm-team:review` for reviewers that discuss and challenge each other's findings |
 | `feature-dev:code-architect` | Spawn as a teammate alongside implementation teammates for real-time architectural guidance |
 | `superpowers:dispatching-parallel-agents` | Agent Teams provides native parallel coordination; see `dm-team:tiered-delegation` for when each approach fits |
 

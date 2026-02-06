@@ -40,7 +40,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 |--------|--------|---------|
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
 | dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
-| dm-team | Agent Teams patterns | `dm-team:team-lead` |
+| dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
 | dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
@@ -150,12 +150,12 @@ Agent Teams patterns for multi-agent coordination, deliberation, and collaborati
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-team:team-lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, beads integration |
+| `dm-team:lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, beads integration |
 | `dm-team:teammate` | Skill | Teammate protocol — file ownership, self-claiming, inter-agent communication |
 | `dm-team:council` | Skill | Multi-perspective deliberation (LLM Council pattern) for decisions and trade-offs |
-| `dm-team:team-refinement` | Skill | Live adversarial spec refinement through teammate debate |
-| `dm-team:team-review` | Skill | Collaborative code review where reviewers discuss and challenge findings |
-| `dm-team:team-brainstorm` | Skill | Multi-perspective brainstorming with simultaneous exploration |
+| `dm-team:refinement` | Skill | Live adversarial spec refinement through teammate debate |
+| `dm-team:review` | Skill | Collaborative code review where reviewers discuss and challenge findings |
+| `dm-team:brainstorm` | Skill | Multi-perspective brainstorming with simultaneous exploration |
 | `dm-team:tiered-delegation` | Skill | Decision framework: when to use Agent Teams vs subagents vs single session |
 | `dm-team:compositions` | Skill | Reusable team templates and beads-teams bridge patterns |
 | `/dm-team:council` | Command | Spawn a deliberation council for a decision or topic |

@@ -83,7 +83,7 @@ Let Claude orchestrate while subagents implement.
 
 For complex work requiring inter-agent coordination — collaborative review, adversarial refinement, multi-perspective analysis — consider Agent Teams instead of subagents:
 
-1. **Activate `dm-team:team-lead`** — instead of `dm-work:orchestrator`
+1. **Activate `dm-team:lead`** — instead of `dm-work:orchestrator`
 2. **Use `/dm-team:review`** — reviewers discuss and challenge findings
 3. **Use `/dm-team:refine`** — live adversarial debate instead of sequential pipeline
 4. **Use `/dm-team:council`** — multi-perspective deliberation on decisions
@@ -165,7 +165,7 @@ The key insight: **external state (beads) + explicit summaries (snapshot) + dele
 | Starting new session | Paste last snapshot + `bd ready` |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
-| Complex multi-agent work | Activate `dm-team:team-lead`, use Agent Teams |
+| Complex multi-agent work | Activate `dm-team:lead`, use Agent Teams |
 | Decision needs debate | `/dm-team:council` |
 | Spec needs adversarial refinement | `/dm-team:refine` (team) or `/dm-work:refine` (subagent) |
 
@@ -274,5 +274,5 @@ See **autonomous-runs.md** for full configuration and the **`dm-work:srt` skill*
 - **`dm-work:srt` skill** — Sandbox Runtime configuration for CLI/autonomous runs
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills
 - **`autonomous-runs.md`** — Full guide to sandboxed autonomous Claude
-- **`dm-team:team-lead` skill** — Claude's instructions for being an Agent Teams lead
+- **`dm-team:lead` skill** — Claude's instructions for being an Agent Teams lead
 - **`dm-team:tiered-delegation` skill** — When to use teams vs subagents

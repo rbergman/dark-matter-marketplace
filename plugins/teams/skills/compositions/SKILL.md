@@ -33,7 +33,7 @@ The value is in the tension between investigators. Investigator A builds the cas
 
 **Use for:** PR review, pre-merge review, audit.
 
-See **dm-team:team-review** for full implementation.
+See **dm-team:review** for full implementation.
 
 Reviewers may disagree — the architecture reviewer wants an abstraction layer, the code reviewer says YAGNI. The lead (opus) resolves these tensions with judgment, not compromise.
 
@@ -48,7 +48,7 @@ Reviewers may disagree — the architecture reviewer wants an abstraction layer,
 
 **Use for:** spec refinement, epic scoping.
 
-See **dm-team:team-refinement** for full implementation.
+See **dm-team:refinement** for full implementation.
 
 The Analyst finds the holes. The Proposer tries to shrink scope. The Advocate pushes back when cuts go too deep. The lead judges which cuts improve the spec and which gut it.
 
@@ -208,7 +208,7 @@ Compose teams by selecting profiles and wiring them into a team template. Adjust
 ## Related Skills
 
 - **dm-team:tiered-delegation** — When to use teams vs subagents vs single session
-- **dm-team:team-review** — Full review team implementation
-- **dm-team:team-refinement** — Full refinement team implementation
+- **dm-team:review** — Full review team implementation
+- **dm-team:refinement** — Full refinement team implementation
 - **dm-team:council** — Full council team implementation
 - **dm-work:orchestrator** — Delegation thresholds and subagent templates

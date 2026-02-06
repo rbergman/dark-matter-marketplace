@@ -1,5 +1,5 @@
 ---
-name: team-brainstorm
+name: brainstorm
 description: Multi-perspective brainstorming using Agent Teams. Spawn 2-3 teammates with different analytical angles who explore a design space simultaneously while the human observes and steers via the lead. Falls back to dm-work:brainstorming for simpler design work.
 ---
 
@@ -58,7 +58,7 @@ Lead adds/replaces perspectives based on the specific domain.
 
 ## Comparison with dm-work:brainstorming
 
-| Aspect | dm-work:brainstorming | dm-team:team-brainstorm |
+| Aspect | dm-work:brainstorming | dm-team:brainstorm |
 |--------|----------------------|------------------------|
 | Interaction | 1:1 dialogue | Multi-perspective team |
 | Speed | Faster for simple designs | Faster for complex designs |

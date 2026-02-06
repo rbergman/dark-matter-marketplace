@@ -44,7 +44,7 @@ At session start, activate one of these based on your coordination needs:
 | Situation | Skill | Mechanism |
 |-----------|-------|-----------|
 | Standard delegation | `dm-work:orchestrator` | Task() subagents |
-| Complex multi-agent work | `dm-team:team-lead` | Agent Teams |
+| Complex multi-agent work | `dm-team:lead` | Agent Teams |
 
 If you are a **subagent**, activate `dm-work:subagent`.
 If you are a **teammate**, activate `dm-team:teammate`.

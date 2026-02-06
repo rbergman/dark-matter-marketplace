@@ -36,7 +36,7 @@ Spawn Agent Team with Analyst (haiku), Proposer (sonnet), Advocate (sonnet). Lea
 
 ### 5. Run Debate Protocol
 
-Execute the debate protocol as described in the **team-refinement** skill:
+Execute the debate protocol as described in the **refinement** skill:
 
 1. **Analysis** -- Analyst surfaces ambiguity, tags protected items, shares with team
 2. **Live Debate** -- Proposer proposes cuts, Advocate challenges, genuine back-and-forth until convergence

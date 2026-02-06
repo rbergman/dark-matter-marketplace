@@ -1,5 +1,5 @@
 ---
-name: team-review
+name: review
 description: Collaborative code review using Agent Teams where reviewers discuss findings, challenge each other, and converge on a unified assessment. Evolves dm-work:review from isolated parallel reviewers to a review team.
 ---
 

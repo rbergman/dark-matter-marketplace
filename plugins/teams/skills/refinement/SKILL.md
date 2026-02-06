@@ -1,5 +1,5 @@
 ---
-name: team-refinement
+name: refinement
 description: Transform ambiguous specs into implementable work items through live adversarial debate using Agent Teams. Evolves dm-work:dialectical-refinement from sequential pipeline to simultaneous multi-agent debate. Use PROACTIVELY for l/xl complexity tasks.
 ---
 
@@ -17,7 +17,7 @@ The original dialectical-refinement runs 5 sequential phases (Analyst->Proposer-
 |-----------|-----------|
 | xs/s | Skip refinement entirely |
 | m | Use dm-work:dialectical-refinement (2-phase, lightweight) |
-| l/xl | Use team-refinement (full debate) |
+| l/xl | Use refinement (full debate) |
 
 ## Team Composition
 

@@ -1,5 +1,5 @@
 ---
-name: team-lead
+name: lead
 description: Activate at session start when using Agent Teams for complex multi-agent work. Establishes team lead role with delegation protocols, teammate spawning, model selection, and beads integration. You coordinate the team; teammates implement.
 ---
 

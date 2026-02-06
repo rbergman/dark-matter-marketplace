@@ -128,4 +128,4 @@ When the lead requests shutdown:
 
 ---
 
-Related: **dm-team:team-lead** -- the lead-side protocol for coordinating teammates.
+Related: **dm-team:lead** -- the lead-side protocol for coordinating teammates.

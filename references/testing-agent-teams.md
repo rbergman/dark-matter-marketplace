@@ -35,9 +35,9 @@ A practical guide for testing and iterating on the Agent Teams skills and comman
 
 Quick validation that each component works at all.
 
-### team-lead + teammate
+### lead + teammate
 ```
-Start a session. Tell Claude to activate dm-team:team-lead.
+Start a session. Tell Claude to activate dm-team:lead.
 Ask it to create a 2-person team to implement a simple feature (e.g., "add a hello-world endpoint").
 Verify: team created, teammates spawned, tasks assigned, file ownership respected.
 ```
@@ -55,14 +55,14 @@ Create a bead with a vague spec: bd create --title="Add caching to the API" --ty
 Verify: complexity assessed as l/xl, team spawned, debate occurs, refined spec produced.
 ```
 
-### team-review
+### review
 ```
 Make some changes on a feature branch.
 /dm-team:review
 Verify: scout runs, review team spawned, cross-examination occurs, unified assessment produced.
 ```
 
-### team-brainstorm
+### brainstorm
 ```
 Ask to brainstorm a feature: "I want to add real-time collaboration to the editor"
 Verify: multiple perspectives spawn, parallel exploration, convergence to design.
@@ -93,10 +93,10 @@ Verify: multiple perspectives spawn, parallel exploration, convergence to design
 ## Iteration Tips
 
 1. **Start with council** — simplest to test (no file changes, just debate)
-2. **Then team-review** — verifiable output, comparable to dm-work:review
+2. **Then review** — verifiable output, comparable to dm-work:review
 3. **Then team-refine** — more complex, needs a real spec to refine
-4. **Then team-brainstorm** — subjective output, harder to validate
-5. **Test team-lead + teammate last** — these are activated by the other skills
+4. **Then brainstorm** — subjective output, harder to validate
+5. **Test lead + teammate last** — these are activated by the other skills
 
 ### Comparing with dm-work equivalents
 
