@@ -79,6 +79,17 @@ Let Claude orchestrate while subagents implement.
 2. **Review results** — Check what subagents produced before committing.
 3. **Commit incrementally** — One commit per completed unit. Don't batch.
 
+### Agent Teams Alternative (Experimental)
+
+For complex work requiring inter-agent coordination — collaborative review, adversarial refinement, multi-perspective analysis — consider Agent Teams instead of subagents:
+
+1. **Activate `dm-team:team-lead`** — instead of `dm-work:orchestrator`
+2. **Use `/dm-team:review`** — reviewers discuss and challenge findings
+3. **Use `/dm-team:refine`** — live adversarial debate instead of sequential pipeline
+4. **Use `/dm-team:council`** — multi-perspective deliberation on decisions
+
+See `dm-team:tiered-delegation` for when to use teams vs subagents. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` and uses significantly more tokens.
+
 ---
 
 ## Context Management
@@ -134,6 +145,7 @@ Multiple compactions compound information loss. Each is lossy; stacking them deg
 | Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
 | Compaction information loss | Never exceed 1 compaction |
+| Multiple perspectives needed | Agent Teams with dm-team skills |
 
 The key insight: **external state (beads) + explicit summaries (snapshot) + delegation (subagents) = sessions that pause and resume reliably.**
 
@@ -153,6 +165,9 @@ The key insight: **external state (beads) + explicit summaries (snapshot) + dele
 | Starting new session | Paste last snapshot + `bd ready` |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
+| Complex multi-agent work | Activate `dm-team:team-lead`, use Agent Teams |
+| Decision needs debate | `/dm-team:council` |
+| Spec needs adversarial refinement | `/dm-team:refine` (team) or `/dm-work:refine` (subagent) |
 
 ---
 
@@ -259,3 +274,5 @@ See **autonomous-runs.md** for full configuration and the **`dm-work:srt` skill*
 - **`dm-work:srt` skill** — Sandbox Runtime configuration for CLI/autonomous runs
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills
 - **`autonomous-runs.md`** — Full guide to sandboxed autonomous Claude
+- **`dm-team:team-lead` skill** — Claude's instructions for being an Agent Teams lead
+- **`dm-team:tiered-delegation` skill** — When to use teams vs subagents

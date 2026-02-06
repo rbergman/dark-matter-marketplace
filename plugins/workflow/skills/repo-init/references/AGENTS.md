@@ -1,11 +1,5 @@
 # GLOBAL INSTRUCTIONS
 
-> **Canonical template moved.** The AGENTS.md template is now in the repo-init skill:
-> `plugins/workflow/skills/repo-init/references/AGENTS.md`
->
-> This file remains as a quick-reference for the global CLAUDE.md (~/.claude/CLAUDE.md).
-> For new repos, use `dm-work:repo-init` which creates AGENTS.md + symlinks CLAUDE.md to it.
-
 ## Prime Directive
 
 **Always grow complexity from a simple system that already works.**
@@ -46,8 +40,10 @@ At session start, activate one of these based on your coordination needs:
 | Standard delegation | `dm-work:orchestrator` | Task() subagents |
 | Complex multi-agent work | `dm-team:team-lead` | Agent Teams |
 
-If you are a **subagent**, activate `dm-work:subagent`.
-If you are a **teammate**, activate `dm-team:teammate`.
+Both establish delegation thresholds, quality gates, and file ownership boundaries. See `dm-team:tiered-delegation` for the decision framework.
+
+If you are a **subagent** (delegated by an orchestrator), activate `dm-work:subagent`.
+If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:teammate`.
 
 ---
 
@@ -57,17 +53,20 @@ Run `bd onboard` to install the latest beads guidance for this project.
 
 ### Bead Detail Discipline
 
-When creating beads, **capture ample detail** so work can resume with high fidelity in any future session.
+When creating beads, **capture ample detail** so work can resume with high fidelity in any future session — even one with no prior context.
 
 Every bead must include:
-- **Clear title** in imperative form
-- **Description** with enough context to start work cold
-- **Dependencies** explicitly linked
+- **Clear title** in imperative form ("Implement X", "Fix Y")
+- **Description** with enough context to start work cold: what, why, acceptance criteria
+- **Dependencies** explicitly linked (`bd dep add`)
 - **Complexity estimate** (xs/s/m/l/xl)
 
-For m+ complexity: link to plan doc with full breakdown.
+For m+ complexity beads, also include:
+- Link to a plan doc (`docs/plans/YYYY-MM-DD-<topic>.md`) with full breakdown
+- Key architectural decisions and constraints
+- Relevant file paths and current state
 
-**The test**: Could a fresh session pick up this bead and make meaningful progress? If not, add more detail.
+**The test**: Could a fresh session with zero conversation history pick up this bead and make meaningful progress? If not, add more detail.
 
 ---
 

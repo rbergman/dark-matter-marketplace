@@ -1,6 +1,6 @@
 ---
 name: repo-init
-description: Initialize a new repository with standard scaffolding - git, gitignore, CLAUDE.md, justfile, mise, and beads. Use when starting a new project or setting up an existing repo for Claude Code workflows.
+description: Initialize a new repository with standard scaffolding - git, gitignore, AGENTS.md, justfile, mise, and beads. Use when starting a new project or setting up an existing repo for Claude Code workflows.
 ---
 
 # Repository Initialization
@@ -123,34 +123,18 @@ __pycache__/
 
 ---
 
-## Step 3: CLAUDE.md
+## Step 3: AGENTS.md
 
-Create project conventions file:
-
-```markdown
-# Project Name - Claude Instructions
-
-## Overview
-
-Brief description of what this project does.
-
-## Development
+Copy the AGENTS.md template from this skill's `references/AGENTS.md` to the project root, then create a symlink so Claude Code discovers it automatically:
 
 ```bash
-just setup    # First-time setup
-just check    # Run all quality gates
+cp <skill-install-path>/references/AGENTS.md ./AGENTS.md
+ln -s AGENTS.md CLAUDE.md
 ```
 
-## Conventions
+AGENTS.md is the canonical file; CLAUDE.md is a symlink so Claude Code discovers it automatically.
 
-- [Add project-specific patterns here]
-
-## Architecture
-
-- [Key directories and their purposes]
-```
-
-Keep it minimal initially. Add conventions as they emerge.
+Customize the template for the specific project (update project description, add project-specific conventions).
 
 ---
 
@@ -222,13 +206,7 @@ fi
 
 ```bash
 bd init -q
-```
-
-Add to CLAUDE.md:
-```markdown
-## Task Tracking
-
-Use `bd` for task tracking. Run `bd ready` to see available work.
+bd onboard
 ```
 
 ---
@@ -251,8 +229,9 @@ Point user to language-specific setup:
 ```bash
 # Full manual init sequence
 git init
-# Create .gitignore, CLAUDE.md, justfile, .mise.toml, .envrc.example
+# Create .gitignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
 bd init -q
+bd onboard
 mise use just@latest
 # Then follow language skill for specifics
 ```

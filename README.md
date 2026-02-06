@@ -40,6 +40,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 |--------|--------|---------|
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
 | dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
+| dm-team | Agent Teams patterns | `dm-team:team-lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
 | dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
@@ -58,6 +59,7 @@ dark-matter-marketplace/
 │   ├── drivers/       # dm-drvr: Codex, Gemini delegation
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
+│   ├── teams/       # dm-team: Agent Teams orchestration and collaboration
 │   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
@@ -142,6 +144,24 @@ Language-specific expertise with strict, opinionated standards.
 | `dm-lang:rescript-pro` | Skill | Type-safe ReScript: exhaustive matching, typed FFI, React integration, pipe-first style |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
 
+### dm-team (teams/)
+
+Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. **Experimental** — requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`.
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-team:team-lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, beads integration |
+| `dm-team:teammate` | Skill | Teammate protocol — file ownership, self-claiming, inter-agent communication |
+| `dm-team:council` | Skill | Multi-perspective deliberation (LLM Council pattern) for decisions and trade-offs |
+| `dm-team:team-refinement` | Skill | Live adversarial spec refinement through teammate debate |
+| `dm-team:team-review` | Skill | Collaborative code review where reviewers discuss and challenge findings |
+| `dm-team:team-brainstorm` | Skill | Multi-perspective brainstorming with simultaneous exploration |
+| `dm-team:tiered-delegation` | Skill | Decision framework: when to use Agent Teams vs subagents vs single session |
+| `dm-team:compositions` | Skill | Reusable team templates and beads-teams bridge patterns |
+| `/dm-team:council` | Command | Spawn a deliberation council for a decision or topic |
+| `/dm-team:refine` | Command | Team-based adversarial spec refinement |
+| `/dm-team:review` | Command | Collaborative team code review |
+
 ### dm-tool (tooling/)
 
 Patterns for designing tools that agents can use effectively.
@@ -158,12 +178,13 @@ Non-installable materials for reference and sharing.
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Minimal global instructions — prime directive + pointer to `dm-work:orchestrator` skill |
+| `CLAUDE.md` | Global instructions — prime directive, role selection (orchestrator or team lead), beads guidance |
 | `workflow.md` | Human guide to the development loop (80k rule, snapshot workflow, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
+| `testing-agent-teams.md` | Testing guide for the dm-team plugin |
 
 ---
 
@@ -181,6 +202,7 @@ claude plugin install dm-arch@dark-matter-marketplace
 claude plugin install dm-drvr@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
+claude plugin install dm-team@dark-matter-marketplace
 claude plugin install dm-tool@dark-matter-marketplace
 claude plugin install dm-work@dark-matter-marketplace
 ```
@@ -191,7 +213,7 @@ claude plugin install dm-work@dark-matter-marketplace
 
 See `references/workflow.md` for the full workflow, but the core ideas:
 
-1. **Orchestrator model** — You strategize, Claude orchestrates, subagents implement
+1. **Orchestrator model** — You strategize, Claude orchestrates, agents implement (subagents for focused tasks, Agent Teams for collaborative work)
 2. **Context is precious** — Delegate to preserve it; checkpoint to manage it
 3. **External state** — Use beads to track work outside the conversation
 4. **One compaction max** — Multiple compactions compound information loss
