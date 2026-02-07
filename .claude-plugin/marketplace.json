@@ -45,6 +45,14 @@
       "category": "development"
     },
     {
+      "name": "dm-team",
+      "description": "Agent Teams patterns: multi-agent coordination, deliberation, and collaborative workflows (experimental)",
+      "version": "0.1.0",
+      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/teams",
+      "category": "development"
+    },
+    {
       "name": "dm-tool",
       "description": "Tool design patterns: building CLIs, MCPs, and APIs that agents can use effectively",
       "version": "0.1.0",
