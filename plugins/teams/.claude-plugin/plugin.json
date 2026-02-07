@@ -2,5 +2,5 @@
   "name": "dm-team",
   "version": "0.1.0",
   "description": "Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. Experimental — requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS.",
-  "author": "rbergman"
+  "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }
