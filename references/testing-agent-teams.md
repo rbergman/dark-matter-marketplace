@@ -1,6 +1,6 @@
 # Testing the dm-team Plugin
 
-A practical guide for testing and iterating on the Agent Teams skills and commands.
+A practical guide for testing and iterating on the [Agent Teams](https://code.claude.com/docs/en/agent-teams) skills and commands.
 
 ---
 

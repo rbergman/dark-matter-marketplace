@@ -38,9 +38,9 @@ At session start, activate one of these based on your coordination needs:
 | Situation | Skill | Mechanism |
 |-----------|-------|-----------|
 | Standard delegation | `dm-work:orchestrator` | Task() subagents |
-| Complex multi-agent work | `dm-team:lead` | Agent Teams |
+| Complex multi-agent work | `dm-team:lead` | [Agent Teams](https://code.claude.com/docs/en/agent-teams) |
 
-Both establish delegation thresholds, quality gates, and file ownership boundaries. See `dm-team:tiered-delegation` for the decision framework.
+Both establish delegation thresholds, quality gates, and file ownership boundaries. See `dm-team:tiered-delegation` for the decision framework. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json.
 
 If you are a **subagent** (delegated by an orchestrator), activate `dm-work:subagent`.
 If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:teammate`.

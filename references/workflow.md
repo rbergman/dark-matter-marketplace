@@ -81,14 +81,24 @@ Let Claude orchestrate while subagents implement.
 
 ### Agent Teams Alternative (Experimental)
 
-For complex work requiring inter-agent coordination — collaborative review, adversarial refinement, multi-perspective analysis — consider Agent Teams instead of subagents:
+For complex work requiring inter-agent coordination — collaborative review, adversarial refinement, multi-perspective analysis — consider [Agent Teams](https://code.claude.com/docs/en/agent-teams) instead of subagents.
+
+Agent Teams spawns persistent teammates (each a full Claude Code session) that message each other directly, self-claim tasks from a shared list, and collaborate. Unlike `Task()` subagents which report back to the orchestrator only, teammates can discuss, challenge, and coordinate autonomously.
+
+**Enable it:**
+```json
+// ~/.claude/settings.json
+{ "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" } }
+```
+
+**dm-team commands:**
 
 1. **Activate `dm-team:lead`** — instead of `dm-work:orchestrator`
 2. **Use `/dm-team:review`** — reviewers discuss and challenge findings
 3. **Use `/dm-team:refine`** — live adversarial debate instead of sequential pipeline
 4. **Use `/dm-team:council`** — multi-perspective deliberation on decisions
 
-See `dm-team:tiered-delegation` for when to use teams vs subagents. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` and uses significantly more tokens.
+See `dm-team:tiered-delegation` for when to use teams vs subagents. Agent Teams uses significantly more tokens than subagents — each teammate is a separate Claude instance.
 
 ---
 

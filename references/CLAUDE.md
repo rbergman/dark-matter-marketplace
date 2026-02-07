@@ -44,7 +44,9 @@ At session start, activate one of these based on your coordination needs:
 | Situation | Skill | Mechanism |
 |-----------|-------|-----------|
 | Standard delegation | `dm-work:orchestrator` | Task() subagents |
-| Complex multi-agent work | `dm-team:lead` | Agent Teams |
+| Complex multi-agent work | `dm-team:lead` | [Agent Teams](https://code.claude.com/docs/en/agent-teams) |
+
+Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json. See `dm-team:tiered-delegation` for when to use teams vs subagents.
 
 If you are a **subagent**, activate `dm-work:subagent`.
 If you are a **teammate**, activate `dm-team:teammate`.

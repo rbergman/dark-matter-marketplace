@@ -146,7 +146,20 @@ Language-specific expertise with strict, opinionated standards.
 
 ### dm-team (teams/)
 
-Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. **Experimental** — requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`.
+Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. Built on Anthropic's [Agent Teams](https://code.claude.com/docs/en/agent-teams) feature.
+
+**Experimental** — Agent Teams is in preview and disabled by default. Enable it:
+
+```json
+// ~/.claude/settings.json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+**When to use dm-team vs dm-work:** dm-work uses `Task()` subagents — fire-and-forget workers that report back to the orchestrator. dm-team uses Agent Teams — persistent teammates with their own context windows that message each other directly, self-claim tasks, and collaborate. Use dm-work for focused result-only delegation. Use dm-team when agents need to discuss, challenge each other, or coordinate. See `dm-team:tiered-delegation` for the full decision framework.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
