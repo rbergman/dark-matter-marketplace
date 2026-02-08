@@ -197,6 +197,7 @@ Non-installable materials for reference and sharing.
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
+| `multi-agent-coordination.md` | Three tiers: subagents vs Agent Teams vs Gastown |
 | `testing-agent-teams.md` | Testing guide for the dm-team plugin |
 
 ---
