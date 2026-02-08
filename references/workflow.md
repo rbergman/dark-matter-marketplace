@@ -115,20 +115,32 @@ Good pause points:
 - Phase transition (convergence → breakdown, breakdown → execution)
 - Natural stopping point in discussion
 
-### The Snapshot Workflow
+### Session Rotation (Preferred)
 
 When you're ready to pause:
 
 ```
-1. Run /dm-work:snapshot
-2. Copy the output
+1. Run /dm-work:rotate
+2. Run /copy (backup to clipboard)
 3. Run /clear
-4. Paste the snapshot as your first message
-5. Add any additional context about next steps
-6. Continue with fresh context
 ```
 
-`/dm-work:snapshot` produces an explicit summary: work completed, roadmap, next steps, where to find bead state. This is more reliable than depending on built-in compaction. You can also use it post-`/compact` to recover a clean view of the session from the obscured internals.
+`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `.claude/snapshot.md`, and syncs beads. After `/clear`, the new session detects the snapshot file and recovers automatically. The `/copy` step is a safety net — if auto-recovery doesn't trigger, paste from clipboard.
+
+The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps. Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
+
+### Manual Snapshot (Fallback)
+
+If you prefer manual control, or `/rotate` isn't available:
+
+```
+1. Run /dm-work:snapshot
+2. Run /copy
+3. Run /clear
+4. Paste the snapshot as your first message
+```
+
+`/dm-work:snapshot` produces the same high-fidelity output but doesn't save to file or sync beads automatically.
 
 ### Emergency Recovery
 
@@ -169,10 +181,10 @@ The key insight: **external state (beads) + explicit summaries (snapshot) + dele
 | Low confidence in spec | `/dm-work:breakdown` or `/dm-work:refine` |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm-work:snapshot` → copy → `/clear` → paste |
-| Context critical | Emergency: compact then snapshot |
+| Ready to pause | `/dm-work:rotate` → `/copy` → `/clear` (auto-recovers) |
+| Context critical | Emergency: compact then `/dm-work:rotate` |
 | Task complete | Review, commit, close bead |
-| Starting new session | Paste last snapshot + `bd ready` |
+| Starting new session | Auto-recovery from snapshot, or paste + `bd ready` |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
 | Complex multi-agent work | Activate `dm-team:lead`, use Agent Teams |

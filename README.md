@@ -105,7 +105,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
-| `/dm-work:snapshot` | Command | Session snapshot for handoffs, recovery, or resets (see workflow.md) |
+| `/dm-work:snapshot` | Command | Session snapshot for handoffs, recovery, or resets |
+| `/dm-work:rotate` | Command | One-step session rotation — snapshot + save + sync, then /clear |
 | `/dm-work:review` | Command | Parallel arch/code/security review — local (beads) or PR (GH comments) |
 | `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
 | `/dm-work:advice` | Command | Get architectural guidance |

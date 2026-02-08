@@ -19,13 +19,37 @@ In practice:
 
 ## Quality Gates
 
-Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete—regardless of origin.
+**CRITICAL RULE**
 
+Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete—regardless of origin.
 - "Already broken" ≠ excuse
 - Others' failures don't exempt us
 - Usually our prior miss anyway
 
 **Fix failing gates. No exceptions.**
+
+---
+
+## Beads
+
+Run `bd onboard` to install the latest beads guidance for this project, updating this section with additional detial as instructed.
+
+### Bead Detail Discipline
+
+When creating beads, **capture ample detail** so work can resume with high fidelity in any future session — even one with no prior context.
+
+Every bead must include:
+- **Clear title** in imperative form ("Implement X", "Fix Y")
+- **Description** with enough context to start work cold: what, why, acceptance criteria
+- **Dependencies** explicitly linked (`bd dep add`)
+- **Complexity estimate** (xs/s/m/l/xl)
+
+For m+ complexity beads, also include:
+- Link to a plan doc (`docs/plans/YYYY-MM-DD-<topic>.md`) with full breakdown
+- Key architectural decisions and constraints
+- Relevant file paths and current state
+
+**The test**: Could a fresh session with zero conversation history pick up this bead and make meaningful progress? If not, add more detail.
 
 ---
 
@@ -47,26 +71,16 @@ If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:t
 
 ---
 
-## Beads
+## Session Recovery
 
-Run `bd onboard` to install the latest beads guidance for this project.
+At session start, check if `.claude/snapshot.md` exists. If it does:
 
-### Bead Detail Discipline
+1. Read it — it's a snapshot from a previous session rotation
+2. Use it as your session context (it contains all prior state, decisions, and next steps)
+3. Delete the file: `rm .claude/snapshot.md`
+4. Confirm recovery to the user: "Recovered session from snapshot. [brief summary of where we left off]"
 
-When creating beads, **capture ample detail** so work can resume with high fidelity in any future session — even one with no prior context.
-
-Every bead must include:
-- **Clear title** in imperative form ("Implement X", "Fix Y")
-- **Description** with enough context to start work cold: what, why, acceptance criteria
-- **Dependencies** explicitly linked (`bd dep add`)
-- **Complexity estimate** (xs/s/m/l/xl)
-
-For m+ complexity beads, also include:
-- Link to a plan doc (`docs/plans/YYYY-MM-DD-<topic>.md`) with full breakdown
-- Key architectural decisions and constraints
-- Relevant file paths and current state
-
-**The test**: Could a fresh session with zero conversation history pick up this bead and make meaningful progress? If not, add more detail.
+This file is written by `/dm-work:rotate` to enable seamless session handoffs.
 
 ---
 

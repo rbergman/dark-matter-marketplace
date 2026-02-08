@@ -73,6 +73,12 @@ For m+ complexity: link to plan doc with full breakdown.
 
 ---
 
+## Session Recovery
+
+At session start, check if `.claude/snapshot.md` exists. If it does: read it (snapshot from a previous session), use it as context, delete the file, confirm recovery to the user. Written by `/dm-work:rotate`.
+
+---
+
 ## Skills & Tools
 
 You have MCPs, skills, and bash tools. Use them. Ensure subagents and teammates know about relevant skills when delegating.
