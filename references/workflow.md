@@ -125,7 +125,7 @@ When you're ready to pause:
 3. Run /clear
 ```
 
-`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `.claude/snapshot.md`, and syncs beads. After `/clear`, the new session detects the snapshot file and recovers automatically. The `/copy` step is a safety net — if auto-recovery doesn't trigger, paste from clipboard.
+`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and syncs beads. After `/clear`, the new session detects the snapshot file and recovers automatically. The `/copy` step is a safety net — if auto-recovery doesn't trigger, paste from clipboard.
 
 The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps. Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
 

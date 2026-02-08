@@ -73,11 +73,11 @@ If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:t
 
 ## Session Recovery
 
-At session start, check if `.claude/snapshot.md` exists. If it does:
+At session start, check if `history/snapshot.md` exists. If it does:
 
 1. Read it — it's a snapshot from a previous session rotation
 2. Use it as your session context (it contains all prior state, decisions, and next steps)
-3. Delete the file: `rm .claude/snapshot.md`
+3. Delete the file: `rm history/snapshot.md`
 4. Confirm recovery to the user: "Recovered session from snapshot. [brief summary of where we left off]"
 
 This file is written by `/dm-work:rotate` to enable seamless session handoffs.

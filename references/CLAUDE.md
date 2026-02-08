@@ -75,7 +75,7 @@ For m+ complexity: link to plan doc with full breakdown.
 
 ## Session Recovery
 
-At session start, check if `.claude/snapshot.md` exists. If it does: read it (snapshot from a previous session), use it as context, delete the file, confirm recovery to the user. Written by `/dm-work:rotate`.
+At session start, check if `history/snapshot.md` exists. If it does: read it (snapshot from a previous session), use it as context, delete the file, confirm recovery to the user. Written by `/dm-work:rotate`.
 
 ---
 

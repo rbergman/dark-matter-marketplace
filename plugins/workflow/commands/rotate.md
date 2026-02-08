@@ -15,13 +15,13 @@ Run the full `/dm-work:snapshot` logic with $ARGUMENTS. Capture the complete sna
 
 ### 2. Save for auto-recovery
 
-Write the snapshot to `.claude/snapshot.md` in the project root:
+Write the snapshot to `history/snapshot.md` in the project root:
 
 ```bash
-mkdir -p .claude
+mkdir -p history
 ```
 
-Then use the Write tool to save the snapshot content to `.claude/snapshot.md`.
+Then use the Write tool to save the snapshot content to `history/snapshot.md`.
 
 **Important:** Write the raw snapshot markdown, not wrapped in code fences. The next session will read this file directly.
 
@@ -42,7 +42,7 @@ Then append this footer:
 
 **Session rotation ready.**
 
-Snapshot saved to `.claude/snapshot.md` for auto-recovery.
+Snapshot saved to `history/snapshot.md` for auto-recovery.
 
 **Next:** Run `/copy` (backup to clipboard), then `/clear`.
 
