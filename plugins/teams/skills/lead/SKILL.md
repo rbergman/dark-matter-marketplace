@@ -44,7 +44,7 @@ Teammates do **not** inherit your conversation history. Give them everything the
 | Role | Model | Rationale |
 |------|-------|-----------|
 | Synthesis, judgment, architecture | Opus | Deep reasoning, nuanced decisions |
-| Implementation, debate, review | Sonnet | Fast, capable, cost-effective |
+| Implementation, debate, review | Opus | Highest quality for substantive work |
 | Research, scouting, file inventory | Haiku | Lightweight, high throughput |
 
 **Plan approval:** Require teammates to present a plan before executing risky or complex work. Approve or redirect before they proceed.

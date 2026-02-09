@@ -29,7 +29,7 @@ Read target spec, related files, existing beads for the project.
 
 ### 4. Create Team
 
-Spawn Agent Team with Analyst (haiku), Proposer (sonnet), Advocate (sonnet). Lead acts as Judge.
+Spawn Agent Team with Analyst (haiku), Proposer (opus), Advocate (opus). Lead acts as Judge.
 
 - Include in each spawn prompt: the spec text, their role description, protected categories, instructions to debate with other teammates
 - Require plan approval for the Analyst (fast review of analysis before debate starts)

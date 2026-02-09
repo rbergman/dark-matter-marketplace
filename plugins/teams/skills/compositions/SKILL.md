@@ -13,9 +13,9 @@ Reusable team templates for common multi-agent workflows. Pick a template, adapt
 
 | Role | Model | Responsibility |
 |------|-------|---------------|
-| Investigator A | sonnet | Primary research angle |
-| Investigator B | sonnet | Alternative angle, different sources |
-| Devil's Advocate | sonnet | Challenge findings, look for gaps |
+| Investigator A | opus | Primary research angle |
+| Investigator B | opus | Alternative angle, different sources |
+| Devil's Advocate | opus | Challenge findings, look for gaps |
 | **Lead** | — | Synthesize findings into report |
 
 **Use for:** library evaluation, architecture research, debugging with competing hypotheses.
@@ -26,9 +26,9 @@ The value is in the tension between investigators. Investigator A builds the cas
 
 | Role | Model | Responsibility |
 |------|-------|---------------|
-| Architecture Reviewer | sonnet | SOLID, module boundaries, dependency direction |
-| Code Reviewer | sonnet | Bugs, logic errors, test coverage, conventions |
-| Security Reviewer | sonnet | Vulnerabilities, secrets, injection, auth |
+| Architecture Reviewer | opus | SOLID, module boundaries, dependency direction |
+| Code Reviewer | opus | Bugs, logic errors, test coverage, conventions |
+| Security Reviewer | opus | Vulnerabilities, secrets, injection, auth |
 | **Lead** | opus | Merge findings, resolve conflicts between reviewers |
 
 **Use for:** PR review, pre-merge review, audit.
@@ -42,8 +42,8 @@ Reviewers may disagree — the architecture reviewer wants an abstraction layer,
 | Role | Model | Responsibility |
 |------|-------|---------------|
 | Analyst | haiku | Surface ambiguity, formalize spec |
-| Proposer | sonnet | Suggest simplifications and cuts |
-| Advocate | sonnet | Challenge cuts, defend scope |
+| Proposer | opus | Suggest simplifications and cuts |
+| Advocate | opus | Challenge cuts, defend scope |
 | **Lead as Judge** | opus | Synthesize final spec |
 
 **Use for:** spec refinement, epic scoping.
@@ -56,7 +56,7 @@ The Analyst finds the holes. The Proposer tries to shrink scope. The Advocate pu
 
 | Role | Model | Responsibility |
 |------|-------|---------------|
-| Module Owner A-D | sonnet | Each owns a distinct set of files |
+| Module Owner A-D | opus | Each owns a distinct set of files |
 | **Lead** | — | Coordinate dependencies, merge shared files, run quality gates |
 
 **Use for:** parallel feature implementation, cross-layer changes.
@@ -89,11 +89,10 @@ Use mixed models for epistemic diversity — different models emphasize differen
 | Role type | Recommended model | Why |
 |-----------|------------------|-----|
 | Research / scouting | haiku | Fast, cheap, good for information gathering |
-| Implementation / debate | sonnet | Balanced capability and cost |
+| Implementation / debate / review | opus | Highest quality for all substantive work |
 | Synthesis / judgment | opus | Highest quality for final decisions |
-| Diverse perspectives | mixed | Model diversity = epistemic diversity |
 
-When in doubt, default to sonnet for teammates and opus for leads that must make judgment calls. Use haiku for high-volume, low-stakes roles (scanning, listing, initial triage).
+Default to opus for all teammates doing substantive work (implementation, debate, review, analysis). Use haiku only for high-volume, low-stakes roles (scanning, listing, initial triage).
 
 ## Beads-Teams Bridge
 
@@ -153,7 +152,7 @@ prompt_fragment: |
 
 ```yaml
 role: architecture-reviewer
-model: sonnet
+model: opus
 skills:
   - dm-arch:adr
   - dm-tool:mise
@@ -171,7 +170,7 @@ prompt_fragment: |
 
 ```yaml
 role: module-owner
-model: sonnet
+model: opus
 skills:
   - dm-work:subagent
 file_ownership:
@@ -189,7 +188,7 @@ prompt_fragment: |
 
 ```yaml
 role: devils-advocate
-model: sonnet
+model: opus
 skills: []
 file_ownership: []
 success_criteria:

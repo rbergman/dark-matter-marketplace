@@ -167,7 +167,7 @@ Launch selected reviewers in a SINGLE message (parallel execution).
 ### Architecture Reviewer (a)
 
 ````
-Task(subagent_type="general-purpose", model="sonnet", description="Architecture review", prompt="
+Task(subagent_type="general-purpose", model="opus", description="Architecture review", prompt="
 You are a Senior Architecture Reviewer. Review the following scope for architectural quality.
 
 SCOPE:
@@ -239,7 +239,7 @@ Based on the scout's `REVIEW_DOMAINS` output, code review may split into special
 Each domain reviewer uses:
 
 ````
-Task(subagent_type="feature-dev:code-reviewer", model="sonnet", description="Code review: <domain>", prompt="
+Task(subagent_type="feature-dev:code-reviewer", model="opus", description="Code review: <domain>", prompt="
 You are a Senior Code Reviewer specializing in <domain name>.
 
 SCOPE:
@@ -313,7 +313,7 @@ Only report findings with ≥80% confidence.
 ### Security Reviewer (s)
 
 ````
-Task(subagent_type="general-purpose", model="sonnet", description="Security review", prompt="
+Task(subagent_type="general-purpose", model="opus", description="Security review", prompt="
 You are a Senior Security Reviewer. Review the following scope for security vulnerabilities.
 
 SCOPE:

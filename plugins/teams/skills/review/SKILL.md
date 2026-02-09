@@ -26,9 +26,9 @@ Current /dm-work:review spawns 3 isolated subagents that report back independent
 
 | Role | Teammate | Model | Skills to inject |
 |------|----------|-------|-----------------|
-| Architecture | Teammate 1 | sonnet | dm-arch:solid-architecture, dm-arch:data-oriented-architecture |
-| Code Quality | Teammate 2 | sonnet | Language-specific dm-lang:*-pro skill |
-| Security | Teammate 3 | sonnet | (none — general security knowledge) |
+| Architecture | Teammate 1 | opus | dm-arch:solid-architecture, dm-arch:data-oriented-architecture |
+| Code Quality | Teammate 2 | opus | Language-specific dm-lang:*-pro skill |
+| Security | Teammate 3 | opus | (none — general security knowledge) |
 | Lead | You | opus | Synthesis and final assessment |
 
 Code reviewer may split by domain (same as dm-work:review) for large reviews.

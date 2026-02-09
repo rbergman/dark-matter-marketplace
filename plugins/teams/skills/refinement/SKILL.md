@@ -24,8 +24,8 @@ The original dialectical-refinement runs 5 sequential phases (Analyst->Proposer-
 | Role | Teammate | Model | Purpose |
 |------|----------|-------|---------|
 | Analyst | Teammate 1 | haiku | Surface ambiguity, identify gaps, tag protected items |
-| Proposer | Teammate 2 | sonnet | Propose simplifications and cuts with confidence levels |
-| Advocate | Teammate 3 | sonnet | Challenge cuts, defend scope, suggest cheap additions |
+| Proposer | Teammate 2 | opus | Propose simplifications and cuts with confidence levels |
+| Advocate | Teammate 3 | opus | Challenge cuts, defend scope, suggest cheap additions |
 | Judge | Lead | opus | Moderate debate, enforce scope lock, synthesize final spec |
 
 ## Protected Categories

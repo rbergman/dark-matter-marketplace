@@ -25,9 +25,9 @@ Multi-perspective brainstorming using Agent Teams.
 
 | Role | Analytical frame | Model |
 |------|-----------------|-------|
-| User Advocate | Focuses on UX, simplicity, user goals | sonnet |
-| Technical Skeptic | Finds complexity, maintenance burden, failure modes | sonnet |
-| Creative Explorer | Proposes unconventional approaches, challenges assumptions | sonnet |
+| User Advocate | Focuses on UX, simplicity, user goals | opus |
+| Technical Skeptic | Finds complexity, maintenance burden, failure modes | opus |
+| Creative Explorer | Proposes unconventional approaches, challenges assumptions | opus |
 
 Lead adds/replaces perspectives based on the specific domain.
 
