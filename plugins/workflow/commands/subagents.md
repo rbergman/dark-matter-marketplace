@@ -74,10 +74,32 @@ Each subagent prompt follows `/subagent` template with:
 | 1s08.2 | success | game-renderer*.ts | Split into 5 sub-renderers |
 ```
 
-4. **If all success:** Proceed to merge
+4. **If all success:** Proceed to intent review
 5. **If any failed:** Read ONLY that report, fix or re-launch
 
-## 6. Merge & Complete (BATCH)
+## 6. Intent Review (M+ tasks)
+
+For M+ subagent returns, launch review subagents (can parallelize — one per returning subagent):
+
+```
+Task(subagent_type="general-purpose", model="opus", description="Review subagent output", prompt="
+ROLE: Post-subagent intent reviewer.
+TASK DESCRIPTION: <original task>
+FILES CHANGED: <from response>
+Run git diff to see the actual changes. Answer:
+1. COVERAGE: full|partial|miss
+2. DRIFT: none|minor|major
+3. GAPS: <list or 'none'>
+VERDICT: accept|rework
+DETAIL: <1 sentence if rework>
+")
+```
+
+- VERDICT=accept for all → proceed to merge
+- Any VERDICT=rework → send gaps back, re-launch targeted fix
+- Log outcomes to `history/checkpoint-effectiveness.log`
+
+## 7. Merge & Complete (BATCH)
 
 1. Merge shared files yourself (barrel exports, etc.)
 2. Run quality gates yourself — MANDATORY: `just check` or `npm run check`
@@ -89,14 +111,14 @@ Each subagent prompt follows `/subagent` template with:
    git commit -m "feat: <combined summary from COMMIT_MSGs>"
    ```
 
-## 7. Handle Failures
+## 8. Handle Failures
 
 - Don't let one failure block parallel work
 - Read failed subagent's report file for details
 - Fix or re-launch failed subagent only
 - If unexpected conflicts: revert one, re-run serial
 
-## 8. Optional: Batch Code Review
+## 9. Optional: Batch Code Review
 
 If thorough review needed before commit:
 ```

@@ -100,6 +100,20 @@ RETURN:
 - Do NOT commit or close beads
 ```
 
+### Pre-Delegation Checklist (M+ tasks)
+
+Before launching any M+ subagent, verify these five items. Do NOT skip this — vague delegation is a top source of wasted work.
+
+| Check | Question |
+|-------|----------|
+| Requirements mapped | Does every requirement from the bead/task have a corresponding action in the prompt? |
+| Correct layer | Is the work targeting the right architectural layer (controller vs service vs model)? |
+| File ownership explicit | Are OWN and READ-ONLY lists specific (not "relevant files")? |
+| Gates named | Is the exact gate command specified (not just "run tests")? |
+| Exit criteria clear | Will the subagent know unambiguously when it's done? |
+
+If any check fails, fix the prompt before launching. Log to `history/checkpoint-effectiveness.log` if the checklist caught a real issue (see Checkpoint Effectiveness Tracking).
+
 ---
 
 ## Token Efficiency Rules
@@ -162,7 +176,43 @@ Before merging to main or completing significant work:
 
 ## Post-Subagent Verification
 
-After all subagents complete (or after a single subagent returns):
+After each M+ subagent returns (or after all complete for parallel batches):
+
+### Step 1: Intent Review (mandatory for M+ tasks)
+
+Launch a review subagent to compare intent vs implementation:
+
+```
+Task(subagent_type="general-purpose", model="opus", description="Review subagent output", prompt="
+ROLE: Post-subagent intent reviewer. Compare what was asked vs what was done.
+
+TASK DESCRIPTION (what was asked):
+<paste the original task description from the delegation prompt>
+
+FILES CHANGED: <from subagent response>
+
+REVIEW: Run `git diff HEAD` (or `git diff` for unstaged changes) to see the actual diff.
+
+Answer these three questions:
+1. COVERAGE: Does the diff implement everything in the task description? (full / partial / miss)
+2. DRIFT: Does the diff include changes NOT requested? (none / minor / major)
+3. GAPS: List any specific requirements from the task description not addressed in the diff.
+
+RETURN FORMAT (structured, 3-5 lines only):
+COVERAGE: full|partial|miss
+DRIFT: none|minor|major
+GAPS: <comma-separated list, or 'none'>
+VERDICT: accept|rework
+DETAIL: <1 sentence if rework needed>
+")
+```
+
+**Decision tree:**
+- VERDICT=accept → proceed to Step 2
+- VERDICT=rework → send GAPS back to original subagent for targeted fix
+- If you disagree with the reviewer's verdict, override it but log the disagreement (see Checkpoint Effectiveness Tracking)
+
+### Step 2: Mechanical Gates (mandatory for all tasks)
 
 1. **Run quality gates yourself:** `just check` or `npm run check`
    - Do NOT trust subagent summaries of gate results
@@ -170,7 +220,10 @@ After all subagents complete (or after a single subagent returns):
 2. **Spot-check scope:** Did the subagent stay within OWN boundaries?
 3. **If gates fail:** Read the subagent report, fix or re-launch
 
-This is a PROTOCOL REQUIREMENT, not a suggestion.
+### Skip Conditions
+
+- **XS/S tasks:** Skip Step 1 (intent review). Mechanical gates (Step 2) are sufficient.
+- **Exploration/search subagents:** Skip both. No code changes to verify.
 
 ---
 
@@ -187,6 +240,39 @@ Specify the model explicitly in every Task() call:
 ```
 Task(subagent_type="general-purpose", model="opus", ...)
 ```
+
+---
+
+## Checkpoint Effectiveness Tracking
+
+The pre-delegation checklist and post-return intent review are new protocols. Track their effectiveness so we can tune or drop them based on evidence.
+
+**Log file:** `history/checkpoint-effectiveness.log`
+
+**When to log (append one line per event):**
+
+| Event | Log it when... |
+|-------|----------------|
+| `CHECKLIST_CATCH` | Pre-delegation checklist caught a real issue (wrong layer, missing requirement, vague ownership) |
+| `CHECKLIST_PASS` | Checklist passed without changes (routine confirmation) — log only 1 in 5 to avoid noise |
+| `REVIEW_CATCH` | Intent reviewer flagged a real gap that led to rework |
+| `REVIEW_FALSE_POS` | Intent reviewer flagged something but you overrode it as incorrect |
+| `REVIEW_MISS` | You discovered an intent gap AFTER accepting reviewed work (the reviewer missed it) |
+| `REVIEW_PASS` | Reviewer said accept and you agreed — log only 1 in 5 |
+
+**Format:**
+```
+[DATE] [EVENT] task=<bead-id> size=<xs/s/m/l/xl> detail=<brief description>
+```
+
+**Example entries:**
+```
+[2026-02-10] CHECKLIST_CATCH task=abc-123 size=m detail=prompt targeted controller layer, bug was in service
+[2026-02-10] REVIEW_CATCH task=abc-124 size=l detail=subagent missed error handling requirement from bead
+[2026-02-10] REVIEW_FALSE_POS task=abc-125 size=m detail=reviewer flagged refactor as drift, was intentional cleanup
+```
+
+**Session-end review:** At session end, glance at the log. If you notice patterns (e.g., reviewer false positives dominating, or checklist never catching anything), mention it to the user. This is how we decide whether these checkpoints earn their keep.
 
 ---
 

@@ -64,27 +64,42 @@ REPORT: history/subagent-reports/<bead-id>.md
 ```
 ```
 
-## 4. Launch
+## 4. Pre-Delegation Checklist (M+ tasks)
+
+Before launching, verify against the orchestrator's pre-delegation checklist:
+- [ ] Requirements mapped (every bead requirement has a prompt action)
+- [ ] Correct architectural layer
+- [ ] File ownership explicit (OWN/READ-ONLY are specific)
+- [ ] Gate command named exactly
+- [ ] Exit criteria unambiguous
+
+If any check fails, fix the prompt first. Log catches to `history/checkpoint-effectiveness.log`.
+
+## 5. Launch
 
 ```
 Task(subagent_type="<type>", model="opus", description="<3-5 words>", prompt="<prompt>")
 ```
 
-## 5. After Completion (MINIMAL CONTEXT)
+## 6. After Completion
 
 **DO NOT read full report into context unless there's a problem.**
 
 1. Parse the minimal response (STATUS, FILES, SUMMARY)
-2. If STATUS=success:
+2. If STATUS=success AND task is M+:
+   - Launch intent review subagent (see orchestrator skill: Post-Subagent Verification Step 1)
+   - If VERDICT=accept, run quality gates: `just check` or `npm run check`
+   - If VERDICT=rework, send gaps back to subagent
+   - If gates pass, proceed to commit
+3. If STATUS=success AND task is XS/S:
    - Run quality gates yourself: `just check` or `npm run check`
    - If gates pass, proceed to commit
-   - If gates fail, read the report and fix or re-launch
-3. If STATUS=partial|failed:
+4. If STATUS=partial|failed:
    - Read `history/subagent-reports/<bead-id>.md` for details
    - Fix or re-launch
-4. Commit: `git add . && bd close <id> --reason "..." && git commit -m "<COMMIT_MSG from response>"`
+5. Commit: `git add . && bd close <id> --reason "..." && git commit -m "<COMMIT_MSG from response>"`
 
-**For thorough review:** Spawn a `superpowers:code-reviewer` subagent pointing at the report file instead of reviewing inline.
+**Log review outcomes** to `history/checkpoint-effectiveness.log` (see orchestrator skill: Checkpoint Effectiveness Tracking).
 
 ## Parallel Safety
 
