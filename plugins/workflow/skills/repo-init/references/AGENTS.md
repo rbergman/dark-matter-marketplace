@@ -73,14 +73,11 @@ If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:t
 
 ## Session Recovery
 
-At session start, check if `history/snapshot.md` exists. If it does:
+If the user pastes a session snapshot as their first message, use it as your starting context — it contains all prior state, decisions, and next steps. Confirm recovery: "Recovered session from snapshot. [brief summary of where we left off]"
 
-1. Read it — it's a snapshot from a previous session rotation
-2. Use it as your session context (it contains all prior state, decisions, and next steps)
-3. Delete the file: `rm history/snapshot.md`
-4. Confirm recovery to the user: "Recovered session from snapshot. [brief summary of where we left off]"
+If no pasted snapshot but `history/snapshot.md` exists, read it as a fallback, then delete it: `rm history/snapshot.md`
 
-This file is written by `/dm-work:rotate` to enable seamless session handoffs.
+Snapshots are created by `/dm-work:rotate`. The paste-based workflow is: `/copy` → `/clear` → paste into new session.
 
 ---
 

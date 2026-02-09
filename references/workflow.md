@@ -121,32 +121,22 @@ When you're ready to pause:
 
 ```
 1. Run /dm-work:rotate
-2. Run /copy (backup to clipboard)
-3. Run /clear
-```
-
-`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and syncs beads. After `/clear`, the new session detects the snapshot file and recovers automatically. The `/copy` step is a safety net — if auto-recovery doesn't trigger, paste from clipboard.
-
-The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps. Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
-
-### Manual Snapshot (Fallback)
-
-If you prefer manual control, or `/rotate` isn't available:
-
-```
-1. Run /dm-work:snapshot
 2. Run /copy
 3. Run /clear
-4. Paste the snapshot as your first message
+4. Paste the snapshot as your first message in the new session
 ```
 
-`/dm-work:snapshot` produces the same high-fidelity output but doesn't save to file or sync beads automatically.
+`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and syncs beads. The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps.
+
+Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
+
+The pasted snapshot is the primary recovery mechanism. The file on disk (`history/snapshot.md`) is a fallback for when clipboard is lost.
 
 ### Emergency Recovery
 
 If you run out of context before you can take a snapshot:
 
-1. **If `/compact` still works:** Run it, then run `/dm-work:snapshot` — it usually still works. Then `/clear` and paste to recover.
+1. **If `/compact` still works:** Run it, then run `/dm-work:rotate`. Then `/copy` → `/clear` → paste to recover.
 
 2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
@@ -162,14 +152,14 @@ Multiple compactions compound information loss. Each is lossy; stacking them deg
 
 | Problem | Solution |
 |---------|----------|
-| Context exhaustion mid-task | Proactive snapshot at 80k |
+| Context exhaustion mid-task | Proactive rotation at 80k |
 | Lost context after compaction | Explicit summaries you control |
 | Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
 | Compaction information loss | Never exceed 1 compaction |
 | Multiple perspectives needed | Agent Teams with dm-team skills |
 
-The key insight: **external state (beads) + explicit summaries (snapshot) + delegation (subagents) = sessions that pause and resume reliably.**
+The key insight: **external state (beads) + explicit summaries (rotation) + delegation (subagents) = sessions that pause and resume reliably.**
 
 ---
 
@@ -181,10 +171,10 @@ The key insight: **external state (beads) + explicit summaries (snapshot) + dele
 | Low confidence in spec | `/dm-work:breakdown` or `/dm-work:refine` |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm-work:rotate` → `/copy` → `/clear` (auto-recovers) |
+| Ready to pause | `/dm-work:rotate` → `/copy` → `/clear` → paste |
 | Context critical | Emergency: compact then `/dm-work:rotate` |
 | Task complete | Review, commit, close bead |
-| Starting new session | Auto-recovery from snapshot, or paste + `bd ready` |
+| Starting new session | Paste snapshot, or `bd ready` if no snapshot |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
 | CLI/autonomous runs | Configure `.srt.json`, run with srt |
 | Complex multi-agent work | Activate `dm-team:lead`, use Agent Teams |

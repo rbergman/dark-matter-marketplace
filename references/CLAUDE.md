@@ -75,7 +75,7 @@ For m+ complexity: link to plan doc with full breakdown.
 
 ## Session Recovery
 
-At session start, check if `history/snapshot.md` exists. If it does: read it (snapshot from a previous session), use it as context, delete the file, confirm recovery to the user. Written by `/dm-work:rotate`.
+If the user pastes a session snapshot as their first message, use it as starting context. Fallback: if `history/snapshot.md` exists, read it, use it, then delete it. Written by `/dm-work:rotate`. Workflow: `/copy` → `/clear` → paste into new session.
 
 ---
 

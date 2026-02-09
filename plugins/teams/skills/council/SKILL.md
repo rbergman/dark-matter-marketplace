@@ -79,7 +79,7 @@ grep -qx 'history/' .gitignore 2>/dev/null || echo 'history/' >> .gitignore
 Council deliberations consume ~25-35k tokens of conversation history (subagent prompts + responses). If the session needs to act on the council's recommendation (implementation work), **strongly recommend rotating first**:
 
 1. Run `/rotate` to snapshot the session
-2. Start fresh session — it auto-recovers from snapshot
+2. `/copy` → `/clear` → paste snapshot into new session
 3. Read `history/council-<topic>.md` for the full recommendation (~2k tokens vs 25-35k in conversation)
 
 This prevents the #1 cause of council-related context overflow: running deliberation AND implementation in the same session.
