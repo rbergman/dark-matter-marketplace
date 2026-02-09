@@ -60,11 +60,19 @@ if [ -z "$GATE_CMD" ]; then
   exit 0
 fi
 
-echo "Running quality gates: $GATE_DESC" >&2
+# Capture output to temp file — only show on failure.
+# CRITICAL: Do NOT let gate output reach stdout/stderr.
+# Claude Code hooks capture all output and inject it into conversation context.
+# A typical test suite produces 500KB+ of output — instant context overflow.
+GATE_OUTPUT=$(mktemp)
+trap 'rm -f "$GATE_OUTPUT"' EXIT
 
-if eval "$GATE_CMD" >&2 2>&1; then
+if eval "$GATE_CMD" >"$GATE_OUTPUT" 2>&1; then
+  # Gates passed — suppress all output, exit clean
   exit 0
 else
-  echo "{\"decision\":\"block\",\"reason\":\"🚫 Quality gates failed ($GATE_DESC). Fix failures before ending session.\"}"
+  # Gates failed — show only the last 50 lines as context for fixing
+  TAIL=$(tail -50 "$GATE_OUTPUT")
+  echo "{\"decision\":\"block\",\"reason\":\"🚫 Quality gates failed ($GATE_DESC). Last 50 lines:\\n${TAIL}\"}"
   exit 2
 fi
