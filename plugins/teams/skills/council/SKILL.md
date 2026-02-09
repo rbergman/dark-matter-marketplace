@@ -56,6 +56,24 @@ All councilors use opus for maximum depth of reasoning. The council is designed 
 - Make a recommendation with reasoning
 - Note dissenting views that have merit
 
+### Phase 5 — Persist (lead, mandatory)
+
+Write the synthesis to `history/` so it survives context loss:
+
+```bash
+# Ensure history/ exists and is gitignored
+mkdir -p history
+grep -qx 'history/' .gitignore 2>/dev/null || echo 'history/' >> .gitignore
+```
+
+**File:** `history/council-<topic-slug>-<YYYY-MM-DD>.md`
+
+**Contents:** The full output format (see below) — question, perspectives, key debates, recommendation, dissenting views, confidence.
+
+**Why this is mandatory:** Council deliberations are expensive (3-5 opus subagents). If the session runs out of context or crashes, the recommendation is lost and must be re-run. Writing to `history/` makes recovery trivial — a fresh session reads the file and has the full council output.
+
+**Recovery:** If a session finds `history/council-*.md` files, it can read them to recover prior deliberation results without re-running the council.
+
 ## Model & Perspective Strategy
 
 Epistemic diversity comes from **different analytical frames**, not different models. All councilors run on opus for maximum reasoning depth. Diversity is achieved through:
