@@ -193,6 +193,8 @@ FILES CHANGED: <from subagent response>
 
 REVIEW: Run `git diff HEAD` (or `git diff` for unstaged changes) to see the actual diff.
 
+SCOPE CONSTRAINT: Read ONLY the diff and the files listed in FILES CHANGED. Do NOT explore neighboring files, imports, or the broader codebase. Stay within the diff.
+
 Answer these three questions:
 1. COVERAGE: Does the diff implement everything in the task description? (full / partial / miss)
 2. DRIFT: Does the diff include changes NOT requested? (none / minor / major)
@@ -294,6 +296,29 @@ When you or subagents encounter gaps, log them.
 **Log to:** `history/gaps.log` (or `/tmp/claude-gaps.log` fallback)
 
 Review gaps at session end to identify missing skills/agents.
+
+---
+
+## Context Budget Awareness
+
+Every subagent roundtrip costs ~3-5k tokens of conversation history (prompt + response). Monitor your budget:
+
+| Activity | Approximate cost | Cumulative risk |
+|----------|-----------------|-----------------|
+| Council deliberation (3 councilors) | 25-35k tokens | High — rotate after |
+| 3 parallel implementation subagents | 12-18k tokens | Medium |
+| 3 intent review subagents | 9-12k tokens | Medium |
+| Session overhead (system prompt, CLAUDE.md, skills) | 15-20k tokens | Fixed |
+
+**Rules of thumb:**
+- After a council deliberation, **rotate before implementing** (council output is in `history/`)
+- After 5+ subagent roundtrips, consider whether remaining work fits in context
+- If you feel context pressure (compaction warnings, sluggish responses), rotate immediately via `/rotate`
+- Subagent prompts should be concise — include task + boundaries + gate, not full bead history
+
+**Scope-bound code reviewers:** When launching `feature-dev:code-reviewer` or intent review subagents, explicitly constrain what they read:
+- "Read ONLY the diff and the OWN files listed. Do NOT explore neighboring files."
+- This prevents reviewers from reading themselves into context overflow.
 
 ---
 

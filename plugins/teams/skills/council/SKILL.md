@@ -74,6 +74,18 @@ grep -qx 'history/' .gitignore 2>/dev/null || echo 'history/' >> .gitignore
 
 **Recovery:** If a session finds `history/council-*.md` files, it can read them to recover prior deliberation results without re-running the council.
 
+### Phase 6 — Rotate (lead, recommended)
+
+Council deliberations consume ~25-35k tokens of conversation history (subagent prompts + responses). If the session needs to act on the council's recommendation (implementation work), **strongly recommend rotating first**:
+
+1. Run `/rotate` to snapshot the session
+2. Start fresh session — it auto-recovers from snapshot
+3. Read `history/council-<topic>.md` for the full recommendation (~2k tokens vs 25-35k in conversation)
+
+This prevents the #1 cause of council-related context overflow: running deliberation AND implementation in the same session.
+
+**Exception:** If the council result is small and the follow-up work is trivial, skip the rotate.
+
 ## Model & Perspective Strategy
 
 Epistemic diversity comes from **different analytical frames**, not different models. All councilors run on opus for maximum reasoning depth. Diversity is achieved through:
