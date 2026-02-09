@@ -52,6 +52,8 @@ Task(...) Task(...) Task(...)
 
 **HYBRID:** Parallel independent sets → merge → serial dependent tasks.
 
+**MODEL:** Always specify `model="opus"` for implementation subagents. Use `model="haiku"` only for exploration/search tasks.
+
 Each subagent prompt follows `/subagent` template with:
 - Explicit OWN/READ boundaries
 - Report file path: `history/subagent-reports/<bead-id>.md`
@@ -78,7 +80,8 @@ Each subagent prompt follows `/subagent` template with:
 ## 6. Merge & Complete (BATCH)
 
 1. Merge shared files yourself (barrel exports, etc.)
-2. Run quality gates ONCE: `npm run check`
+2. Run quality gates yourself — MANDATORY: `just check` or `npm run check`
+   - Do NOT skip this. Subagent summaries may be stale or incomplete.
 3. Batch close and commit:
    ```bash
    bd close <id1> <id2> <id3> --reason "Parallel implementation"

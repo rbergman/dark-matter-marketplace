@@ -160,6 +160,36 @@ Before merging to main or completing significant work:
 
 ---
 
+## Post-Subagent Verification
+
+After all subagents complete (or after a single subagent returns):
+
+1. **Run quality gates yourself:** `just check` or `npm run check`
+   - Do NOT trust subagent summaries of gate results
+   - The Stop hook catches session-end state, but mid-session verification catches issues early
+2. **Spot-check scope:** Did the subagent stay within OWN boundaries?
+3. **If gates fail:** Read the subagent report, fix or re-launch
+
+This is a PROTOCOL REQUIREMENT, not a suggestion.
+
+---
+
+## Subagent Model Selection
+
+| Task Type | Model | Rationale |
+|-----------|-------|-----------|
+| Implementation (code changes) | `opus` | Highest quality, fewest regressions |
+| Planning / architecture | `opus` | Deep reasoning for design decisions |
+| Exploration / search | `haiku` | Fast, cheap, sufficient for reads |
+| Code review | `opus` | Thorough analysis needed |
+
+Specify the model explicitly in every Task() call:
+```
+Task(subagent_type="general-purpose", model="opus", ...)
+```
+
+---
+
 ## Capability Gap Reporting
 
 When you or subagents encounter gaps, log them.
@@ -195,4 +225,5 @@ Review gaps at session end to identify missing skills/agents.
 - [ ] All work committed
 - [ ] Beads closed for completed work
 - [ ] Run `bd sync` to sync with remote
-- [ ] Quality gates passing
+- [ ] Quality gates passing (verified by YOU, not just subagent summaries)
+- [ ] Post-subagent verification completed for all delegated work

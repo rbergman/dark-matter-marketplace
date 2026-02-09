@@ -20,6 +20,16 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 ---
 
+## Guardrails
+
+- **NEVER** merge a worktree branch to main without explicit user sign-off
+- **NEVER** delete a worktree without explicit user sign-off
+- **NEVER** close beads for a worktree branch without user sign-off
+- After completing implementation, **STOP and report status**. Do not proceed to merge.
+- Use `/merge` when ready to integrate — it enforces the pre-flight checklist.
+
+---
+
 ## Setup: Ensure .worktrees/ is Ignored
 
 **Before creating any worktrees**, ensure `.worktrees/` is in `.gitignore`. This is a one-time setup that covers all future worktrees:

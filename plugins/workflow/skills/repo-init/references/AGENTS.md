@@ -84,6 +84,31 @@ This file is written by `/dm-work:rotate` to enable seamless session handoffs.
 
 ---
 
+## Session Orientation
+
+Before starting any work, verify your context:
+
+1. **Branch:** `git branch --show-current` — confirm you're on the expected branch
+2. **Worktree:** `git worktree list` — are you in a worktree or the main repo?
+3. **Confirm with user:** "I'm on branch X in [worktree/main]. Is this where you want me working?"
+4. **Check beads:** `bd ready` — what work is available?
+
+**NEVER skip orientation.** Working on the wrong branch wastes entire sessions silently.
+
+---
+
+## Settled Decisions
+
+Do NOT revisit items marked SETTLED without explicit user request.
+
+<!-- Add decisions as they're made:
+| Decision | Date | Rationale | Status |
+|----------|------|-----------|--------|
+| Example: Auth uses JWT | 2025-01-15 | See docs/plans/auth.md | SETTLED |
+-->
+
+---
+
 ## Skills & Tools
 
 You have MCPs, skills, and bash tools. Use them. Ensure subagents and teammates know about relevant skills when delegating.

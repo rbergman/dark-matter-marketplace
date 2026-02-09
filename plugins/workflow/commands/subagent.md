@@ -67,7 +67,7 @@ REPORT: history/subagent-reports/<bead-id>.md
 ## 4. Launch
 
 ```
-Task(subagent_type="<type>", description="<3-5 words>", prompt="<prompt>")
+Task(subagent_type="<type>", model="opus", description="<3-5 words>", prompt="<prompt>")
 ```
 
 ## 5. After Completion (MINIMAL CONTEXT)
@@ -76,9 +76,9 @@ Task(subagent_type="<type>", description="<3-5 words>", prompt="<prompt>")
 
 1. Parse the minimal response (STATUS, FILES, SUMMARY)
 2. If STATUS=success:
-   - Trust the subagent ran quality gates
-   - Optionally spot-check 1-2 files with `head -20`
-   - Proceed to commit
+   - Run quality gates yourself: `just check` or `npm run check`
+   - If gates pass, proceed to commit
+   - If gates fail, read the report and fix or re-launch
 3. If STATUS=partial|failed:
    - Read `history/subagent-reports/<bead-id>.md` for details
    - Fix or re-launch

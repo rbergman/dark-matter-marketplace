@@ -124,14 +124,18 @@ Complete each phase before proceeding to the next.
    - Test passes now?
    - No other tests broken?
 
-4. **If 3+ Fixes Failed: Question Architecture**
+4. **Circuit Breaker — 2+ Approaches Failed**
 
-   Pattern indicating architectural problem:
-   - Each fix reveals new problem in different place
-   - Fixes require massive refactoring
-   - Each fix creates new symptoms elsewhere
+   If you have attempted 2 or more distinct approaches to the same problem:
 
-   **STOP and question fundamentals before attempting more fixes**
+   **STOP. Do not attempt a third approach.**
+
+   Instead:
+   1. Summarize what you tried and why each failed
+   2. Propose 2-3 alternative approaches with tradeoffs
+   3. Ask the user to choose before continuing
+
+   This is NOT optional. Cycling through 3-4 failed approaches wastes entire sessions.
 
 ---
 
@@ -144,7 +148,7 @@ If you catch yourself thinking:
 - "I don't fully understand but this might work"
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before tracing data flow
-- "One more fix attempt" (when already tried 2+)
+- "One more fix attempt" — **circuit breaker: STOP after 2 failed approaches**
 
 ---
 
@@ -157,7 +161,7 @@ If you catch yourself thinking:
 | "Just try this first" | First fix sets the pattern |
 | "Multiple fixes saves time" | Can't isolate what worked |
 | "I see the problem" | Seeing symptoms ≠ understanding root cause |
-| "One more attempt" (after 2+) | 3+ failures = architectural problem |
+| "One more attempt" (after 2+) | Circuit breaker: STOP, summarize, ask user |
 
 ---
 

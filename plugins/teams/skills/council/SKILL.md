@@ -5,7 +5,7 @@ description: Multi-perspective deliberation using Agent Teams. Spawn 3-5 teammat
 
 # Council Deliberation Pattern
 
-When facing decisions where multiple valid perspectives exist, spawn a deliberation team rather than relying on a single viewpoint. Model diversity creates epistemic diversity — different models notice different things.
+When facing decisions where multiple valid perspectives exist, spawn a deliberation team rather than relying on a single viewpoint. Council is a premium tool — use it rarely, for decisions that warrant deep thought from multiple angles.
 
 ## When to Use
 
@@ -17,15 +17,17 @@ When facing decisions where multiple valid perspectives exist, spawn a deliberat
 
 ## Council Structure
 
-| Role | Purpose | Recommended model |
-|------|---------|------------------|
-| Advocate | Argues for the most promising approach | sonnet |
-| Skeptic | Finds flaws, challenges assumptions | sonnet (or different sonnet version) |
-| Pragmatist | Focuses on practical constraints (time, complexity, maintenance) | sonnet |
-| Domain Expert | Brings specialized knowledge relevant to the topic | sonnet |
+| Role | Purpose | Model |
+|------|---------|-------|
+| Advocate | Argues for the most promising approach | opus |
+| Skeptic | Finds flaws, challenges assumptions | opus |
+| Pragmatist | Focuses on practical constraints (time, complexity, maintenance) | opus |
+| Domain Expert | Brings specialized knowledge relevant to the topic | opus |
 | Lead (you) | Frames the question, moderates, synthesizes | opus |
 
 3 perspectives minimum, 5 maximum. Tailor roles to the specific decision.
+
+All councilors use opus for maximum depth of reasoning. The council is designed for quality over speed — if you need fast iteration, use dialectical-refinement instead.
 
 ## Debate Protocol
 
@@ -54,13 +56,15 @@ When facing decisions where multiple valid perspectives exist, spawn a deliberat
 - Make a recommendation with reasoning
 - Note dissenting views that have merit
 
-## Model Diversity Strategy
+## Model & Perspective Strategy
 
-The core insight from llm-council: using different models (not just different prompts) produces genuinely different perspectives. Where possible:
+Epistemic diversity comes from **different analytical frames**, not different models. All councilors run on opus for maximum reasoning depth. Diversity is achieved through:
 
-- Use different model versions or families for different perspectives
-- At minimum, use different system prompts that enforce different analytical frames
-- The lead should always use the most capable model available (opus) for synthesis
+- Distinct system prompts that enforce different analytical lenses (e.g., advocate vs. skeptic)
+- Role-specific constraints (e.g., "you must find at least 2 flaws" for the skeptic)
+- Different information emphasis (same context, different focus areas)
+
+Future option: cross-model councils (e.g., Codex, Gemini) via driver plugins could add genuine model diversity. Not yet implemented.
 
 ## Output Format
 
