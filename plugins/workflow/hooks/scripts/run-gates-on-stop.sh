@@ -60,6 +60,17 @@ if [ -z "$GATE_CMD" ]; then
   exit 0
 fi
 
+# Skip gates if no source code changes.
+# Ignore docs, config, and non-code files that can't break a build.
+CHANGED=$(git status --porcelain 2>/dev/null | awk '{print $NF}' \
+  | grep -Ev '\.(md|txt|log|json|yaml|yml|toml|csv|svg|png|jpg|gif|ico)$' \
+  | grep -Ev '^(LICENSE|CHANGELOG|AGENTS|CLAUDE|README|\.gitignore|\.beads/|history/)' \
+  || true)
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
 # Capture output to temp file — only show on failure.
 # CRITICAL: Do NOT let gate output reach stdout/stderr.
 # Claude Code hooks capture all output and inject it into conversation context.
