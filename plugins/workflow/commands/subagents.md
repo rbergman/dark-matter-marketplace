@@ -122,7 +122,7 @@ DETAIL: <1 sentence if rework>
 
 If thorough review needed before commit:
 ```
-Task(subagent_type="superpowers:code-reviewer", prompt="
+Task(subagent_type="feature-dev:code-reviewer", prompt="
 Review changes from parallel subagents:
 - Reports: history/subagent-reports/n7vy.2.md, history/subagent-reports/1s08.2.md
 - Focus: integration issues, missed edge cases

@@ -20,7 +20,7 @@ Arguments: $ARGUMENTS
 
 **Skills:** Infer from language/task:
 - TypeScript → `typescript-pro`
-- Bug fix → `superpowers:systematic-debugging`
+- Bug fix → `dm-work:debugging`
 - New feature → TDD
 - Refactoring → `solid-architecture`
 - Entities → `data-oriented-architecture`
@@ -105,4 +105,4 @@ Task(subagent_type="<type>", model="opus", description="<3-5 words>", prompt="<p
 
 - Non-overlapping file ownership per subagent
 - YOU handle: index.ts, package.json, configs
-- Consider worktrees for isolation (`superpowers:using-git-worktrees`)
+- Consider worktrees for isolation (`dm-work:worktrees`)
