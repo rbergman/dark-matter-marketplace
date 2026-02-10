@@ -233,7 +233,7 @@ See `references/workflow.md` for the full workflow, but the core ideas:
 1. **Orchestrator model** — You strategize, Claude orchestrates, agents implement (subagents for focused tasks, Agent Teams for collaborative work)
 2. **Context is precious** — Delegate to preserve it; checkpoint to manage it
 3. **External state** — Use beads to track work outside the conversation
-4. **One compaction max** — Multiple compactions compound information loss
+4. **Rotate before compaction** — One compaction is OK if needed, but multiple compound information loss
 
 ### Developer Experience (DX)
 

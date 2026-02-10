@@ -31,7 +31,7 @@ One Claude session delegates focused tasks to ephemeral workers via `Task()`. Wo
 - Workers can't talk to each other
 - Orchestrator is the bottleneck for all decisions
 - No genuine adversarial tension (same model, sequential passes)
-- Context window is the ceiling — one compaction max before quality degrades
+- Context window is the ceiling — rotate proactively, avoid multiple compactions
 
 ### Relevant skills
 

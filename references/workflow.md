@@ -6,10 +6,6 @@ A practical guide for humans working with Claude Code. This documents my persona
 
 ## Prerequisites
 
-### Disable Auto-Compaction
-
-In Claude Code settings, disable automatic compaction. This gives you control over when and how context is managed. Auto-compaction doesn't prevent checkpointing, but it complicates things from a transparency perspective and encourages lossier sessions overall.
-
 ### Enable Context in Status Line
 
 In Claude Code settings, enable showing context usage in the status line. This makes it easy to see when you're approaching the 80k threshold without having to ask Claude or run commands.
@@ -141,11 +137,11 @@ If you run out of context before you can take a snapshot:
 
 2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
 
-### The Cardinal Rule
+### Compaction
 
-**Never let a session exceed one built-in compaction.**
+**Rotate before compaction whenever possible.** Proactive rotation at 80k preserves full fidelity. But sometimes Claude needs to compact once mid-task — finishing a heavy `/subagents` run or wrapping up an Agent Teams session. That's fine. One compaction is acceptable; hitting the hard context wall and losing a turn mid-work is worse.
 
-Multiple compactions compound information loss. Each is lossy; stacking them degrades quality fast. The snapshot workflow ensures you never need more than one.
+**Avoid multiple compactions.** Each is lossy; stacking them degrades quality fast. If a session has already compacted once and context is climbing again, rotate immediately rather than risking a second compaction.
 
 ---
 
@@ -157,7 +153,7 @@ Multiple compactions compound information loss. Each is lossy; stacking them deg
 | Lost context after compaction | Explicit summaries you control |
 | Claude doing implementation directly | Subagent delegation |
 | Unclear next steps after pause | Beads track state externally |
-| Compaction information loss | Never exceed 1 compaction |
+| Compaction information loss | Rotate before compaction; one compaction OK if needed |
 | Multiple perspectives needed | Agent Teams with dm-team skills |
 
 The key insight: **external state (beads) + explicit summaries (rotation) + delegation (subagents) = sessions that pause and resume reliably.**
