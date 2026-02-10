@@ -68,7 +68,9 @@ dark-matter-marketplace/
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lsp-setup.md   # LSP configuration and troubleshooting
 │   ├── autonomous-runs.md   # Sandboxing Claude (srt for CLI/autonomous runs)
-│   └── lang-skill-adaptation.md  # Adapting skills + DX testing
+│   ├── lang-skill-adaptation.md  # Adapting skills + DX testing
+│   ├── multi-agent-coordination.md  # Three tiers: subagents vs Agent Teams vs Gastown
+│   └── testing-agent-teams.md  # Testing guide for dm-team plugin
 └── README.md
 ```
 
@@ -106,6 +108,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
 | `/dm-work:rotate` | Command | Session rotation — snapshot + save + /copy + /clear + paste to resume |
+| `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
 | `/dm-work:review` | Command | Parallel arch/code/security review — local (beads) or PR (GH comments) |
 | `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
 | `/dm-work:advice` | Command | Get architectural guidance |
@@ -192,7 +195,7 @@ Non-installable materials for reference and sharing.
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | Global instructions — prime directive, role selection (orchestrator or team lead), beads guidance |
-| `workflow.md` | Human guide to the development loop (80k rule, snapshot workflow, beads) |
+| `workflow.md` | Human guide to the development loop (80k rule, session rotation, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |

@@ -78,6 +78,7 @@ Let Claude orchestrate while subagents implement.
 1. **Use `/subagents`** — This handles multiple beads with dependency awareness. It degrades to single-subagent mode when appropriate.
 2. **Review results** — Check what subagents produced before committing.
 3. **Commit incrementally** — One commit per completed unit. Don't batch.
+4. **For worktree work** — Use `/merge` when ready to integrate. It enforces a pre-flight checklist (quality gates, review, beads closed).
 
 ### Agent Teams Alternative (Experimental)
 
@@ -173,6 +174,7 @@ The key insight: **external state (beads) + explicit summaries (rotation) + dele
 | Context at 80-150k | Start looking for pause point |
 | Ready to pause | `/dm-work:rotate` → `/copy` → `/clear` → paste |
 | Context critical | Emergency: compact then `/dm-work:rotate` |
+| Worktree ready to merge | `/dm-work:merge` — pre-flight checklist |
 | Task complete | Review, commit, close bead |
 | Starting new session | Paste snapshot, or `bd ready` if no snapshot |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
@@ -180,6 +182,26 @@ The key insight: **external state (beads) + explicit summaries (rotation) + dele
 | Complex multi-agent work | Activate `dm-team:lead`, use Agent Teams |
 | Decision needs debate | `/dm-team:council` |
 | Spec needs adversarial refinement | `/dm-team:refine` (team) or `/dm-work:refine` (subagent) |
+
+---
+
+## Quality Enforcement Hooks
+
+The dm-work plugin includes three Claude Code hooks that enforce quality automatically:
+
+| Hook | Event | What it does |
+|------|-------|--------------|
+| **block-no-verify** | PreToolUse (Bash) | Blocks `--no-verify` and other gate-bypass flags |
+| **flag-config-edit** | PostToolUse (Edit/Write) | Flags edits to settings.json, .claude files, and other config |
+| **run-gates-on-stop** | Stop | Auto-detects project type and runs quality gates before session ends |
+
+The Stop hook is smart about when to run:
+- Skips if no source code changes (docs-only or clean tree)
+- Auto-detects `just check`, `npm run check`, `cargo test`, or `go test`
+- Captures output to temp file — only shows last 50 lines on failure (prevents context overflow)
+- Blocks the stop (exit 2) if gates fail, allowing you to fix before ending
+
+These hooks are installed automatically with dm-work. No configuration needed.
 
 ---
 

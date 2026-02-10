@@ -51,6 +51,10 @@ Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json. Se
 If you are a **subagent**, activate `dm-work:subagent`.
 If you are a **teammate**, activate `dm-team:teammate`.
 
+### Worktrees
+
+When creating worktrees for isolated feature work, always place them under `.worktrees/` in the repo root. Ensure `.worktrees/` is in `.gitignore` before creating. See `dm-work:worktrees` for the full workflow.
+
 ---
 
 ## Beads

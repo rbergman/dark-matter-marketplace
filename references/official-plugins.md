@@ -141,12 +141,13 @@ Security best practices and guidance for code review.
 
 | Task | Official Plugin | dm-* Complement |
 |------|-----------------|-----------------|
-| Code review | feature-dev:code-reviewer | dm-arch:solid-architecture for principles |
+| Code review | feature-dev:code-reviewer | `/dm-work:review` (parallel reviewers) or `/dm-team:review` (collaborative) |
 | Feature development | feature-dev | dm-work:orchestrator for delegation |
 | Code cleanup | code-simplifier | dm-lang:* for language-specific standards |
 | Plugin creation | plugin-dev | - |
 | Debugging | - | dm-work:debugging |
 | TDD | - | dm-work:tdd |
+| Quality enforcement | - | dm-work hooks (block --no-verify, run gates on stop) |
 
 ---
 
