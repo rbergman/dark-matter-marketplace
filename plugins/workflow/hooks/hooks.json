@@ -1,6 +1,18 @@
 {
-  "description": "Quality enforcement hooks: block gate bypasses, flag config tampering, run gates before stop",
+  "description": "Quality enforcement hooks and beads context recovery",
   "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -d .beads ]; then bd prime; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

@@ -71,6 +71,18 @@ if [ -z "$CHANGED" ]; then
   exit 0
 fi
 
+# Dedup: skip gates if working tree unchanged since last successful run.
+# Without this, the Stop hook (which fires every turn) creates a feedback loop:
+# turn ends → gates run → pass → Claude Code shows feedback → agent responds → repeat.
+STATE_HASH=$( (git diff HEAD 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null) | cksum | cut -d' ' -f1 )
+mkdir -p "$PROJECT_ROOT/history"
+HASH_FILE="$PROJECT_ROOT/history/.gates-last-pass"
+
+if [ -f "$HASH_FILE" ] && [ "$(cat "$HASH_FILE" 2>/dev/null)" = "$STATE_HASH" ]; then
+  # Same state as last successful run — skip
+  exit 0
+fi
+
 # Capture output to temp file — only show on failure.
 # CRITICAL: Do NOT let gate output reach stdout/stderr.
 # Claude Code hooks capture all output and inject it into conversation context.
@@ -79,10 +91,13 @@ GATE_OUTPUT=$(mktemp)
 trap 'rm -f "$GATE_OUTPUT"' EXIT
 
 if eval "$GATE_CMD" >"$GATE_OUTPUT" 2>&1; then
-  # Gates passed — suppress all output, exit clean
+  # Gates passed — record state hash so subsequent turns skip
+  echo "$STATE_HASH" > "$HASH_FILE"
   exit 0
 else
-  # Gates failed — show only the last 50 lines as context for fixing
+  # Gates failed — clear hash so they re-run after fix attempts
+  rm -f "$HASH_FILE"
+  # Show only the last 50 lines as context for fixing
   TAIL=$(tail -50 "$GATE_OUTPUT")
   echo "{\"decision\":\"block\",\"reason\":\"🚫 Quality gates failed ($GATE_DESC). Last 50 lines:\\n${TAIL}\"}"
   exit 2
