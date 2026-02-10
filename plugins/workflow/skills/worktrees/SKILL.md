@@ -1,6 +1,6 @@
 ---
 name: worktrees
-description: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with beads integration via bd worktree commands
+description: Use when creating a worktree, setting up a worktree, starting feature work that needs isolation, or before executing implementation plans. Covers git worktree creation under .worktrees/, gitignore setup, beads integration, and merge guardrails.
 ---
 
 # Git Worktrees

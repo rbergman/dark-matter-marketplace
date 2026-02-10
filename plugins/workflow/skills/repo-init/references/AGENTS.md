@@ -69,6 +69,10 @@ Both establish delegation thresholds, quality gates, and file ownership boundari
 If you are a **subagent** (delegated by an orchestrator), activate `dm-work:subagent`.
 If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:teammate`.
 
+### Worktrees
+
+When creating worktrees for isolated feature work, always place them under `.worktrees/` in the repo root. Ensure `.worktrees/` is in `.gitignore` before creating. See `dm-work:worktrees` for the full workflow.
+
 ---
 
 ## Session Recovery
