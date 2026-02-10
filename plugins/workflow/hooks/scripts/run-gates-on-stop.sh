@@ -97,8 +97,8 @@ if eval "$GATE_CMD" >"$GATE_OUTPUT" 2>&1; then
 else
   # Gates failed — clear hash so they re-run after fix attempts
   rm -f "$HASH_FILE"
-  # Show only the last 50 lines as context for fixing
-  TAIL=$(tail -50 "$GATE_OUTPUT")
-  echo "{\"decision\":\"block\",\"reason\":\"🚫 Quality gates failed ($GATE_DESC). Last 50 lines:\\n${TAIL}\"}"
+  # Show last 50 lines on stderr — Claude Code reads stderr (not stdout) on exit 2
+  echo "Quality gates failed ($GATE_DESC). Last 50 lines:" >&2
+  tail -50 "$GATE_OUTPUT" >&2
   exit 2
 fi
