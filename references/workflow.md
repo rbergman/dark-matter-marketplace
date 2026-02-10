@@ -97,6 +97,8 @@ Agent Teams spawns persistent teammates (each a full Claude Code session) that m
 
 See `dm-team:tiered-delegation` for when to use teams vs subagents. Agent Teams uses significantly more tokens than subagents — each teammate is a separate Claude instance.
 
+**Review commands:** Both `/dm-work:review` (isolated parallel subagents) and `/dm-team:review` (team with cross-examination) exist. Use dm-work for routine reviews; use dm-team when cross-examination adds value (large features, risky changes). Same flags and output format. See `multi-agent-coordination.md` for the full comparison.
+
 ---
 
 ## Context Management

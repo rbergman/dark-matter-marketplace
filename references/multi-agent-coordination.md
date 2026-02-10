@@ -179,3 +179,17 @@ Council/Refine (teams)  →  Breakdown (beads)  →  Implement (subagents)  → 
 | Single file fix | Direct (no delegation needed) |
 
 See `dm-team:tiered-delegation` for the full decision framework between subagents and teams.
+
+### Review: Subagents vs Teams
+
+Both `/dm-work:review` and `/dm-team:review` exist because they serve different needs:
+
+| | `/dm-work:review` | `/dm-team:review` |
+|---|---|---|
+| **Mechanism** | 3 parallel `Task()` subagents (arch, code, security) | Agent Teams — persistent reviewers with their own context |
+| **Implementation** | Full self-contained command (scope detection, scout, domain-aware code review, dedup, output, review tags, beads) | Thin wrapper — reuses dm-work:review's Phases 1, 2, and 5, adds team discussion |
+| **Cross-examination** | None — reviewers are isolated, findings merged mechanically | Yes — reviewers share findings, challenge each other, converge |
+| **Token cost** | Lower — subagents return results and disappear | Higher — each reviewer is a full Claude instance with multi-turn discussion |
+| **Best for** | Routine reviews, smaller changes, token-conscious sessions | Important reviews where cross-examination adds value (large features, risky changes) |
+
+Both share the same flags (`--pr`, `--commits`, `--only`, `--min-severity`, `--skip-beads`) and produce the same output format. The team version's value-add is genuine adversarial discussion — reviewers can say "I disagree with the arch reviewer's assessment of X because..." which sometimes surfaces issues that isolated reviewers miss.
