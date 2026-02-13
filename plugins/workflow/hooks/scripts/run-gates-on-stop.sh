@@ -83,6 +83,10 @@ if [ -f "$HASH_FILE" ] && [ "$(cat "$HASH_FILE" 2>/dev/null)" = "$STATE_HASH" ];
   exit 0
 fi
 
+# Loop breaker: after 3 consecutive failures on the same state, stop blocking.
+# Without this, a lint violation creates an infinite stop→fail→feedback→respond loop.
+FAIL_FILE="$PROJECT_ROOT/history/.gates-fail-state"
+
 # Capture output to temp file — only show on failure.
 # CRITICAL: Do NOT let gate output reach stdout/stderr.
 # Claude Code hooks capture all output and inject it into conversation context.
@@ -93,10 +97,23 @@ trap 'rm -f "$GATE_OUTPUT"' EXIT
 if eval "$GATE_CMD" >"$GATE_OUTPUT" 2>&1; then
   # Gates passed — record state hash so subsequent turns skip
   echo "$STATE_HASH" > "$HASH_FILE"
+  rm -f "$FAIL_FILE"
   exit 0
 else
-  # Gates failed — clear hash so they re-run after fix attempts
+  # Gates failed — clear pass hash so they re-run after fix attempts
   rm -f "$HASH_FILE"
+
+  # Track consecutive failures on the same working tree state.
+  PREV_FAIL_STATE=$(cat "$FAIL_FILE" 2>/dev/null || echo "")
+  if [ "$PREV_FAIL_STATE" = "$STATE_HASH" ]; then
+    # Same state failed before — agent hasn't changed anything. Break the loop.
+    echo "Quality gates still failing ($GATE_DESC) — same state as last attempt, allowing stop." >&2
+    rm -f "$FAIL_FILE"
+    exit 0
+  fi
+
+  # First failure on this state — record it and block
+  echo "$STATE_HASH" > "$FAIL_FILE"
   # Show last 50 lines on stderr — Claude Code reads stderr (not stdout) on exit 2
   echo "Quality gates failed ($GATE_DESC). Last 50 lines:" >&2
   tail -50 "$GATE_OUTPUT" >&2
