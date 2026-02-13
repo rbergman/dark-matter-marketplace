@@ -31,8 +31,12 @@ GATE_CMD=""
 GATE_DESC=""
 
 if [ -f "justfile" ]; then
-  # Check if justfile has a 'check' recipe
-  if just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check'; then
+  # Prefer 'check-fast' (lint only, no tests) over 'check' (full gate).
+  # check-fast exists to keep Stop hook latency low on projects with slow test suites.
+  if just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check-fast'; then
+    GATE_CMD="just check-fast"
+    GATE_DESC="just check-fast"
+  elif just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check'; then
     GATE_CMD="just check"
     GATE_DESC="just check"
   fi
@@ -46,7 +50,10 @@ elif [ -f "Cargo.toml" ]; then
   GATE_CMD="cargo test"
   GATE_DESC="cargo test"
 elif [ -f "go.mod" ]; then
-  if [ -f "justfile" ] && just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check'; then
+  if [ -f "justfile" ] && just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check-fast'; then
+    GATE_CMD="just check-fast"
+    GATE_DESC="just check-fast"
+  elif [ -f "justfile" ] && just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check'; then
     GATE_CMD="just check"
     GATE_DESC="just check"
   else

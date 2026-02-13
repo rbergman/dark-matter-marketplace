@@ -121,14 +121,14 @@ check: fmt lint test coverage-check
     @echo "All checks passed"
 ```
 
-### Quick Check (Dev Iteration)
+### Fast Check (Stop Hook Gate)
 
-Fast feedback loop for development - essential checks only:
+The dm-work Stop hook runs quality gates after every turn. If `just check` includes slow tests, add a `check-fast` recipe with lint-only gates. The hook prefers `check-fast` when available, falling back to `check`.
 
 ```just
-# Quick feedback loop - essential checks only
-check-quick: lint test
-    @echo "Quick checks passed"
+# Fast gate for Stop hook — lint only, no tests
+check-fast: fmt lint
+    @echo "Fast checks passed"
 ```
 
 ### Clean Recipe
