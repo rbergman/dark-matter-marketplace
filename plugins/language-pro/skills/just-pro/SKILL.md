@@ -123,13 +123,21 @@ check: fmt lint test coverage-check
 
 ### Fast Check (Stop Hook Gate)
 
-The dm-work Stop hook runs quality gates after every turn. If `just check` includes slow tests, add a `check-fast` recipe with lint-only gates. The hook prefers `check-fast` when available, falling back to `check`.
+The dm-work Stop hook runs quality gates after every turn. If `just check` is slow (>10s), add a `check-fast` recipe that drops the slowest steps. The hook prefers `check-fast` when available, falling back to `check`.
+
+Profile first to find what's slow — usually production builds and coverage, not tests:
 
 ```just
-# Fast gate for Stop hook — lint only, no tests
-check-fast: fmt lint
+# Full gate — pre-commit, CI
+check: fmt lint test coverage-check build
+    @echo "All checks passed"
+
+# Fast gate — Stop hook, iterative dev (drop slow build + coverage)
+check-fast: fmt lint test
     @echo "Fast checks passed"
 ```
+
+**Tips:** Add `--cache` to ESLint for repeat-run speedup (~6s to ~1s). Add `.eslintcache` to `.gitignore`.
 
 ### Clean Recipe
 
@@ -141,15 +149,27 @@ clean:
     rm -rf build/ coverage.out node_modules/.cache
 ```
 
-### Parallel Check Execution (CI)
+### Parallel Execution
 
-Run package checks in parallel for faster CI:
+`just` doesn't have native parallel deps. Use shell backgrounding for monorepos:
 
 ```just
-# Run all package checks in parallel (CI optimization)
-check-parallel:
-    @just api check & just web check & wait
+# Parallel check across packages
+check:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    just api check &  PID1=$!
+    just web check &  PID2=$!
+    just mcp check &  PID3=$!
+    FAIL=0
+    wait $PID1 || FAIL=1
+    wait $PID2 || FAIL=1
+    wait $PID3 || FAIL=1
+    [ $FAIL -eq 0 ] || { echo "Checks failed"; exit 1; }
+    echo "All checks passed"
 ```
+
+Note: use `set -uo pipefail` (not `-euo`) — with `-e`, a failed `wait` exits before checking the others.
 
 ### Coverage Enforcement
 
