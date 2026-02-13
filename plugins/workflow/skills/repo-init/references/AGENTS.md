@@ -19,14 +19,9 @@ In practice:
 
 ## Quality Gates
 
-**CRITICAL RULE**
+Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete — regardless of origin. "Already broken" is not an excuse; it's usually our prior miss.
 
-Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete—regardless of origin.
-- "Already broken" ≠ excuse
-- Others' failures don't exempt us
-- Usually our prior miss anyway
-
-**Fix failing gates. No exceptions.**
+Fix failing gates before declaring work complete.
 
 ---
 
@@ -94,13 +89,13 @@ Before starting any work, verify your context:
 3. **Confirm with user:** "I'm on branch X in [worktree/main]. Is this where you want me working?"
 4. **Check beads:** `bd ready` — what work is available?
 
-**NEVER skip orientation.** Working on the wrong branch wastes entire sessions silently.
+Skipping orientation risks working on the wrong branch, which wastes entire sessions silently.
 
 ---
 
 ## Settled Decisions
 
-Do NOT revisit items marked SETTLED without explicit user request.
+Items marked SETTLED should not be revisited unless the user explicitly asks.
 
 <!-- Add decisions as they're made:
 | Decision | Date | Rationale | Status |
