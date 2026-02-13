@@ -41,7 +41,7 @@ SPEC TO ANALYZE:
 </spec>
 ```
 
-**MANDATORY CLARIFICATION CHECKPOINT:**
+**Clarification checkpoint:**
 
 After Pass 1, review the output for major unknowns:
 
@@ -51,7 +51,7 @@ After Pass 1, review the output for major unknowns:
 
 If ANY major unknowns exist, PAUSE and ask 1-3 focused questions. Do NOT proceed to Pass 2 carrying assumptions silently.
 
-**HITL CLARIFICATION PROTOCOL:**
+**User clarification protocol:**
 
 When unknowns require user input, use the `AskUserQuestion` tool:
 - Provide 2-4 concrete options (not open-ended)

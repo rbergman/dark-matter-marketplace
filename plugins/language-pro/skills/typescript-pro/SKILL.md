@@ -15,7 +15,7 @@ Senior-level TypeScript expertise for production projects. Focuses on strict typ
 
 ## Core Standards
 
-**Non-Negotiable:**
+**Required:**
 - Strict mode enabled with all compiler flags
 - **NO explicit or implicit `any`** - use `unknown` and narrow
 - **NO type assertions to circumvent the type system** (`as any`, `as unknown as T`)
@@ -35,20 +35,9 @@ Senior-level TypeScript expertise for production projects. Focuses on strict typ
 
 ## Project Setup (TypeScript 5.5+)
 
-### Version Management with mise
+### Version Management
 
-[mise](https://mise.jdx.dev) manages language runtimes per-project. Ensures all contributors use the same Node version—no "works on my machine" issues.
-
-```bash
-# Install mise (once)
-curl https://mise.run | sh
-
-# In project root
-mise use node@22
-
-# Creates .mise.toml — commit it
-# Team members just run: mise install
-```
+Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
 
 ### New Project Quick Start
 

@@ -15,7 +15,7 @@ Senior-level Rust expertise following "Boring Rust" principles. Correctness over
 
 ## Core Standards
 
-**Non-Negotiable:**
+**Required:**
 - All clippy warnings treated as errors
 - **NO `unwrap()` or `expect()` in production code** — use `.context("...")?`
 - **NO `unsafe` without `#[human_authored]` designation**
@@ -97,20 +97,9 @@ pub fn simd_normalize(vectors: &mut [f32x8]) {
 
 ## Project Setup (Rust 1.83+)
 
-### Version Management with mise
+### Version Management
 
-[mise](https://mise.jdx.dev) manages language runtimes per-project. For Rust, this complements rustup by pinning the exact toolchain version.
-
-```bash
-# Install mise (once)
-curl https://mise.run | sh
-
-# In project root
-mise use rust@1.83
-
-# Creates .mise.toml — commit it
-# Team members just run: mise install
-```
+Pin Rust toolchain with [mise](https://mise.jdx.dev): `mise use rust@1.83` (creates `.mise.toml` — commit it, complements rustup). Team members run `mise install`. See **mise** skill for setup.
 
 Alternatively, use `rust-toolchain.toml` (rustup-native) if you prefer not to add mise as a dependency.
 

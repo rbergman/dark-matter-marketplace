@@ -15,7 +15,7 @@ Senior-level Python expertise for production projects. Focuses on modern tooling
 
 ## Core Standards
 
-**Non-Negotiable:**
+**Required:**
 - All public functions/classes have docstrings
 - All functions have type annotations (params + return)
 - ruff passes with project configuration
@@ -32,20 +32,9 @@ Senior-level Python expertise for production projects. Focuses on modern tooling
 
 ## Project Setup (Python 3.12+)
 
-### Version Management with mise
+### Version Management
 
-[mise](https://mise.jdx.dev) manages language runtimes per-project. Ensures all contributors use the same Python version.
-
-```bash
-# Install mise (once)
-curl https://mise.run | sh
-
-# In project root
-mise use python@3.12
-
-# Creates .mise.toml - commit it
-# Team members just run: mise install
-```
+Pin Python version with [mise](https://mise.jdx.dev): `mise use python@3.12` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
 
 ### New Project Quick Start with uv
 

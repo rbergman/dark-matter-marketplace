@@ -30,15 +30,7 @@ The original dialectical-refinement runs 5 sequential phases (Analyst->Proposer-
 
 ## Protected Categories
 
-Carry over from dialectical-refinement:
-
-| Category | Description |
-|----------|-------------|
-| Core Workflow | The minimal viable loop |
-| Agent Primitives | Flags/features enabling agent autonomy (--json, --range, --auto) |
-| User-Requested Features | Explicitly requested by user |
-| Token Efficiency | Batch operations, context injection |
-| Structured Output | Machine-parseable output |
+Same as dm-work:dialectical-refinement — Core Workflow, Agent Primitives, User-Requested Features, Token Efficiency, Structured Output. Tag these early; Proposer does not propose cutting them.
 
 ## Debate Protocol
 

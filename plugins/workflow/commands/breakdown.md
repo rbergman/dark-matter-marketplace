@@ -31,7 +31,7 @@ Before proposing breakdown, understand:
 
 If unclear on any, ask the user before proceeding.
 
-**HITL CLARIFICATION PROTOCOL:**
+**User clarification protocol:**
 
 When uncertainties block decomposition, use the `AskUserQuestion` tool:
 - Provide 2-4 concrete options (not open-ended)

@@ -142,36 +142,19 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 ]
 ```
 
-### Ecosystem-Specific Allowlists
+### Ecosystem Domain Allowlists
 
-**Rust (minimal):**
-```json
-"allowedDomains": [
-  "api.anthropic.com",
-  "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
-  "static.rust-lang.org"
-]
-```
+All ecosystems need `api.anthropic.com`. Add ecosystem-specific domains:
 
-**Go (minimal):**
-```json
-"allowedDomains": [
-  "api.anthropic.com",
-  "proxy.golang.org", "sum.golang.org", "storage.googleapis.com",
-  "gopkg.in"
-]
-```
+| Ecosystem | Domains |
+|-----------|---------|
+| Rust | `crates.io`, `*.crates.io`, `static.crates.io`, `index.crates.io`, `static.rust-lang.org` |
+| Go | `proxy.golang.org`, `sum.golang.org`, `storage.googleapis.com`, `gopkg.in` |
+| Node/TypeScript | `registry.npmjs.org`, `*.npmjs.org` |
+| Python | `pypi.org`, `*.pypi.org`, `files.pythonhosted.org` |
 
-**Node/TypeScript (minimal):**
-```json
-"allowedDomains": [
-  "api.anthropic.com",
-  "registry.npmjs.org", "*.npmjs.org"
-]
-```
-
-**Add GitHub to any of the above if:**
-- Build fails fetching git-based dependencies
+**Add `github.com`, `*.github.com` only if:**
+- Builds fail on git-based dependencies
 - You need `bd sync` for beads state persistence
 
 ### MCP in Sandbox (Context7, Brightdata)
@@ -285,7 +268,7 @@ claude --dangerously-skip-permissions \
 
 ## Example Configs
 
-### Project-Specific `.srt.json`
+### Base Project Config
 
 For a Rust project (minimal — no GitHub):
 
@@ -310,97 +293,53 @@ For a Rust project (minimal — no GitHub):
 }
 ```
 
-If builds fail on git-based deps, add: `"github.com", "*.github.com", "*.cloudfront.net"`
+Customize `allowedDomains` using the [Ecosystem Domain Allowlists](#ecosystem-domain-allowlists) table above.
 
-### With Beads Sync
+### Config Variants
 
-If you need `bd sync` to push work state:
+Modify the base config per scenario:
 
+| Scenario | Extra domains | Extra write paths | Notes |
+|----------|--------------|-------------------|-------|
+| With beads sync | `github.com`, `*.github.com` | — | Or skip sync, review manually |
+| DX testing (/tmp) | All ecosystem domains (Rust, Go, Node, Python) | `/tmp`, `~/.cargo/*`, `~/.npm`, `~/.cache/*`, `~/.claude/session-env` | Multi-ecosystem; session-env required for bash execution |
+| With Context7 (MCP) | `context7.com`, `*.context7.com`, `api.upstash.com` | `~/Library/Caches/claude-cli-nodejs` | Run without `--strict-mcp-config` |
+
+**DX Testing specifics:** For multi-ecosystem testing in `/tmp`:
 ```json
 {
-  "network": {
-    "allowedDomains": [
-      "api.anthropic.com",
-      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
-      "static.rust-lang.org",
-      "github.com", "*.github.com"
-    ]
-  },
-  "filesystem": {
-    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
-    "allowWrite": [
-      ".",
-      "~/.cargo/registry", "~/.cargo/git",
-      "/tmp"
-    ]
-  }
+  "allowedDomains": [
+    "api.anthropic.com",
+    "crates.io", "*.crates.io", "static.crates.io", "index.crates.io", "static.rust-lang.org",
+    "registry.npmjs.org", "*.npmjs.org",
+    "proxy.golang.org", "sum.golang.org", "storage.googleapis.com",
+    "pypi.org", "*.pypi.org", "files.pythonhosted.org"
+  ],
+  "allowWrite": [
+    "/tmp",
+    "~/.cargo/registry", "~/.cargo/git",
+    "~/.npm", "~/.cache/go-build", "~/.cache/uv",
+    "~/.claude/session-env"
+  ]
 }
 ```
 
-**Alternative:** Skip `bd sync` in autonomous runs and sync manually after review. This keeps GitHub out of the allowlist.
-
-### DX Testing Config
-
-For stress-testing skills in `/tmp` (multi-ecosystem):
-
+**Context7 specifics:** For documentation lookup with MCP:
 ```json
 {
-  "network": {
-    "allowedDomains": [
-      "api.anthropic.com",
-      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
-      "static.rust-lang.org",
-      "registry.npmjs.org", "*.npmjs.org",
-      "proxy.golang.org", "sum.golang.org", "storage.googleapis.com",
-      "pypi.org", "*.pypi.org", "files.pythonhosted.org"
-    ],
-    "deniedDomains": []
-  },
-  "filesystem": {
-    "denyRead": ["~/.ssh", "~/.gnupg"],
-    "allowWrite": [
-      "/tmp",
-      "~/.cargo/registry", "~/.cargo/git",
-      "~/.npm", "~/.cache/go-build",
-      "~/.cache/uv",
-      "~/.claude/session-env"
-    ],
-    "denyWrite": []
-  }
+  "allowedDomains": [
+    "api.anthropic.com",
+    "context7.com", "*.context7.com", "api.upstash.com",
+    "crates.io", "*.crates.io", "static.crates.io", "index.crates.io", "static.rust-lang.org"
+  ],
+  "allowWrite": [
+    ".",
+    "~/.cargo/registry", "~/.cargo/git",
+    "~/Library/Caches/claude-cli-nodejs",
+    "/tmp"
+  ]
 }
 ```
-
-**Note:** `~/.claude/session-env` is required for Claude to execute bash commands even with `--no-session-persistence`. Without it, subagent bash commands fail with EPERM.
-
-No GitHub in DX testing config. Add only if tests specifically need git-based deps.
-
-### With Context7 (MCP enabled)
-
-For tasks needing documentation lookup:
-
-```json
-{
-  "network": {
-    "allowedDomains": [
-      "api.anthropic.com",
-      "context7.com", "*.context7.com", "api.upstash.com",
-      "crates.io", "*.crates.io", "static.crates.io", "index.crates.io",
-      "static.rust-lang.org"
-    ]
-  },
-  "filesystem": {
-    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
-    "allowWrite": [
-      ".",
-      "~/.cargo/registry", "~/.cargo/git",
-      "~/Library/Caches/claude-cli-nodejs",
-      "/tmp"
-    ]
-  }
-}
-```
-
-Run without `--strict-mcp-config` to enable Context7.
 
 ---
 

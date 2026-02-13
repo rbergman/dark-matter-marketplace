@@ -1,6 +1,6 @@
 ---
 name: mise
-description: Modern dev tool version management with mise. Use PROACTIVELY when setting up repos, managing tool versions, or when users ask about nvm/pyenv/goenv alternatives. Covers project setup, direnv integration, and CI/CD patterns.
+description: Modern dev tool version management with mise. Use when setting up repos, managing tool versions, or when users ask about nvm/pyenv/goenv alternatives.
 ---
 
 # Mise: Modern Dev Tool Management
@@ -269,49 +269,6 @@ setup:
 | **CI parity** | Good (mise in CI) | Excellent (same container) |
 
 **Recommendation:** Use mise for fast local dev. Add devcontainer for hermetic reproducibility if needed. They're not mutually exclusive.
-
----
-
-## Common Tools Available
-
-```bash
-mise registry | grep <tool>  # Search for a tool
-```
-
-| Category | Tools |
-|----------|-------|
-| **Languages** | node, python, go, rust, java, ruby, php, elixir, zig |
-| **JSON/YAML** | jq, yq, gojq |
-| **Search** | ripgrep, fd, fzf, ag |
-| **Git** | gh, lazygit, delta, git-cliff |
-| **Files** | bat, eza, tree, dust, duf |
-| **HTTP** | httpie, curlie, xh |
-| **Containers** | kubectl, helm, k9s, docker-compose |
-| **Cloud** | awscli, terraform, opentofu, pulumi |
-| **Dev** | just, make, watchexec, hyperfine |
-| **Editors** | neovim, helix |
-
----
-
-## Migration from Homebrew
-
-**Keep in Homebrew:**
-- `git` (system integration)
-- Your shell (`fish`, `zsh`)
-- GUI apps (casks)
-- System utilities (`coreutils` if needed)
-
-**Move to mise:**
-- Language runtimes (node, python, go, rust)
-- CLI dev tools (jq, ripgrep, bat, etc.)
-- Cloud CLIs (awscli, kubectl, terraform)
-
-```bash
-# Check what mise can replace
-brew leaves | while read pkg; do
-  mise registry | grep -q "^$pkg " && echo "✓ $pkg"
-done
-```
 
 ---
 

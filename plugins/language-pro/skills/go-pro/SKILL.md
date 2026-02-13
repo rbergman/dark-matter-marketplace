@@ -15,7 +15,7 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 
 ## Core Standards
 
-**Non-Negotiable:**
+**Required:**
 - All exported identifiers have doc comments
 - All errors checked and handled (no `_ = err`)
 - NO `panic()` for recoverable errors
@@ -32,20 +32,9 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 
 ## Project Setup (Go 1.25+)
 
-### Version Management with mise
+### Version Management
 
-[mise](https://mise.jdx.dev) manages language runtimes per-project. Ensures all contributors use the same Go version—no "works on my machine" issues.
-
-```bash
-# Install mise (once)
-curl https://mise.run | sh
-
-# In project root
-mise use go@1.25
-
-# Creates .mise.toml — commit it
-# Team members just run: mise install
-```
+Pin Go version with [mise](https://mise.jdx.dev): `mise use go@1.25` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
 
 ### New Project Quick Start
 

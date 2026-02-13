@@ -227,75 +227,12 @@ fd -e png | xargs -P4 -I{} optipng {}
 
 ---
 
-## bat (better cat)
+## bat / delta
 
-**When to use:** Quick file preview with syntax highlighting and line numbers.
+- `bat` — Syntax-highlighted file preview with line numbers (`bat -r 50:100 file.ts`)
+- `delta` — Readable git diffs with side-by-side view (`git diff | delta -s`)
 
-```bash
-# View file with syntax highlighting
-bat src/index.ts
-
-# Show line range
-bat -r 50:100 src/index.ts
-
-# Show non-printable characters
-bat -A file.txt
-
-# Plain output (no decorations)
-bat -p file.ts
-
-# Diff two files
-bat --diff file1.ts file2.ts
-
-# As pager for other commands
-git diff | bat
-
-# Multiple files
-bat src/*.ts
-```
-
-**Note:** Read tool covers most needs, but bat useful for quick multi-file preview with highlighting.
-
----
-
-## delta (better git diff)
-
-**When to use:** Readable git diffs with syntax highlighting and side-by-side view.
-
-```bash
-# Use as git pager (add to ~/.gitconfig)
-# [core]
-#   pager = delta
-# [delta]
-#   side-by-side = true
-
-# Or one-off
-git diff | delta
-
-# Side by side
-git diff | delta -s
-
-# With line numbers
-git diff | delta -n
-
-# Compare files directly
-delta file1.ts file2.ts
-
-# Show only file names
-git diff --name-only | delta
-```
-
-**Config (~/.gitconfig):**
-```ini
-[core]
-    pager = delta
-[interactive]
-    diffFilter = delta --color-only
-[delta]
-    navigate = true
-    side-by-side = true
-    line-numbers = true
-```
+Configure delta as git pager in `~/.gitconfig`: `[core] pager = delta`
 
 ---
 
