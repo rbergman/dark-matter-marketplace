@@ -27,7 +27,7 @@ Arguments: $ARGUMENTS
 
 ## 3. Generate Prompt
 
-```
+~~~
 CONTEXT:
 - Bead: <id> - <title>
 - Workspace: <path>
@@ -52,7 +52,7 @@ DELIVERABLES:
 - Write detailed report to: history/subagent-reports/<bead-id>.md
 - Return ONLY the minimal response format below
 
-RESPONSE FORMAT (CRITICAL - return ONLY this, nothing else):
+RESPONSE FORMAT (return ONLY this, nothing else):
 ```
 STATUS: success | partial | failed
 BEAD: <id>
@@ -62,7 +62,7 @@ SUMMARY: <1-2 sentences max>
 COMMIT_MSG: <ready-to-use commit message, 1 line>
 REPORT: history/subagent-reports/<bead-id>.md
 ```
-```
+~~~
 
 ## 4. Pre-Delegation Checklist (M+ tasks)
 

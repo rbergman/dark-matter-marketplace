@@ -73,7 +73,7 @@ Use the **shared task list** as the coordination backbone.
 
 ## File Ownership
 
-**CRITICAL: Two teammates editing the same file = overwrites.** Agent Teams has no merge conflict resolution.
+Two teammates editing the same file causes overwrites — Agent Teams has no merge conflict resolution.
 
 **Rules:**
 - Assign **exclusive file sets** per teammate before work begins
@@ -129,17 +129,6 @@ Lead owns bead state. Teammates read bead context but never modify it.
 7. Quality gates      → Full project verification
 8. Close out          → bd close, commit, cleanup team
 ```
-
----
-
-## Session Start Checklist
-
-- [ ] I am the team lead, not an implementer
-- [ ] Delegate mode enabled (Shift+Tab)
-- [ ] `bd ready` / `bd prime` — bead context loaded
-- [ ] Work assessed: team vs subagents vs direct
-- [ ] File ownership mapped before spawning teammates
-- [ ] Teammates spawned with full context, skills, and model selection
 
 ---
 

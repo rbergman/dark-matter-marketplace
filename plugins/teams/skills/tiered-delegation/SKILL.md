@@ -1,6 +1,6 @@
 ---
 name: tiered-delegation
-description: Decision framework for when to use Agent Teams vs Task() subagents vs single-session work. Use PROACTIVELY when facing delegation decisions to choose the right coordination mechanism.
+description: Decision framework for when to use Agent Teams vs Task() subagents vs single-session work. Use when facing delegation decisions to choose the right coordination mechanism.
 ---
 
 # Tiered Delegation

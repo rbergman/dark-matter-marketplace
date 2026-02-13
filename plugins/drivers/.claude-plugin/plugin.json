@@ -1,6 +1,6 @@
 {
   "name": "dm-drvr",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "AI drivers: delegate to Codex CLI or leverage Gemini's 1M token context",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

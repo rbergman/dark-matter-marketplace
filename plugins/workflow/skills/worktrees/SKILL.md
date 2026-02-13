@@ -22,10 +22,10 @@ Git worktrees create isolated workspaces sharing the same repository, allowing w
 
 ## Guardrails
 
-- **NEVER** merge a worktree branch to main without explicit user sign-off
-- **NEVER** delete a worktree without explicit user sign-off
-- **NEVER** close beads for a worktree branch without user sign-off
-- After completing implementation, **STOP and report status**. Do not proceed to merge.
+- Do not merge a worktree branch to main without explicit user sign-off — merges affect shared codebase and may contain unreviewed work
+- Do not delete a worktree without explicit user sign-off — deletion destroys uncommitted changes
+- Do not close beads for a worktree branch without user sign-off
+- After completing implementation, stop and report status. Do not proceed to merge.
 - Use `/merge` when ready to integrate — it enforces the pre-flight checklist.
 
 ---

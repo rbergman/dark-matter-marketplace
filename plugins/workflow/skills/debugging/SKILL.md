@@ -7,17 +7,13 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 
 Random fixes waste time and create new bugs. Quick patches mask underlying issues.
 
-**Core principle:** ALWAYS find root cause before attempting fixes. Symptom fixes are failure.
+**Core principle:** Find root cause before attempting fixes. Symptom fixes are failure.
 
 ---
 
 ## The Iron Law
 
-```
-NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
-```
-
-If you haven't completed Phase 1, you cannot propose fixes.
+Investigate root cause before attempting any fix. If you haven't completed Phase 1, you cannot propose fixes.
 
 ---
 
@@ -45,7 +41,7 @@ Complete each phase before proceeding to the next.
 
 ### Phase 1: Root Cause Investigation
 
-**BEFORE attempting ANY fix:**
+Before attempting any fix:
 
 1. **Read Error Messages Carefully**
    - Don't skip past errors or warnings
@@ -149,19 +145,6 @@ If you catch yourself thinking:
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before tracing data flow
 - "One more fix attempt" — **circuit breaker: STOP after 2 failed approaches**
-
----
-
-## Common Rationalizations
-
-| Excuse | Reality |
-|--------|---------|
-| "Issue is simple" | Simple issues have root causes too |
-| "Emergency, no time" | Systematic is FASTER than thrashing |
-| "Just try this first" | First fix sets the pattern |
-| "Multiple fixes saves time" | Can't isolate what worked |
-| "I see the problem" | Seeing symptoms ≠ understanding root cause |
-| "One more attempt" (after 2+) | Circuit breaker: STOP, summarize, ask user |
 
 ---
 

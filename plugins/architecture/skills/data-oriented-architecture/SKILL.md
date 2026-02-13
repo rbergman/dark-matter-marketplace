@@ -1,6 +1,6 @@
 ---
 name: data-oriented-architecture
-description: "Apply data-oriented architecture patterns when designing systems with polymorphic entities. This skill should be used PROACTIVELY when encountering switch statements or if/else chains that dispatch based on entity type, when designing new entity systems, or when refactoring toward extensibility. Provides registry-based dispatch, capability composition, and infrastructure-first development patterns. Complements solid-architecture with concrete implementation strategies."
+description: Apply when encountering switch/if-else dispatch on entity type, designing entity systems, or refactoring toward extensibility. Provides registry-based dispatch, capability composition, and infrastructure-first patterns. Complements solid-architecture.
 ---
 
 # Data-Oriented Architecture Patterns

@@ -102,7 +102,9 @@ RETURN:
 
 ### Pre-Delegation Checklist (M+ tasks)
 
-Before launching any M+ subagent, verify these five items. Do NOT skip this — vague delegation is a top source of wasted work.
+M+ means medium, large, or extra-large complexity.
+
+Before launching any M+ subagent, verify these five items. Vague delegation is a top source of wasted work.
 
 | Check | Question |
 |-------|----------|
@@ -319,15 +321,6 @@ Every subagent roundtrip costs ~3-5k tokens of conversation history (prompt + re
 **Scope-bound code reviewers:** When launching `feature-dev:code-reviewer` or intent review subagents, explicitly constrain what they read:
 - "Read ONLY the diff and the OWN files listed. Do NOT explore neighboring files."
 - This prevents reviewers from reading themselves into context overflow.
-
----
-
-## Session Start Checklist
-
-- [ ] I am the orchestrator, not the implementer
-- [ ] I will delegate implementation to subagents
-- [ ] I will instruct subagents on skills and quality gates
-- [ ] I will protect my context through delegation and concise returns
 
 ---
 

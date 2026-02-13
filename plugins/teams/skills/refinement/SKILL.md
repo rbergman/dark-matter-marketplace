@@ -1,6 +1,6 @@
 ---
 name: refinement
-description: Transform ambiguous specs into implementable work items through live adversarial debate using Agent Teams. Evolves dm-work:dialectical-refinement from sequential pipeline to simultaneous multi-agent debate. Use PROACTIVELY for l/xl complexity tasks.
+description: Transform ambiguous specs into implementable work items through live adversarial debate using Agent Teams. Evolves dm-work:dialectical-refinement from sequential pipeline to simultaneous multi-agent debate. Use for l/xl complexity tasks.
 ---
 
 # Team Refinement

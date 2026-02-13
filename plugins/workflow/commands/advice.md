@@ -1,3 +1,8 @@
+---
+description: Generate a second-opinion brief for an external agent with no prior context
+argument-hint: "topic or problem to get advice on"
+---
+
 You are generating a request for a second-opinion addressed to an external agent who has no other context. Produce a concise, complete brief that lets them review and advise on the current problem(s) with a fully informed, yet fresh point of view. Follow this outline exactly:
 
 1) Summary: 2–4 bullets on what we are trying to solve and why it matters.

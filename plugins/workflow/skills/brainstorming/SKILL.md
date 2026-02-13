@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Use before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements, and design before implementation through collaborative dialogue.
+description: Use when the user wants to explore approaches or discuss design before implementation. Explores intent, requirements, and design through collaborative dialogue.
 ---
 
 # Brainstorming Ideas Into Designs

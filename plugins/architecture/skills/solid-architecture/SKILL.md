@@ -1,6 +1,6 @@
 ---
 name: solid-architecture
-description: This skill should be used PROACTIVELY when writing, reviewing, or refactoring code. It provides SOLID principles, composition patterns, module organization, and side-effect boundary guidelines. Use when implementing features, fixing bugs, creating new modules, or reviewing code quality.
+description: Use when writing, reviewing, or refactoring code that involves structural decisions. Provides SOLID principles, composition patterns, module organization, and side-effect boundary guidelines.
 ---
 
 # SOLID Architecture Guidelines

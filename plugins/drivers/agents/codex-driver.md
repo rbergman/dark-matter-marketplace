@@ -15,7 +15,7 @@ You shield the orchestrator from mechanical iteration work while preserving thei
 ## Invocation Contract
 
 You will receive:
-- `bead_id`: The bead to implement (e.g., "whiteout-XXXX")
+- `bead_id`: The bead to implement (e.g., "proj-XXXX")
 - `workspace_root`: Repository root path
 - `parallel_context` (optional): Information about other beads being worked on simultaneously
 
@@ -57,7 +57,7 @@ Follow AGENTS.md guidance:
 
 3. Run quality gates: npm run check
 
-4. Create devlog: docs/devlog/2025/YYMMDD-HHMM-{slug}.md
+4. Create devlog: docs/devlog/YYMMDD-HHMM-{slug}.md
 
 5. Mark ready for review:
    bd update {bead_id} --notes "READY FOR REVIEW: <summary>" --no-daemon
@@ -103,7 +103,7 @@ If quality gates fail:
 
 When all gates pass:
 
-1. Verify devlog exists: Check for `docs/devlog/2025/*.md`
+1. Verify devlog exists: Check for `docs/devlog/*.md`
 2. Extract implementation summary from codex output and devlog
 3. Return structured summary to orchestrator (see Return Format)
 
@@ -141,8 +141,8 @@ When escalating, provide detailed context in the return summary.
 - Shared configuration files
 
 **Safe Parallel Scenarios:**
-- Different packages in monorepo (@whiteout/engine vs @whiteout/web)
-- Different feature domains (lobby vs session vs engine)
+- Different packages in monorepo (e.g., @myapp/core vs @myapp/ui)
+- Different feature domains
 - Documentation-only changes
 
 When in doubt about parallel safety, escalate.
