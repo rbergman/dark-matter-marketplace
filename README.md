@@ -102,6 +102,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
 | `dm-work:mise` | Skill | Modern dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
+| `dm-work:tokf` | Skill | CLI output compression — reduce build/test/git noise by 60-99% before it reaches LLM context |
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
 | `dm-work:srt` | Skill | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous runs |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
@@ -244,6 +245,7 @@ The plugins include opinionated DX tooling that works together:
 | [mise](https://mise.jdx.dev) | `dm-work:mise` | Version management for all languages/tools — replaces nvm, pyenv, goenv |
 | [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
 | CLI tools | `dm-work:cli-tools` | fd, rg, jq, yq, sd, bat, delta — power tools when built-ins aren't enough |
+| [tokf](https://tokf.net) | `dm-work:tokf` | CLI output compression — filter build/test/git noise before it reaches LLM context |
 | [srt](https://github.com/anthropic-experimental/sandbox-runtime) | `dm-work:srt` | Sandbox Runtime — OS-level isolation for CLI/autonomous runs (use `/sandbox` for interactive) |
 
 **The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.

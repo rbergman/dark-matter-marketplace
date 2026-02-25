@@ -116,6 +116,62 @@ Before launching any M+ subagent, verify these five items. Vague delegation is a
 
 If any check fails, fix the prompt before launching. Log to `history/checkpoint-effectiveness.log` if the checklist caught a real issue (see Checkpoint Effectiveness Tracking).
 
+### Architect Gate (M+ tasks with structural impact)
+
+Before delegating M+ tasks that affect system structure, run a quick architecture check. This prevents subagents from building on shaky foundations.
+
+**Trigger conditions** (any one is sufficient):
+- New modules or services being created
+- API contracts being defined or changed
+- Data model changes (new entities, schema modifications)
+- Cross-cutting concerns (auth, logging, error handling patterns)
+- Integration boundaries (third-party APIs, message queues, external systems)
+
+**Skip conditions** (skip the gate if ALL apply):
+- XS/S task size
+- Pure bug fix (no structural change)
+- Single-module internal change (no new interfaces)
+
+**5-Question Checklist:**
+
+| # | Question |
+|---|----------|
+| 1 | **Pattern fit** — Does this follow an established pattern in the codebase, or is it introducing a new one? |
+| 2 | **Module boundaries** — Are the module/package boundaries clear? Will this create circular dependencies? |
+| 3 | **Coupling** — What will depend on this, and what will this depend on? Is the coupling appropriate? |
+| 4 | **Simpler alternative** — Is there a simpler approach that achieves the same goal with less structural change? |
+| 5 | **Interface design** — Are the public interfaces (function signatures, API contracts, data shapes) right, or will they need to change soon? |
+
+**Decision tree:**
+- All clear → proceed with delegation
+- 1-2 concerns → add constraints to the subagent prompt (e.g., "use the existing service pattern from X", "keep the interface minimal")
+- 3+ concerns → pause and either resolve yourself or launch an architect subagent
+
+**Quick architect subagent template (L/XL only):**
+
+```
+Task(subagent_type="general-purpose", model="opus", description="Architecture review", prompt="
+ROLE: Architecture reviewer. Evaluate structural decisions ONLY.
+
+CONTEXT: <brief description of the planned change>
+
+EXISTING PATTERNS: <list 2-3 relevant existing modules/patterns in the codebase>
+
+SKILLS: dm-arch:solid-architecture
+
+ANSWER THESE 5 QUESTIONS:
+1. Pattern fit — follow existing or introduce new?
+2. Module boundaries — clear? circular dependency risk?
+3. Coupling — what depends on what? appropriate?
+4. Simpler alternative — less structural change possible?
+5. Interface design — will public interfaces need to change soon?
+
+RETURN: 5 one-line answers + VERDICT (proceed / constrain / redesign) + 1 sentence rationale
+")
+```
+
+Log `ARCH_GATE_CATCH` when the gate identifies a real structural issue, `ARCH_GATE_PASS` routinely (1 in 5). See Checkpoint Effectiveness Tracking.
+
 ---
 
 ## Token Efficiency Rules
@@ -259,6 +315,8 @@ The pre-delegation checklist and post-return intent review are new protocols. Tr
 |-------|----------------|
 | `CHECKLIST_CATCH` | Pre-delegation checklist caught a real issue (wrong layer, missing requirement, vague ownership) |
 | `CHECKLIST_PASS` | Checklist passed without changes (routine confirmation) — log only 1 in 5 to avoid noise |
+| `ARCH_GATE_CATCH` | Architect gate identified a real structural issue (wrong pattern, coupling risk, interface problem) |
+| `ARCH_GATE_PASS` | Architect gate passed without concerns — log only 1 in 5 to avoid noise |
 | `REVIEW_CATCH` | Intent reviewer flagged a real gap that led to rework |
 | `REVIEW_FALSE_POS` | Intent reviewer flagged something but you overrode it as incorrect |
 | `REVIEW_MISS` | You discovered an intent gap AFTER accepting reviewed work (the reviewer missed it) |

@@ -68,10 +68,16 @@
       "depends_on": ["gitignore"]
     },
     {
+      "id": "tokf-setup",
+      "title": "Set up tokf output compression (optional)",
+      "description": "Install tokf (`brew install mpecan/tokf/tokf` or `cargo install tokf` or `mise use -g tokf`). Run `tokf hook install` to add Claude Code PreToolUse hook. Optionally run `tokf skill install` to enable agent filter authoring. Create `.tokf/filters/` for project-specific overrides if needed.",
+      "depends_on": ["mise-toml"]
+    },
+    {
       "id": "lang-specific",
       "title": "Language-specific setup for {{lang}}",
       "description": "Point user to {{lang}}-pro skill for next steps. For Go: go mod init. For Rust: cargo init. For TypeScript: npm init. For Python: uv init.",
-      "depends_on": ["mise-toml", "justfile", "beads-init", "envrc-example"]
+      "depends_on": ["mise-toml", "justfile", "beads-init", "envrc-example", "tokf-setup"]
     }
   ]
 }

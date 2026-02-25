@@ -10,6 +10,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 **Related skills:**
 - **just-pro** - Build system patterns and templates
 - **mise** - Tool version management
+- **tokf** - CLI output compression for LLM context efficiency
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
 ## Execution Modes
@@ -179,6 +180,28 @@ Create `.mise.toml`:
 # rust = "1.83"
 # just = "latest"
 ```
+
+---
+
+## Step 5.5: tokf Setup (Optional)
+
+If the user wants CLI output compression for LLM context efficiency:
+
+```bash
+# Install tokf
+brew install mpecan/tokf/tokf   # or: cargo install tokf, mise use -g tokf
+
+# Set up Claude Code hook (auto-filters Bash output)
+tokf hook install
+
+# Enable agent filter authoring
+tokf skill install
+
+# Verify
+tokf ls                          # List available filters
+```
+
+Optionally create `.tokf/filters/` for project-specific filter overrides and commit it. See **tokf** skill for full configuration details.
 
 ---
 
