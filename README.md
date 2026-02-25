@@ -43,6 +43,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
+| dm-pmgr | PM Script architecture | `dm-pmgr` (reference only) |
 | dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
 | dm-work | Workflow tools | `dm-work:orchestrator` |
 
@@ -60,6 +61,7 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/       # dm-team: Agent Teams orchestration and collaboration
+│   ├── pm-script/     # dm-pmgr: PM Script architecture reference
 │   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
@@ -148,6 +150,14 @@ Language-specific expertise with strict, opinionated standards.
 | `dm-lang:rescript-pro` | Skill | Type-safe ReScript: exhaustive matching, typed FFI, React integration, pipe-first style |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
 
+### dm-pmgr (pm-script/)
+
+Architecture reference for the PM Script — a Level 7.5 project manager that sits between a human director and a swarm of Claude Code worker sessions. The PM is a Python script (not a CC session) using the Claude Agent SDK, with targeted LLM calls at decision points.
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `pm-script-architecture.md` | Reference | Comprehensive architecture doc covering escalation engine, worker lifecycle, NL interface, demo/coherence systems |
+
 ### dm-team (teams/)
 
 Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. Built on Anthropic's [Agent Teams](https://code.claude.com/docs/en/agent-teams) feature.
@@ -220,6 +230,7 @@ claude plugin install dm-arch@dark-matter-marketplace
 claude plugin install dm-drvr@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
+claude plugin install dm-pmgr@dark-matter-marketplace
 claude plugin install dm-team@dark-matter-marketplace
 claude plugin install dm-tool@dark-matter-marketplace
 claude plugin install dm-work@dark-matter-marketplace
