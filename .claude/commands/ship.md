@@ -19,12 +19,12 @@ If no plugin name provided, infer from `git status` by looking at which `plugins
 2. **Push** - Push to origin
 3. **Update marketplace** - Run `claude plugin marketplace update dark-matter-marketplace`
 4. **Reinstall plugin (primary account)** - Run `claude plugin uninstall <plugin> && claude plugin install <plugin>`
-5. **Reinstall plugin (secondary account)** - Run:
+5. **Reinstall plugin (secondary account)** - If `CLAUDE_SECONDARY_CONFIG_DIR` is set, run:
    ```bash
-   CLAUDE_CONFIG_DIR=/Users/bob/.claude-rs claude plugin marketplace update dark-matter-marketplace
-   CLAUDE_CONFIG_DIR=/Users/bob/.claude-rs claude plugin uninstall <plugin> && CLAUDE_CONFIG_DIR=/Users/bob/.claude-rs claude plugin install <plugin>
+   CLAUDE_CONFIG_DIR=$CLAUDE_SECONDARY_CONFIG_DIR claude plugin marketplace update dark-matter-marketplace
+   CLAUDE_CONFIG_DIR=$CLAUDE_SECONDARY_CONFIG_DIR claude plugin uninstall <plugin> && CLAUDE_CONFIG_DIR=$CLAUDE_SECONDARY_CONFIG_DIR claude plugin install <plugin>
    ```
-   Note: The secondary account may not have all plugins installed. If uninstall fails with "not found", just run the install.
+   Note: The secondary account may not have all plugins installed. If uninstall fails with "not found", just run the install. Skip this step entirely if no secondary account is configured.
 
 ## Notes
 
