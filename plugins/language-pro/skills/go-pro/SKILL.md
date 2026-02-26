@@ -46,6 +46,7 @@ go mod edit -go=1.25
 # Add toolchain dependencies (tracked in go.mod)
 go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 go get -tool golang.org/x/tools/cmd/goimports@latest
+go get -tool golang.org/x/vuln/cmd/govulncheck@latest
 
 # Copy configs from this skill's references/ directory:
 #   references/gitignore          → .gitignore
@@ -95,7 +96,7 @@ just fix             # Or: go tool golangci-lint run --fix && go tool goimports 
 
 **Verification:**
 ```bash
-just check           # Or: go tool golangci-lint run && go test -race ./...
+just check           # Or: go tool golangci-lint run && go test -race ./... && go tool govulncheck ./...
 ```
 
 ---
@@ -391,3 +392,4 @@ setup-force:
 1. Run `just check` (standard for projects using just)
 2. Fallback: `go tool golangci-lint run --fix && go tool golangci-lint run`
 3. Fallback: `go test -race ./...` to catch race conditions
+4. Fallback: `go tool govulncheck ./...` to catch known vulnerabilities

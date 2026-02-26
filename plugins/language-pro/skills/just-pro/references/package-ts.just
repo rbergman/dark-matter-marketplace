@@ -20,9 +20,10 @@ setup:
 
 # === Quality Gates ===
 
-# Run all checks (typecheck, lint, test, build)
+# Run all checks (typecheck, lint, test, vulnerability audit)
 check:
     npm run check
+    npm audit --omit=dev --audit-level=high
 
 # === Format & Lint ===
 

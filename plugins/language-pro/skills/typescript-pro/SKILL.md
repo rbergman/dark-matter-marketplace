@@ -105,6 +105,12 @@ npx tsc --noEmit             # Type check without emit
 **Verification:**
 ```bash
 npm run check                # typecheck + lint + test
+npm audit --omit=dev --audit-level=high   # vulnerability check (production deps only)
+```
+
+Or via just (which combines both):
+```bash
+just check
 ```
 
 **Pre-commit Hook** (automatic if husky configured):
@@ -307,6 +313,7 @@ See `references/integration.md` for detailed framework patterns.
 4. Add explicit return types to exported functions
 
 **Before committing:**
-1. Run `npm run check` (standard for single packages)
-2. For monorepos at repo root: `just check` or `turbo run check`
-3. Fallback: `npx eslint src/ --fix && npx tsc --noEmit && npm test`
+1. Run `just check` (includes typecheck + lint + test + vulnerability audit)
+2. Fallback: `npm run check && npm audit --omit=dev --audit-level=high`
+3. For monorepos at repo root: `just check` or `turbo run check`
+4. Fallback: `npx eslint src/ --fix && npx tsc --noEmit && npm test`

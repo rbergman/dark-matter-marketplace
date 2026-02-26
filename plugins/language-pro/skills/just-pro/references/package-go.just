@@ -87,8 +87,8 @@ audit-ci:
 
 # === Quality Gates ===
 
-# Run all checks (fmt, lint, test, coverage) - use before commits
-check: fmt lint coverage-check
+# Run all checks (fmt, lint, test, coverage, vulnerabilities) - use before commits
+check: fmt lint coverage-check audit
     @echo "All Go checks passed"
 
 # === Run ===
