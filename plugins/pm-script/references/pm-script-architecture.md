@@ -1,6 +1,6 @@
 # PM Script Architecture
 
-> Level 7.5 Project Management — a Python script using the Claude Agent SDK that sits between a human director and a swarm of Claude Code worker sessions.
+> Level 7.5 Project Management — a Python script that sits between a human director and a swarm of Claude Code worker sessions. Spawns workers via either the Claude Agent SDK (API key) or `claude -p` (OAuth/Max plan).
 
 ---
 
@@ -43,14 +43,16 @@ Human Director
        │  structured commands
        ▼
 ┌─────────────┐
-│  PM Script   │  Python + Claude Agent SDK
+│  PM Script   │  Python
 │              │  • Escalation engine
 │              │  • Worker lifecycle
 │              │  • Feedback translation
 │              │  • Demo generation
 │              │  • Coherence monitoring
 └──┬───┬───┬──┘
-   │   │   │   Agent SDK query() per worker
+   │   │   │   Worker backend (pluggable)
+   │   │   │   • Agent SDK query()  ← API key users
+   │   │   │   • claude -p          ← OAuth/Max plan users
    ▼   ▼   ▼
 ┌────┐┌────┐┌────┐
 │ W1 ││ W2 ││ W3 │  Claude Code sessions in worktrees
@@ -74,6 +76,8 @@ Every PM component is classified as **deterministic** (no LLM call) or **NL** (r
 | Contradiction detection | **NL** | Compare new feedback against existing constraints |
 | Coherence checking | **NL** | Detect architectural drift across workers |
 | Demo narrative | **NL** | Generate human-readable progress summary |
+| Rate limit detection/recovery | Deterministic | Parse error responses, backoff, resume |
+| Model routing | Deterministic | Task complexity → model selection table |
 | Spinning detection | Deterministic + **NL** | Heuristics flag, LLM confirms |
 
 ---
@@ -357,34 +361,78 @@ class WorkerState:
     escalation_history: list[dict]   # All escalations for this worker
 ```
 
+### Authentication & Worker Backend
+
+The PM supports two worker backends, selected at configuration time:
+
+| Backend | Auth | Billing | Best for |
+|---------|------|---------|----------|
+| **Agent SDK** (`query()`) | `ANTHROPIC_API_KEY` | Pay-per-token API | Teams, CI/CD, high-volume |
+| **Claude CLI** (`claude -p`) | `CLAUDE_CODE_OAUTH_TOKEN` | Max/Pro subscription | Individual developers |
+
+**Why two backends:** Anthropic's [updated policy (Feb 2026)](https://www.theregister.com/2026/02/20/anthropic_clarifies_ban_third_party_claude_access/) explicitly prohibits using OAuth tokens with the Agent SDK. Max plan users must use `claude -p` (the CLI's headless/pipe mode) to stay within ToS. Both backends produce identical results — the PM abstracts the difference behind a `WorkerBackend` interface.
+
+**Backend differences:**
+
+| Capability | Agent SDK | Claude CLI |
+|-----------|-----------|------------|
+| Streaming token counts | Native (streaming metadata) | Parse from `--output-format json` |
+| Model selection | `model` parameter | `--model` flag |
+| MCP server support | Native | Native (inherits CC config) |
+| Interrupt mechanism | SDK cancel | Process signal (SIGINT) |
+| Rate limit info | Error response with retry-after | Exit code + stderr |
+| Concurrent session limit | API tier limits | Max plan limits (varies) |
+
 ### Spawning Workers
 
-Workers are spawned via the Agent SDK's `query()` function, each in its own worktree:
+Workers are spawned in worktrees via the configured backend:
 
 ```python
+class WorkerBackend(Protocol):
+    """Abstraction over Agent SDK vs Claude CLI."""
+    async def spawn(self, prompt: str, cwd: str, model: str) -> WorkerSession: ...
+    async def interrupt(self, session: WorkerSession) -> None: ...
+    async def get_token_count(self, session: WorkerSession) -> int: ...
+
+class AgentSDKBackend(WorkerBackend):
+    """For API key users. Uses claude-agent-sdk query()."""
+    async def spawn(self, prompt, cwd, model):
+        return await agent_sdk.query(
+            prompt=prompt, working_directory=cwd,
+            model=model, stream=True,
+        )
+
+class ClaudeCLIBackend(WorkerBackend):
+    """For OAuth/Max plan users. Uses claude -p subprocess."""
+    async def spawn(self, prompt, cwd, model):
+        proc = await asyncio.create_subprocess_exec(
+            "claude", "-p", prompt,
+            "--model", model,
+            "--output-format", "json",
+            "--max-turns", str(self.max_turns),
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        return CLIWorkerSession(proc)
+
 async def spawn_worker(bead_id: str, base_branch: str = "main") -> WorkerState:
     """Spawn a new worker for a bead."""
     worker_id = generate_worker_id()
     worktree_path = create_worktree(base_branch, worker_id)
 
-    # Build prompt from journal (not from previous session)
     prompt = build_worker_prompt(
         bead_id=bead_id,
         owned_files=determine_file_ownership(bead_id),
         constraints=get_active_constraints(bead_id),
-        failed_approaches=[],  # Fresh worker, no failures yet
+        failed_approaches=[],
     )
 
-    # Launch via Agent SDK
-    session = await agent_sdk.query(
-        prompt=prompt,
-        working_directory=worktree_path,
-        stream=True,  # For token counting
-    )
+    model = select_model(bead_id)  # See Model Routing section
+    session = await backend.spawn(prompt, worktree_path, model)
 
     return WorkerState(
-        id=worker_id,
-        bead_id=bead_id,
+        id=worker_id, bead_id=bead_id,
         worktree_path=worktree_path,
         worktree_branch=f"pm/{worker_id}",
         status="active",
@@ -564,6 +612,86 @@ When multiple workers complete simultaneously:
 | `pm_overhead_cap` | 15% | Max percentage of total budget spent on PM's own LLM calls |
 
 When `bead_token_limit` is exceeded, the PM escalates to the human with a cost report and asks whether to continue, pivot, or abandon.
+
+### Rate Limit Handling
+
+With multiple workers making concurrent API calls, rate limits are a real operational concern. The PM handles this deterministically — no LLM call needed.
+
+**Detection by backend:**
+
+| Backend | Signal | Data available |
+|---------|--------|---------------|
+| Agent SDK | `RateLimitError` with `retry_after` header | Exact retry delay |
+| Claude CLI | Exit code + stderr message | Parse retry delay from error text |
+
+**Response protocol:**
+
+```
+Rate limit hit on worker W2
+    │
+    ├─ Is retry_after available?
+    │   ├─ Yes → Suspend W2, schedule resume at now + retry_after
+    │   └─ No  → Exponential backoff: 30s, 60s, 120s, 240s, max 5min
+    │
+    ├─ Are other workers affected?
+    │   ├─ Same API key → All workers share quota. Pause lowest-priority worker(s)
+    │   │                  to reduce pressure. Resume after cooldown.
+    │   └─ Different keys → Only affected worker pauses
+    │
+    └─ Has this worker been rate-limited 3+ times this hour?
+        └─ Yes → Notify human: "Worker W2 hitting rate limits frequently.
+                  Consider reducing max_concurrent or upgrading API tier."
+```
+
+**Max plan specifics:** Claude Max has per-model rate limits that differ from API tiers. The PM tracks per-model usage across all workers and preemptively pauses spawning when approaching limits, rather than waiting for rejections.
+
+**Worker state during rate limit:** Status transitions to `suspended` with `suspend_reason: "rate_limit"`. The worker's worktree and journal are preserved. On resume, the PM reconstructs the prompt from the journal (same as rotation) since the CLI session is terminated.
+
+### Model Routing
+
+Not every task needs the most expensive model. The PM routes workers to appropriate models based on task characteristics.
+
+**Routing table:**
+
+| Task signal | Model | Rationale |
+|-------------|-------|-----------|
+| Architecture changes, complex debugging | Opus | Needs deep reasoning |
+| Standard feature implementation | Sonnet | Good balance of quality and cost |
+| Boilerplate, simple fixes, test writing | Haiku | Fast and cheap |
+| PM's own NL calls (classification, coherence) | Haiku/Sonnet | PM calls are short, focused queries |
+
+**How routing works:**
+
+The PM classifies each bead's complexity at assignment time (deterministic heuristics + optional NL classification):
+
+```python
+def select_model(bead_id: str) -> str:
+    """Select model based on bead characteristics."""
+    bead = get_bead(bead_id)
+
+    # Explicit override in bead metadata takes precedence
+    if bead.metadata.get("model"):
+        return bead.metadata["model"]
+
+    # Heuristic classification
+    if bead.type == "bug" and bead.priority >= 3:
+        return config.models.simple       # Haiku for low-priority bugs
+    if any(d in bead.labels for d in ["architecture", "security", "api_contract"]):
+        return config.models.complex      # Opus for architectural work
+    return config.models.default          # Sonnet for everything else
+```
+
+**Mid-session model switching:** Not supported. If a worker on Sonnet hits a problem that needs Opus-level reasoning, the PM rotates the worker to a new session with the upgraded model. The journal preserves continuity.
+
+**PM's own LLM calls:** The PM uses a separate model config for its internal NL queries. These are short, focused calls — escalation classification, coherence checks, feedback translation. Defaults to Haiku for cost efficiency, upgradeable to Sonnet if classification accuracy is insufficient.
+
+```toml
+[models]
+complex = "claude-opus-4-6"       # Architecture, complex debugging
+default = "claude-sonnet-4-6"     # Standard implementation
+simple = "claude-haiku-4-5"       # Boilerplate, simple fixes
+pm_internal = "claude-haiku-4-5"  # PM's own NL classification calls
+```
 
 ### Graceful Shutdown Protocol
 
@@ -1018,11 +1146,27 @@ name = "my-project"
 archetype = "mature"               # greenfield | mature | maintenance
 phase = "feature"                  # greenfield_init | feature | hardening | maintenance
 
+[auth]
+backend = "claude-cli"             # "agent-sdk" (API key) | "claude-cli" (OAuth/Max)
+# Agent SDK: set ANTHROPIC_API_KEY env var
+# Claude CLI: set CLAUDE_CODE_OAUTH_TOKEN env var (via `claude setup-token`)
+
+[models]
+complex = "claude-opus-4-6"       # Architecture, complex debugging
+default = "claude-sonnet-4-6"     # Standard implementation
+simple = "claude-haiku-4-5"       # Boilerplate, simple fixes, test writing
+pm_internal = "claude-haiku-4-5"  # PM's own NL calls (classification, coherence)
+
 [workers]
 max_concurrent = 3                 # Maximum parallel workers
 session_token_limit = 150000       # Tokens per CC session before rotation
 bead_token_limit = 500000          # Max tokens per bead across all sessions
 pm_overhead_cap = 0.15             # Max 15% of budget for PM's own LLM calls
+
+[rate_limits]
+max_suspensions_before_notify = 3  # Notify human after this many rate limits/hour
+backoff_base_seconds = 30          # Initial backoff on rate limit
+backoff_max_seconds = 300          # Max backoff (5 min)
 
 [rotation]
 trigger_threshold = 0.80           # Rotate at 80% of context window
@@ -1078,6 +1222,8 @@ Each phase builds on the previous. The system works at every phase — no phase 
 - No coherence monitoring (only one worker)
 - Worker state journal and rotation working
 - Gates run automatically
+- Auth backend chosen at config time (Agent SDK or Claude CLI)
+- Single model (Sonnet default), no routing
 
 **What you get:** Hands-off single-stream execution. Human checks in periodically instead of actively directing.
 
@@ -1090,7 +1236,8 @@ Each phase builds on the previous. The system works at every phase — no phase 
 - Escalation learning loop (Bayesian updates from human responses)
 - Automated demo generation
 - Spinning detection and crash recovery
-- Token budget tracking
+- Token budget tracking and rate limit handling
+- Model routing (Opus/Sonnet/Haiku by task complexity)
 
 **What you get:** Parallel progress on multiple beads. PM handles the merge choreography.
 
@@ -1117,8 +1264,9 @@ Each phase builds on the previous. The system works at every phase — no phase 
 - Demo version stamping with stale feedback detection
 - Advanced spinning detection with LLM confirmation
 - Graceful shutdown with full state preservation
+- Skill extraction: PM identifies reusable techniques from successful worker sessions and proposes new project personality entries or worker prompt patterns
 
-**What you get:** The human directs at the outcome level. The PM translates, delegates, monitors, and escalates.
+**What you get:** The human directs at the outcome level. The PM translates, delegates, monitors, escalates, and learns.
 
 ---
 

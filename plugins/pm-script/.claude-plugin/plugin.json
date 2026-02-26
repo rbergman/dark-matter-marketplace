@@ -1,6 +1,6 @@
 {
   "name": "dm-pmgr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "PM Script architecture: Level 7.5 project management between human director and Claude Code worker swarm",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }
