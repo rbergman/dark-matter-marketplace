@@ -157,6 +157,7 @@ Architecture reference for the PM Script — a Level 7.5 project manager that si
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `pm-script-architecture.md` | Reference | Comprehensive architecture doc covering escalation engine, worker lifecycle, NL interface, demo/coherence systems |
+| `piloting-guide.md` | Reference | How to start using PM Script, phase by phase — config, first run, what to watch for |
 
 ### dm-team (teams/)
 
