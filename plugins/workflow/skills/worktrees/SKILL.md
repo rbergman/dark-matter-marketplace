@@ -68,6 +68,19 @@ bd worktree create .worktrees/bugfix --branch fix-123
 
 ---
 
+## Personal Prefs Across Worktrees
+
+`CLAUDE.local.md` only exists in one worktree. To share personal preferences across all worktrees, use a home-directory import in each worktree's `CLAUDE.local.md`:
+
+```markdown
+# CLAUDE.local.md
+@~/.claude/my-project-instructions.md
+```
+
+This way all worktrees load the same personal preferences from a single source. The `@~/...` import syntax resolves to your home directory regardless of which worktree you're in.
+
+---
+
 ## After Creation
 
 ### 1. Enter Worktree

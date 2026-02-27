@@ -105,6 +105,18 @@ Items marked SETTLED should not be revisited unless the user explicitly asks.
 
 ---
 
+## Memory Layout
+
+| File | Purpose | Committed? |
+|------|---------|------------|
+| `AGENTS.md` (+ `CLAUDE.md` symlink) | Team-shared project instructions | Yes |
+| `CLAUDE.local.md` | Personal project prefs (sandbox URLs, local paths) | No (auto-gitignored) |
+| `.claude/rules/*.md` | Modular topic rules, optionally path-scoped | Yes |
+
+For personal prefs that should work across worktrees, use imports: `@~/.claude/my-project-instructions.md` in your `CLAUDE.local.md`.
+
+---
+
 ## Skills & Tools
 
 You have MCPs, skills, and bash tools. Use them. Ensure subagents and teammates know about relevant skills when delegating.

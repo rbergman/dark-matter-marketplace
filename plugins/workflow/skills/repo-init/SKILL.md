@@ -137,6 +137,50 @@ AGENTS.md is the canonical file; CLAUDE.md is a symlink so Claude Code discovers
 
 Customize the template for the specific project (update project description, add project-specific conventions).
 
+### CLAUDE.local.md (personal project prefs)
+
+Create `CLAUDE.local.md` for personal preferences that shouldn't be committed (it's auto-added to `.gitignore`):
+
+```bash
+cat > CLAUDE.local.md << 'EOF'
+# Personal Project Preferences
+# This file is gitignored — safe for local paths, sandbox URLs, etc.
+
+# For worktrees: import shared personal prefs so all worktrees stay in sync
+# @~/.claude/my-project-instructions.md
+EOF
+```
+
+Use this for sandbox URLs, test data paths, local tool overrides, and other per-developer settings.
+
+### Modular rules (monorepos)
+
+For monorepos or projects with distinct subsystems, use `.claude/rules/` instead of a single large CLAUDE.md:
+
+```
+.claude/
+├── CLAUDE.md              # Core project instructions
+└── rules/
+    ├── go-backend.md      # Go-specific rules
+    ├── ts-frontend.md     # TypeScript-specific rules
+    └── api-design.md      # API conventions
+```
+
+All `.md` files in `.claude/rules/` are auto-loaded. Rules can be **path-scoped** via YAML frontmatter to only activate when Claude touches matching files:
+
+```markdown
+---
+paths:
+  - "packages/api/**/*.go"
+---
+
+# API Backend Rules
+- All handlers return structured errors
+- Use slog for logging, never fmt.Print
+```
+
+Skip this for single-language repos — a single CLAUDE.md is simpler.
+
 ---
 
 ## Step 4: Justfile Skeleton
