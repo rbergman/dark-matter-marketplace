@@ -1,6 +1,6 @@
 {
   "name": "dm-game",
-  "version": "0.5.1",
-  "description": "Game development skills: design methodology (5-component framework), per-frame performance optimization, and PixiJS 8 vector arcade game bootstrapping",
+  "version": "0.6.0",
+  "description": "Game development skills: design methodology, balance tuning, experience design, player UX, progression systems, game feel, playtest design, per-frame performance, and PixiJS 8 vector arcade bootstrapping",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

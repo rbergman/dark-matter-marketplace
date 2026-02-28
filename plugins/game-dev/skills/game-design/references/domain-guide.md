@@ -126,6 +126,8 @@ Every resource must answer: "What decision does this create?"
 
 ## Abilities & Progression
 
+> **Deep dive:** See **progression-systems** for power curves, XP math, flow channel targeting, and difficulty sandwich framework.
+
 **Core question:** How does the player evolve?
 
 **Structure types:**
@@ -144,6 +146,8 @@ Every resource must answer: "What decision does this create?"
 
 ## Core Loop & Pacing
 
+> **Deep dive:** See **experience-design** for engagement loop analysis, pacing frameworks, the experience triangle, and "why isn't this fun?" diagnostic.
+
 **Core question:** What does the player do repeatedly, and why do they return?
 
 **Loop definition (mandatory for new games):**
@@ -161,6 +165,8 @@ Every resource must answer: "What decision does this create?"
 ---
 
 ## UI/UX & Information Architecture
+
+> **Deep dive:** See **player-ux** for cognitive load framework (perception/attention/memory), Gestalt UI principles, onboarding flow design, and accessibility checklists.
 
 **Core question:** How does the player understand, decide, and act?
 

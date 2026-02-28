@@ -129,11 +129,17 @@ Agents for delegating work to external AI systems.
 
 ### dm-game (game-dev/)
 
-Game design methodology, performance optimization, and project bootstrapping.
+Game design methodology, balance, experience design, player UX, progression, game feel, playtest design, performance optimization, and project bootstrapping.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-game:game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
+| `dm-game:game-balance` | Skill | Cost curves, transitive/intransitive systems, economy design, dominant strategy detection |
+| `dm-game:experience-design` | Skill | Engagement loops, experience triangle, emotion layering, pacing, "why isn't this fun?" diagnostic |
+| `dm-game:player-ux` | Skill | Cognitive load (perception/attention/memory), Gestalt UI principles, onboarding, accessibility |
+| `dm-game:progression-systems` | Skill | Power curves, flow channel, XP math, difficulty sandwich, unlock pacing, adaptive difficulty |
+| `dm-game:game-feel` | Skill | Juice checklists, feedback layers, perception-action cycle, timing reference, feel diagnostics |
+| `dm-game:playtest-design` | Skill | Question generation, observation protocols, metrics tracking, confirmation bias avoidance |
 | `dm-game:game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
 | `dm-game:pixi-vector-arcade` | Skill | Bootstrap PixiJS 8 games with retro vector aesthetics, ECS-lite, pooling, spatial hashing |
 

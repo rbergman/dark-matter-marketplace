@@ -5,9 +5,11 @@ description: This skill should be used when the user asks to "design a game mech
 
 # Game Design Framework
 
-**Purpose:** Constraint system for evaluating and implementing game mechanics with focus on player experience over feature completion.
+**Purpose:** Central evaluation framework for game mechanics. Use this as the **first pass** on any feature — the 5-Component Filter identifies what's weak, then specialized skills provide deep guidance.
 
 **Core principle:** Mechanics are code. Gameplay is the player's *experience* of that code. The goal is not to implement features, but to implement **Relevance**.
+
+**Influences:** The 5-Component Framework synthesizes principles from Tynan Sylvester (experience engineering), Celia Hodent (cognitive UX), and Ian Schreiber (balance methodology).
 
 ---
 
@@ -95,13 +97,16 @@ For ANY feature that changes player state (movement abilities, combat actions, s
 
 When told "it feels wrong/boring/clunky," diagnose in order:
 
-| Symptom | Check First | Before Tuning Numbers |
-|---------|-------------|----------------------|
-| "I didn't know that would happen" | Clarity | Add telegraph, audio cue, UI indicator |
-| "I don't care" | Motivation | Connect to progression, increase stakes |
-| "It feels laggy" | Response | Add buffering, allow cancels, reduce lockouts |
-| "It feels weak" | Satisfaction | Add feedback channels (minimum 2) |
-| "It doesn't fit" | Fit | Adjust timing, weight, audio texture |
+| Symptom | Check First | Before Tuning Numbers | Deep Dive |
+|---------|-------------|----------------------|-----------|
+| "I didn't know that would happen" | Clarity | Add telegraph, audio cue, UI indicator | **player-ux** |
+| "I don't care" | Motivation | Connect to progression, increase stakes | **experience-design** |
+| "It feels laggy" | Response | Add buffering, allow cancels, reduce lockouts | **game-feel** |
+| "It feels weak" | Satisfaction | Add feedback channels (minimum 2) | **game-feel** |
+| "It doesn't fit" | Fit | Adjust timing, weight, audio texture | **game-feel** |
+| "It's not balanced" | Balance | Check cost curves, dominant strategies | **game-balance** |
+| "It's boring" | Engagement | Check loop, pacing, meaningful choice | **experience-design** |
+| "It's too hard/easy" | Progression | Check flow channel, difficulty curve | **progression-systems** |
 
 **Rule:** Do not tune damage/timing numbers until Clarity and Response are verified as not the root cause.
 
@@ -152,6 +157,21 @@ When proposing or critiquing a feature:
 6. **Tuning Priority** — What to adjust first if it doesn't feel right
 
 ---
+
+## Related Skills
+
+After the 5-Component Filter identifies a weakness, go deeper:
+
+| Area | Skill | When to Use |
+|------|-------|-------------|
+| Balance & economy | **game-balance** | Cost curves, dominant strategies, economy sinks/sources |
+| Engagement & pacing | **experience-design** | Core loops, emotion layering, "why isn't this fun?" |
+| Cognitive load & UI | **player-ux** | Perception/attention/memory, Gestalt UI, onboarding |
+| Difficulty & leveling | **progression-systems** | Power curves, flow channel, XP math, unlock pacing |
+| Feedback & juice | **game-feel** | Juice checklists, timing, "why does this feel bad?" |
+| Testing & validation | **playtest-design** | Question generation, observation protocols, metrics |
+| Per-frame performance | **game-perf** | Zero-allocation patterns for hot paths |
+| Project bootstrapping | **pixi-vector-arcade** | PixiJS 8 setup with vector aesthetics |
 
 ## Reference Files
 
