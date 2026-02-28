@@ -1,6 +1,6 @@
 ---
 description: Run parallel architecture, code, and security review with local beads or GitHub PR comments
-argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads"
+argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads, --output-file <path>, --format json, --no-interactive"
 ---
 
 # Unified Code Review Command
@@ -23,6 +23,9 @@ $ARGUMENTS
 | `--only <letters>` | Filter reviewers: a=arch, c=code, s=security | `acs` (all) |
 | `--min-severity <level>` | Filter output: low\|medium\|high\|critical | all |
 | `--skip-beads` | Local mode only - don't create beads | create beads |
+| `--output-file <path>` | Write findings to file instead of inline report | (inline) |
+| `--format <mode>` | Output format: `markdown` or `json` | `markdown` |
+| `--no-interactive` | Skip all AskUserQuestion prompts, use defaults | (interactive) |
 
 ---
 
@@ -41,10 +44,13 @@ CURRENT_BRANCH=$(git branch --show-current)
 PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q '.headRefName')
 ```
 
-**If not on PR branch:** Use AskUserQuestion to offer checkout:
-- "Checkout PR branch" - Run `gh pr checkout $PR_NUMBER`
-- "Review from current branch" - Continue without checkout
-- "Cancel" - Abort review
+**If not on PR branch:**
+
+- **Interactive (default):** Use AskUserQuestion to offer checkout:
+  - "Checkout PR branch" - Run `gh pr checkout $PR_NUMBER`
+  - "Review from current branch" - Continue without checkout
+  - "Cancel" - Abort review
+- **`--no-interactive`:** Continue without checkout (equivalent to "Review from current branch")
 
 ```bash
 # Get diff for PR
@@ -86,10 +92,12 @@ git diff $(gh pr view $PR_NUMBER --json baseRefName -q '.baseRefName')...HEAD
    git diff --stat $BASE_BRANCH...HEAD
    ```
 
-4. **On main with unclear scope**: Use AskUserQuestion:
-   - "Recent commits (HEAD~5)" - Review last 5 commits
-   - "Custom range" - Prompt for range
-   - "Cancel" - Abort
+4. **On main with unclear scope**:
+   - **Interactive (default):** Use AskUserQuestion:
+     - "Recent commits (HEAD~5)" - Review last 5 commits
+     - "Custom range" - Prompt for range
+     - "Cancel" - Abort
+   - **`--no-interactive`:** Default to `HEAD~5..HEAD`
 
 **Scope output needed:**
 - Commit range (BASE_SHA..HEAD_SHA)
@@ -210,6 +218,7 @@ OUTPUT as JSON to stdout:
       "line": 45,
       "side": "RIGHT",
       "severity": "medium",
+      "size_estimate": "M",
       "category": "SOLID:SRP",
       "body": "[Architecture] **medium** - SOLID:SRP\n\nThis module handles both X and Y..."
     }
@@ -222,6 +231,12 @@ Severity guide:
 - high: Significant issue worth blocking
 - medium: Worth addressing, not blocking
 - low: Suggestion for improvement
+
+Size estimate (effort to fix):
+- S: Trivial fix, <10 lines changed
+- M: Moderate, 10-50 lines or needs some thought
+- L: Significant refactor, 50-200 lines or cross-file
+- XL: Major restructuring, 200+ lines or architectural change
 
 Only flag genuine concerns. No nitpicks.
 ")
@@ -292,6 +307,7 @@ OUTPUT as JSON to stdout:
       "line": 112,
       "side": "RIGHT",
       "severity": "high",
+      "size_estimate": "S",
       "category": "bug",
       "confidence": 85,
       "body": "[Code:<domain>] **high** - bug (85% confidence)\n\nError from DoThing() is not checked..."
@@ -305,6 +321,12 @@ Severity guide:
 - high: Likely bug or security issue
 - medium: Code smell or minor bug risk
 - low: Style or minor improvement
+
+Size estimate (effort to fix):
+- S: Trivial fix, <10 lines changed
+- M: Moderate, 10-50 lines or needs some thought
+- L: Significant refactor, 50-200 lines or cross-file
+- XL: Major restructuring, 200+ lines or architectural change
 
 Only report findings with ≥80% confidence.
 ")
@@ -361,6 +383,7 @@ OUTPUT as JSON to stdout:
       "line": 78,
       "side": "RIGHT",
       "severity": "critical",
+      "size_estimate": "M",
       "category": "injection",
       "body": "[Security] **critical** - injection\n\nSQL query built via string concatenation..."
     }
@@ -373,6 +396,12 @@ Severity guide:
 - high: Significant security risk
 - medium: Defense-in-depth issue
 - low: Hardening suggestion
+
+Size estimate (effort to fix):
+- S: Trivial fix, <10 lines changed
+- M: Moderate, 10-50 lines or needs some thought
+- L: Significant refactor, 50-200 lines or cross-file
+- XL: Major restructuring, 200+ lines or architectural change
 
 Flag anything exploitable. Be thorough but not paranoid.
 ")
@@ -389,6 +418,7 @@ After all reviewers complete (including multiple domain code reviewers if split)
 2. **Dedupe by file+line**
    - Key: `${path}:${line}`
    - Keep finding with higher severity
+   - Keep larger `size_estimate` on merge (XL > L > M > S)
    - Merge bodies if from different reviewers or different domain code reviewers
 
 3. **Apply `--min-severity` filter**
@@ -401,6 +431,66 @@ After all reviewers complete (including multiple domain code reviewers if split)
 ---
 
 ## Phase 5: Output
+
+Output behavior depends on `--format` and `--output-file` flags:
+
+| `--format` | `--output-file` | Behavior |
+|------------|-----------------|----------|
+| `markdown` (default) | not set | Inline report to conversation |
+| `markdown` | set | Write markdown report to file |
+| `json` | not set | Print JSON to conversation |
+| `json` | set | Write JSON to file |
+
+### JSON Output Format (`--format json`)
+
+When `--format json` is specified, produce machine-readable output:
+
+```json
+{
+  "scope": {
+    "commit_range": "abc123..def456",
+    "commit_count": 5,
+    "files_changed": 12,
+    "loc_changed": 340
+  },
+  "verdict": "issues_found",
+  "summaries": {
+    "architecture": { "verdict": "pass", "summary": "Clean module boundaries" },
+    "code": { "verdict": "issues", "summary": "2 unchecked errors" },
+    "security": { "verdict": "pass", "summary": "No vulnerabilities found" }
+  },
+  "findings": [
+    {
+      "id": "f1",
+      "reviewer": "code",
+      "domain": "backend",
+      "path": "pkg/handler.go",
+      "line": 112,
+      "side": "RIGHT",
+      "severity": "high",
+      "size_estimate": "S",
+      "category": "bug",
+      "confidence": 85,
+      "body": "Error from DoThing() is not checked...",
+      "bead_id": "beads-abc123"
+    }
+  ],
+  "stats": {
+    "total": 5,
+    "by_severity": { "critical": 0, "high": 2, "medium": 2, "low": 1 },
+    "by_size": { "S": 3, "M": 1, "L": 1, "XL": 0 }
+  }
+}
+```
+
+Notes:
+- `verdict` is one of: `pass`, `issues_found`, `critical_issues`
+- `bead_id` is present only when beads are created (omitted with `--skip-beads`)
+- `confidence` is present only for code reviewer findings
+
+### File Output (`--output-file <path>`)
+
+When `--output-file` is specified, write the output (markdown or JSON per `--format`) to the given file path instead of printing inline. Always confirm the write succeeded and print the path.
 
 ### Local Mode
 
@@ -417,7 +507,9 @@ Priority mapping:
 - medium → P2
 - low → P3
 
-**Generate inline report:**
+**Generate report** (format depends on `--format` flag):
+
+#### Markdown Report (default)
 
 ````markdown
 ## Review: <scope description> (<N> commits, <LOC> across <M> files)
@@ -425,18 +517,18 @@ Priority mapping:
 ### Verdict: <emoji> <summary>
 
 **Critical** (<count>)
-1. `file:line` - <description> → bead <id>
+1. `file:line` [XL] - <description> → bead <id>
 
 **High** (<count>)
-2. `file:line` - <description> → bead <id>
+2. `file:line` [S] - <description> → bead <id>
 ...
 
 **Medium** (<count>)
-- `file:line` - <description> → bead <id>
+- `file:line` [M] - <description> → bead <id>
 ...
 
 **Low** (<count>)
-- `file:line` - <description> → bead <id>
+- `file:line` [S] - <description> → bead <id>
 ...
 
 **Architecture**: <PASS/ISSUES verdict + summary>
@@ -452,6 +544,9 @@ Verdict emojis:
 - ⚠️ ISSUES FOUND - Has important/minor issues
 - 🚨 CRITICAL ISSUES - Has critical issues
 
+Size tags (in brackets after file:line):
+- `[S]` `[M]` `[L]` `[XL]` — estimated fix effort
+
 **Tag checkpoint** (after report output):
 
 ```bash
@@ -466,9 +561,11 @@ This moves (or creates) the review tag to HEAD so the next `/review` starts from
 
 **Step 1: Show preview** of what will be posted (same format as local inline report, without bead references)
 
-**Step 2: Confirm with AskUserQuestion:**
-- "Post to GitHub" - Proceed with posting
-- "Cancel" - Abort without posting
+**Step 2: Confirm posting:**
+- **Interactive (default):** Use AskUserQuestion:
+  - "Post to GitHub" - Proceed with posting
+  - "Cancel" - Abort without posting
+- **`--no-interactive`:** Post immediately without confirmation
 
 **Step 3: Post review via GitHub API:**
 
@@ -528,4 +625,10 @@ gh api repos/$OWNER_REPO/pulls/$PR_NUMBER/reviews \
 
 # PR review, security only
 /dm-work:review --pr 123 --only s
+
+# Automated/nightly: JSON output to file, no prompts, no beads
+/dm-work:review --format json --output-file review-findings.json --no-interactive --skip-beads
+
+# Automated: write markdown report to file
+/dm-work:review --output-file review-report.md --no-interactive
 ```
