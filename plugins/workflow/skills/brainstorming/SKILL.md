@@ -33,6 +33,19 @@ Before asking questions:
 - Constraints: What must it work with?
 - Success criteria: How do we know it's done?
 
+### Value Pre-flight
+
+Before exploring approaches, run these four checks on the idea:
+
+| Check | Question | Red Flag |
+|-------|----------|----------|
+| **Clarity** | Can someone explain what this does in one sentence? | They describe internals, not outcomes |
+| **Timeline** | Is the value immediate or does it compound over time? | Neither — value is vague or hypothetical |
+| **Perception** | Can the user see/feel it working? | Value is invisible or requires explanation |
+| **Discovery** | Does the user seek this out, or must they stumble into it? | Must be explained repeatedly to new users |
+
+Any red flags → address them as design constraints in Phase 2, not afterthoughts.
+
 ---
 
 ## Phase 2: Exploring Approaches
