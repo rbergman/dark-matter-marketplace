@@ -122,6 +122,30 @@ node_modules/
 __pycache__/
 ```
 
+### .claudeignore
+
+Every repo should have a `.claudeignore` file. Claude Code indexes everything it can see — without ignore patterns, it reads build artifacts, generated files, and large binaries, wasting massive token budget. This is the single highest-impact CC optimization.
+
+**Universal base (all projects):**
+
+```
+.worktrees/
+*.log
+.DS_Store
+```
+
+**Add language-specific patterns:**
+
+| Language | Patterns |
+|----------|----------|
+| TypeScript/Node | `node_modules/`, `dist/`, `build/`, `.next/`, `coverage/`, `*.tsbuildinfo`, `.turbo/`, `.cache/` |
+| Python | `__pycache__/`, `.venv/`, `venv/`, `*.pyc`, `.mypy_cache/`, `.pytest_cache/`, `dist/`, `build/`, `*.egg-info/` |
+| Go | `vendor/`, `bin/` |
+| Rust | `target/` |
+| AI/ML | `output/`, `models/`, `*.safetensors`, `*.ckpt`, `*.pt`, `*.bin`, `checkpoints/` |
+
+**For multi-language repos:** Combine all relevant language patterns.
+
 ---
 
 ## Step 3: AGENTS.md
@@ -296,7 +320,7 @@ Point user to language-specific setup:
 ```bash
 # Full manual init sequence
 git init
-# Create .gitignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
+# Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
 bd init -q
 bd onboard
 mise use just@latest
@@ -308,6 +332,7 @@ mise use just@latest
 For monorepos, the root gets:
 - Root `justfile` with module imports (see just-pro monorepo patterns)
 - Root `.mise.toml` with shared tooling
+- Root `.claudeignore` combining patterns for all languages in the monorepo
 - Single `.beads/` at root
 
 Each package gets:

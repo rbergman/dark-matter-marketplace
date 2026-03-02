@@ -38,6 +38,12 @@
       "depends_on": ["git-init"]
     },
     {
+      "id": "claudeignore",
+      "title": "Create .claudeignore for {{lang}}",
+      "description": "Create .claudeignore with universal base (.worktrees/, *.log, .DS_Store) plus language-specific patterns. See repo-init SKILL.md for per-language templates. This is the highest-impact CC token optimization.",
+      "depends_on": ["git-init"]
+    },
+    {
       "id": "claude-md",
       "title": "Create CLAUDE.md",
       "description": "Create project conventions file with: Overview, Development commands (just setup, just check), Conventions section, Architecture section. Keep minimal initially.",

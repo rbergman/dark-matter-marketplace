@@ -112,8 +112,11 @@ Items marked SETTLED should not be revisited unless the user explicitly asks.
 | `AGENTS.md` (+ `CLAUDE.md` symlink) | Team-shared project instructions | Yes |
 | `CLAUDE.local.md` | Personal project prefs (sandbox URLs, local paths) | No (auto-gitignored) |
 | `.claude/rules/*.md` | Modular topic rules, optionally path-scoped | Yes |
+| `.claudeignore` | Patterns for CC to skip (build artifacts, large files) | Yes |
 
 For personal prefs that should work across worktrees, use imports: `@~/.claude/my-project-instructions.md` in your `CLAUDE.local.md`.
+
+**Deduplication:** If your `~/.claude/CLAUDE.md` already covers Prime Directive, Quality Gates, or Role sections, remove those sections from this file. Per-repo AGENTS.md should contain only project-specific content. Cross-repo policies belong in `~/.claude/rules/`.
 
 ---
 
