@@ -129,9 +129,48 @@ Every repo should have a `.claudeignore` file. Claude Code indexes everything it
 **Universal base (all projects):**
 
 ```
-.worktrees/
+# Secrets — never leak into CC context
+.env
+.env.*
+.envrc
+secrets/
+*.pem
+*.key
+*.p12
+
+# Lock files (large, no signal)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+bun.lockb
+Cargo.lock
+go.sum
+Gemfile.lock
+poetry.lock
+
+# Source maps
+*.map
+
+# Binary assets (images, fonts)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Logs and OS
 *.log
+logs/
 .DS_Store
+
+# Agent working dirs
+.worktrees/
+history/
 ```
 
 **Add language-specific patterns:**

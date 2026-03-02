@@ -106,6 +106,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:tokf` | Skill | CLI output compression — reduce build/test/git noise by 60-99% before it reaches LLM context |
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
+| `dm-work:repo-health` | Skill | Audit repo config against CC and workflow best practices — severity-rated report with auto-fix |
 | `dm-work:srt` | Skill | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous runs |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
