@@ -180,6 +180,92 @@ If pending commit count is high (>20), note it as INFO — suggest `timbers log`
 
 ---
 
+## Step 5.5: Quality Gate Checks
+
+Verify the repo has infrastructure to catch problems before they ship. Detection uses the project type from Step 1.
+
+### 5.5.1 Build system (IMPORTANT)
+
+Check for `justfile` at repo root:
+
+```bash
+[ -f justfile ] || [ -f Justfile ] && echo "exists" || echo "missing"
+```
+
+If exists, verify it has core recipes:
+
+```bash
+just --list 2>/dev/null | grep -E '^\s*(check|test|setup|clean)\b'
+```
+
+| Recipe | Purpose | Severity if missing |
+|--------|---------|---------------------|
+| `check` or `test` | Quality gates | IMPORTANT |
+| `setup` | First-time setup | NICE |
+| `clean` | Remove artifacts | NICE |
+
+If no justfile at all → NICE (suggest creating via **just-pro** skill).
+
+### 5.5.2 Tool version pinning (NICE)
+
+```bash
+[ -f .mise.toml ] && echo "exists" || echo "missing"
+```
+
+If missing → NICE. Suggest `mise use <lang>@<version>` to pin.
+
+If exists, verify at least one tool is pinned (not just comments):
+
+```bash
+grep -E '^\w+\s*=' .mise.toml 2>/dev/null | grep -v '^#'
+```
+
+### 5.5.3 Language-specific quality configs (IMPORTANT)
+
+Check for expected configs based on detected language:
+
+| Language | Expected configs | What to check |
+|----------|-----------------|---------------|
+| Node/TS | `tsconfig.json` | `"strict": true` present |
+| Node/TS | ESLint config (`.eslintrc*`, `eslint.config.*`, `eslint` in `package.json`) | Config exists |
+| Python | `pyproject.toml` | Has `[tool.ruff]` or `[tool.pyright]` section |
+| Rust | `rust-toolchain.toml` or `Cargo.toml` | Clippy lints configured (`[lints.clippy]` or `clippy.toml`) |
+| Go | Built-in tooling | `go vet` and `staticcheck` mentioned in justfile/CI |
+
+Missing configs → IMPORTANT. Don't create them (too opinionated) — report and point to the relevant **lang-pro** skill.
+
+### 5.5.4 Test infrastructure (IMPORTANT)
+
+Verify tests can be discovered:
+
+```bash
+# Node/TS
+[ -f package.json ] && grep -q '"test"' package.json && echo "npm test configured"
+
+# Go
+find . -name '*_test.go' -maxdepth 3 | head -1 | grep -q . && echo "go tests found"
+
+# Rust
+grep -q '\[dev-dependencies\]' Cargo.toml 2>/dev/null || find . -name '*_test.rs' -o -path '*/tests/*.rs' | head -1 | grep -q . && echo "rust tests found"
+
+# Python
+find . -name 'test_*.py' -o -name '*_test.py' -maxdepth 3 | head -1 | grep -q . && echo "python tests found"
+```
+
+No test files found → IMPORTANT. Suggest creating initial test structure via **lang-pro** skill.
+
+### 5.5.5 CI/CD (NICE)
+
+```bash
+[ -d .github/workflows ] && ls .github/workflows/*.yml .github/workflows/*.yaml 2>/dev/null | head -5
+```
+
+No CI workflows → NICE for private repos. IMPORTANT for repos with a remote and collaborators.
+
+If CI exists, verify it runs quality gates (grep for `test`, `check`, `lint` in workflow files).
+
+---
+
 ## Step 6: Present Report
 
 Collect all findings and present as a severity-grouped table:
@@ -200,6 +286,9 @@ Detected: <language(s)>, <project-type>
 |-------|--------|-----|
 | .claudeignore covers lock files | Missing Cargo.lock | Add pattern? |
 | CLAUDE.md size | 147 lines (~920 tokens) | Run /compress? |
+| Quality gates recipe | No `just check` recipe | Add to justfile? |
+| TypeScript strict mode | `"strict": false` in tsconfig | Enable strict? |
+| Test infrastructure | No test files found | See typescript-pro skill |
 
 ### NICE TO HAVE
 | Check | Status | Fix |
@@ -218,6 +307,9 @@ Detected: <language(s)>, <project-type>
 ✓ .claudeignore covers secrets
 ✓ Beads initialized and healthy
 ✓ No CLAUDE.md/AGENTS.md duplication
+✓ just check recipe exists
+✓ tsconfig.json strict mode enabled
+✓ CI workflow runs quality gates
 ```
 
 ---
