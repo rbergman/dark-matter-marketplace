@@ -222,17 +222,90 @@ grep -E '^\w+\s*=' .mise.toml 2>/dev/null | grep -v '^#'
 
 ### 5.5.3 Language-specific quality configs (IMPORTANT)
 
-Check for expected configs based on detected language:
+Each **lang-pro** skill ships strict reference configs that enforce complexity limits, file/function length caps, and comprehensive lint rules. Repos should adopt these configs — they represent the quality floor.
 
-| Language | Expected configs | What to check |
-|----------|-----------------|---------------|
-| Node/TS | `tsconfig.json` | `"strict": true` present |
-| Node/TS | ESLint config (`.eslintrc*`, `eslint.config.*`, `eslint` in `package.json`) | Config exists |
-| Python | `pyproject.toml` | Has `[tool.ruff]` or `[tool.pyright]` section |
-| Rust | `rust-toolchain.toml` or `Cargo.toml` | Clippy lints configured (`[lints.clippy]` or `clippy.toml`) |
-| Go | Built-in tooling | `go vet` and `staticcheck` mentioned in justfile/CI |
+**Do NOT auto-create or auto-update configs.** Instead: read the repo's current config, read the lang-pro reference, analyze the diff, and present the user with specific recommendations. Let the user decide what to adopt.
 
-Missing configs → IMPORTANT. Don't create them (too opinionated) — report and point to the relevant **lang-pro** skill.
+#### Go — check against `go-pro/references/golangci-v2.yml`
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| `.golangci.yml` exists | This is where Go quality lives — without it, only `go vet` runs | IMPORTANT |
+| Linter count | Reference enables 40+ linters (funlen, gocognit, gosec, errcheck, etc.) | IMPORTANT |
+| Complexity limits | `funlen: 60 lines / 40 statements`, `gocognit: 15`, `cyclop: 10` | IMPORTANT |
+| File length | `revive file-length-limit: 350` | IMPORTANT |
+| Line length | `lll: 140` | NICE |
+| Formatters | `gofumpt` + `gci` enabled | NICE |
+
+If `.golangci.yml` exists but is weak (few linters, no complexity limits), diff against the reference and present gaps.
+
+#### TypeScript — check against `typescript-pro/references/`
+
+Two configs to check:
+
+**`tsconfig.json`** vs `tsconfig.strict.json` reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| `"strict": true` | Base requirement | IMPORTANT |
+| `"noUncheckedIndexedAccess": true` | Catches undefined from index access | IMPORTANT |
+| `"exactOptionalPropertyTypes": true` | Distinguishes undefined from optional | IMPORTANT |
+| `"noImplicitReturns": true` | All code paths return | IMPORTANT |
+| `"verbatimModuleSyntax": true` | Enforces type-only imports | NICE |
+
+**`eslint.config.js`** vs `eslint.config.js` reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| ESLint config exists | Any ESLint config file present | IMPORTANT |
+| `strictTypeChecked` preset | Reference uses `tseslint.configs.strictTypeChecked` | IMPORTANT |
+| Zero-any rules | `no-explicit-any`, `no-unsafe-*` family all set to `error` | IMPORTANT |
+| Floating promises | `no-floating-promises` set to `error` | IMPORTANT |
+| Complexity limits | `complexity: 10`, `max-lines-per-function: 60`, `max-lines: 400`, `max-depth: 4` | IMPORTANT |
+| Comment discipline | `no-restricted-disable` blocks disabling critical rules | NICE |
+
+#### Rust — check against `rust-pro/references/`
+
+Three configs:
+
+**`clippy.toml`** reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| `clippy.toml` exists | Complexity thresholds configured | IMPORTANT |
+| `cognitive-complexity-threshold = 15` | Function complexity cap | IMPORTANT |
+| `too-many-lines-threshold = 50` | Function length cap | IMPORTANT |
+| `too-many-arguments-threshold = 5` | Parameter count cap | IMPORTANT |
+
+**`Cargo.toml` `[lints]`** vs `cargo_lints.toml` reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| `[lints.clippy]` section exists | Central lint configuration | IMPORTANT |
+| Pedantic/nursery/cargo groups enabled | `pedantic = "warn"`, etc. | IMPORTANT |
+| Panic prevention denies | `unwrap_used`, `expect_used`, `panic`, `indexing_slicing` = `"deny"` | IMPORTANT |
+| Type safety denies | `as_conversions`, `cast_*` family = `"deny"` | IMPORTANT |
+| `unsafe_code = "deny"` in `[lints.rust]` | Safety guarantee | IMPORTANT |
+
+**`rustfmt.toml`** — check exists.
+
+#### Python — check against `python-pro/references/`
+
+**`pyproject.toml`** ruff section vs `pyproject-ruff.toml` reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| `[tool.ruff]` section exists | Primary linter configured | IMPORTANT |
+| Rule selection breadth | Reference selects: E, W, F, I, B, C4, UP, ARG, SIM, TCH, PTH, RUF | IMPORTANT |
+| `target-version` set | Ensures modern Python features | NICE |
+
+**Type checking** vs `pyrightconfig.json` reference:
+
+| Check | What to look for | Severity |
+|-------|-----------------|----------|
+| Pyright or mypy configured | `pyrightconfig.json`, or `[tool.pyright]`/`[tool.mypy]` in pyproject.toml | IMPORTANT |
+| `"typeCheckingMode": "strict"` | Maximum type safety | IMPORTANT |
+| `reportUnknown*Type` rules enabled | Catches untyped code | IMPORTANT |
 
 ### 5.5.4 Test infrastructure (IMPORTANT)
 
