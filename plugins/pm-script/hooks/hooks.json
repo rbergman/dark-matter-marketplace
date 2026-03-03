@@ -1,5 +1,5 @@
 {
-  "description": "PM control plane hooks — active only when .pm/ exists",
+  "description": "PM control plane hooks — active only when .pm/config.toml exists (not in worker worktrees)",
   "hooks": {
     "PreCompact": [
       {

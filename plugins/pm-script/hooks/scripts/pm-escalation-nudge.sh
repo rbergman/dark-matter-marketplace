@@ -5,7 +5,8 @@
 
 set -euo pipefail
 
-if [ ! -d .pm ]; then
+# Only activate in PM control plane (has config.toml), not in worker worktrees
+if [ ! -f .pm/config.toml ]; then
   exit 0
 fi
 

@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # PreCompact hook: Inject PM state summary before context compaction.
-# When .pm/ exists, outputs a systemMessage with worker status so the
-# post-compaction context knows to resume PM operations.
+# When .pm/config.toml exists (PM control plane, not worker worktree),
+# outputs a systemMessage with worker status so post-compaction context
+# knows to resume PM operations.
 # Exit 0 always — never block compaction.
 
 set -euo pipefail
 
-if [ ! -d .pm ]; then
+# Only activate in PM control plane (has config.toml), not in worker worktrees
+# (which only have .pm/worker-escalations.jsonl).
+if [ ! -f .pm/config.toml ]; then
   exit 0
 fi
 
