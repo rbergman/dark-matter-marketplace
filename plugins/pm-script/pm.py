@@ -237,10 +237,12 @@ def respond_to_escalation(pm_dir: Path, escalation_id: str, action: str) -> dict
             updated = rec
             break
     if updated:
-        # Rewrite ledger (small file, acceptable for Phase 1)
-        with open(ledger_path, "w") as f:
+        # Atomic rewrite: write to temp, then rename (crash-safe on POSIX)
+        tmp = ledger_path.with_suffix(".tmp")
+        with open(tmp, "w") as f:
             for rec in records:
                 f.write(json.dumps(rec) + "\n")
+        tmp.replace(ledger_path)
     return updated
 
 
@@ -449,28 +451,61 @@ async def remove_worktree(root: Path, worktree_path: Path) -> None:
 
 
 async def merge_to_integration(root: Path, worker_branch: str, integration_branch: str) -> tuple[bool, str]:
-    """Merge worker branch into integration branch. Returns (success, message)."""
+    """Merge worker branch into integration branch using a temporary worktree.
+
+    Never touches the user's working tree — all merge work happens in a
+    disposable worktree under .worktrees/.
+    """
     # Ensure integration branch exists
     code, _, _ = await _git(["rev-parse", "--verify", integration_branch], cwd=root)
     if code != 0:
         await _git(["branch", integration_branch, "main"], cwd=root)
 
-    await _git(["checkout", integration_branch], cwd=root)
-    code, out, err = await _git(["merge", "--no-ff", worker_branch, "-m", f"Merge {worker_branch} into {integration_branch}"], cwd=root)
-    # Return to previous branch
-    await _git(["checkout", "-"], cwd=root)
+    # Create temporary worktree for the merge
+    merge_wt = root / ".worktrees" / "_pm_merge"
+    merge_wt.parent.mkdir(parents=True, exist_ok=True)
+    # Clean up stale worktree if it exists
+    if merge_wt.exists():
+        await _git(["worktree", "remove", "--force", str(merge_wt)], cwd=root)
+    code, _, err = await _git(["worktree", "add", str(merge_wt), integration_branch], cwd=root)
     if code != 0:
-        return False, err
-    return True, out
+        return False, f"Failed to create merge worktree: {err}"
+
+    try:
+        code, out, err = await _git(
+            ["merge", "--no-ff", worker_branch, "-m", f"Merge {worker_branch} into {integration_branch}"],
+            cwd=merge_wt,
+        )
+        if code != 0:
+            # Abort the failed merge in the worktree
+            await _git(["merge", "--abort"], cwd=merge_wt)
+            return False, err
+        return True, out
+    finally:
+        await _git(["worktree", "remove", "--force", str(merge_wt)], cwd=root)
 
 
 async def fast_forward_main(root: Path, integration_branch: str) -> tuple[bool, str]:
-    """Fast-forward main to integration branch."""
-    await _git(["checkout", "main"], cwd=root)
-    code, out, err = await _git(["merge", "--ff-only", integration_branch], cwd=root)
+    """Fast-forward main to the integration branch tip.
+
+    Uses git update-ref to avoid checking out main in the user's working tree.
+    Only succeeds if main is an ancestor of the integration branch (true ff).
+    """
+    # Verify fast-forward is possible
+    code, _, _ = await _git(["merge-base", "--is-ancestor", "main", integration_branch], cwd=root)
+    if code != 0:
+        return False, f"Cannot fast-forward: main is not an ancestor of {integration_branch}"
+
+    # Get the integration branch tip
+    _, tip_sha, _ = await _git(["rev-parse", integration_branch], cwd=root)
+    if not tip_sha:
+        return False, "Could not resolve integration branch"
+
+    # Update main ref directly (no checkout needed)
+    code, out, err = await _git(["update-ref", "refs/heads/main", tip_sha], cwd=root)
     if code != 0:
         return False, err
-    return True, out
+    return True, f"main updated to {tip_sha[:8]}"
 
 
 async def get_head_sha(cwd: Path) -> str:
@@ -692,12 +727,17 @@ class ClaudeCLIBackend:
 
 
 class AgentSDKBackend:
-    """Worker backend using the Claude Agent SDK (optional)."""
+    """Worker backend using the Claude Agent SDK.
+
+    NOTE: Phase 1 stub — currently shells out to `claude -p` identically to
+    ClaudeCLIBackend. Requires claude-code-sdk to be installed as a signal that
+    the user intends SDK-style usage. True SDK streaming integration (real token
+    counts, native cancellation) is deferred to Phase 2.
+    """
 
     def __init__(self) -> None:
         try:
             import claude_code_sdk  # noqa: F401
-            self._sdk = claude_code_sdk
         except ImportError:
             _die("claude-code-sdk not installed. Use --backend=claude-cli or install with: pip install claude-code-sdk")
 
@@ -754,13 +794,20 @@ def _get_bead_context(bead_id: str) -> str:
 
 
 def _poll_escalations(pm_dir: Path) -> list[dict]:
-    """Poll the worker-escalations.jsonl file for new escalations from the worker."""
+    """Poll the worker-escalations.jsonl file for new escalations from the worker.
+
+    Uses rename-read-delete to avoid TOCTOU race with the worker appending.
+    """
     esc_path = pm_dir / "worker-escalations.jsonl"
     if not esc_path.exists():
         return []
-    records = _jsonl_read(esc_path)
-    # Clear the file after reading
-    esc_path.write_text("")
+    tmp = esc_path.with_suffix(".reading")
+    try:
+        esc_path.rename(tmp)  # atomic on POSIX
+    except FileNotFoundError:
+        return []
+    records = _jsonl_read(tmp)
+    tmp.unlink(missing_ok=True)
     return records
 
 
@@ -894,14 +941,20 @@ async def run_bead(bead_id: str, config: PMConfig) -> None:
     exit_code, output = await backend.wait(session) if session.returncode is None else (session.returncode, "")
     elapsed = time.monotonic() - session_start
 
-    # Record cost (rough estimate from CLI output)
+    # Propagate token count from session to state
+    if session.token_count > 0:
+        state.session_token_count = session.token_count
+        state.bead_token_count += session.token_count
+
+    # Record cost (use session tokens if available, else rough estimate)
+    input_tokens = state.session_token_count or 50000
     record_cost(config.pm_dir, CostEntry(
         timestamp=_now_iso(),
         worker_id=state.id,
         bead_id=bead_id,
         model=config.model,
-        input_tokens=state.session_token_count or 50000,  # estimate if not available
-        output_tokens=state.session_token_count // 3 or 15000,
+        input_tokens=input_tokens,
+        output_tokens=input_tokens // 3 or 15000,
         session_number=state.rotation_count + 1,
     ))
 
@@ -961,17 +1014,15 @@ def cmd_init(args: argparse.Namespace) -> None:
 def cmd_run(args: argparse.Namespace) -> None:
     config = PMConfig.load(Path.cwd())
 
-    # If worker is blocked and we have a pending response, resume
+    # Refuse to run if worker is blocked — human must respond first
     active = find_active_worker(config.pm_dir)
     if active and active.status == "blocked" and active.pending_escalation:
-        pending_id = active.pending_escalation.get("id")
-        if pending_id:
-            resp = respond_to_escalation(config.pm_dir, pending_id, "approve-only")
-            if resp:
-                print(f"Auto-resolved pending escalation {pending_id}")
-                active.pending_escalation = None
-                active.status = "active"
-                save_journal(config.pm_dir, active)
+        esc = active.pending_escalation
+        print(f"Worker {active.id} is blocked on escalation {esc.get('id')}:")
+        print(f"  [{esc.get('domain')}] {esc.get('description', '')[:80]}")
+        print(f"\nRespond first: python pm.py respond {esc.get('id')} <action>")
+        print("Actions: approve-only | approve+relax | approve+tighten | reject | defer")
+        sys.exit(1)
 
     asyncio.run(run_bead(args.bead_id, config))
 
@@ -1107,7 +1158,7 @@ def cmd_shutdown(args: argparse.Namespace) -> None:
     worker.status = "suspended"
     save_journal(pm_dir, worker)
     print(f"Worker {worker.id} suspended. Worktree preserved at {worker.worktree_path}")
-    print("Resume later with: python pm.py run {worker.bead_id}")
+    print(f"Resume later with: python pm.py run {worker.bead_id}")
 
 
 def main() -> None:
