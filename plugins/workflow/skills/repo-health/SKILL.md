@@ -55,11 +55,11 @@ If exists → verify it covers:
 | Category | Patterns to check | Severity |
 |----------|--------------------|----------|
 | Secrets | `.env`, `.env.*`, `.envrc`, `*.pem`, `*.key` | CRITICAL |
-| Lock files | `package-lock.json`, `yarn.lock`, `Cargo.lock`, `go.sum`, etc. | IMPORTANT |
+| Lock files | `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `Cargo.lock`, `go.sum`, `poetry.lock`, `uv.lock` | IMPORTANT |
 | Source maps | `*.map` | IMPORTANT |
-| Binary assets | `*.png`, `*.jpg`, `*.svg`, `*.woff`, etc. | IMPORTANT |
+| Binary assets | `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.ico`, `*.svg`, `*.woff`, `*.woff2`, `*.ttf`, `*.eot` | IMPORTANT |
 | Build output | Language-specific (`node_modules/`, `target/`, `dist/`, etc.) | IMPORTANT |
-| Agent dirs | `.worktrees/`, `history/` | NICE |
+| Agent dirs | `.worktrees/`, `.beads/`, `.timbers/`, `history/` | IMPORTANT |
 
 Report each missing category separately.
 
@@ -74,10 +74,12 @@ wc -l CLAUDE.md AGENTS.md 2>/dev/null
 
 ### 2.3 CLAUDE.md / AGENTS.md duplication (IMPORTANT)
 
-If both files exist and neither is a symlink:
-- Check if CLAUDE.md is a symlink to AGENTS.md (`readlink CLAUDE.md`)
-- If not a symlink, check for content overlap (shared headings, similar line counts)
-- Flag duplication, suggest stub pattern or symlink
+If both files exist:
+
+1. **Check symlinks first** — run `readlink CLAUDE.md` and `readlink AGENTS.md`
+2. If either is a symlink to the other → **PASSED** ("unified via symlink — zero-maintenance dedup")
+3. If both are regular files → check for content overlap (shared headings, similar line counts)
+4. If overlap detected → flag as IMPORTANT, suggest **either** a stub pattern or symlink as valid dedup strategies — don't prescribe one over the other
 
 ### 2.4 Global config duplication (NICE)
 
