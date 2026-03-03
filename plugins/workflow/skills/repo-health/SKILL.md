@@ -127,11 +127,23 @@ command -v bd >/dev/null 2>&1 && echo "installed" || echo "not installed"
 [ -d .beads ] && echo "initialized" || echo "not initialized"
 ```
 
-### 4.2 If beads installed but not initialized (IMPORTANT)
+### 4.2 Beads version (IMPORTANT)
+
+```bash
+bd --version 2>/dev/null
+```
+
+**Pin to the latest pre-0.50 release** (currently 0.49.x). Beads 0.50+ migrated from SQLite to a Dolt backend. Dolt is a version-controlled SQL database that requires separate installation (`brew install dolt`) and server management. The migration path has known issues (data import failures, missing tables post-upgrade). Until a unified dolt support strategy is established:
+
+- If version is 0.50+: flag as IMPORTANT — downgrade recommended, migration bugs are active
+- If version is pre-0.50 but outdated within 0.49.x: flag as NICE — suggest updating to latest 0.49.x
+- Pin in `.mise.toml`: `beads = "0.49"` (mise will resolve to latest 0.49.x)
+
+### 4.3 If beads installed but not initialized (IMPORTANT)
 
 Suggest `bd init -q && bd onboard` for project repos. Skip for config/docs-only repos.
 
-### 4.3 If beads initialized — run doctor (NICE)
+### 4.4 If beads initialized — run doctor (NICE)
 
 ```bash
 bd doctor 2>/dev/null
@@ -139,7 +151,7 @@ bd doctor 2>/dev/null
 
 Surface any warnings or failures.
 
-### 4.4 `.beads/` in `.gitignore` check (IMPORTANT)
+### 4.5 `.beads/` in `.gitignore` check (IMPORTANT)
 
 Beads tracks its own files in git, but `.beads/beads.db*` should NOT be tracked. Check:
 
