@@ -5,3 +5,4 @@
 .cursor/
 .beads/
 history/
+__pycache__/

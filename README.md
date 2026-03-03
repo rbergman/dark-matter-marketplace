@@ -159,12 +159,13 @@ Language-specific expertise with strict, opinionated standards.
 
 ### dm-pmgr (pm-script/)
 
-Architecture reference for the PM Script — a Level 7.5 project manager that sits between a human director and a swarm of Claude Code worker sessions. The PM is a Python script (not a CC session) using the Claude Agent SDK, with targeted LLM calls at decision points.
+Level 7.5 project manager — a Python script that sits between a human director and a Claude Code worker session. Spawns workers via `claude -p` (CLI backend) or the Claude Agent SDK. PM logic is deterministic; the only LLM interaction is the worker session itself.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `pm-script-architecture.md` | Reference | Comprehensive architecture doc covering escalation engine, worker lifecycle, NL interface, demo/coherence systems |
-| `piloting-guide.md` | Reference | How to start using PM Script, phase by phase — config, first run, what to watch for |
+| `pm.py` | Script | Phase 1 MVP — single worker, escalation routing, cost tracking, gate execution, session rotation |
+| `pm-script-architecture.md` | Reference | Full architecture: escalation engine, worker lifecycle, NL interface, demo/coherence |
+| `piloting-guide.md` | Reference | How to start using PM Script, phase by phase |
 
 ### dm-team (teams/)
 

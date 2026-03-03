@@ -6,32 +6,35 @@
 
 ## Prerequisites
 
-- Python 3.11+
-- [Claude Agent SDK](https://github.com/anthropics/agent-sdk) (`pip install claude-agent-sdk`)
+- Python 3.11+ (stdlib only — no pip installs required for CLI backend)
 - Git (for worktree management)
+- Claude Code CLI (`claude`) for the CLI backend
 - A project with a `just check` gate (or configure a custom gate command)
-- Beads CLI (`bd`) for issue tracking
+- Beads CLI (`bd`) for issue tracking (optional but recommended)
 
 ## Phase 1: Single Worker MVP
 
 Start here. One worker, one bead, CLI frontend. The goal is to replace "human manually directs a CC session" with "script directs a CC session while human reviews escalations."
 
+The implementation is `pm.py` — a single Python script with zero external dependencies.
+
 ### 1. Initialize PM state
 
 ```bash
-mkdir -p .pm/workers
+python pm.py init --name my-project --archetype greenfield
 ```
 
-Create `.pm/config.toml`:
+This creates `.pm/` with `config.toml`, ready to customize:
 
 ```toml
 [project]
 name = "my-project"
 archetype = "greenfield"    # or "mature" / "maintenance"
 phase = "feature"
+backend = "claude-cli"      # or "agent-sdk"
+model = "claude-sonnet-4-6"
 
 [workers]
-max_concurrent = 1
 session_token_limit = 150000
 bead_token_limit = 500000
 
@@ -40,29 +43,42 @@ check_command = "just check"
 timeout_seconds = 300
 ```
 
-### 2. Create your first escalation profile
+### 2. Pick a bead and run
 
-Copy the defaults — don't customize yet. The whole point of Phase 1 is to let the archetype defaults work and learn from your responses.
-
-```bash
-cp escalation-profile-template.toml .pm/escalation-profile.toml
-```
-
-### 3. Pick a bead and run
+No manual escalation profile setup needed — archetype defaults handle cold start.
 
 ```bash
 bd ready                          # Find a bead to work on
 python pm.py run <bead-id>        # PM spawns worker, you review escalations
 ```
 
-### 4. What to watch for
+### 3. Handle escalations
+
+```bash
+python pm.py escalations          # See pending Block decisions
+python pm.py respond <id> approve-only     # This specific decision is OK
+python pm.py respond <id> approve+relax    # OK, and similar things are too
+python pm.py respond <id> approve+tighten  # OK, but show me more of these
+python pm.py respond <id> reject           # Don't do this
+python pm.py respond <id> defer            # I'll decide later
+```
+
+### 4. Monitor progress
+
+```bash
+python pm.py status               # Worker state
+python pm.py cost                 # Token usage and USD estimates
+python pm.py ledger               # Decision history
+```
+
+### 5. What to watch for
 
 - **Escalation accuracy**: Is the PM blocking on the right things? Use `approve+relax` and `approve+tighten` to calibrate
 - **Worker autonomy**: Is the worker staying within file boundaries? Committing at checkpoints?
 - **Rotation**: Does the PM rotate smoothly when context gets large?
 - **Gate reliability**: Does `just check` catch real problems?
 
-### 5. When to move to Phase 2
+### 6. When to move to Phase 2
 
 You're ready when:
 - You've completed 3+ beads through the PM without manual intervention
@@ -95,10 +111,12 @@ shared_types = [
 
 | I want to... | Command |
 |--------------|---------|
+| Initialize PM | `python pm.py init --name <project> --archetype greenfield` |
 | Start the PM | `python pm.py run <bead-id>` |
 | See pending escalations | `python pm.py escalations` |
 | Respond to an escalation | `python pm.py respond <id> approve-only` |
-| Check worker status | `python pm.py workers` |
+| Check worker status | `python pm.py status` |
+| View cost dashboard | `python pm.py cost` |
 | View decision ledger | `python pm.py ledger` |
 | Shut down gracefully | `python pm.py shutdown` |
 | View PM config | `cat .pm/config.toml` |
