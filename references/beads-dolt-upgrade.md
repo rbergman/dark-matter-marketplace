@@ -25,7 +25,7 @@ Beads 0.58 removed SQLite entirely. The storage backend is now **Dolt** — a ve
 |-----------------|---------------|
 | SQLite file: `.beads/beads.db` | Dolt database: `.beads/dolt/` |
 | `bd sync` pushes via git refs | `bd dolt push` pushes via `refs/dolt/data` |
-| Manual `bd import` after corruption | Dolt handles integrity natively |
+| Manual `bd import` after corruption | Dolt journal can corrupt if CLI used while server runs (see Troubleshooting) |
 | `bd sync` (bidirectional) | `bd dolt push` / `bd dolt pull` (explicit direction) |
 
 The `bd sync` command still exists but is a **deprecated no-op**. All remote operations go through `bd dolt push` and `bd dolt pull`.
@@ -172,9 +172,12 @@ Beads does **not** auto-detect your git remote. You must add it manually:
 # Format: git+ssh:// version of your git remote
 bd dolt remote add origin "git+ssh://git@github.com/<owner>/<repo>.git"
 
-# Test the roundtrip
-bd dolt push
+# First push must be forced to establish common ancestor
+bd dolt push --force
+
+# Verify roundtrip
 bd dolt pull
+bd dolt push    # should work without --force now
 ```
 
 This uses `refs/dolt/data` in the same git repo — no separate server or credentials needed. Your existing SSH keys work.
@@ -201,9 +204,69 @@ rm AGENTS.md  # or: git checkout AGENTS.md
 git checkout .gitignore
 ```
 
-### 7. Replace `bd sync` in Scripts/Docs
+Note: `bd init` injects a `<!-- BEGIN BEADS INTEGRATION -->` block into AGENTS.md. If your AGENTS.md already has beads instructions, you'll get duplicates. The injected block also references `bd sync` (deprecated). Remove manually. Be aware `bd doctor --fix` re-injects it, so you may need to remove it again after running doctor.
+
+### 7. Clean Up Legacy Artifacts
+
+The old beads created worktrees and branches that 0.58 no longer uses:
+
+```bash
+# Remove orphaned beads-sync worktree and branch
+git worktree remove --force .git/beads-worktrees/beads-sync 2>/dev/null
+git branch -D beads-sync 2>/dev/null
+git push origin --delete beads-sync 2>/dev/null  # if pushed to remote
+rmdir .git/beads-worktrees 2>/dev/null            # if empty
+
+# Old SQLite and daemon files (harmless but noisy)
+# bd doctor --fix cleans some of these
+# .beads/.gitignore excludes all legacy files from git
+```
+
+### 8. Replace `bd sync` in Scripts/Docs
 
 Replace `bd sync` with `bd dolt push` in any automation, AGENTS.md, or workflow docs. `bd sync` is a no-op now.
+
+---
+
+## Troubleshooting
+
+### Journal corruption from concurrent CLI + SQL server writes
+
+**Symptom:** `invalid journal record length` errors, `dolt fsck` reports corruption.
+
+**Cause:** Using `dolt` CLI commands directly while the beads-managed SQL server is running. The CLI and server write to the same journal concurrently, corrupting it. This does **not** self-heal.
+
+**Prevention:** Never use raw `dolt` CLI commands while the SQL server is running. Use `bd dolt push` / `bd dolt pull` instead — they route through the server. If you must use the CLI, kill the server first:
+
+```bash
+kill $(cat .beads/dolt-server.pid)
+```
+
+**Recovery:**
+```bash
+# 1. Kill the server
+kill $(cat .beads/dolt-server.pid)
+
+# 2. Try journal repair (may lose uncommitted data)
+cd .beads/dolt/os && dolt fsck --revive-journal-with-data-loss
+
+# 3. If repair fails, clone fresh from remote
+cd .beads/dolt
+rm -rf os
+dolt clone <remote-url> os
+```
+
+After clone recovery, `bd dolt push` will fail with "no common ancestor". Fix with a one-time force push:
+```bash
+bd dolt push --force   # re-establishes common ancestor
+bd dolt push           # works normally after this
+```
+
+### "no common ancestor" on push
+
+Usually happens after a fresh `bd init` or clone recovery. The local and remote tracking refs haven't been linked yet.
+
+**Fix:** `bd dolt push --force` (one-time). Regular pushes work after.
 
 ---
 
