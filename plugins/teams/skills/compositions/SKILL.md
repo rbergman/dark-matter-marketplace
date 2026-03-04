@@ -61,7 +61,7 @@ The Analyst finds the holes. The Proposer tries to shrink scope. The Advocate pu
 
 **Use for:** parallel feature implementation, cross-layer changes.
 
-**CRITICAL:** Assign non-overlapping file sets per teammate. File ownership collisions cause merge conflicts and wasted tokens. The lead owns any shared files (interfaces, types, configs) and distributes them after coordinating with owners.
+Assign non-overlapping file sets per teammate — overlapping ownership causes merge conflicts and wasted tokens. The lead owns any shared files (interfaces, types, configs) and distributes them after coordinating with owners.
 
 Example file ownership split:
 ```

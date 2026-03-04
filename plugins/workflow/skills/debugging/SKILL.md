@@ -103,13 +103,13 @@ Before attempting any fix:
 3. **Verify Before Continuing**
    - Did it work? Yes → Phase 4
    - Didn't work? Form NEW hypothesis
-   - DON'T add more fixes on top
+   - Avoid stacking fixes — each added change obscures which one helped
 
 ### Phase 4: Implementation
 
 1. **Create Failing Test Case**
    - Simplest possible reproduction
-   - MUST have before fixing
+   - Create this before fixing — it proves the fix addresses the root cause
 
 2. **Implement Single Fix**
    - Address the root cause
@@ -124,14 +124,14 @@ Before attempting any fix:
 
    If you have attempted 2 or more distinct approaches to the same problem:
 
-   **STOP. Do not attempt a third approach.**
+   **Stop and regroup** — a third attempt without new information is unlikely to succeed.
 
    Instead:
    1. Summarize what you tried and why each failed
    2. Propose 2-3 alternative approaches with tradeoffs
    3. Ask the user to choose before continuing
 
-   This is NOT optional. Cycling through 3-4 failed approaches wastes entire sessions.
+   Cycling through 3-4 failed approaches wastes entire sessions and erodes confidence in each subsequent fix.
 
 ---
 
@@ -144,7 +144,7 @@ If you catch yourself thinking:
 - "I don't fully understand but this might work"
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before tracing data flow
-- "One more fix attempt" — **circuit breaker: STOP after 2 failed approaches**
+- "One more fix attempt" — **circuit breaker: stop and regroup after 2 failed approaches**
 
 ---
 

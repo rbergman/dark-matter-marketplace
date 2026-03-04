@@ -5,7 +5,7 @@ argument-hint: "[file paths]"
 
 # Align Steering Files
 
-Review steering files for alignment with Claude Opus 4.6 prompting best practices, then apply fixes.
+Review steering files and skill definitions for alignment with Claude Opus 4.6 prompting best practices, then apply fixes.
 
 ## Arguments
 
@@ -13,6 +13,7 @@ If file paths are provided, review those files. Otherwise, find and review the s
 - `CLAUDE.md` (project root)
 - `AGENTS.md` (project root)
 - `.claude/CLAUDE.md` (if present)
+- `SKILL.md` files (if reviewing a plugin)
 
 ## Checklist
 
@@ -92,6 +93,28 @@ If this distinction is missing and the project has agents doing implementation w
 ### 8. Match style to desired output
 
 If the steering file uses heavy markdown formatting (bold everywhere, tables for simple lists, nested bullet points), the agent's output will mirror that style. Simplify the file's own formatting to match the communication style you want.
+
+### 9. Skill descriptions: imperative and trigger-forward
+
+When reviewing SKILL.md frontmatter descriptions:
+
+- Use imperative form: "Use when..." not "This skill should be used when..." or "This skill provides..."
+- List adjacent trigger contexts explicitly, including edge cases where the user doesn't name the skill directly
+- Focus on what the user is trying to do, not what the skill implements internally
+- Target 100-200 words — descriptions compete with other skills for attention in the available_skills list
+- Make descriptions distinctive and immediately recognizable
+
+**Before:** "This skill provides patterns for setting up just in projects."
+**After:** "Patterns for setting up just (command runner). Use PROACTIVELY when creating build systems, setting up new repos, or when the user asks about justfile configuration."
+
+### 10. Explain reasoning behind constraints
+
+Reinforces check 2 for skill body content specifically. If a skill includes rules or constraints, each should explain why. LLMs follow reasoning-backed instructions more precisely than bare commands — they can generalize from explanations to handle edge cases the rule didn't anticipate.
+
+**Before:** "Lower layers MUST NOT import from higher layers"
+**After:** "Lower layers never import from higher layers — this preserves dependency direction and enables independent testing"
+
+If you find ALWAYS/NEVER/MUST in skill content, reframe as: state the constraint in lowercase + explain the consequence of violating it.
 
 ## Output
 

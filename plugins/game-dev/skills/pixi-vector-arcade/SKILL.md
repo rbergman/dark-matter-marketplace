@@ -1,6 +1,6 @@
 ---
 name: pixi-vector-arcade
-description: Bootstrap browser-based games with PixiJS 8 and a modern retro/vector aesthetic (Geometry Wars, Asteroids, Tempest, Tron). This skill should be used when the user asks to "create a new game", "start a browser game project", "build an arcade game", "prototype a game", "set up PixiJS", or mentions wanting vector graphics, neon aesthetics, or arcade-style gameplay. Provides project scaffolding, ECS-lite architecture, performance patterns (pooling, spatial hashing, fixed timestep), and visual design system.
+description: Bootstrap browser-based games with PixiJS 8 and a modern retro/vector aesthetic (Geometry Wars, Asteroids, Tempest, Tron). Use when creating a new game, starting a browser game project, building an arcade game, prototyping a game, setting up PixiJS, or when the user mentions vector graphics, neon aesthetics, or arcade-style gameplay. Provides project scaffolding, ECS-lite architecture, performance patterns (pooling, spatial hashing, fixed timestep), and visual design system.
 ---
 
 # PixiJS Vector Arcade Game Bootstrapping

@@ -1,6 +1,6 @@
 ---
 name: agent-dx-cli
-description: "This skill provides patterns for designing command-line tools that agents can use effectively. Use when designing new CLIs, reviewing existing CLIs for agent compatibility, or adding agent-friendly features. Covers minimal ceremony, JSON output, context injection, batch operations, and error handling."
+description: "Patterns for designing command-line tools that agents can use effectively. Use when designing new CLIs, reviewing existing CLIs for agent compatibility, or adding agent-friendly features. Covers minimal ceremony, JSON output, context injection, batch operations, and error handling."
 ---
 
 # Agent DX Guide for CLI Projects

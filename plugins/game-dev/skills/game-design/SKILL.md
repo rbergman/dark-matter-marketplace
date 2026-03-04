@@ -1,6 +1,6 @@
 ---
 name: game-design
-description: This skill should be used when the user asks to "design a game mechanic", "evaluate gameplay feel", "tune game systems", "review player experience", "debug why something feels wrong", "balance combat", "design progression", or when working on any player-facing game feature. Provides a constraint system for evaluating mechanics with focus on player experience over feature completion.
+description: Use when designing game mechanics, evaluating gameplay feel, tuning game systems, reviewing player experience, debugging why something feels wrong, balancing combat, designing progression, or working on any player-facing game feature. Provides a constraint system for evaluating mechanics with focus on player experience over feature completion.
 ---
 
 # Game Design Framework

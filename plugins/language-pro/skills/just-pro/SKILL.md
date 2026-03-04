@@ -1,6 +1,6 @@
 ---
 name: just-pro
-description: This skill provides patterns for setting up just (command runner) in projects. Use PROACTIVELY when creating build systems, setting up new repos, or when the user asks about just/justfile configuration. Covers both simple single-project repos and monorepos with hierarchical justfile modules.
+description: Patterns for setting up just (command runner) in projects. Use PROACTIVELY when creating build systems, setting up new repos, or when the user asks about just/justfile configuration. Covers both simple single-project repos and monorepos with hierarchical justfile modules.
 ---
 
 # Justfile Skill

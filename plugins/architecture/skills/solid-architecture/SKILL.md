@@ -92,7 +92,7 @@ core → domain → application → UI
 ```
 
 **Rules:**
-- Lower layers MUST NOT import from higher layers
+- Lower layers never import from higher layers (this preserves dependency direction)
 - Mark any temporary violations and track cleanup
 - Use barrel/index files only for public APIs
 - Internal modules import directly; external consumers use public API

@@ -1,6 +1,6 @@
 ---
 name: typescript-pro
-description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. This skill should be used PROACTIVELY when working on any TypeScript code - implementing features, reviewing configurations, or debugging type errors. Use unless a more specific subagent role applies.
+description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. Use PROACTIVELY when working on any TypeScript code - implementing features, reviewing configurations, or debugging type errors, even if not explicitly requested. Applies unless a more specific subagent role overrides.
 ---
 
 # TypeScript Pro
@@ -123,7 +123,7 @@ just check
 
 ### eslint.config.js Template
 
-**IMPORTANT:** When creating a new project, use this complete template. Do not omit rules.
+When creating a new project, use this complete template — omitting rules allows `any` to leak through the codebase.
 
 ```javascript
 import tseslint from 'typescript-eslint';

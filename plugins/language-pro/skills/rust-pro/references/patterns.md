@@ -38,8 +38,8 @@ fn process_entity(id: u64) -> Result<Entity> {
 
 // BAD: unwrap/expect
 fn process_entity_bad(id: u64) -> Entity {
-    let raw = load_from_disk(id).unwrap(); // NEVER
-    parse_entity(&raw).expect("parse failed") // NEVER
+    let raw = load_from_disk(id).unwrap(); // panics on error
+    parse_entity(&raw).expect("parse failed") // panics on error
 }
 ```
 

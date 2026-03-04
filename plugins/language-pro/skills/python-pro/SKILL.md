@@ -1,6 +1,6 @@
 ---
 name: python-pro
-description: Expert Python developer specializing in modern tooling (uv, ruff, pyright), type safety, and clean module design. This skill should be used PROACTIVELY when working on any Python code - implementing features, designing APIs, debugging issues, or reviewing code quality. Use unless a more specific subagent role applies.
+description: Expert Python developer specializing in modern tooling (uv, ruff, pyright), type safety, and clean module design. Use PROACTIVELY when working on any Python code - implementing features, designing APIs, debugging issues, or reviewing code quality, even if not explicitly requested. Applies unless a more specific subagent role overrides.
 ---
 
 # Python Pro
@@ -71,7 +71,7 @@ just check   # Or: uv run ruff check . && uv run pyright
 
 ### pyproject.toml Requirements
 
-**Critical:** uv init creates a minimal pyproject.toml. For src layout to work, you MUST add:
+**Note:** uv init creates a minimal pyproject.toml. For src layout to work, add these sections:
 
 ```toml
 [build-system]

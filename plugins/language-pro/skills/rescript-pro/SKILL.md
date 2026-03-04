@@ -1,6 +1,6 @@
 ---
 name: rescript-pro
-description: Expert ReScript developer specializing in type-safe functional programming, JavaScript interop, and React integration. This skill should be used PROACTIVELY when working on any ReScript code - implementing features, designing APIs, debugging type errors, or reviewing code quality. Use unless a more specific subagent role applies.
+description: Expert ReScript developer specializing in type-safe functional programming, JavaScript interop, and React integration. Use PROACTIVELY when working on any ReScript code - implementing features, designing APIs, debugging type errors, or reviewing code quality, even if not explicitly requested. Applies unless a more specific subagent role overrides.
 ---
 
 # ReScript Pro
