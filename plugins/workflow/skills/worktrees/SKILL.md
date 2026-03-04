@@ -252,7 +252,7 @@ git rm --cached .beads/issues.jsonl
 git add .beads/issues.jsonl
 ```
 
-Or run `bd sync` which sets the correct index flags.
+Or run `bd dolt push` which sets the correct index flags.
 
 ---
 

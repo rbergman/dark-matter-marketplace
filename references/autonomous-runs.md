@@ -177,7 +177,7 @@ For interactive sandboxed sessions, use `/sandbox` in Claude Code instead.
 | Reason to allow GitHub | When needed |
 |------------------------|-------------|
 | Git-based dependencies | Cargo git deps, Go modules, npm git refs |
-| Beads sync | `bd sync` pushes work state to remote |
+| Beads push | `bd dolt push` pushes work state to remote |
 
 | Reason to avoid GitHub | Consideration |
 |------------------------|---------------|
@@ -185,7 +185,7 @@ For interactive sandboxed sessions, use `/sandbox` in Claude Code instead.
 | Often unnecessary | Pure registry deps don't need it |
 | Context7 alternative | Better for docs lookup |
 
-**Recommendation:** Start minimal. Add GitHub only if builds fail or you need beads sync.
+**Recommendation:** Start minimal. Add GitHub only if builds fail or you need `bd dolt push`.
 
 ## Limitations
 

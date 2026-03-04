@@ -14,12 +14,21 @@ In Claude Code settings, enable showing context usage in the status line. This m
 
 [Beads](https://github.com/steveyegge/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
 
+Beads 0.58+ requires **Dolt** as its storage backend:
+
 ```bash
+# Install dolt (prerequisite)
+brew install dolt
+
 # Install beads (pick one)
 curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
 # or: npm install -g @beads/bd
 # or: brew install steveyegge/beads/bd
 # or: go install github.com/steveyegge/beads/cmd/bd@latest
+
+# Verify both
+dolt version
+bd --version   # should be 0.58+
 
 # Initialize in your project
 bd init
@@ -125,7 +134,7 @@ When you're ready to pause:
 4. Paste the snapshot as your first message in the new session
 ```
 
-`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and syncs beads. The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps.
+`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and pushes beads to remote. The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps.
 
 Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
 

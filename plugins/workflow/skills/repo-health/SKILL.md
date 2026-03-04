@@ -129,17 +129,18 @@ command -v bd >/dev/null 2>&1 && echo "installed" || echo "not installed"
 [ -d .beads ] && echo "initialized" || echo "not initialized"
 ```
 
-### 4.2 Beads version (IMPORTANT)
+### 4.2 Beads version and Dolt dependency (IMPORTANT)
 
 ```bash
 bd --version 2>/dev/null
+command -v dolt >/dev/null 2>&1 && echo "dolt installed" || echo "dolt missing"
 ```
 
-**Pin to the latest pre-0.50 release** (currently 0.49.x). Beads 0.50+ migrated from SQLite to a Dolt backend. Dolt is a version-controlled SQL database that requires separate installation (`brew install dolt`) and server management. The migration path has known issues (data import failures, missing tables post-upgrade). Until a unified dolt support strategy is established:
+Beads 0.58+ requires Dolt as its storage backend. Check both:
 
-- If version is 0.50+: flag as IMPORTANT — downgrade recommended, migration bugs are active
-- If version is pre-0.50 but outdated within 0.49.x: flag as NICE — suggest updating to latest 0.49.x
-- Pin in `.mise.toml`: `beads = "0.49"` (mise will resolve to latest 0.49.x)
+- If beads version is below 0.58: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
+- If dolt is not installed: flag as IMPORTANT — required dependency (`brew install dolt`)
+- If both present and current: PASSED
 
 ### 4.3 If beads installed but not initialized (IMPORTANT)
 
@@ -153,13 +154,15 @@ bd doctor 2>/dev/null
 
 Surface any warnings or failures.
 
-### 4.5 `.beads/` in `.gitignore` check (IMPORTANT)
+### 4.5 `.beads/` gitignore check (IMPORTANT)
 
-Beads tracks its own files in git, but `.beads/beads.db*` should NOT be tracked. Check:
+Beads 0.58+ stores data in `.beads/dolt/` and creates `.beads/.gitignore` automatically to exclude dolt data and runtime files. Check that this internal gitignore exists:
 
 ```bash
-git check-ignore -q .beads/beads.db 2>/dev/null || echo "beads.db not ignored"
+[ -f .beads/.gitignore ] && echo "beads gitignore exists" || echo "beads gitignore missing"
 ```
+
+If missing → flag as IMPORTANT. Suggest running any `bd` command to trigger auto-creation, or manually create `.beads/.gitignore` with `dolt/` entry.
 
 ---
 

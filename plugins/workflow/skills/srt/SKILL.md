@@ -107,7 +107,7 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 | Reason to allow GitHub | When needed |
 |------------------------|-------------|
 | Git-based dependencies | Cargo git deps, Go modules, npm git refs |
-| Beads sync | `bd sync` pushes work state to remote |
+| Beads push | `bd dolt push` pushes work state to remote |
 | Code search | Looking up OSS implementations |
 
 | Reason to block GitHub | Consideration |
@@ -116,7 +116,7 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 | Not always needed | Pure registry deps (crates.io, npm) don't need GitHub |
 | Context7 alternative | For docs/code lookup, Context7 is more focused |
 
-**Recommendation:** Start with minimal allowlist, add GitHub only if builds fail on git-based deps or you need beads sync.
+**Recommendation:** Start with minimal allowlist, add GitHub only if builds fail on git-based deps or you need `bd dolt push`.
 
 ### Minimal vs Full Allowlists
 
@@ -155,7 +155,7 @@ All ecosystems need `api.anthropic.com`. Add ecosystem-specific domains:
 
 **Add `github.com`, `*.github.com` only if:**
 - Builds fail on git-based dependencies
-- You need `bd sync` for beads state persistence
+- You need `bd dolt push` for beads state persistence
 
 ### MCP in Sandbox (Context7, Brightdata)
 
@@ -301,7 +301,7 @@ Modify the base config per scenario:
 
 | Scenario | Extra domains | Extra write paths | Notes |
 |----------|--------------|-------------------|-------|
-| With beads sync | `github.com`, `*.github.com` | — | Or skip sync, review manually |
+| With beads push | `github.com`, `*.github.com` | — | Or skip push, review manually |
 | DX testing (/tmp) | All ecosystem domains (Rust, Go, Node, Python) | `/tmp`, `~/.cargo/*`, `~/.npm`, `~/.cache/*`, `~/.claude/session-env` | Multi-ecosystem; session-env required for bash execution |
 | With Context7 (MCP) | `context7.com`, `*.context7.com`, `api.upstash.com` | `~/Library/Caches/claude-cli-nodejs` | Run without `--strict-mcp-config` |
 
@@ -397,7 +397,7 @@ ai-auto prompt:
 |------|-----------|-------|
 | Pure build/test | Minimal (no GitHub) | Prefer this when possible |
 | Git-based deps | Add GitHub | Only if builds fail without it |
-| Beads sync | Add GitHub | Or skip sync, review manually |
+| Beads push | Add GitHub | Or skip push, review manually |
 | Docs lookup | Context7 + MCP cache | Better than GitHub search |
 | Web research | Brightdata + MCP cache | Or skip for autonomous builds |
 
@@ -414,8 +414,8 @@ For **pure execution** (build, test, lint):
 - Claude works from training data + local context
 
 For **beads integration**:
-- GitHub required for `bd sync`
-- Alternative: Skip sync during autonomous run, sync manually after
+- GitHub required for `bd dolt push`
+- Alternative: Skip push during autonomous run, push manually after
 - Consider: Is persisting work state during autonomous run worth the exfiltration risk?
 
 ---

@@ -110,10 +110,10 @@ bd ready --json | jq -r '.[] | .id + ": " + .title'
 
 # After team cleanup — sync back to beads
 bd close <id1> <id2> ... --reason "Completed by team"
-bd sync
+bd dolt push
 ```
 
-**Pattern:** beads = persistent cross-session state, Agent Teams tasks = session-level coordination. Beads survive session boundaries; team tasks do not. Always sync results back to beads before the session ends.
+**Pattern:** beads = persistent cross-session state, Agent Teams tasks = session-level coordination. Beads survive session boundaries; team tasks do not. Always push results to remote (`bd dolt push`) before the session ends.
 
 ### Workflow
 
@@ -122,7 +122,7 @@ bd sync
 3. Spawn team, teammates work against tasks
 4. Lead collects results, closes team tasks
 5. `bd close` completed beads with reason
-6. `bd sync` to persist state
+6. `bd dolt push` to persist state
 
 ## Teammate Profiles
 
