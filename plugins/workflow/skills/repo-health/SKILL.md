@@ -279,6 +279,7 @@ Two configs to check:
 | Zero-any rules | `no-explicit-any`, `no-unsafe-*` family all set to `error` | IMPORTANT |
 | Floating promises | `no-floating-promises` set to `error` | IMPORTANT |
 | Complexity limits | `complexity: 10`, `max-lines-per-function: 60`, `max-lines: 400`, `max-depth: 4` | IMPORTANT |
+| `max-lines` has no skip options | `max-lines` must NOT use `skipBlankLines` or `skipComments` — total lines count | IMPORTANT |
 | Comment discipline | `no-restricted-disable` blocks disabling critical rules | NICE |
 
 #### Rust — check against `rust-pro/references/`
@@ -412,6 +413,17 @@ For each finding with an available fix, ask the user:
 - **Add patterns**: append to existing file, show what will be added, confirm
 - **Compress**: invoke `/compress` on oversized files
 - **Initialize tools**: run `bd init`, `timbers init` with confirmation
+- **Fix `max-lines` skip options**: If `max-lines` uses `skipBlankLines` or `skipComments`, apply this migration:
+  1. Remove skip options: change to `'max-lines': ['error', { max: 400 }]`
+  2. Find existing violations: `find src -name '*.ts' ! -name '*.test.ts' ! -name '*.spec.ts' | xargs wc -l | awk '$1 > 400'`
+  3. Add a legacy override block in `eslint.config.js` for existing violations (warn, not error):
+     ```js
+     {
+       files: ['src/existing-large-file.ts', ...],  // frozen list — trends DOWN only
+       rules: { 'max-lines': ['warn', { max: 400 }] },
+     },
+     ```
+  4. New files get `error`. Legacy files get `warn` until refactored below 400.
 
 **Never auto-fix:**
 - Secrets in git history (destructive, needs `git filter-branch` or BFG)

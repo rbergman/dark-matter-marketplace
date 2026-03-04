@@ -128,12 +128,8 @@ export default tseslint.config(
         skipComments: true,
       }],
 
-      // File length - prevent god modules
-      'max-lines': ['error', {
-        max: 400,
-        skipBlankLines: true,
-        skipComments: true,
-      }],
+      // File length - prevent god modules (total lines, no skips)
+      'max-lines': ['error', { max: 400 }],
 
       // Maximum parameters - use options objects for complex APIs
       'max-params': ['error', 4],

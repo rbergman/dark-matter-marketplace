@@ -47,7 +47,7 @@ export default tseslint.config(
       'complexity': ['error', { max: 10 }],
       'max-depth': ['error', 4],
       'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
-      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 400 }],
       'max-params': ['error', 4],
       'max-nested-callbacks': ['error', 3],
 
@@ -122,7 +122,7 @@ export default tseslint.config(
 | `complexity` | 10 | Functions with cyclomatic complexity >10 are hard to test |
 | `max-depth` | 4 | Deep nesting signals extraction needed |
 | `max-lines-per-function` | 60 | Forces single-responsibility functions |
-| `max-lines` | 400 | Files >400 lines usually need splitting |
+| `max-lines` | 400 total | Files >400 total lines need splitting (blanks + comments count) |
 | `max-params` | 4 | More params → use options object |
 
 ### No-Disable Rules

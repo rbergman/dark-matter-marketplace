@@ -164,7 +164,7 @@ export default tseslint.config(
       'complexity': ['error', { max: 10 }],
       'max-depth': ['error', 4],
       'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
-      'max-lines': ['error', { max: 400, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 400 }],
       'max-params': ['error', 4],
 
       // === BLOCK DISABLING CRITICAL RULES ===
@@ -211,7 +211,7 @@ export default tseslint.config(
 
 | Limit | Value | Purpose |
 |-------|-------|---------|
-| `max-lines` | 400 | Prevent god modules |
+| `max-lines` | 400 total | Prevent god modules (blanks + comments count) |
 | `max-lines-per-function` | 60 | Single responsibility |
 | `complexity` | 10 | Cyclomatic complexity cap |
 | `max-depth` | 4 | Avoid arrow code |

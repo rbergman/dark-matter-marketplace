@@ -141,7 +141,7 @@ Copy `references/eslint.config.js` to your project root. This config:
 | `complexity` | 15 | Cyclomatic complexity cap |
 | `max-depth` | 4 | Avoid deeply nested code |
 | `max-lines-per-function` | 80 | Single responsibility |
-| `max-lines` | 500 | Prevent god modules |
+| `max-lines` | 500 total | Prevent god modules (blanks + comments count) |
 | `max-params` | 5 | Use records for many params |
 | `max-nested-callbacks` | 3 | Flatten callback chains |
 
