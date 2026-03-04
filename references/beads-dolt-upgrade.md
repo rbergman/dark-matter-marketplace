@@ -73,22 +73,45 @@ The remote uses `git+ssh://` transport, so existing SSH keys and GitHub access w
 
 ---
 
-## Hybrid: Beads + GitHub Issues/Projects
+## Hybrid: Beads + External Tracker
 
-Beads and GitHub Issues serve different audiences at different granularities:
+Beads and external trackers serve different audiences at different granularities:
 
-| | Beads | GitHub Issues/Projects |
-|---|-------|------------------------|
+| | Beads | External Tracker (Linear, Jira, etc.) |
+|---|-------|---------------------------------------|
 | **Audience** | Agents (Claude, subagents) | Humans (developers, PMs, stakeholders) |
 | **Granularity** | Task-level (atomic, agent-completable) | Epic/milestone-level (cross-team, multi-session) |
 | **Speed** | Local, instant, no network roundtrip | API call per operation |
-| **Dependencies** | First-class (`blocked_by`, `bd ready`) | Labels/milestones (no dependency graph) |
-| **Persistence** | Git refs (survives push/pull) | GitHub cloud |
+| **Dependencies** | First-class (`blocked_by`, `bd ready`) | Varies (Linear has relations, GH Issues doesn't) |
+| **Persistence** | Git refs (survives push/pull) | Cloud |
 
-**Bridge pattern:**
-- Use `--external-ref` on beads to link to a GitHub issue: `bd create --title="..." --external-ref="gh:owner/repo#42"`
-- Use GitHub labels or automation to track which issues have active beads work
-- Agents work beads; humans work GitHub Issues. Neither needs to touch the other's system directly.
+### Plan: Linear sync bridge (preferred)
+
+Beads 0.58 ships with `bd linear sync` — a bidirectional sync bridge with priority/state/label mapping built in:
+
+```bash
+# Configure
+bd config set linear.api_key "$LINEAR_API_KEY"
+bd config set linear.team_id "$LINEAR_TEAM_ID"
+
+# Sync
+bd linear sync --pull    # import from Linear
+bd linear sync --push    # export to Linear
+bd linear sync           # bidirectional
+bd linear sync --dry-run # preview
+```
+
+This replaces the manual bridge pattern — agents work beads locally, `bd linear sync` keeps the human-facing tracker in step. Priority mapping, state mapping, and relation types are all configurable.
+
+Beads also has `bd jira sync` and `bd gitlab` integrations with similar patterns.
+
+### Fallback: manual bridge via `--external-ref`
+
+If the Linear sync doesn't work out (or for repos using GitHub Issues/Projects where no sync bridge exists):
+
+- Use `--external-ref` on beads to link to an external issue: `bd create --title="..." --external-ref="gh:owner/repo#42"`
+- Use labels or automation on the external tracker to mark which issues have active beads work
+- Agents work beads; humans work the external tracker. Neither needs to touch the other's system directly.
 
 ---
 
