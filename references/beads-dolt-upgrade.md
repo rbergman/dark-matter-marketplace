@@ -59,13 +59,13 @@ Dolt remotes piggyback on your existing git remote. Data is stored under `refs/d
 - Single-machine, single-developer projects
 - Projects where beads is local-only scratchpad
 
-**Setup** (automatic for repos with a git remote):
+**Setup** (manual — beads does not auto-detect your git remote):
 ```bash
-# Beads auto-configures the dolt remote from your git remote
-# Push explicitly when ready:
-bd dolt push
+# Add the remote (git+ssh:// form of your git remote URL)
+bd dolt remote add origin "git+ssh://git@github.com/<owner>/<repo>.git"
 
-# Pull from remote:
+# Push/pull explicitly:
+bd dolt push
 bd dolt pull
 ```
 
@@ -115,16 +115,50 @@ Verify: `bd --version` should show 0.58+.
 
 ### 3. Initialize Per Repo
 
-Run any `bd` command in each repo. Beads auto-migrates:
+Run `bd init` in each repo. This creates a fresh dolt database:
 
 ```bash
 cd your-repo
-bd ready    # triggers migration, starts dolt server
+bd init
 ```
+
+**Issues are NOT auto-migrated.** The old `issues.jsonl` is still on disk but 0.58 has no `import` command. If this repo has open issues you need to preserve, re-create them manually before deleting the old data:
+
+```bash
+# Check what you had
+cat .beads/issues.jsonl | python3 -c "
+import json, sys
+for line in sys.stdin:
+    i = json.loads(line)
+    if i.get('status') in ('open', 'in_progress'):
+        print(f'[{i[\"status\"]}] {i[\"id\"]} — {i[\"title\"]}')"
+
+# Re-create important ones manually
+bd create --title="..." --type=task --priority=2 -d "..."
+```
+
+For repos with many open issues, script the re-creation from the jsonl. For repos with only closed issues, no action needed — the history lives in git.
 
 The old `.beads/beads.db*` files are no longer used. You can delete them after verifying migration succeeded.
 
-### 4. Update .gitignore
+### 4. Configure Dolt Remote
+
+Beads does **not** auto-detect your git remote. You must add it manually:
+
+```bash
+# Format: git+ssh:// version of your git remote
+bd dolt remote add origin "git+ssh://git@github.com/<owner>/<repo>.git"
+
+# Test the roundtrip
+bd dolt push
+bd dolt pull
+```
+
+This uses `refs/dolt/data` in the same git repo — no separate server or credentials needed. Your existing SSH keys work.
+
+Skip this step if you only need beads locally (single machine, no sharing).
+
+### 5. Update .gitignore
 
 Beads 0.58+ creates `.beads/.gitignore` automatically to exclude `dolt/` and runtime files. Verify it exists:
 
@@ -132,7 +166,19 @@ Beads 0.58+ creates `.beads/.gitignore` automatically to exclude `dolt/` and run
 cat .beads/.gitignore
 ```
 
-### 5. Replace `bd sync` in Scripts/Docs
+### 6. Discard `bd init` Artifacts
+
+`bd init` generates an `AGENTS.md` and appends to `.gitignore`. If your repo already has these, discard the generated versions:
+
+```bash
+# If you already have AGENTS.md
+rm AGENTS.md  # or: git checkout AGENTS.md
+
+# If .gitignore was modified unnecessarily
+git checkout .gitignore
+```
+
+### 7. Replace `bd sync` in Scripts/Docs
 
 Replace `bd sync` with `bd dolt push` in any automation, AGENTS.md, or workflow docs. `bd sync` is a no-op now.
 
