@@ -268,6 +268,16 @@ Usually happens after a fresh `bd init` or clone recovery. The local and remote 
 
 **Fix:** `bd dolt push --force` (one-time). Regular pushes work after.
 
+### Claude Code sandbox blocks dolt connections
+
+**Symptom:** `bd ready` fails with "port 3307 is in use by a non-dolt process" or `connect: operation not permitted`, but `bd dolt status` shows the server is running fine. Commands work with `dangerouslyDisableSandbox: true`.
+
+**Cause:** Claude Code's sandbox and permissions are **two independent security layers**. Even in `bypassPermissions` mode, the OS-level sandbox blocks TCP connections to `127.0.0.1:3307` because localhost isn't in the network allowlist. Beads misdiagnoses the blocked connection as a port conflict with a non-dolt process.
+
+**Fix options:**
+1. **Disable sandbox** — Run `/sandbox` and select "No Sandbox". If you're already running `bypassPermissions` + `skipDangerousModePermissionPrompt`, the sandbox isn't adding meaningful protection and is only creating friction with dolt.
+2. **Add localhost to allowlist** — If you want to keep the sandbox, add `127.0.0.1` to the network allowlist via `/sandbox` overrides.
+
 ---
 
 ## Impact on Sandboxing (srt)
