@@ -1,6 +1,6 @@
 ---
 description: Run parallel architecture, code, and security review with local beads or GitHub PR comments
-argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads, --output-file <path>, --format json, --no-interactive"
+argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads, --output-file <path>, --format json, --no-interactive, --adversarial"
 ---
 
 # Unified Code Review Command
@@ -26,6 +26,7 @@ $ARGUMENTS
 | `--output-file <path>` | Write findings to file instead of inline report | (inline) |
 | `--format <mode>` | Output format: `markdown` or `json` | `markdown` |
 | `--no-interactive` | Skip all AskUserQuestion prompts, use defaults | (interactive) |
+| `--adversarial` | Spawn blind verifier that tests behavior against spec | (off) |
 
 ---
 
@@ -406,6 +407,110 @@ Size estimate (effort to fix):
 Flag anything exploitable. Be thorough but not paranoid.
 ")
 ````
+
+---
+
+## Phase 3.5: Adversarial Verification (`--adversarial`)
+
+**Only runs when `--adversarial` flag is present.** Launches in parallel with Phase 3 reviewers.
+
+The adversarial agent verifies behavior against the spec WITHOUT reading the implementation. It derives what the code SHOULD do from the spec, writes tests to verify those behaviors, and reports gaps.
+
+### Spec resolution
+
+Find the spec from (in priority order):
+1. Bead — if reviewing a bead-linked branch, fetch via `bd show <id>`
+2. PR body — if `--pr` mode, extract from PR description
+3. Commit messages — concatenate commit messages in the scope range
+
+If no spec is found, skip adversarial verification and warn: "No spec found for adversarial verification. Provide a bead or PR description."
+
+### Agent design
+
+````
+Agent(subagent_type="general-purpose", model="opus", description="Adversarial verification", prompt="
+You are an Adversarial Verifier. Your job is to test whether the implementation matches the spec — WITHOUT reading the implementation source code.
+
+SPEC:
+<resolved spec text>
+
+SCOPE:
+- Commit range: <range>
+- Changed files: <file list — for reference only, DO NOT read these>
+
+RULES — what you CAN and CANNOT read:
+- DO NOT read changed source files (the implementation under review)
+- MAY read: test files, config files, type definitions, unchanged source files
+- MAY read: package.json, tsconfig, go.mod, Cargo.toml (project structure)
+
+PROCESS:
+1. Read the spec carefully. Identify 5-10 behavioral assertions — things the code MUST do if it correctly implements the spec.
+2. For each assertion, write a test that verifies the behavior from the outside (call the public API, check the output, verify side effects).
+3. Write all tests to a temporary file: __adversarial_test__.<appropriate extension>
+4. Run the tests.
+5. Delete the temporary test file.
+6. Report results.
+
+OUTPUT as JSON to stdout:
+```json
+{
+  \"reviewer\": \"adversarial\",
+  \"summary\": \"1-2 sentence assessment of spec compliance\",
+  \"assertions_total\": 8,
+  \"assertions_passed\": 6,
+  \"assertions_failed\": 2,
+  \"findings\": [
+    {
+      \"path\": \"(spec)\",
+      \"line\": 0,
+      \"side\": \"RIGHT\",
+      \"severity\": \"high\",
+      \"size_estimate\": \"M\",
+      \"category\": \"spec-gap\",
+      \"assertion\": \"Users with expired tokens should receive 401\",
+      \"test_result\": \"FAIL\",
+      \"body\": \"[Adversarial] **high** - spec-gap\\n\\nSpec says expired tokens return 401, but test shows 403 returned instead.\"
+    }
+  ]
+}
+```
+
+Severity for adversarial findings:
+- critical: Core spec requirement completely unimplemented
+- high: Spec behavior incorrect or missing
+- medium: Edge case from spec not handled
+- low: Spec ambiguity that could go either way
+")
+````
+
+### Output integration
+
+Adversarial findings merge into Phase 4 alongside other reviewer findings. They appear with `reviewer: "adversarial"` and `category: "spec-gap"`.
+
+**Markdown output** adds an "Adversarial Verification" section:
+
+````markdown
+### Adversarial Verification (6/8 assertions passed)
+
+| # | Assertion | Result |
+|---|-----------|--------|
+| 1 | Users with expired tokens receive 401 | FAIL |
+| 2 | Rate limit headers present in response | PASS |
+| ... | ... | ... |
+
+**Gap analysis:** 2 spec behaviors not correctly implemented. See findings above.
+````
+
+**JSON output** adds an `adversarial` key to the `summaries` object:
+
+```json
+"adversarial": {
+  "verdict": "issues",
+  "summary": "6/8 spec assertions passed",
+  "assertions_total": 8,
+  "assertions_passed": 6
+}
+```
 
 ---
 
