@@ -164,13 +164,14 @@ Beads 0.58+ stores data in `.beads/dolt/` and creates `.beads/.gitignore` automa
 
 If missing → flag as IMPORTANT. Suggest running any `bd` command to trigger auto-creation, or manually create `.beads/.gitignore` with `dolt/` entry.
 
-Also verify `dolt-monitor.pid.lock` is in `.beads/.gitignore` (new in 0.59, not auto-added during upgrade):
+Also verify these entries are in `.beads/.gitignore` (not auto-added during upgrade):
 
 ```bash
-grep -q "dolt-monitor.pid.lock" .beads/.gitignore 2>/dev/null && echo "present" || echo "missing"
+grep -q "dolt-monitor.pid.lock" .beads/.gitignore 2>/dev/null && echo "pid.lock: present" || echo "pid.lock: missing"
+grep -q "^backup/" .beads/.gitignore 2>/dev/null && echo "backup/: present" || echo "backup/: missing"
 ```
 
-If missing → flag as IMPORTANT. Add it after `dolt-monitor.pid`.
+If either is missing → flag as IMPORTANT. `dolt-monitor.pid.lock` goes after `dolt-monitor.pid`. `backup/` is the local backup directory (auto-generated, should not be committed).
 
 ### 4.6 Dolt server port check (IMPORTANT)
 
