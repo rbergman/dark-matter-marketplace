@@ -347,17 +347,13 @@ Extract and structure requirements for this epic. Output:
 
 ```bash
 # Create tasks
-bd create --type task --title "Task 1 title" --description "..." --acceptance "..." --design "..." --priority 2 --no-daemon
-# (repeat for all tasks)
+bd create --type task --title "Task 1 title" --description "..." --acceptance "..." --design "..." --priority 2# (repeat for all tasks)
 
 # Add dependencies
-bd dep add {task-id} {epic-id} --type parent-child --no-daemon
-bd dep add {task-id-2} {task-id-1} --type blocks --no-daemon
-# (repeat for all dependencies)
+bd dep add {task-id} {epic-id} --type parent-childbd dep add {task-id-2} {task-id-1} --type blocks# (repeat for all dependencies)
 
 # Update epic status
-bd update {epic-id} --status open --no-daemon
-```
+bd update {epic-id} --status open```
 
 ## Critical Constraints
 

@@ -138,13 +138,13 @@ command -v dolt >/dev/null 2>&1 && echo "dolt installed" || echo "dolt missing"
 
 Beads 0.58+ requires Dolt as its storage backend. Check both:
 
-- If beads version is below 0.58: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
+- If beads version is below 0.59: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
 - If dolt is not installed: flag as IMPORTANT — required dependency (`brew install dolt`)
 - If both present and current: PASSED
 
 ### 4.3 If beads installed but not initialized (IMPORTANT)
 
-Suggest `bd init -q && bd onboard` for project repos. Skip for config/docs-only repos.
+Suggest `bd init` for project repos. Skip for config/docs-only repos.
 
 ### 4.4 If beads initialized — run doctor (NICE)
 
@@ -163,6 +163,22 @@ Beads 0.58+ stores data in `.beads/dolt/` and creates `.beads/.gitignore` automa
 ```
 
 If missing → flag as IMPORTANT. Suggest running any `bd` command to trigger auto-creation, or manually create `.beads/.gitignore` with `dolt/` entry.
+
+Also verify `dolt-monitor.pid.lock` is in `.beads/.gitignore` (new in 0.59, not auto-added during upgrade):
+
+```bash
+grep -q "dolt-monitor.pid.lock" .beads/.gitignore 2>/dev/null && echo "present" || echo "missing"
+```
+
+If missing → flag as IMPORTANT. Add it after `dolt-monitor.pid`.
+
+### 4.6 Dolt server port check (IMPORTANT)
+
+```bash
+bd dolt show 2>/dev/null | grep 'Port:'
+```
+
+If port is 3307, this repo is using the stale hardcoded port from pre-0.59. Flag as IMPORTANT — needs migration to hash-derived port (see beads 0.59 migration guide).
 
 ---
 

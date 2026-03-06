@@ -335,8 +335,7 @@ fi
 ## Step 7: Beads Initialization
 
 ```bash
-bd init -q
-bd onboard
+bd init
 ```
 
 ---
@@ -360,8 +359,7 @@ Point user to language-specific setup:
 # Full manual init sequence
 git init
 # Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
-bd init -q
-bd onboard
+bd init
 mise use just@latest
 # Then follow language skill for specifics
 ```

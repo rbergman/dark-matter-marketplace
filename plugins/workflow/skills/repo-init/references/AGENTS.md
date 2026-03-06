@@ -27,7 +27,7 @@ Fix failing gates before declaring work complete.
 
 ## Beads
 
-Run `bd onboard` to install the latest beads guidance for this project, updating this section with additional detial as instructed.
+Use `bd init` to initialize beads for this project. Use `bd ready` to find available work, `bd close <id>` to complete, and `bd dolt commit && bd dolt push` to sync at session end.
 
 ### Bead Detail Discipline
 

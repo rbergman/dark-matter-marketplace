@@ -25,8 +25,7 @@ You will receive:
 
 1. Claim the bead:
    ```bash
-   bd update {bead_id} --status in_progress --no-daemon
-   ```
+   bd update {bead_id} --status in_progress   ```
 
 2. Read full context:
    ```bash
@@ -60,8 +59,7 @@ Follow AGENTS.md guidance:
 4. Create devlog: docs/devlog/YYMMDD-HHMM-{slug}.md
 
 5. Mark ready for review:
-   bd update {bead_id} --notes "READY FOR REVIEW: <summary>" --no-daemon
-```
+   bd update {bead_id} --notes "READY FOR REVIEW: <summary>"```
 
 Config: `{"approval-policy": "on-request"}`
 
@@ -90,9 +88,7 @@ If quality gates fail:
 
 2. **Provide specific feedback to codex:**
    ```bash
-   bd reopen {bead_id} --no-daemon
-   bd update {bead_id} --notes "NEEDS REVISION: {specific issue and fix}" --no-daemon
-   ```
+   bd reopen {bead_id}   bd update {bead_id} --notes "NEEDS REVISION: {specific issue and fix}"   ```
    - Then invoke codex again with fix guidance
 
 3. **Track iteration count:**

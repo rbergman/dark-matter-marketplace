@@ -28,7 +28,7 @@ Beads 0.58 removed SQLite entirely. The storage backend is now **Dolt** — a ve
 | Manual `bd import` after corruption | Dolt journal can corrupt if CLI used while server runs (see Troubleshooting) |
 | `bd sync` (bidirectional) | `bd dolt push` / `bd dolt pull` (explicit direction) |
 
-The `bd sync` command still exists but is a **deprecated no-op**. All remote operations go through `bd dolt push` and `bd dolt pull`.
+The `bd sync` command does not exist in 0.59. All remote operations go through `bd dolt push` and `bd dolt pull`.
 
 ---
 
@@ -204,7 +204,7 @@ rm AGENTS.md  # or: git checkout AGENTS.md
 git checkout .gitignore
 ```
 
-Note: `bd init` injects a `<!-- BEGIN BEADS INTEGRATION -->` block into AGENTS.md. If your AGENTS.md already has beads instructions, you'll get duplicates. The injected block also references `bd sync` (deprecated). Remove manually. Be aware `bd doctor --fix` re-injects it, so you may need to remove it again after running doctor.
+Note: `bd init` injects a `<!-- BEGIN BEADS INTEGRATION -->` block into AGENTS.md. If your AGENTS.md already has beads instructions, you'll get duplicates. The injected block may reference stale commands. Remove manually. Be aware `bd doctor --fix` re-injects it, so you may need to remove it again after running doctor.
 
 ### 7. Clean Up Legacy Artifacts
 
@@ -224,7 +224,7 @@ rmdir .git/beads-worktrees 2>/dev/null            # if empty
 
 ### 8. Replace `bd sync` in Scripts/Docs
 
-Replace `bd sync` with `bd dolt push` in any automation, AGENTS.md, or workflow docs. `bd sync` is a no-op now.
+Replace any `bd sync` references with `bd dolt commit && bd dolt push` in automation, AGENTS.md, or workflow docs. `bd sync` does not exist in 0.59.
 
 ---
 

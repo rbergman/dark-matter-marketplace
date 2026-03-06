@@ -214,45 +214,11 @@ bd worktree remove .worktrees/feature-auth
 
 ## Known Limitations
 
-### Daemon Mode
+### Worktrees Share the Dolt Database
 
-Daemon mode does not work correctly with user-created git worktrees. Worktrees share the same `.git` directory and beads database, but the daemon doesn't track which branch each worktree has checked out.
+Worktrees created with `bd worktree create` share the main repo's Dolt database via `.beads/redirect`. This is the correct behavior — all worktrees see the same beads data.
 
-**Solution**: Use direct mode in worktrees:
-```bash
-bd --no-daemon <command>
-# Or set environment variable
-export BEADS_NO_DAEMON=1
-```
-
-### Two Types of Worktrees
-
-Don't confuse these:
-
-| Type | Location | Purpose |
-|------|----------|---------|
-| User worktrees | `.worktrees/<name>` | Parallel feature work (you create these) |
-| Beads internal | `.git/beads-worktrees/beads-sync` | Sync-branch commits (beads creates this) |
-
-The internal worktree is hidden and managed by beads for the sync-branch feature. Don't manually modify it.
-
-### SKIP_WORKTREE Issues
-
-If `git status` doesn't show changes to `.beads/*.jsonl` files, check for SKIP_WORKTREE flags:
-
-```bash
-git ls-files -v .beads/
-# 'h' prefix = SKIP_WORKTREE set (changes hidden)
-# 'H' prefix = normal tracking
-```
-
-**Fix**: Remove and re-add the files:
-```bash
-git rm --cached .beads/issues.jsonl
-git add .beads/issues.jsonl
-```
-
-Or run `bd dolt push` which sets the correct index flags.
+If a worktree was created with `git worktree add` instead, it gets an independent empty Dolt DB. Fix by deleting the worktree's `.beads/dolt/` and creating a `.beads/redirect` file pointing to the main repo's `.beads/`.
 
 ---
 
@@ -271,4 +237,4 @@ git worktree add .worktrees/feature-auth -b feature-auth
 git worktree remove .worktrees/feature-auth
 ```
 
-But you lose: automatic gitignore, beads sync, and safety checks.
+But you lose: automatic redirect setup and safety checks.
