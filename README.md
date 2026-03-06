@@ -39,7 +39,6 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | Plugin | Prefix | Example |
 |--------|--------|---------|
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
-| dm-drvr | External AI drivers | `dm-drvr:codex-driver` |
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
@@ -57,7 +56,7 @@ Commands use `/dm-work:command` format (e.g., `/dm-work:rotate`).
 dark-matter-marketplace/
 ├── plugins/           # Installable Claude Code plugins
 │   ├── architecture/  # dm-arch: SOLID, data-oriented patterns
-│   ├── drivers/       # dm-drvr: Codex, Gemini delegation
+│   ├── drivers/       # dm-drvr: ARCHIVED — Codex, Gemini delegation
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/       # dm-team: Agent Teams orchestration and collaboration
@@ -119,15 +118,6 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:subagent` | Command | Delegate work to a single subagent |
 | `/dm-work:compete` | Command | Competitive generation — spawn N agents on same spec, compare by metrics, merge winner |
 | `/dm-work:subagents` | Command | Orchestrate multiple subagents with dependency awareness |
-
-### dm-drvr (drivers/)
-
-Agents for delegating work to external AI systems.
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `dm-drvr:codex-driver` | Agent | Delegate bead implementation to Codex CLI with quality gates |
-| `dm-drvr:gemini-driver` | Agent | Leverage Gemini's 1M context for planning, research, and deep analysis |
 
 ### dm-game (game-dev/)
 
@@ -237,7 +227,6 @@ claude plugin marketplace update dark-matter-marketplace
 
 # Install plugins
 claude plugin install dm-arch@dark-matter-marketplace
-claude plugin install dm-drvr@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
 claude plugin install dm-pmgr@dark-matter-marketplace
@@ -276,6 +265,21 @@ The plugins include opinionated DX tooling that works together:
 [Beads](https://github.com/steveyegge/beads) is the issue tracking CLI I use, and it appears throughout these plugins. It's a critical part of my workflow — providing external state that survives session boundaries, enabling orchestrators to track progress across compactions, and giving subagents clear work items to implement.
 
 References to `bd` CLI, bead IDs (like `whiteout-4eed`), and bead states (`ready`, `claimed`, `done`) appear in many skills and agents. If you're not using beads, you can substitute your own issue tracking system or ignore those references.
+
+---
+
+## Archived Plugins
+
+These plugins are no longer installable but kept in the repo for reference.
+
+### dm-drvr (drivers/)
+
+Agents for delegating work to external AI systems (Codex CLI, Gemini). Archived — neither driver has been used in active workflows for a while.
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-drvr:codex-driver` | Agent | Delegate bead implementation to Codex CLI with quality gates |
+| `dm-drvr:gemini-driver` | Agent | Leverage Gemini's 1M context for planning, research, and deep analysis |
 
 ---
 

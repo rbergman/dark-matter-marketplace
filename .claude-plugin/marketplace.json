@@ -36,15 +36,7 @@
       "source": "./plugins/workflow",
       "category": "development"
     },
-    {
-      "name": "dm-drvr",
-      "description": "AI drivers: delegate to Codex CLI or leverage Gemini's 1M token context",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
-      "source": "./plugins/drivers",
-      "category": "development"
-    },
-    {
+{
       "name": "dm-team",
       "description": "Agent Teams patterns: multi-agent coordination, deliberation, and collaborative workflows (experimental)",
       "version": "0.1.0",
