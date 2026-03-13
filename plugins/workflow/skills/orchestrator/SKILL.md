@@ -31,7 +31,7 @@ Delegate to subagents if ANY apply:
 - Ask clarifying questions
 - Git operations (add, commit, push, branch)
 - Merge barrel exports after parallel work
-- Run `bd dolt commit && bd dolt push` at session end (or before handoff)
+- Run `bd dolt push` at session end (or before handoff)
 
 ---
 
@@ -386,6 +386,6 @@ Every subagent roundtrip costs ~3-5k tokens of conversation history (prompt + re
 
 - [ ] All work committed
 - [ ] Beads closed for completed work
-- [ ] Run `bd dolt commit && bd dolt push` to push beads to remote
+- [ ] Run `bd dolt push` to push beads to remote
 - [ ] Quality gates passing (verified by YOU, not just subagent summaries)
 - [ ] Post-subagent verification completed for all delegated work

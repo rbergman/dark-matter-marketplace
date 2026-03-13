@@ -1,7 +1,7 @@
 # Beads Dolt Upgrade: Decision & Migration Guide
 
-**Date:** 2026-03-04
-**Status:** Decided — upgrade to beads 0.58+
+**Date:** 2026-03-04 (updated 2026-03-13 for 0.60)
+**Status:** Decided — upgrade to beads 0.60+
 
 ---
 
@@ -28,7 +28,7 @@ Beads 0.58 removed SQLite entirely. The storage backend is now **Dolt** — a ve
 | Manual `bd import` after corruption | Dolt journal can corrupt if CLI used while server runs (see Troubleshooting) |
 | `bd sync` (bidirectional) | `bd dolt push` / `bd dolt pull` (explicit direction) |
 
-The `bd sync` command does not exist in 0.59. All remote operations go through `bd dolt push` and `bd dolt pull`.
+The `bd sync` command does not exist in 0.59+. All remote operations go through `bd dolt push` and `bd dolt pull`. As of 0.60, these auto-commit pending changes before executing, so explicit `bd dolt commit` is no longer needed.
 
 ---
 
@@ -134,7 +134,7 @@ brew upgrade steveyegge/beads/bd
 # or: go install github.com/steveyegge/beads/cmd/bd@latest
 ```
 
-Verify: `bd --version` should show 0.58+.
+Verify: `bd --version` should show 0.60+.
 
 ### 3. Initialize Per Repo
 
@@ -224,7 +224,7 @@ rmdir .git/beads-worktrees 2>/dev/null            # if empty
 
 ### 8. Replace `bd sync` in Scripts/Docs
 
-Replace any `bd sync` references with `bd dolt commit && bd dolt push` in automation, AGENTS.md, or workflow docs. `bd sync` does not exist in 0.59.
+Replace any `bd sync` references with `bd dolt push` in automation, AGENTS.md, or workflow docs. `bd sync` does not exist in 0.59+. As of 0.60, `bd dolt push` auto-commits pending changes, so `bd dolt commit && bd dolt push` can be simplified to just `bd dolt push`.
 
 ---
 
@@ -270,9 +270,9 @@ Usually happens after a fresh `bd init` or clone recovery. The local and remote 
 
 ### Claude Code sandbox blocks dolt connections
 
-**Symptom:** `bd ready` fails with "port 3307 is in use by a non-dolt process" or `connect: operation not permitted`, but `bd dolt status` shows the server is running fine. Commands work with `dangerouslyDisableSandbox: true`.
+**Symptom:** `bd ready` fails with "port is in use by a non-dolt process" or `connect: operation not permitted`, but `bd dolt status` shows the server is running fine. Commands work with `dangerouslyDisableSandbox: true`. (Prior to 0.60, this referenced port 3307; now beads uses OS-assigned ephemeral ports.)
 
-**Cause:** Claude Code's sandbox and permissions are **two independent security layers**. Even in `bypassPermissions` mode, the OS-level sandbox blocks TCP connections to `127.0.0.1:3307` because localhost isn't in the network allowlist. Beads misdiagnoses the blocked connection as a port conflict with a non-dolt process.
+**Cause:** Claude Code's sandbox and permissions are **two independent security layers**. Even in `bypassPermissions` mode, the OS-level sandbox blocks TCP connections to localhost because it isn't in the network allowlist. Beads misdiagnoses the blocked connection as a port conflict with a non-dolt process.
 
 **Fix options:**
 1. **Disable sandbox** — Run `/sandbox` and select "No Sandbox". If you're already running `bypassPermissions` + `skipDangerousModePermissionPrompt`, the sandbox isn't adding meaningful protection and is only creating friction with dolt.
@@ -292,5 +292,5 @@ If you use srt for autonomous Claude runs and need beads remote push:
 ## What We're NOT Doing
 
 - **Not pinning to 0.49 anymore** — the SQLite corruption issues (`no such column: spec_id`) made pinning a liability, not an asset
-- **Not running a shared Dolt server** — per-repo sidecar is simpler and sufficient for our single-developer workflow
+- **Not running a shared Dolt server** — per-repo sidecar is simpler and sufficient for our single-developer workflow (though 0.60 adds shared server mode via `BEADS_DOLT_*` env vars if needed for multi-agent setups)
 - **Not replacing beads with GitHub Issues** — they serve different purposes (see hybrid section above)

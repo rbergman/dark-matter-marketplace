@@ -9,7 +9,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
-bd dolt commit && bd dolt push  # Push beads to remote
+bd dolt push              # Push beads to remote
 ```
 
 ## Non-Interactive Shell Commands
@@ -107,13 +107,13 @@ bd uses Dolt as its storage backend. Sync explicitly:
 
 ```bash
 # Start of session — pull latest:
-bd dolt commit              # workaround for #2316 (dirty metadata)
 bd dolt pull
 
 # End of session — push changes:
-bd dolt commit              # workaround for #2316 (dirty metadata)
 bd dolt push
 ```
+
+Beads 0.60+ auto-commits pending changes before pull/push, so explicit `bd dolt commit` is no longer needed.
 
 ### Important Rules
 
@@ -139,7 +139,7 @@ For more details, see README.md and docs/QUICKSTART.md.
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd dolt commit && bd dolt push
+   bd dolt push
    git push
    git status  # MUST show "up to date with origin"
    ```

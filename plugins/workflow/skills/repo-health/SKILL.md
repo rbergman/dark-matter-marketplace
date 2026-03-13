@@ -138,7 +138,7 @@ command -v dolt >/dev/null 2>&1 && echo "dolt installed" || echo "dolt missing"
 
 Beads 0.58+ requires Dolt as its storage backend. Check both:
 
-- If beads version is below 0.59: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
+- If beads version is below 0.60: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
 - If dolt is not installed: flag as IMPORTANT — required dependency (`brew install dolt`)
 - If both present and current: PASSED
 
@@ -179,7 +179,7 @@ If either is missing → flag as IMPORTANT. `dolt-monitor.pid.lock` goes after `
 bd dolt show 2>/dev/null | grep 'Port:'
 ```
 
-If port is 3307, this repo is using the stale hardcoded port from pre-0.59. Flag as IMPORTANT — needs migration to hash-derived port (see beads 0.59 migration guide).
+Beads 0.60+ uses OS-assigned ephemeral ports. If port is 3307 (pre-0.59 hardcoded) or a fixed hash-derived port (0.59), flag as IMPORTANT — upgrade to beads 0.60+ for automatic ephemeral port assignment.
 
 ---
 
