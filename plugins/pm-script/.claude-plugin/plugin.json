@@ -1,6 +1,7 @@
 {
   "name": "dm-pmgr",
   "version": "0.5.0",
-  "description": "PM Script: Level 7.5 project management between human director and Claude Code worker swarm. Includes pm.py MVP and control plane hooks.",
+  "description": "DEFERRED — PM Script: Level 7.5 project management between human director and Claude Code worker swarm. Removed from marketplace; files kept for reference.",
+  "status": "deferred",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

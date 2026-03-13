@@ -42,7 +42,6 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
-| dm-pmgr | PM Script architecture | `dm-pmgr` (reference only) |
 | dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
 | dm-work | Workflow tools | `dm-work:orchestrator` |
 
@@ -60,7 +59,7 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/       # dm-team: Agent Teams orchestration and collaboration
-│   ├── pm-script/     # dm-pmgr: PM Script architecture reference
+│   ├── pm-script/     # dm-pmgr: DEFERRED — PM Script architecture reference
 │   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
@@ -149,7 +148,9 @@ Language-specific expertise with strict, opinionated standards.
 | `dm-lang:rescript-pro` | Skill | Type-safe ReScript: exhaustive matching, typed FFI, React integration, pipe-first style |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
 
-### dm-pmgr (pm-script/)
+### dm-pmgr (pm-script/) — DEFERRED
+
+> **Status:** Removed from marketplace. Files kept for reference. Revisit when PM Script architecture matures.
 
 Level 7.5 project manager — a Python script that sits between a human director and a Claude Code worker session. Spawns workers via `claude -p` (CLI backend) or the Claude Agent SDK. PM logic is deterministic; the only LLM interaction is the worker session itself.
 
@@ -230,7 +231,6 @@ claude plugin marketplace update dark-matter-marketplace
 claude plugin install dm-arch@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
-claude plugin install dm-pmgr@dark-matter-marketplace
 claude plugin install dm-team@dark-matter-marketplace
 claude plugin install dm-tool@dark-matter-marketplace
 claude plugin install dm-work@dark-matter-marketplace
