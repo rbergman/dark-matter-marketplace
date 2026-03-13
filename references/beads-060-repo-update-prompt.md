@@ -32,20 +32,32 @@ Search AGENTS.md, CLAUDE.md, justfile, .claude/rules/, and any other steering/co
 Also add this note near any Dolt Sync section if not already present:
 > Beads 0.60+ auto-commits pending changes before pull/push, so explicit `bd dolt commit` is no longer needed.
 
-### 2. Session retro now harvests factual learnings into `bd remember`
+### 2. Add `bd remember` / `bd memories` guidance
 
-The session-retro skill (dm-work) was updated to actively prompt for factual learnings — library gotchas, API quirks, env-specific behaviors, architectural discoveries — and route them to `bd remember`.
+If this repo's AGENTS.md has a beads section (quick reference, commands, etc.), ensure it includes:
 
-**No file changes needed for this** — the skill update is already installed via the plugin. But if this repo's AGENTS.md or .claude/rules/ has any custom session-end or retro instructions, add a reminder:
+```bash
+bd remember "insight"    # Save a factual learning for future sessions
+bd memories <keyword>    # Search saved memories by keyword
+```
+
+And add a short recall section if not present:
+
+> ### Recalling Knowledge
+>
+> Use `bd remember` to persist factual learnings (library gotchas, API quirks, env-specific behaviors) across sessions. Search with `bd memories <keyword>` when you encounter a problem that might have been solved before — especially at session start or when debugging unfamiliar behavior.
+
+Also, if this repo's AGENTS.md or .claude/rules/ has custom session-end or retro instructions, add:
 
 > During session retro, actively harvest factual learnings (library gotchas, API quirks, env behaviors) into `bd remember`. Ask: "What did I learn today that I'd have to rediscover from scratch next time?"
 
 ### Instructions
 
-1. Search for all patterns listed above across the repo
-2. Make the replacements
+1. Search for all patterns listed above across the repo (AGENTS.md, CLAUDE.md, justfile, .claude/rules/)
+2. Make the beads 0.60 replacements
 3. Remove any justfile recipes that only existed as #2316 workarounds (check if they have other value first)
-4. Commit the changes: `git commit -m "Update beads integration for 0.60 — remove #2316 workaround, simplify Dolt sync"`
-5. Push: `git push`
+4. Add `bd remember` / `bd memories` to the beads quick reference and recall section
+5. Commit: `git commit -m "Update beads integration for 0.60 — simplify Dolt sync, add bd remember guidance"`
+6. Push: `git push`
 
 **Be conservative**: only change beads-related patterns. Don't restructure or rewrite surrounding content.
