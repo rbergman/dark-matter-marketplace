@@ -374,6 +374,34 @@ If CI exists, verify it runs quality gates (grep for `test`, `check`, `lint` in 
 
 ---
 
+## Step 5.6: Session Retro Integration
+
+Check that the user's landing-the-plane workflow includes session retro.
+
+### 5.6.1 Landing-the-plane rule exists (IMPORTANT)
+
+```bash
+[ -f ~/.claude/rules/landing-the-plane.md ] && echo "exists" || echo "missing"
+```
+
+If missing → flag as IMPORTANT. Offer to create from the standard template (see dm-work:session-retro skill for context).
+
+### 5.6.2 Session retro step present (IMPORTANT)
+
+```bash
+grep -qi 'session.retro\|session-retro' ~/.claude/rules/landing-the-plane.md 2>/dev/null && echo "present" || echo "missing"
+```
+
+If the rule file exists but doesn't mention session retro → flag as IMPORTANT. Offer to add the retro step:
+
+```markdown
+3. **Session retro** — run `/session-retro` to convert friction, mistakes, and discoveries into persistent rules and memories
+```
+
+This is the self-improvement loop — without it, sessions end without capturing what went wrong or what was learned.
+
+---
+
 ## Step 6: Present Report
 
 Collect all findings and present as a severity-grouped table:
