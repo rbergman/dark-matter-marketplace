@@ -1,6 +1,6 @@
 ---
 name: repo-init
-description: Initialize a new repository with standard scaffolding - git, gitignore, AGENTS.md, justfile, mise, and beads. Use when starting a new project or setting up an existing repo for Claude Code workflows.
+description: Initialize a new repository with standard scaffolding - git, gitignore, AGENTS.md, justfile, mise, beads, and timbers. Use when starting a new project or setting up an existing repo for Claude Code workflows.
 ---
 
 # Repository Initialization
@@ -11,6 +11,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 - **just-pro** - Build system patterns and templates
 - **mise** - Tool version management
 - **tokf** - CLI output compression for LLM context efficiency
+- Timbers (`timbers init`) - Development reasoning ledger
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
 ## Execution Modes
@@ -340,6 +341,33 @@ bd init
 
 ---
 
+## Step 7.5: Timbers Initialization (Optional)
+
+If the user wants structured development reasoning logs (what/why/how per commit):
+
+```bash
+# Check if installed
+command -v timbers || echo "Install: brew install gorewood/tap/timbers"
+
+# Initialize (creates .timbers/, .gitattributes, git hooks, Claude Code integration)
+timbers init --yes --git-hooks
+
+# Add onboarding snippet to AGENTS.md
+timbers onboard --target agents >> AGENTS.md
+```
+
+This sets up:
+- `.timbers/` directory for entry storage
+- Pre-commit hook (blocks commits when prior commits are undocumented)
+- Post-commit hook (reminds to document)
+- Claude Code Stop hook (blocks session end if pending entries)
+
+Timbers captures the *reasoning* behind commits — the "why" that git log can't tell you. Entries are files in `.timbers/` that sync via regular `git push`.
+
+Skip if the project is trivial or short-lived.
+
+---
+
 ## Step 8: Next Steps
 
 Point user to language-specific setup:
@@ -360,6 +388,7 @@ Point user to language-specific setup:
 git init
 # Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
 bd init
+timbers init --yes --git-hooks && timbers onboard --target agents >> AGENTS.md
 mise use just@latest
 # Then follow language skill for specifics
 ```
