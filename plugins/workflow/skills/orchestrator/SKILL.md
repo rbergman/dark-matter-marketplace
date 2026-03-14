@@ -209,13 +209,11 @@ When launching parallel subagents:
 
 ---
 
-## Git Worktrees
+## Worktree Isolation
 
-Use when parallel subagents need filesystem isolation (conflicting files, separate builds/servers).
+**For parallel subagents** — use Claude Code's native `isolation: "worktree"` parameter on the Agent tool. This automatically creates an ephemeral worktree, gives the subagent an isolated repo copy, and cleans up after. No manual setup needed. This is the default for parallel delegation where subagents touch overlapping files or need independent builds.
 
-**Skill:** `dm-work:worktrees`
-**Command:** `bd worktree create <name>` — handles git + beads integration automatically
-**Beads:** Automatic redirect to main repo's database (shared issue state)
+**For persistent feature branches** — use `bd worktree create` (see `dm-work:worktrees`) when you need a worktree that survives across sessions, has beads integration, and follows merge guardrails.
 
 ---
 

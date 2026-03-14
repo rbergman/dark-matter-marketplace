@@ -105,4 +105,4 @@ Task(subagent_type="<type>", model="opus", description="<3-5 words>", prompt="<p
 
 - Non-overlapping file ownership per subagent
 - YOU handle: index.ts, package.json, configs
-- Consider worktrees for isolation (`dm-work:worktrees`)
+- Use `isolation: "worktree"` on the Agent tool for filesystem isolation
