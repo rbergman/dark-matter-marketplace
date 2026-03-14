@@ -1,18 +1,20 @@
 // TypeScript ESLint Strict Configuration Template
 // Copy to project root as eslint.config.js
-// Requires: npm install -D eslint typescript-eslint @eslint-community/eslint-plugin-eslint-comments
+// Requires: npm install -D eslint typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs
 //
 // Usage: npx eslint src/
 // Auto-fix: npx eslint src/ --fix
 
 import tseslint from 'typescript-eslint';
 import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default tseslint.config(
   // --- Base: Strict Type-Checked ---
   // Includes recommended + recommended-type-checked + strict rules requiring type info
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+  sonarjs.configs.recommended,
 
   // --- Main Configuration ---
   {
@@ -102,6 +104,7 @@ export default tseslint.config(
         '@typescript-eslint/no-unsafe-return',
         '@typescript-eslint/no-floating-promises',
         'complexity',
+        'sonarjs/cognitive-complexity',
         'max-lines-per-function',
         'max-lines',
       ],
@@ -117,6 +120,10 @@ export default tseslint.config(
 
       // Cyclomatic complexity - keep functions simple
       'complexity': ['error', { max: 10 }],
+
+      // Cognitive complexity - penalizes nesting, breaks, continues, recursion
+      // Higher threshold than cyclomatic because it measures perceived difficulty
+      'sonarjs/cognitive-complexity': ['error', 15],
 
       // Maximum nesting depth - avoid arrow code
       'max-depth': ['error', 4],
@@ -238,6 +245,7 @@ export default tseslint.config(
       'max-lines-per-function': 'off',
       'max-lines': 'off',
       'complexity': 'off',
+      'sonarjs/cognitive-complexity': 'off',
       'max-depth': 'off',
 
       // Allow disabling rules in tests

@@ -44,7 +44,7 @@ Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates 
 ```bash
 # Initialize
 npm init -y
-npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments vitest husky
+npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs vitest husky
 
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
@@ -128,10 +128,12 @@ When creating a new project, use this complete template — omitting rules allow
 ```javascript
 import tseslint from 'typescript-eslint';
 import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default tseslint.config(
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
+  sonarjs.configs.recommended,
   {
     files: ['src/**/*.ts', 'src/**/*.tsx'],
     languageOptions: {
@@ -162,6 +164,7 @@ export default tseslint.config(
 
       // === COMPLEXITY LIMITS (enforced) ===
       'complexity': ['error', { max: 10 }],
+      'sonarjs/cognitive-complexity': ['error', 15],
       'max-depth': ['error', 4],
       'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
       'max-lines': ['error', { max: 400 }],
@@ -173,7 +176,7 @@ export default tseslint.config(
         '@typescript-eslint/no-unsafe-assignment',
         '@typescript-eslint/no-unsafe-argument',
         '@typescript-eslint/no-floating-promises',
-        'complexity', 'max-lines-per-function', 'max-lines',
+        'complexity', 'sonarjs/cognitive-complexity', 'max-lines-per-function', 'max-lines',
       ],
       '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
 
@@ -200,6 +203,7 @@ export default tseslint.config(
       'max-lines-per-function': 'off',
       'max-lines': 'off',
       'complexity': 'off',
+      'sonarjs/cognitive-complexity': 'off',
       '@eslint-community/eslint-comments/no-restricted-disable': 'off',
     },
   },
@@ -213,7 +217,8 @@ export default tseslint.config(
 |-------|-------|---------|
 | `max-lines` | 400 total | Prevent god modules (blanks + comments count) |
 | `max-lines-per-function` | 60 | Single responsibility |
-| `complexity` | 10 | Cyclomatic complexity cap |
+| `complexity` | 10 | Cyclomatic complexity (branching paths) |
+| `sonarjs/cognitive-complexity` | 15 | Cognitive complexity (perceived difficulty) |
 | `max-depth` | 4 | Avoid arrow code |
 | `max-params` | 4 | Use options objects |
 
