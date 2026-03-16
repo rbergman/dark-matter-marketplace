@@ -1,2 +1,4 @@
+{"actor":"Bob Bergman","comment":null,"created_at":"2026-03-04T09:32:08Z","event_type":"created","id":"4ca3385c-c797-4573-b29f-659b4efc501e","issue_id":"dark-matter-marketplace-8m9","new_value":"","old_value":""}
 {"actor":"Bob Bergman","comment":null,"created_at":"2026-03-04T09:32:08Z","event_type":"created","id":"f1c9ef65-14e1-4f27-82d5-4666f60531d1","issue_id":"dark-matter-marketplace-8m9","new_value":"","old_value":""}
+{"actor":"Bob Bergman","comment":null,"created_at":"2026-03-04T09:32:53Z","event_type":"closed","id":"04b998e4-234c-44bc-ae2f-839360f106d0","issue_id":"dark-matter-marketplace-8m9","new_value":"Migration test passed","old_value":""}
 {"actor":"Bob Bergman","comment":null,"created_at":"2026-03-04T09:32:53Z","event_type":"closed","id":"96978128-bbd1-4447-9064-85dc1051e910","issue_id":"dark-matter-marketplace-8m9","new_value":"Migration test passed","old_value":""}
