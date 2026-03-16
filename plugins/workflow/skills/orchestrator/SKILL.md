@@ -27,6 +27,7 @@ Delegate to subagents if ANY apply:
 - Read files to understand scope
 - Use Explore agent for codebase research
 - Claim/update/close beads (`bd` CLI)
+- **Open a bead before implementing ad hoc work** — when the user raises a task that doesn't have an existing bead, create one (`bd create`) before starting implementation. This creates a paper trail: every code change traces back to a bead, making session history, retros, and handoffs reliable.
 - Review and commit subagent work
 - Ask clarifying questions
 - Git operations (add, commit, push, branch)

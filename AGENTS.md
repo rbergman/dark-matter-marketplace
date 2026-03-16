@@ -95,11 +95,14 @@ bd close bd-42 --reason "Completed" --json
 ### Workflow for AI Agents
 
 1. **Check ready work**: `bd ready` shows unblocked issues
-2. **Claim your task atomically**: `bd update <id> --claim`
-3. **Work on it**: Implement, test, document
-4. **Discover new work?** Create linked issue:
+2. **Ad hoc request?** Create a bead first: `bd create "Title" --description="Context" -t task -p 2`
+3. **Claim your task atomically**: `bd update <id> --claim`
+4. **Work on it**: Implement, test, document
+5. **Discover new work?** Create linked issue:
    - `bd create "Found bug" --description="Details about what was found" -p 1 --deps discovered-from:<parent-id>`
-5. **Complete**: `bd close <id> --reason "Done"`
+6. **Complete**: `bd close <id> --reason "Done"`
+
+Every code change should trace back to a bead — this creates a full paper trail for session history, retros, and handoffs.
 
 ### Dolt Sync
 
