@@ -27,7 +27,7 @@ Fix failing gates before declaring work complete.
 
 ## Beads
 
-Use `bd init` to initialize beads for this project. Use `bd ready` to find available work, `bd close <id>` to complete, and `bd dolt push` to sync at session end. Use `bd remember "insight"` to persist factual learnings (library gotchas, API quirks, env behaviors) across sessions, and `bd memories <keyword>` to search them.
+Use `bd init` to initialize beads for this project. Use `bd ready` to find available work, `bd close <id>` to complete, and `bd backup export-git` to sync beads state at session end. Use `bd remember "insight"` to persist factual learnings (library gotchas, API quirks, env behaviors) across sessions, and `bd memories <keyword>` to search them.
 
 ### Bead-First Workflow
 

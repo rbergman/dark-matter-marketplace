@@ -107,7 +107,7 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 | Reason to allow GitHub | When needed |
 |------------------------|-------------|
 | Git-based dependencies | Cargo git deps, Go modules, npm git refs |
-| Beads push | `bd dolt push` pushes work state to remote |
+| Beads sync | `bd backup export-git` syncs work state via git backup branch |
 | Code search | Looking up OSS implementations |
 
 | Reason to block GitHub | Consideration |
@@ -116,7 +116,7 @@ srt uses JSON config files (default: `~/.srt-settings.json` or `-s <path>`).
 | Not always needed | Pure registry deps (crates.io, npm) don't need GitHub |
 | Context7 alternative | For docs/code lookup, Context7 is more focused |
 
-**Recommendation:** Start with minimal allowlist, add GitHub only if builds fail on git-based deps or you need `bd dolt push`.
+**Recommendation:** Start with minimal allowlist, add GitHub only if builds fail on git-based deps or you need `bd backup export-git`.
 
 ### Minimal vs Full Allowlists
 
@@ -155,7 +155,7 @@ All ecosystems need `api.anthropic.com`. Add ecosystem-specific domains:
 
 **Add `github.com`, `*.github.com` only if:**
 - Builds fail on git-based dependencies
-- You need `bd dolt push` for beads state persistence
+- You need `bd backup export-git` for beads state persistence
 
 ### MCP in Sandbox (Context7, Brightdata)
 
@@ -414,7 +414,7 @@ For **pure execution** (build, test, lint):
 - Claude works from training data + local context
 
 For **beads integration**:
-- GitHub required for `bd dolt push`
+- GitHub required for `bd backup export-git`
 - Alternative: Skip push during autonomous run, push manually after
 - Consider: Is persisting work state during autonomous run worth the exfiltration risk?
 

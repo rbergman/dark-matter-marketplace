@@ -9,7 +9,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
-bd dolt push              # Push beads to remote
+bd backup export-git      # Sync beads state to git
 ```
 
 ## Non-Interactive Shell Commands
@@ -44,7 +44,7 @@ cp -rf source dest          # NOT: cp -r source dest
 ### Why bd?
 
 - Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Syncs via Dolt remote (push/pull)
+- Git-friendly: Syncs via git backup branch (fast, conflict-safe)
 - Agent-optimized: JSON output, ready work detection, discovered-from links
 - Prevents duplicate tracking systems and confusion
 
@@ -104,19 +104,19 @@ bd close bd-42 --reason "Completed" --json
 
 Every code change should trace back to a bead — this creates a full paper trail for session history, retros, and handoffs.
 
-### Dolt Sync
+### Sync (Git Backup)
 
-bd uses Dolt as its storage backend. Sync explicitly:
+bd syncs beads state via a dedicated `beads-backup` git branch — fast, conflict-safe, no Dolt remote needed.
 
 ```bash
 # Start of session — pull latest:
-bd dolt pull
+bd backup fetch-git
 
 # End of session — push changes:
-bd dolt push
+bd backup export-git
 ```
 
-Beads 0.60+ auto-commits pending changes before pull/push, so explicit `bd dolt commit` is no longer needed.
+Beads 0.61+ auto-detects your git remote. No manual remote configuration needed.
 
 ### Important Rules
 
@@ -142,7 +142,7 @@ For more details, see README.md and docs/QUICKSTART.md.
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
    git pull --rebase
-   bd dolt push
+   bd backup export-git
    git push
    git status  # MUST show "up to date with origin"
    ```

@@ -59,7 +59,7 @@ When creating worktrees for isolated feature work, always place them under `.wor
 
 ## Beads
 
-Use `bd init` to initialize beads for this project. Use `bd ready` to find available work, `bd close <id>` to complete, and `bd dolt push` to sync at session end.
+Use `bd init` to initialize beads for this project. Use `bd ready` to find available work, `bd close <id>` to complete, and `bd backup export-git` to sync beads state at session end.
 
 ### Bead Detail Discipline
 

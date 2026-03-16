@@ -1,7 +1,7 @@
 # Beads Dolt Upgrade: Decision & Migration Guide
 
-**Date:** 2026-03-04 (updated 2026-03-13 for 0.60)
-**Status:** Decided — upgrade to beads 0.60+
+**Date:** 2026-03-04 (updated 2026-03-16 for 0.61)
+**Status:** Decided — upgrade to beads 0.61+
 
 ---
 
@@ -46,30 +46,54 @@ You don't manage the server. Beads handles start/stop. If a server is already ru
 
 ---
 
-## Dolt Remotes
+## Dolt Remotes (Legacy)
 
-Dolt remotes piggyback on your existing git remote. Data is stored under `refs/dolt/data` in the same git repo — no separate database server, no new credentials.
+Dolt remotes piggyback on your existing git remote via `git+ssh://` transport, storing data under `refs/dolt/data`. This was the only sync mechanism in 0.58-0.60.
 
-**When you need remotes:**
-- Multi-machine work (laptop + desktop sharing beads state)
-- Multi-developer collaboration on the same beads issues
-- CI/CD that reads or writes beads state
+**Problems with Dolt remotes:**
+- Push takes 10+ seconds (30+ seconds for large databases)
+- Non-fast-forward rejections when multiple agents/machines push concurrently
+- Requires Dolt server running for push/pull (routes through SQL server)
+- Manual `bd dolt remote add` setup per repo
 
-**When you don't need remotes:**
-- Single-machine, single-developer projects
-- Projects where beads is local-only scratchpad
+**When Dolt remotes still make sense:**
+- Multi-developer teams needing real-time sync (not our use case)
+- CI/CD that writes beads state and needs instant visibility elsewhere
 
-**Setup** (manual — beads does not auto-detect your git remote):
+For single-developer multi-machine setups (our case), use **git backup** instead (see next section).
+
+---
+
+## Sync: Git Backup (Recommended)
+
+Beads 0.61 introduces `bd backup export-git` and `bd backup fetch-git` — a git-native sync mechanism that replaces Dolt remotes for most workflows.
+
+**How it works:**
+- `bd backup export-git` exports JSONL snapshot to a dedicated `beads-backup` git branch, commits, and pushes
+- `bd backup fetch-git` fetches from that branch and restores into the local database
+- Uses regular git transport — fast, handles conflicts naturally, no Dolt server needed for sync
+
+**Advantages over Dolt remotes:**
+
+| | Dolt Remote | Git Backup |
+|---|---|---|
+| **Speed** | 10-30+ seconds | Milliseconds (small JSONL files) |
+| **Conflicts** | Non-fast-forward rejection | Git merge on backup branch |
+| **Setup** | `bd dolt remote add origin "git+ssh://..."` per repo | Nothing — auto-detects git remote |
+| **Server needed** | Yes (routes through Dolt SQL) | No (pure git + JSONL) |
+| **Data format** | Dolt binary | Human-readable JSONL |
+
+**Session workflow:**
 ```bash
-# Add the remote (git+ssh:// form of your git remote URL)
-bd dolt remote add origin "git+ssh://git@github.com/<owner>/<repo>.git"
+# Session end
+bd backup export-git   # pushes beads state to beads-backup branch
 
-# Push/pull explicitly:
-bd dolt push
-bd dolt pull
+# Session start (other machine)
+bd backup fetch-git    # pulls beads state from beads-backup branch
+bd ready               # find work
 ```
 
-The remote uses `git+ssh://` transport, so existing SSH keys and GitHub access work without additional config.
+**Automatic JSONL backup:** Beads also auto-exports JSONL to `.beads/backup/` every 15 minutes when a git remote is detected. These files are git-tracked on your current branch as a defense-in-depth safety net. The `export-git` mechanism is separate — it pushes to a dedicated branch for explicit cross-machine sync.
 
 ---
 
@@ -134,7 +158,7 @@ brew upgrade steveyegge/beads/bd
 # or: go install github.com/steveyegge/beads/cmd/bd@latest
 ```
 
-Verify: `bd --version` should show 0.60+.
+Verify: `bd --version` should show 0.61+.
 
 ### 3. Initialize Per Repo
 
@@ -164,25 +188,25 @@ For repos with many open issues, script the re-creation from the jsonl. For repo
 
 The old `.beads/beads.db*` files are no longer used. You can delete them after verifying migration succeeded.
 
-### 4. Configure Dolt Remote
+### 4. Configure Sync (Git Backup)
 
-Beads does **not** auto-detect your git remote. You must add it manually:
+Beads 0.61+ auto-detects your git remote for backup. Verify it's working:
 
 ```bash
-# Format: git+ssh:// version of your git remote
-bd dolt remote add origin "git+ssh://git@github.com/<owner>/<repo>.git"
-
-# First push must be forced to establish common ancestor
-bd dolt push --force
-
-# Verify roundtrip
-bd dolt pull
-bd dolt push    # should work without --force now
+bd backup status    # should show "enabled=true (auto: git remote detected)"
 ```
 
-This uses `refs/dolt/data` in the same git repo — no separate server or credentials needed. Your existing SSH keys work.
+To sync beads state across machines:
+```bash
+bd backup export-git    # push beads state (session end)
+bd backup fetch-git     # pull beads state (session start, other machine)
+```
 
-Skip this step if you only need beads locally (single machine, no sharing).
+**Migrating from Dolt remotes:** If you previously used `bd dolt remote add`, you can remove it:
+```bash
+bd dolt remote remove origin    # remove the Dolt remote
+```
+The Dolt remote is no longer needed — git backup handles cross-machine sync.
 
 ### 5. Update .gitignore
 
@@ -224,7 +248,7 @@ rmdir .git/beads-worktrees 2>/dev/null            # if empty
 
 ### 8. Replace `bd sync` in Scripts/Docs
 
-Replace any `bd sync` references with `bd dolt push` in automation, AGENTS.md, or workflow docs. `bd sync` does not exist in 0.59+. As of 0.60, `bd dolt push` auto-commits pending changes, so `bd dolt commit && bd dolt push` can be simplified to just `bd dolt push`.
+Replace any `bd sync` or `bd dolt push` references with `bd backup export-git` in automation, AGENTS.md, or workflow docs. `bd sync` does not exist in 0.59+. As of 0.61, `bd backup export-git` is the recommended sync mechanism, replacing `bd dolt push` for single-developer workflows.
 
 ---
 
@@ -292,5 +316,6 @@ If you use srt for autonomous Claude runs and need beads remote push:
 ## What We're NOT Doing
 
 - **Not pinning to 0.49 anymore** — the SQLite corruption issues (`no such column: spec_id`) made pinning a liability, not an asset
-- **Not running a shared Dolt server** — per-repo sidecar is simpler and sufficient for our single-developer workflow (though 0.60 adds shared server mode via `BEADS_DOLT_*` env vars if needed for multi-agent setups)
+- **Not using Dolt remotes for sync** — git backup (`bd backup export-git`) is faster and simpler for single-developer workflows. Dolt remotes remain available for multi-developer real-time sync if needed.
+- **Not setting up DoltHub** — git backup eliminates the need for a separate Dolt hosting service
 - **Not replacing beads with GitHub Issues** — they serve different purposes (see hybrid section above)
