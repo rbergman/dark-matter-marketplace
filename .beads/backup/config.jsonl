@@ -8,4 +8,7 @@
 {"key":"compact_tier2_dep_levels","value":"5"}
 {"key":"compaction_enabled","value":"false"}
 {"key":"issue_prefix","value":"dark-matter-marketplace"}
-{"key":"schema_version","value":"6"}
+{"key":"kv.memory.cc-agent-tool-has-native-isolation-worktree-for","value":"CC Agent tool has native isolation: \"worktree\" for ephemeral parallel subagent isolation — creates worktrees under .claude/worktrees/, auto-cleans up. Use bd worktree create only for persistent feature branches needing beads integration and merge guardrails."}
+{"key":"kv.memory.eslint-plugin-sonarjs-cognitive-complexity-rule-uses-plain","value":"eslint-plugin-sonarjs cognitive-complexity rule uses plain number arg in v4+: ['error', 15], NOT object form. Also sonarjs.configs.recommended may flag branded type aliases — disable sonarjs/redundant-type-aliases if using branded types."}
+{"key":"kv.memory.webfetch-cannot-access-reddit-com-or-medium-paywalled","value":"WebFetch cannot access reddit.com or Medium paywalled articles. Use WebSearch to find alternative sources (mirrors, GitHub links) when those URLs come up."}
+{"key":"schema_version","value":"7"}
