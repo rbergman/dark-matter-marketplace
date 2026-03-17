@@ -167,7 +167,7 @@ export default tseslint.config(
       'sonarjs/cognitive-complexity': ['error', 15],
       'max-depth': ['error', 4],
       'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
-      'max-lines': ['error', { max: 400 }],
+      'max-lines': ['error', { max: 400, skipComments: true }],
       'max-params': ['error', 4],
 
       // === BLOCK DISABLING CRITICAL RULES ===
@@ -215,7 +215,7 @@ export default tseslint.config(
 
 | Limit | Value | Purpose |
 |-------|-------|---------|
-| `max-lines` | 400 total | Prevent god modules (blanks + comments count) |
+| `max-lines` | 400 code | Prevent god modules (comments excluded) |
 | `max-lines-per-function` | 60 | Single responsibility |
 | `complexity` | 10 | Cyclomatic complexity (branching paths) |
 | `sonarjs/cognitive-complexity` | 15 | Cognitive complexity (perceived difficulty) |
@@ -223,6 +223,26 @@ export default tseslint.config(
 | `max-params` | 4 | Use options objects |
 
 Critical rules **cannot be disabled via eslint-disable comments** - the config blocks it.
+
+### When You Hit a Limit
+
+When a file or function exceeds its limit, **extract into companion files** rather than compressing existing code. Squashing code, removing comments, or shortening variable names to fit under a limit trades one problem (length) for a worse one (readability).
+
+**Preferred approach:**
+1. Identify logical sections within the file/function (validation, transformation, formatting, I/O)
+2. Extract each section into a well-named function or module — the function name itself documents what the section does
+3. Place extracted code in a companion file in the same directory (e.g., `order-service.ts` → `order-validation.ts`, `order-transforms.ts`)
+
+**When extraction is costly:**
+- Many local variables would need to be passed as parameters — consider an options/context object instead of growing the parameter list
+- Tightly coupled logic where splitting would require duplicating state — this may indicate the code needs a different decomposition axis (by entity rather than by phase)
+- Short functions that are already single-purpose — the limit may indicate the *file* has too many responsibilities, not that individual functions are too long
+
+**Never do these to fit under a limit:**
+- Remove useful comments or documentation
+- Compress whitespace or collapse readable formatting
+- Shorten descriptive variable/function names
+- Inline helper functions to reduce function count
 
 ---
 
@@ -285,7 +305,7 @@ project/
 - Over-complicated generic signatures
 - Non-null assertions (the `x!` operator) instead of proper narrowing
 - Truthy/falsy checks on non-booleans
-- Functions over 60 lines or files over 400 lines (refactor instead)
+- Functions over 60 lines or files over 400 lines (extract into companion files, don't compress)
 - God classes/objects with 10+ methods or properties
 - Deep inheritance hierarchies (prefer composition)
 - Barrel files that re-export everything (causes circular deps)

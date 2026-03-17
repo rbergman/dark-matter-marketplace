@@ -488,7 +488,8 @@ setup-force:
 - Bare `except:` clauses (always specify exception type)
 - Mutable default arguments (`def f(items=[])` - use `None` and create inside)
 - Star imports (`from module import *`)
-- God classes with 10+ methods
+- God classes with 10+ methods (extract into companion modules, don't compress)
+- Compressing code or removing comments to fit length limits (extract into well-named functions/modules instead)
 - Missing type annotations on public APIs
 - `Any` when specific types work
 - Nested functions when a module-level function suffices

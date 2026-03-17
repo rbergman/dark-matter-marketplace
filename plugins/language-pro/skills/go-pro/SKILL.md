@@ -361,6 +361,21 @@ setup-force:
 
 ---
 
+## When You Hit a Length Limit
+
+When a file or function exceeds its linter limit (funlen, file-length-limit, gocognit), **extract into companion files** rather than compressing existing code.
+
+**Preferred approach:**
+1. Identify logical sections (validation, transformation, I/O, mapping)
+2. Extract each into a well-named function — the name documents what the section does
+3. Place in a companion file in the same package (e.g., `order.go` → `order_validate.go`, `order_transform.go`)
+
+Go's package-level visibility makes extraction cheap — no parameter explosion since extracted functions in the same package access shared types naturally.
+
+**Never do these to fit under a limit:** remove useful comments, compress whitespace, shorten descriptive names, or inline helpers.
+
+---
+
 ## Anti-Patterns
 
 - `panic()` for recoverable errors (use `return err`)
@@ -369,7 +384,7 @@ setup-force:
 - Channels when mutex suffices
 - Getter/setter methods (Go isn't Java)
 - `init()` with side effects
-- God structs with 10+ fields/methods
+- God structs with 10+ fields/methods (extract into companion files, don't compress)
 - `interface{}` or `any` when specific types work
 - Premature generics (concrete types first)
 

@@ -141,9 +141,15 @@ Copy `references/eslint.config.js` to your project root. This config:
 | `complexity` | 15 | Cyclomatic complexity cap |
 | `max-depth` | 4 | Avoid deeply nested code |
 | `max-lines-per-function` | 80 | Single responsibility |
-| `max-lines` | 500 total | Prevent god modules (blanks + comments count) |
+| `max-lines` | 500 code | Prevent god modules (comments excluded) |
 | `max-params` | 5 | Use records for many params |
 | `max-nested-callbacks` | 3 | Flatten callback chains |
+
+### When You Hit a Limit
+
+When a file or function exceeds its limit, **extract into companion modules** rather than compressing existing code. ReScript's module system makes extraction natural — split by responsibility into sibling `.res` files in the same directory. Function names self-document what each extracted section does.
+
+**Never do these to fit under a limit:** remove useful comments, compress whitespace, shorten descriptive names, or inline helpers.
 
 ### React Hooks Validation
 
@@ -574,7 +580,7 @@ project/
 - Ignoring warnings (treat them as errors)
 - Mutable state everywhere (use immutable by default)
 - Deep nesting instead of early returns
-- Giant modules with 10+ functions (split by responsibility)
+- Giant modules with 10+ functions (extract into companion modules, don't compress)
 - Stringly-typed APIs (use variants for known values)
 - Using `@bs.as` instead of proper binding design
 - Ignoring `option` return types (always handle None)
