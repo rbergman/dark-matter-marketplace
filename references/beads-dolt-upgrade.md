@@ -208,9 +208,41 @@ bd dolt remote remove origin    # remove the Dolt remote
 ```
 The Dolt remote is no longer needed — git backup handles cross-machine sync.
 
-### 5. Update .gitignore
+### 5. Set Up Hooks
 
-Beads 0.58+ creates `.beads/.gitignore` automatically to exclude `dolt/` and runtime files. Verify it exists:
+Beads provides three hook installation modes:
+
+| Mode | Flag | Location | Committed? | Use case |
+|------|------|----------|------------|----------|
+| Default | (none) | `.git/hooks/` | No | Solo dev, simple setup |
+| Local | `--beads` | `.beads/hooks/` | No | Solo dev, keep `.git/hooks/` clean |
+| Shared | `--shared` | `.beads-hooks/` | Yes | Team repos — everyone gets hooks on pull |
+
+**For team repos, use shared hooks:**
+```bash
+bd hooks install --shared --chain    # --chain preserves existing hooks
+```
+
+**For solo repos:**
+```bash
+bd hooks install --beads             # or just: bd hooks install
+```
+
+Add `.beads/hooks/` to `.gitignore` regardless — local hooks should never be committed.
+
+**Pre-commit hook guard:** If your repo has a pre-commit hook running quality gates (lint, test, typecheck), add a branch guard so it doesn't fail when `bd backup export-git` commits to the `beads-backup` branch:
+```bash
+# Add after shebang in your repo's pre-commit hook (.git/hooks/pre-commit, .husky/pre-commit, etc.)
+if [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "beads-backup" ]; then
+  exit 0
+fi
+```
+
+This guard goes in the **repo's** hook, not in `.beads-hooks/`.
+
+### 6. Update .gitignore
+
+Beads 0.58+ creates `.beads/.gitignore` automatically to exclude `dolt/` and runtime files. Verify it exists and includes `hooks/`:
 
 ```bash
 cat .beads/.gitignore
@@ -301,6 +333,21 @@ Usually happens after a fresh `bd init` or clone recovery. The local and remote 
 **Fix options:**
 1. **Disable sandbox** — Run `/sandbox` and select "No Sandbox". If you're already running `bypassPermissions` + `skipDangerousModePermissionPrompt`, the sandbox isn't adding meaningful protection and is only creating friction with dolt.
 2. **Add localhost to allowlist** — If you want to keep the sandbox, add `127.0.0.1` to the network allowlist via `/sandbox` overrides.
+
+### `bd doctor` reports everything as "Skipped: requires CGO"
+
+**Symptom:** `bd doctor` shows ~10 checks in the OTHER section as "Skipped: requires CGO" (orphaned deps, duplicate issues, stale molecules, child-parent deps, test pollution, etc.).
+
+**Cause:** Pre-compiled binaries from `brew install` and `curl | bash` are pure Go without CGO support. Some Dolt internals used by these diagnostic checks require C library linking (CGO).
+
+**Impact:** Data integrity diagnostics are unavailable. Core functionality (create, close, ready, backup, sync) and critical doctor checks (connection, schema, git integration) are unaffected.
+
+**Fix (optional):** Build from source with CGO:
+```bash
+CGO_ENABLED=1 go install github.com/steveyegge/beads/cmd/bd@latest
+```
+
+For most workflows, the CGO warnings are noise and can be ignored.
 
 ---
 

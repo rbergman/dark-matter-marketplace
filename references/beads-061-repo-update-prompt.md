@@ -128,13 +128,54 @@ bd ready
 
 The git backup branch (`beads-backup`) has authoritative state. After restore, you can delete `.beads/dolt-corrupt`.
 
-### 5. Add new 0.61 features to workflow guidance
+### 5. Set up shared hooks (team repos)
+
+For team repos where multiple devs use beads, install shared hooks so everyone gets consistent behavior on pull:
+
+```bash
+# Install shared hooks (committed to git, versioned)
+bd hooks install --shared --chain
+```
+
+This creates `.beads-hooks/` with committable hook scripts that coexist with existing hooks (`--chain` runs existing hooks first). The hooks use section markers, so custom content outside the markers survives upgrades.
+
+**Important distinctions:**
+- `.beads-hooks/` — shared, committed to git, team-wide (use `--shared`)
+- `.beads/hooks/` — local only, should be in `.gitignore`, per-developer (use `--beads`)
+- `.git/hooks/` — default install location (no flag)
+
+**Add to `.gitignore`** (if not already):
+```
+.beads/hooks/
+```
+
+**The pre-commit branch guard (step 2) goes in the repo's own hook** (`.git/hooks/pre-commit`, `.husky/pre-commit`, etc.), NOT in `.beads-hooks/`. The shared beads hooks handle beads-specific logic; the branch guard protects the repo's quality gate hooks from running in the backup worktree context.
+
+**Clean up legacy hooks:** If the repo has outdated hooks in `.beads/hooks/` with old version markers (e.g., `v0.59.0`), delete them — they'll be replaced by the shared hooks:
+```bash
+rm -rf .beads/hooks/
+```
+
+### 6. Add new 0.61 features to workflow guidance
 
 If this repo's AGENTS.md has a beads workflow section, consider adding:
 - `bd close <id> --claim-next` — atomic close-and-claim for continuous work
 - `bd create --no-history` — skip Dolt commits for ephemeral/high-frequency beads
 - `bd create --skills="skill1,skill2"` — attach relevant skills to issues
 - `bd create --context="key=value"` — attach context metadata to issues
+
+### Troubleshooting: `bd doctor` CGO warnings
+
+`bd doctor` may report many checks as "Skipped: requires CGO" (orphaned deps, duplicate issues, stale molecules, etc.). This happens because `brew install` and `curl | bash` ship pre-compiled pure-Go binaries without CGO support. These are data integrity checks that require CGO-linked Dolt internals.
+
+**Impact:** ~10 diagnostic checks are unavailable. Core functionality (create, close, ready, backup, sync) is unaffected.
+
+**Fix (if you need full diagnostics):** Build from source with CGO enabled:
+```bash
+CGO_ENABLED=1 go install github.com/steveyegge/beads/cmd/bd@latest
+```
+
+For most workflows, the CGO warnings are noise. The critical checks (connection, schema, git integration) work without CGO.
 
 ### Instructions
 
@@ -143,6 +184,7 @@ If this repo's AGENTS.md has a beads workflow section, consider adding:
 3. Check AGENTS.md ↔ CLAUDE.md relationship (symlink? independent?) and update accordingly
 4. Make the replacements — be conservative, only change beads-related patterns
 5. Remove any Dolt remote configuration instructions
-6. Test `bd backup export-git` roundtrip
-7. Commit: `git commit -m "Update beads integration for 0.61 — switch to git backup sync"`
-8. Push: `git push`
+6. Set up shared hooks for team repos (step 5)
+7. Test `bd backup export-git` roundtrip
+8. Commit: `git commit -m "Update beads integration for 0.61 — switch to git backup sync"`
+9. Push: `git push`
