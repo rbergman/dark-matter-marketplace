@@ -325,18 +325,18 @@ project/
 
 **File size targets:** Production < 300 LOC (code, excluding comments), Tests < 500 LOC.
 
-### When You Hit a Limit
+### Responding to Limit Violations
 
-When a file or function exceeds its clippy/size limit, **extract into companion modules** rather than compressing existing code.
+**These limits exist to improve code architecture, not to be gamed.** When a file or function exceeds its clippy/size limit, the correct response is to decompose by responsibility.
 
-**Preferred approach:**
+**Extract, don't compress:**
 1. Identify logical sections (validation, transformation, serialization, domain logic)
 2. Extract each into a well-named function or submodule — the name documents what the section does
 3. Place in a companion file (e.g., `order.rs` → `order/validate.rs`, `order/transform.rs`) or a sibling module
 
-**When extraction is costly:** Many local variables would need to be passed — consider a context struct or builder pattern rather than growing parameter lists.
+**When extraction is costly:** Many locals to pass — consider a context struct or builder pattern.
 
-**Never do these to fit under a limit:** remove useful comments, compress whitespace, shorten descriptive names, or inline helpers.
+**Prohibited responses to limit violations:** combining statements onto single lines, removing or shortening comments, compressing whitespace, shortening descriptive names, inlining helpers. The goal is clean architecture, not metric compliance.
 
 ---
 

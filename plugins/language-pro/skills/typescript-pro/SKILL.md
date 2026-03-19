@@ -162,7 +162,10 @@ export default tseslint.config(
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/promise-function-async': 'error',
 
-      // === COMPLEXITY LIMITS (enforced) ===
+      // === COMPLEXITY LIMITS ===
+      // These limits exist to trigger EXTRACTION into well-named companion
+      // files/functions — NOT to compress code, remove comments, combine
+      // statements, or shorten names. When violated, decompose by responsibility.
       'complexity': ['error', { max: 10 }],
       'sonarjs/cognitive-complexity': ['error', 15],
       'max-depth': ['error', 4],
@@ -211,7 +214,27 @@ export default tseslint.config(
 );
 ```
 
-### Enforced Limits Summary
+### Responding to Limit Violations
+
+**These limits exist to improve code architecture, not to be gamed.** When a file or function exceeds a limit, the correct response is to decompose by responsibility — not to make the code fit by any means necessary.
+
+**Extract, don't compress:**
+1. Identify logical sections (validation, transformation, formatting, I/O)
+2. Extract each into a well-named function or module — the function name itself documents what the section does
+3. Place extracted code in a companion file in the same directory (e.g., `order-service.ts` → `order-validation.ts`, `order-transforms.ts`)
+
+**When extraction is costly** (many locals to pass), use a context/options object. If splitting would duplicate state, the code may need a different decomposition axis (by entity rather than by phase).
+
+**Prohibited responses to limit violations:**
+- Combining statements onto single lines
+- Removing or shortening comments
+- Compressing whitespace or collapsing readable formatting
+- Shortening descriptive variable/function names
+- Inlining helper functions to reduce function count
+
+Any of these trades one problem (length) for a worse one (readability). The goal is clean architecture, not metric compliance.
+
+### Enforced Limits
 
 | Limit | Value | Purpose |
 |-------|-------|---------|
@@ -223,26 +246,6 @@ export default tseslint.config(
 | `max-params` | 4 | Use options objects |
 
 Critical rules **cannot be disabled via eslint-disable comments** - the config blocks it.
-
-### When You Hit a Limit
-
-When a file or function exceeds its limit, **extract into companion files** rather than compressing existing code. Squashing code, removing comments, or shortening variable names to fit under a limit trades one problem (length) for a worse one (readability).
-
-**Preferred approach:**
-1. Identify logical sections within the file/function (validation, transformation, formatting, I/O)
-2. Extract each section into a well-named function or module — the function name itself documents what the section does
-3. Place extracted code in a companion file in the same directory (e.g., `order-service.ts` → `order-validation.ts`, `order-transforms.ts`)
-
-**When extraction is costly:**
-- Many local variables would need to be passed as parameters — consider an options/context object instead of growing the parameter list
-- Tightly coupled logic where splitting would require duplicating state — this may indicate the code needs a different decomposition axis (by entity rather than by phase)
-- Short functions that are already single-purpose — the limit may indicate the *file* has too many responsibilities, not that individual functions are too long
-
-**Never do these to fit under a limit:**
-- Remove useful comments or documentation
-- Compress whitespace or collapse readable formatting
-- Shorten descriptive variable/function names
-- Inline helper functions to reduce function count
 
 ---
 

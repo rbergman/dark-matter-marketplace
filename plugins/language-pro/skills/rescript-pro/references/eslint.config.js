@@ -23,6 +23,8 @@ export default [
       "react-compiler/react-compiler": "error",
 
       // === COMPLEXITY LIMITS ===
+      // When violated: EXTRACT into companion .res modules.
+      // Do NOT compress code, remove comments, combine statements, or shorten names.
       "complexity": ["error", { max: 15 }],
       "max-depth": ["error", 4],
       "max-lines-per-function": ["error", { max: 80, skipBlankLines: true, skipComments: true }],

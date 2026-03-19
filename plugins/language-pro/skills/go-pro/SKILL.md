@@ -361,18 +361,18 @@ setup-force:
 
 ---
 
-## When You Hit a Length Limit
+## Responding to Limit Violations
 
-When a file or function exceeds its linter limit (funlen, file-length-limit, gocognit), **extract into companion files** rather than compressing existing code.
+**These limits exist to improve code architecture, not to be gamed.** When a file or function exceeds its linter limit (funlen, file-length-limit, gocognit), the correct response is to decompose by responsibility.
 
-**Preferred approach:**
+**Extract, don't compress:**
 1. Identify logical sections (validation, transformation, I/O, mapping)
 2. Extract each into a well-named function — the name documents what the section does
 3. Place in a companion file in the same package (e.g., `order.go` → `order_validate.go`, `order_transform.go`)
 
 Go's package-level visibility makes extraction cheap — no parameter explosion since extracted functions in the same package access shared types naturally.
 
-**Never do these to fit under a limit:** remove useful comments, compress whitespace, shorten descriptive names, or inline helpers.
+**Prohibited responses to limit violations:** combining statements onto single lines, removing or shortening comments, compressing whitespace, shortening descriptive names, inlining helpers. The goal is clean architecture, not metric compliance.
 
 ---
 

@@ -145,11 +145,11 @@ Copy `references/eslint.config.js` to your project root. This config:
 | `max-params` | 5 | Use records for many params |
 | `max-nested-callbacks` | 3 | Flatten callback chains |
 
-### When You Hit a Limit
+### Responding to Limit Violations
 
-When a file or function exceeds its limit, **extract into companion modules** rather than compressing existing code. ReScript's module system makes extraction natural — split by responsibility into sibling `.res` files in the same directory. Function names self-document what each extracted section does.
+**These limits exist to improve code architecture, not to be gamed.** When a file or function exceeds its limit, decompose by responsibility. ReScript's module system makes extraction natural — split into sibling `.res` files in the same directory. Function names self-document what each extracted section does.
 
-**Never do these to fit under a limit:** remove useful comments, compress whitespace, shorten descriptive names, or inline helpers.
+**Prohibited responses to limit violations:** combining statements onto single lines, removing or shortening comments, compressing whitespace, shortening descriptive names, inlining helpers. The goal is clean architecture, not metric compliance.
 
 ### React Hooks Validation
 

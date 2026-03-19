@@ -116,6 +116,9 @@ export default tseslint.config(
 
       // ============================================================
       // CODE QUALITY - Structural limits
+      // When violated: EXTRACT into well-named companion files/functions.
+      // Do NOT compress code, remove comments, combine statements, or
+      // shorten names. The goal is clean architecture, not metric compliance.
       // ============================================================
 
       // Cyclomatic complexity - keep functions simple
