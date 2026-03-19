@@ -44,7 +44,7 @@ Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates 
 ```bash
 # Initialize
 npm init -y
-npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs vitest husky
+npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest husky
 
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
@@ -53,16 +53,19 @@ npm pkg set scripts.test="vitest run"
 npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
 npm pkg set scripts.prepare="husky"
 
-# Set up pre-commit hook
+# Configure lint-staged (formats only staged files on commit)
+npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,md,yml,yaml}": ["prettier --write"]}'
+
+# Set up pre-commit hook (lint-staged formats, then full check runs)
 npm run prepare
-echo "npm run check" > .husky/pre-commit
+echo 'npx lint-staged && npm run check' > .husky/pre-commit
 chmod +x .husky/pre-commit
 
 # Verify
 npm run check
 ```
 
-**Required Config Files:** Copy `references/gitignore` → `.gitignore`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
+**Required Config Files:** Copy `references/gitignore` → `.gitignore`, `references/prettierrc.json` → `.prettierrc`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
 
 ### Developer Onboarding
 
@@ -98,6 +101,7 @@ npm ci                      # Get dependencies
 **Auto-Fix First** - Always try auto-fix before manual fixes:
 
 ```bash
+npx prettier --write src/    # Format changed files
 npx eslint src/ --fix        # Fixes style, imports, etc.
 npx tsc --noEmit             # Type check without emit
 ```
@@ -113,9 +117,10 @@ Or via just (which combines both):
 just check
 ```
 
-**Pre-commit Hook** (automatic if husky configured):
-- Runs `npm run check` before every commit
-- Blocks commits with type errors, lint violations, or failing tests
+**Pre-commit Hook** (automatic if husky + lint-staged configured):
+- lint-staged formats only staged files via Prettier (no whole-repo formatting)
+- Then `npm run check` runs typecheck + lint + test
+- Blocks commits with formatting issues, type errors, lint violations, or failing tests
 
 ---
 
@@ -232,7 +237,7 @@ export default tseslint.config(
 - Shortening descriptive variable/function names
 - Inlining helper functions to reduce function count
 
-Any of these trades one problem (length) for a worse one (readability). The goal is clean architecture, not metric compliance.
+Any of these trades one problem (length) for a worse one (readability). The goal is clean architecture, not metric compliance. Prettier enforces consistent formatting, so compressed code will be expanded back to its readable form — extraction is the only sustainable fix.
 
 ### Enforced Limits
 
