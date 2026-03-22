@@ -110,7 +110,24 @@ Verify language-specific patterns are present for detected project type:
 | Go | `vendor/` (if vendoring), `bin/` |
 | Rust | `target/` |
 
-### 3.3 Secrets in tracked files (CRITICAL)
+### 3.3 `core.hooksPath` conflicts (IMPORTANT)
+
+```bash
+git config core.hooksPath 2>/dev/null
+```
+
+If set (typically to `.husky/`), this overrides `.git/hooks/` entirely — beads and timbers hooks installed there will never fire. Flag as IMPORTANT.
+
+**Fix:** Remove husky, unset `core.hooksPath`, and let beads own `.git/hooks/` with quality gates appended outside its section markers:
+```bash
+npm uninstall husky
+rm -rf .husky
+git config --unset core.hooksPath
+bd hooks install
+# Then append quality gates after END BEADS INTEGRATION marker
+```
+
+### 3.4 Secrets in tracked files (CRITICAL)
 
 ```bash
 git ls-files | grep -iE '\.env$|\.env\.|\.pem$|\.key$|credentials|secret' 2>/dev/null

@@ -44,25 +44,47 @@ Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates 
 ```bash
 # Initialize
 npm init -y
-npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest husky
+npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest
 
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
 npm pkg set scripts.lint="eslint src/"
 npm pkg set scripts.test="vitest run"
 npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
-npm pkg set scripts.prepare="husky"
 
 # Configure lint-staged (formats only staged files on commit)
 npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,md,yml,yaml}": ["prettier --write"]}'
 
-# Set up pre-commit hook (lint-staged formats, then full check runs)
-npm run prepare
-echo 'npx lint-staged && npm run check' > .husky/pre-commit
-chmod +x .husky/pre-commit
-
 # Verify
 npm run check
+```
+
+### Pre-commit Hook
+
+Quality gates run via a git pre-commit hook. **Do not use husky** — it sets `core.hooksPath` which conflicts with beads and timbers hooks in `.git/hooks/`.
+
+Add quality gates to `.git/hooks/pre-commit` outside the beads section markers (beads preserves content outside its markers on reinstall):
+
+```bash
+# After the END BEADS INTEGRATION marker (or at end of file if no beads):
+# Skip quality gates on beads-backup branch
+if [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "beads-backup" ]; then
+  exit 0
+fi
+npx lint-staged
+npm run check
+```
+
+If beads is installed, run `bd hooks install` first — it creates the hook with section markers. Then append the quality gate lines after the `END BEADS INTEGRATION` marker.
+
+If a project currently uses husky, migrate:
+```bash
+npm uninstall husky
+rm -rf .husky
+git config --unset core.hooksPath
+npm pkg delete scripts.prepare
+# Then reinstall beads hooks and add quality gates as above
+bd hooks install
 ```
 
 **Required Config Files:** Copy `references/gitignore` → `.gitignore`, `references/prettierrc.json` → `.prettierrc`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
@@ -117,10 +139,11 @@ Or via just (which combines both):
 just check
 ```
 
-**Pre-commit Hook** (automatic if husky + lint-staged configured):
+**Pre-commit Hook** (git hook with lint-staged):
 - lint-staged formats only staged files via Prettier (no whole-repo formatting)
 - Then `npm run check` runs typecheck + lint + test
 - Blocks commits with formatting issues, type errors, lint violations, or failing tests
+- Lives in `.git/hooks/pre-commit` alongside beads/timbers hooks (not husky)
 
 ---
 

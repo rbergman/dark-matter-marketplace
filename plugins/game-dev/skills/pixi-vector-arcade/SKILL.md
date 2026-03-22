@@ -39,7 +39,8 @@ Activate this skill when:
     "eslint": "^9.18.0",
     "vite": "^6.0.7",
     "vitest": "^3.0.4",
-    "husky": "^9.1.7"
+    "prettier": "^3.4.0",
+    "lint-staged": "^15.4.0"
   }
 }
 ```
