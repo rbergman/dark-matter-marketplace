@@ -116,10 +116,12 @@ See `references/monorepo-root.just` and `references/package-go.just` for templat
 Always provide a single `check` recipe that runs all quality gates:
 
 ```just
-# Full quality gates - run before commits
+# Full quality gates
 check: fmt lint test coverage-check
     @echo "All checks passed"
 ```
+
+In single-package repos, `just check` can run in a pre-commit hook. In monorepos, it's too slow for pre-commit — use lint-staged in the hook and run `just check` manually or in CI.
 
 ### Fast Check (Stop Hook Gate)
 

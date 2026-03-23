@@ -23,6 +23,12 @@ Pre-existing failures are still our problem. Compile/lint/typecheck/test failure
 
 Fix failing gates before declaring work complete.
 
+### Responding to Length/Complexity Violations
+
+File length, function length, and complexity limits exist to drive code toward clean decomposition. When you hit a limit, **extract logical sections into well-named companion files and functions** — don't compress code to fit.
+
+**Prohibited:** combining statements onto single lines, removing comments, compressing whitespace, shortening descriptive names. The goal is clean architecture, not metric compliance.
+
 ---
 
 ## Beads

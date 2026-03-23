@@ -53,7 +53,7 @@ npm pkg set scripts.test="vitest run"
 npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
 
 # Configure lint-staged (formats only staged files on commit)
-npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,md,yml,yaml}": ["prettier --write"]}'
+npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,yml,yaml}": ["prettier --write"]}'
 
 # Verify
 npm run check
@@ -86,6 +86,39 @@ npm pkg delete scripts.prepare
 # Then reinstall beads hooks and add quality gates as above
 bd hooks install
 ```
+
+### Monorepo Variant
+
+In monorepos (multiple packages, possibly mixed languages), adjust the setup:
+
+**lint-staged: scoped to TS packages only.** Don't format Go/Rust code with Prettier — they have their own formatters (goimports, rustfmt).
+
+```bash
+# Root package.json (npm workspaces / turborepo):
+npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --write"], "*.{json,yml,yaml}": ["prettier --write"]}'
+
+# Or independent packages (no workspaces): install lint-staged per TS package
+```
+
+**Pre-commit: lint-staged only, no `npm run check`.** Full quality gates across all packages are too slow for pre-commit. Run lint-staged in the hook, run full gates via `just check` or CI.
+
+```bash
+# .git/hooks/pre-commit (after beads markers):
+if [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "beads-backup" ]; then
+  exit 0
+fi
+npx lint-staged
+```
+
+For mixed-language monorepos without workspaces, detect which packages have staged files:
+
+```bash
+if git diff --cached --name-only | grep -q '^packages/web/'; then
+  (cd packages/web && npx lint-staged)
+fi
+```
+
+**`.prettierrc`: root-level.** Prettier walks up the directory tree, so a single root config covers all TS packages. Use per-package configs only if packages need different formatting.
 
 **Required Config Files:** Copy `references/gitignore` → `.gitignore`, `references/prettierrc.json` → `.prettierrc`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
 
