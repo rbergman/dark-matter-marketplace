@@ -103,12 +103,14 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
 | `dm-work:repo-health` | Skill | Audit repo config against CC and workflow best practices — severity-rated report with auto-fix |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
+| `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
 | `dm-work:session-retro` | Skill | End-of-session self-improvement — convert friction, mistakes, and discoveries into persistent rules and memories |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
 | `/dm-work:rotate` | Command | Session rotation — snapshot + save + /copy + /clear + paste to resume |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
+| `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |
 | `/dm-work:review` | Command | Parallel arch/code/security/design review with adversarial spec verification — local (beads) or PR (GH comments) |
 | `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
 | `/dm-work:advice` | Command | Get architectural guidance |

@@ -197,73 +197,63 @@ The evaluator (Phase 3.1) grades against these criteria. The browser QA skill (2
 
 ---
 
-## Phase 3: SDLC Pipeline
+## Phase 3: SDLC Pipeline — DONE (2026-03-28)
 
 **Goal:** Connect the pieces into a deterministic pipeline with autonomous evaluation.
 
-### 3.1 Evaluator Protocol
+**Council review (2026-03-28):** Three-perspective council (advocate, skeptic, pragmatist) reviewed the design. Key adjustments:
+- Evaluator only runs when browser-qa available OR criteria require runtime testing (avoids duplicating intent review)
+- Post-merge review scoped narrowly (not full re-review)
+- Phase 3.3 (review improvements) deferred to Phase 4 (wait for real review data)
+- Two-stage subagent review documented as clarification, not expansion
 
-**Core insight from Anthropic: separating the agent doing work from the agent judging it is far more tractable than making one agent self-critical.**
+### 3.1 Evaluator Protocol — SHIPPED
 
-**Design:**
-- Evaluator is a **separate agent** (not the orchestrator, not the subagent)
-- Reads: bead acceptance criteria (sprint contract), review findings, QA report
-- Tests: runs browser QA skill against acceptance criteria
-- Grades: pass/fail per criterion, with severity for failures
-- Reports: structured output compatible with beads
-- Files issues: failures become new beads linked to the original (`discovered-from`)
+New skill: `dm-work:evaluator`. Separate judge agent grading work against bead acceptance criteria.
 
-**When to invoke:**
-- After subagent work completes and passes mechanical gates
-- As a pre-merge check (between review and merge in the pipeline)
-- On-demand for existing features (regression testing)
+- **Scope separation from intent review:** Intent review checks CODE COVERAGE (does the diff contain the right changes?). Evaluator checks BEHAVIORAL CORRECTNESS (does the running app satisfy each criterion?).
+- **Skip conditions:** No acceptance criteria, XS/S tasks, clean intent review + no CDT, no bead.
+- **Integration:** Orchestrator Step 1.5 (between intent review and mechanical gates).
+- **Circuit breaker:** 2 failures on same criterion → escalate to user.
 
-**What this is NOT:**
-- Not a GAN loop (no iterative generation-evaluation cycle — that's Phase 4)
-- Not a replacement for mechanical quality gates (those still run first)
-- Not a replacement for human review (HITL gate at merge still exists)
+### 3.2 Post-Merge Review — SHIPPED
 
-### 3.2 Autonomous Post-Merge Review
+New command: `/dm-work:post-merge`. Autonomous review after code lands.
 
-**The user's stated goal: regular code review after code lands, ideally autonomous.**
+- Detects merge, runs scoped review (medium+ severity), runs evaluator on closed beads
+- Files findings as beads for next-session triage (HITL gate)
+- Merge command suggests running post-merge after successful merge (advisory)
+- Not a full re-review — focuses on net-new concerns, integration issues, criteria failures
 
-**Design:**
-- Triggered after merge (could be a git hook, a beads event, or a manual `/review --post-merge`)
-- Runs the full review pipeline (arch + code + security + design quality) against the merged diff
-- Evaluator runs browser QA against any acceptance criteria from the bead
-- Findings filed as new beads (type: bug or task, linked via `discovered-from`)
-- Next `bd ready` surfaces them as available work
+### 3.3 Review Pipeline Improvements — DEFERRED to Phase 4
 
-**HITL gate:** Findings go to beads, not directly to fixes. Human triages before work begins.
+Per council recommendation: wait for real review data across multiple sessions before investing in Scout optimizations. Items deferred:
+- Hard exclusion pre-filter (need data on which categories are noisy)
+- Adaptive reviewer count (need 20+ reviews to calibrate thresholds)
+- `.review-filter.md` per-repo customization (CLAUDE.md sufficient for now)
+- FP verification as default (current adversarial verification is heavyweight test-writing, not lightweight FP filtering)
+- Cost tracking / `--budget` flag
+- Incremental review memory
 
-**This is the "more workflow determinism" the user wants.** Code lands → gets reviewed → gets evaluated → issues filed → next session picks them up. Deterministic skeleton, autonomous execution.
+### 3.4 Two-Stage Subagent Review — DOCUMENTED
 
-### 3.3 Review Pipeline Improvements
-
-**From dm-review-skill-improvements analysis.** Concrete improvements to `/dm-work:review`:
-
-| Improvement | Priority | Description |
-|-------------|----------|-------------|
-| Hard exclusion pre-filter | High | Port from Anthropic's OSS action. Regex-based exclusion of known FP categories (DoS, rate limiting, memory safety, regex injection). Runs before reviewers, saves tokens. |
-| Verification phase (3.5) | High | Already exists in structure but optional. Make it a first-class mode for spec-compliance review. Uses Sonnet to verify findings against spec. |
-| Adaptive reviewer count | Medium | Light (1 reviewer) for small diffs, standard (3) for normal, deep (5) for large/security-sensitive. Currently always 3. |
-| Two-stage FP filter | Medium | Hard rules + Claude API for nuanced assessment. Supports project-level `.review-filter.md` for custom exclusions. |
-| Cost tracking | Low | `--budget` flag. Track review cost per invocation. |
-| Incremental review memory | Future | Remember prior review findings for a file, don't re-report known issues. |
-
-### 3.4 Two-Stage Subagent Review
-
-**Absorbed from Superpowers.** After subagent returns work:
-1. **Spec compliance check** — does the output match what was specified? (Uses bead acceptance criteria)
-2. **Code quality check** — standard review (arch/code/security)
-
-Currently the orchestrator does a "post-subagent verification" (intent review + mechanical gates) but doesn't separate spec compliance from code quality. Make this explicit in the orchestrator's post-return protocol.
+Clarified in orchestrator as explicit scope separation between intent review (spec coverage), evaluator (behavioral correctness), and code quality review (advisory). No pipeline expansion — existing flow with clearer documentation.
 
 ---
 
-## Phase 4: Harness (Future)
+## Phase 4: Harness + Review Optimization (Future)
 
-**Goal:** For ambitious, multi-hour autonomous builds. Builds ON the Phase 1-3 infrastructure.
+**Goal:** For ambitious, multi-hour autonomous builds. Builds ON the Phase 1-3 infrastructure. Also: optimize the review pipeline with real usage data.
+
+### 4.0 Review Pipeline Optimization (deferred from Phase 3)
+
+After running 20+ reviews across multiple projects, revisit:
+- **Hard exclusion pre-filter** — identify which finding categories are consistently noisy
+- **Adaptive reviewer count** — calibrate LOC thresholds for light/standard/deep/thorough
+- **Lightweight FP verification** — Sonnet pass to filter false positives (different from adversarial spec testing)
+- **`.review-filter.md`** — per-repo customization when CLAUDE.md proves insufficient
+- **Cost tracking** — `--budget` flag, per-review token stats in JSON output
+- **Incremental review memory** — store prior findings alongside review tags, don't re-report known issues
 
 ### 4.1 Planner Agent
 
@@ -340,12 +330,12 @@ Phase 2.2 (slop detection) ─── independent
 Phase 2.3 (sprint contracts) ─── independent
 Phase 2.4 (gate fixer) ─── depends on 1.3 (part of subagent protocol)
     │
-Phase 3.1 (evaluator) ─── depends on 2.1 (browser QA) + 2.3 (contracts)
-Phase 3.2 (post-merge review) ─── depends on 3.1 (evaluator)
-Phase 3.3 (review improvements) ─── depends on 2.2 (slop detection adds reviewer)
-Phase 3.4 (two-stage review) ─── depends on 2.3 (contracts for spec compliance)
+Phase 3.1 (evaluator) ─── DONE
+Phase 3.2 (post-merge review) ─── DONE
+Phase 3.3 (review improvements) ─── DEFERRED to Phase 4 (need review data)
+Phase 3.4 (two-stage review) ─── DONE (docs clarification)
     │
-Phase 4 (harness) ─── depends on Phase 3 pipeline working
+Phase 4 (harness + review optimization) ─── depends on Phase 3 pipeline working (DONE)
 ```
 
 ## Session Planning Guide

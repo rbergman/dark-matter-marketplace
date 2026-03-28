@@ -285,9 +285,22 @@ DETAIL: <1 sentence if rework needed>
 ```
 
 **Decision tree:**
-- VERDICT=accept → proceed to Step 2
+- VERDICT=accept → proceed to Step 1.5 (if applicable) or Step 2
 - VERDICT=rework → send GAPS back to original subagent for targeted fix
 - If you disagree with the reviewer's verdict, override it but log the disagreement (see Checkpoint Effectiveness Tracking)
+
+### Step 1.5: Evaluator (when browser-qa available or criteria require runtime testing)
+
+Run the evaluator (see `dm-work:evaluator`) to grade work against the bead's acceptance criteria.
+
+**When to run:** Intent review passed AND either:
+- CDT MCP is connected and app is running → full runtime evaluation
+- Acceptance criteria contain runtime-testable items ("user can...", "page shows...", "form validates...")
+
+**When to skip:** No acceptance criteria on bead, XS/S tasks, intent review clean + no CDT available, no bead.
+
+**On FAIL:** Send failure details back to subagent. Circuit breaker: 2 failures on same criterion → escalate to user.
+**On PASS or SKIP:** Proceed to Step 2.
 
 ### Step 2: Mechanical Gates (mandatory for all tasks)
 
@@ -299,8 +312,10 @@ DETAIL: <1 sentence if rework needed>
 
 ### Skip Conditions
 
-- **XS/S tasks:** Skip Step 1 (intent review). Mechanical gates (Step 2) are sufficient.
-- **Exploration/search subagents:** Skip both. No code changes to verify.
+- **XS/S tasks:** Skip Step 1 (intent review) and Step 1.5 (evaluator). Mechanical gates (Step 2) are sufficient.
+- **Exploration/search subagents:** Skip all. No code changes to verify.
+- **No acceptance criteria:** Skip Step 1.5 (evaluator). Intent review + gates handle it.
+- **No CDT + clean intent review (COVERAGE: full, DRIFT: none, GAPS: none):** Skip Step 1.5 (evaluator adds no value without runtime testing).
 
 ---
 

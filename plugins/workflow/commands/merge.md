@@ -69,3 +69,6 @@ git merge <source> --no-ff
   git branch -d <source-branch>
   ```
   Prompt user for confirmation before cleanup, but don't skip it — stale worktrees and merged branches create confusion in future sessions.
+- **Suggest post-merge review:**
+  After a successful merge, suggest: "Run `/dm-work:post-merge` to review the merged code?"
+  This is advisory — the user decides. Post-merge review runs the review pipeline + evaluator on the merged diff and files findings as beads for next-session triage.
