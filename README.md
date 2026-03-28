@@ -55,11 +55,9 @@ Commands use `/dm-work:command` format (e.g., `/dm-work:rotate`).
 dark-matter-marketplace/
 ├── plugins/           # Installable Claude Code plugins
 │   ├── architecture/  # dm-arch: SOLID, data-oriented patterns
-│   ├── drivers/       # dm-drvr: ARCHIVED — Codex, Gemini delegation
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
-│   ├── teams/       # dm-team: Agent Teams orchestration and collaboration
-│   ├── pm-script/     # dm-pmgr: DEFERRED — PM Script architecture reference
+│   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
 │   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
@@ -67,7 +65,6 @@ dark-matter-marketplace/
 │   ├── workflow.md    # Human guide to the dev loop
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lsp-setup.md   # LSP configuration and troubleshooting
-│   ├── autonomous-runs.md   # Sandboxing Claude (srt for CLI/autonomous runs)
 │   ├── lang-skill-adaptation.md  # Adapting skills + DX testing
 │   ├── multi-agent-coordination.md  # Three tiers: subagents vs Agent Teams vs Gastown
 │   └── testing-agent-teams.md  # Testing guide for dm-team plugin
@@ -106,7 +103,6 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
 | `dm-work:repo-health` | Skill | Audit repo config against CC and workflow best practices — severity-rated report with auto-fix |
 | `dm-work:session-retro` | Skill | End-of-session self-improvement — convert friction, mistakes, and discoveries into persistent rules and memories |
-| `dm-work:srt` | Skill | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous runs |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:refine` | Command | Sharpen individual work items |
 | `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
@@ -145,20 +141,7 @@ Language-specific expertise with strict, opinionated standards.
 | `dm-lang:python-pro` | Skill | Modern Python: uv, ruff, pyright, type safety, clean module design |
 | `dm-lang:rust-pro` | Skill | "Boring Rust" philosophy: clone freely, for loops over iterators, strict lints |
 | `dm-lang:typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
-| `dm-lang:rescript-pro` | Skill | Type-safe ReScript: exhaustive matching, typed FFI, React integration, pipe-first style |
 | `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
-
-### dm-pmgr (pm-script/) — DEFERRED
-
-> **Status:** Removed from marketplace. Files kept for reference. Revisit when PM Script architecture matures.
-
-Level 7.5 project manager — a Python script that sits between a human director and a Claude Code worker session. Spawns workers via `claude -p` (CLI backend) or the Claude Agent SDK. PM logic is deterministic; the only LLM interaction is the worker session itself.
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `pm.py` | Script | Phase 1 MVP — single worker, escalation routing, cost tracking, gate execution, session rotation |
-| `pm-script-architecture.md` | Reference | Full architecture: escalation engine, worker lifecycle, NL interface, demo/coherence |
-| `piloting-guide.md` | Reference | How to start using PM Script, phase by phase |
 
 ### dm-team (teams/)
 
@@ -211,7 +194,6 @@ Non-installable materials for reference and sharing.
 | `workflow.md` | Human guide to the development loop (80k rule, session rotation, beads) |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
-| `autonomous-runs.md` | Sandboxing Claude — `/sandbox` for interactive, srt for CLI/autonomous |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
 | `multi-agent-coordination.md` | Three tiers: subagents vs Agent Teams vs Gastown |
 | `testing-agent-teams.md` | Testing guide for the dm-team plugin |
@@ -257,7 +239,6 @@ The plugins include opinionated DX tooling that works together:
 | [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
 | CLI tools | `dm-work:cli-tools` | fd, rg, jq, yq, sd, bat, delta — power tools when built-ins aren't enough |
 | [tokf](https://tokf.net) | `dm-work:tokf` | CLI output compression — filter build/test/git noise before it reaches LLM context |
-| [srt](https://github.com/anthropic-experimental/sandbox-runtime) | `dm-work:srt` | Sandbox Runtime — OS-level isolation for CLI/autonomous runs (use `/sandbox` for interactive) |
 
 **The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.
 
@@ -266,21 +247,6 @@ The plugins include opinionated DX tooling that works together:
 [Beads](https://github.com/steveyegge/beads) is the issue tracking CLI I use, and it appears throughout these plugins. It's a critical part of my workflow — providing external state that survives session boundaries, enabling orchestrators to track progress across compactions, and giving subagents clear work items to implement.
 
 References to `bd` CLI, bead IDs (like `whiteout-4eed`), and bead states (`ready`, `claimed`, `done`) appear in many skills and agents. If you're not using beads, you can substitute your own issue tracking system or ignore those references.
-
----
-
-## Archived Plugins
-
-These plugins are no longer installable but kept in the repo for reference.
-
-### dm-drvr (drivers/)
-
-Agents for delegating work to external AI systems (Codex CLI, Gemini). Archived — neither driver has been used in active workflows for a while.
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `dm-drvr:codex-driver` | Agent | Delegate bead implementation to Codex CLI with quality gates |
-| `dm-drvr:gemini-driver` | Agent | Leverage Gemini's 1M context for planning, research, and deep analysis |
 
 ---
 

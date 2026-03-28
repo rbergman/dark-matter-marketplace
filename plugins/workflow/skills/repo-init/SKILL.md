@@ -333,7 +333,54 @@ fi
 
 ---
 
-## Step 7: Beads Initialization
+## Step 7: Claude Code Project Settings
+
+Create `.claude/settings.local.json` to wire DM orchestration, hooks, and session management for this project:
+
+```bash
+mkdir -p .claude
+```
+
+Write to `.claude/settings.local.json`:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v timbers &>/dev/null && [ -d .timbers ]; then timbers prime; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v timbers &>/dev/null && [ -d .timbers ]; then timbers hook run claude-stop; fi",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+This wires session-start context recovery and session-end enforcement. The DM plugin skills (orchestrator, subagent, language skills) are available globally from the plugin install — this file adds project-specific hooks.
+
+**Customize per-project:** Add project-specific SessionStart commands (e.g., `bd prime` if beads is initialized), adjust Stop hook timeout for heavy gate suites.
+
+---
+
+## Step 8: Beads Initialization
 
 ```bash
 bd init
@@ -341,7 +388,7 @@ bd init
 
 ---
 
-## Step 7.5: Timbers Initialization (Optional)
+## Step 8.5: Timbers Initialization (Optional)
 
 If the user wants structured development reasoning logs (what/why/how per commit):
 
@@ -368,7 +415,7 @@ Skip if the project is trivial or short-lived.
 
 ---
 
-## Step 8: Next Steps
+## Step 9: Next Steps
 
 Point user to language-specific setup:
 

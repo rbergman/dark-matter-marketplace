@@ -88,6 +88,17 @@ SKILLS: <relevant skills to activate>
 
 QUALITY GATES: <verification commands, e.g., npm run check>
 
+LINT CONTEXT: <codebase-specific lint rules/gotchas that subagents need to know>
+  Example: "SwiftLint type_contents_order enforced", "ESLint sonarjs/cognitive-complexity at 15",
+  "max-lines: 400, max-lines-per-function: 60"
+  Source these from: bd memories, AGENTS.md settled decisions, repo's lint config.
+  Accumulate new gotchas via `bd remember` when subagents hit lint issues.
+
+ACCEPTANCE CRITERIA: <specific testable criteria from the bead — what "done" looks like>
+  Before claiming a bead, write acceptance criteria into it if missing:
+  `bd update <id> --design="Acceptance: 1) ... 2) ... 3) ..."`
+  The evaluator grades against these. Vague criteria = vague evaluation.
+
 OWN (create/edit freely):
 - <file1>
 - <file2>
@@ -105,15 +116,18 @@ RETURN:
 
 M+ means medium, large, or extra-large complexity.
 
-Before launching any M+ subagent, verify these five items. Vague delegation is a top source of wasted work.
+Before launching any M+ subagent, verify these eight items. Vague delegation is a top source of wasted work.
 
-| Check | Question |
-|-------|----------|
-| Requirements mapped | Does every requirement from the bead/task have a corresponding action in the prompt? |
-| Correct layer | Is the work targeting the right architectural layer (controller vs service vs model)? |
-| File ownership explicit | Are OWN and READ-ONLY lists specific (not "relevant files")? |
-| Gates named | Is the exact gate command specified (not just "run tests")? |
-| Exit criteria clear | Will the subagent know unambiguously when it's done? |
+| # | Check | Question |
+|---|-------|----------|
+| 1 | Requirements mapped | Does every requirement from the bead/task have a corresponding action in the prompt? |
+| 2 | Correct layer | Is the work targeting the right architectural layer (controller vs service vs model)? |
+| 3 | File ownership explicit | Are OWN and READ-ONLY lists specific (not "relevant files")? |
+| 4 | Gates named | Is the exact gate command specified (not just "run tests")? |
+| 5 | Exit criteria clear | Will the subagent know unambiguously when it's done? |
+| 6 | Acceptance criteria in bead | Does the bead have testable acceptance criteria? If not, write them before delegating. |
+| 7 | Lint context included | Are codebase-specific lint rules/gotchas included? Check `bd memories` and AGENTS.md. |
+| 8 | Skills specified | Have you proactively selected ALL applicable skills (language, architecture, domain)? |
 
 If any check fails, fix the prompt before launching. Log to `history/checkpoint-effectiveness.log` if the checklist caught a real issue (see Checkpoint Effectiveness Tracking).
 
@@ -212,7 +226,11 @@ When launching parallel subagents:
 
 ## Worktree Isolation
 
-**For parallel subagents** — use Claude Code's native `isolation: "worktree"` parameter on the Agent tool. This automatically creates an ephemeral worktree, gives the subagent an isolated repo copy, and cleans up after. No manual setup needed. This is the default for parallel delegation where subagents touch overlapping files or need independent builds.
+**Default: all subagent implementation work uses worktree isolation.** Use `isolation: "worktree"` on the Agent tool for every implementation subagent. This gives each subagent an isolated repo copy and prevents branch contamination. The worktree auto-cleans if no changes are made.
+
+**Exceptions (skip isolation):**
+- Exploration/search subagents (read-only, no code changes)
+- Single tiny fix where isolation overhead isn't worth it (XS tasks, 1 file)
 
 **For persistent feature branches** — use `bd worktree create` (see `dm-work:worktrees`) when you need a worktree that survives across sessions, has beads integration, and follows merge guardrails.
 
@@ -283,6 +301,36 @@ DETAIL: <1 sentence if rework needed>
 
 - **XS/S tasks:** Skip Step 1 (intent review). Mechanical gates (Step 2) are sufficient.
 - **Exploration/search subagents:** Skip both. No code changes to verify.
+
+---
+
+## Gate Fixer Profile
+
+When a subagent delivers code that fails quality gates (lint, typecheck, formatting), don't spawn a full general-purpose agent to fix it. Use a focused gate fixer — cheaper, faster, no architectural decisions.
+
+```
+Task(subagent_type="general-purpose", model="haiku", description="Fix gate failures", prompt="
+ROLE: Gate fixer. Apply targeted fixes for lint/typecheck/format errors ONLY.
+
+ERROR OUTPUT:
+<paste the gate failure output>
+
+FILES TO FIX:
+<list only the files with errors>
+
+RULES:
+- Fix ONLY the errors shown in the output
+- Do NOT refactor, rename, or restructure anything
+- Do NOT add features, comments, or documentation
+- If a fix requires architectural judgment, escalate (report in BLOCKERS)
+
+QUALITY GATES: <same gate command>
+
+RETURN: DONE/BLOCKERS + files changed
+")
+```
+
+**When to use:** After subagent work fails gates and the failures are mechanical (lint violations, formatting, type errors). If failures indicate structural issues (missing imports from wrong architecture, test failures from logic errors), send back to the original subagent instead.
 
 ---
 

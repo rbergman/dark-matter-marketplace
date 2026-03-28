@@ -231,11 +231,55 @@ If pending commit count is high (>20), note it as INFO — suggest `timbers log`
 
 ---
 
-## Step 5.5: Quality Gate Checks
+## Step 5.5: DM Orchestration Wiring
+
+Check that the repo has Dark Matter plugin skills configured so the orchestrator and subagents behave consistently.
+
+### 5.5.1 `.claude/settings.local.json` exists (IMPORTANT)
+
+```bash
+[ -f .claude/settings.local.json ] && echo "exists" || echo "missing"
+```
+
+If missing → IMPORTANT. The orchestrator, subagent protocol, and skill activation depend on this file. Without it, DM plugins may be installed globally but not wired for the specific project.
+
+### 5.5.2 DM skills wired (IMPORTANT)
+
+If `.claude/settings.local.json` exists, check for baseline DM skill configuration:
+
+```bash
+# Check for dm-work skills
+jq -r '.skills // {} | keys[]' .claude/settings.local.json 2>/dev/null | grep -c 'dm-work' || echo "0"
+```
+
+**Baseline skills** that every project repo should wire (via plugin install or settings):
+- `dm-work:orchestrator` — delegation protocol
+- `dm-work:subagent` — worker protocol
+- At least one `dm-lang:*-pro` skill matching the project's language(s)
+
+If no dm-work skills are wired → NICE (not IMPORTANT). DM plugin skills are available globally from the plugin install. The real enforcement comes from hooks (5.5.3) and steering files (2.2, 2.3). Missing skills in settings.local.json means the project hasn't been explicitly configured, but the orchestrator will still activate from the global plugin.
+
+**Note:** The minimum indicator that a project is set up for DM workflows is the presence of `.claude/settings.local.json` with hooks (checked in 5.5.3). Explicit skill wiring is a bonus, not a requirement.
+
+### 5.5.3 Hooks wired (IMPORTANT)
+
+```bash
+jq -r '.hooks // {} | keys[]' .claude/settings.local.json 2>/dev/null
+```
+
+Check for essential hooks:
+- `SessionStart` — should prime beads or timbers
+- `Stop` — should run quality gates or timbers stop hook
+
+If no hooks → IMPORTANT. The project runs without session-boundary enforcement.
+
+---
+
+## Step 5.6: Quality Gate Checks
 
 Verify the repo has infrastructure to catch problems before they ship. Detection uses the project type from Step 1.
 
-### 5.5.1 Build system (IMPORTANT)
+### 5.6.1 Build system (IMPORTANT)
 
 Check for `justfile` at repo root:
 
@@ -257,7 +301,7 @@ just --list 2>/dev/null | grep -E '^\s*(check|test|setup|clean)\b'
 
 If no justfile at all → NICE (suggest creating via **just-pro** skill).
 
-### 5.5.2 Tool version pinning (NICE)
+### 5.6.2 Tool version pinning (NICE)
 
 ```bash
 [ -f .mise.toml ] && echo "exists" || echo "missing"
@@ -271,7 +315,7 @@ If exists, verify at least one tool is pinned (not just comments):
 grep -E '^\w+\s*=' .mise.toml 2>/dev/null | grep -v '^#'
 ```
 
-### 5.5.3 Language-specific quality configs (IMPORTANT)
+### 5.6.3 Language-specific quality configs (IMPORTANT)
 
 Each **lang-pro** skill ships strict reference configs that enforce complexity limits, file/function length caps, and comprehensive lint rules. Repos should adopt these configs — they represent the quality floor.
 
@@ -359,7 +403,7 @@ Three configs:
 | `"typeCheckingMode": "strict"` | Maximum type safety | IMPORTANT |
 | `reportUnknown*Type` rules enabled | Catches untyped code | IMPORTANT |
 
-### 5.5.4 Test infrastructure (IMPORTANT)
+### 5.6.4 Test infrastructure (IMPORTANT)
 
 Verify tests can be discovered:
 
@@ -379,7 +423,7 @@ find . -name 'test_*.py' -o -name '*_test.py' -maxdepth 3 | head -1 | grep -q . 
 
 No test files found → IMPORTANT. Suggest creating initial test structure via **lang-pro** skill.
 
-### 5.5.5 CI/CD (NICE)
+### 5.6.5 CI/CD (NICE)
 
 ```bash
 [ -d .github/workflows ] && ls .github/workflows/*.yml .github/workflows/*.yaml 2>/dev/null | head -5
@@ -391,11 +435,11 @@ If CI exists, verify it runs quality gates (grep for `test`, `check`, `lint` in 
 
 ---
 
-## Step 5.6: Session Retro Integration
+## Step 5.7: Session Retro Integration
 
 Check that the user's landing-the-plane workflow includes session retro.
 
-### 5.6.1 Landing-the-plane rule exists (IMPORTANT)
+### 5.7.1 Landing-the-plane rule exists (IMPORTANT)
 
 ```bash
 [ -f ~/.claude/rules/landing-the-plane.md ] && echo "exists" || echo "missing"
@@ -403,7 +447,7 @@ Check that the user's landing-the-plane workflow includes session retro.
 
 If missing → flag as IMPORTANT. Offer to create from the standard template (see dm-work:session-retro skill for context).
 
-### 5.6.2 Session retro step present (IMPORTANT)
+### 5.7.2 Session retro step present (IMPORTANT)
 
 ```bash
 grep -qi 'session.retro\|session-retro' ~/.claude/rules/landing-the-plane.md 2>/dev/null && echo "present" || echo "missing"

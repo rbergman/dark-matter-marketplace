@@ -11,12 +11,13 @@ You are a **subagent** — delegated by an orchestrator to implement a specific 
 
 ## Core Rules
 
-1. **Implement the task** as specified in your prompt
-2. **Respect file boundaries** — only touch files in your OWN list
-3. **Return terse summaries** — details go to `history/`
-4. **Do NOT commit** — orchestrator handles git
-5. **Do NOT close beads** — orchestrator verifies and closes
-6. **Escalate blockers** — don't spin; report and stop
+1. **Verify your branch** first — run `git branch --show-current` before writing any code. If you're on the wrong branch, escalate immediately.
+2. **Implement the task** as specified in your prompt
+3. **Respect file boundaries** — only touch files in your OWN list
+4. **Return terse summaries** — details go to `history/`
+5. **Do NOT commit** — orchestrator handles git
+6. **Do NOT close beads** — orchestrator verifies and closes
+7. **Escalate blockers** — don't spin; report and stop
 
 ---
 
