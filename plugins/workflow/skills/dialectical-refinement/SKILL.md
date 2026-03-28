@@ -131,9 +131,10 @@ If 2+ indicators trigger, return to Phase 3 with guidance to restore scope.
 
 - Resolve remaining Proposer/Advocate debates
 - Write concrete implementation details
-- Define testable acceptance criteria
+- Define testable acceptance criteria (see Sprint Contract below)
 - Document OUT OF SCOPE explicitly
 - **Ensure spec is standalone-reviewable** (see below)
+- **Write acceptance criteria into the bead** (see Sprint Contract below)
 
 **Standalone Context Requirement:**
 
@@ -148,6 +149,32 @@ The final spec must be reviewable by an external agent without access to convers
 
 Keep context token-efficient: enough for an external reviewer to assess readiness, not a full project overview.
 
+**Sprint Contract — Acceptance Criteria:**
+
+Phase 5 MUST produce specific, testable acceptance criteria. These are the contract between the agent doing work and the agent judging it. Vague criteria produce vague evaluation.
+
+Good criteria are **observable from outside the code** — an evaluator using `browser-qa` should be able to verify each one by navigating the app, clicking, and checking results.
+
+```markdown
+## Acceptance Criteria
+1. User can navigate to /settings and see their profile
+2. Email field rejects invalid format with visible error message
+3. Save button is disabled while the form is submitting
+4. Success toast appears within 2 seconds after save
+5. No console errors during the entire flow
+6. Settings persist after page reload
+```
+
+After synthesis, **write the criteria into the bead**:
+```bash
+bd update <id> --design="Acceptance criteria:
+1. ...
+2. ...
+"
+```
+
+This is the sprint contract. The evaluator grades against it. The browser QA skill tests it. Without criteria in the bead, there is nothing to evaluate.
+
 **Spec Structure:**
 ```markdown
 ## Introduction
@@ -157,7 +184,7 @@ Keep context token-efficient: enough for an external reviewer to assess readines
 [What's being built]
 
 ## Acceptance Criteria
-[Testable outcomes]
+[Testable outcomes — same criteria written to the bead]
 
 ## Out of Scope
 [Explicit boundaries]

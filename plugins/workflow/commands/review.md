@@ -1,6 +1,6 @@
 ---
-description: Run parallel architecture, code, and security review with local beads or GitHub PR comments
-argument-hint: "--pr <number>, --commits <range>, --only <acs>, --min-severity <level>, --skip-beads, --output-file <path>, --format json, --no-interactive, --adversarial"
+description: Run parallel architecture, code, security, and design review with local beads or GitHub PR comments
+argument-hint: "--pr <number>, --commits <range>, --only <acsd>, --min-severity <level>, --skip-beads, --output-file <path>, --format json, --no-interactive, --adversarial"
 ---
 
 # Unified Code Review Command
@@ -20,7 +20,7 @@ $ARGUMENTS
 |------|-------------|---------|
 | `--pr <number>` | PR mode - post findings as GH review comments | (local mode) |
 | `--commits <range>` | Explicit commit range (e.g., `HEAD~5..HEAD`) | auto-detect |
-| `--only <letters>` | Filter reviewers: a=arch, c=code, s=security | `acs` (all) |
+| `--only <letters>` | Filter reviewers: a=arch, c=code, s=security, d=design | `acs` (all, design opt-in) |
 | `--min-severity <level>` | Filter output: low\|medium\|high\|critical | all |
 | `--skip-beads` | Local mode only - don't create beads | create beads |
 | `--output-file <path>` | Write findings to file instead of inline report | (inline) |
@@ -164,12 +164,13 @@ REVIEW_DOMAINS:
 
 ## Phase 3: Parallel Reviewers
 
-Launch reviewers based on `--only` filter. Default is all three (`acs`).
+Launch reviewers based on `--only` filter. Default is `acs` (design is opt-in via `d`).
 
 **Parse `--only` flag:**
 - `a` → Architecture reviewer
 - `c` → Code reviewer
 - `s` → Security reviewer
+- `d` → Design quality reviewer (opt-in — not included in default `acs`)
 
 Launch selected reviewers in a SINGLE message (parallel execution).
 
@@ -408,6 +409,101 @@ Flag anything exploitable. Be thorough but not paranoid.
 ")
 ````
 
+### Design Quality Reviewer (d) — Opt-In
+
+Only runs when `d` is included in `--only` (e.g., `--only acsd` or `--only d`). Not part of the default `acs` set because it reviews UI/visual concerns that not every project has.
+
+**Best with CDT MCP:** If the chrome-devtools MCP is connected and the app is running, the reviewer takes screenshots for visual evaluation. Without CDT, it falls back to code-only review of CSS/component files.
+
+````
+Task(subagent_type="general-purpose", model="opus", description="Design quality review", prompt="
+You are a Senior Design Quality Reviewer. Review the UI-facing code for design quality and AI slop patterns.
+
+SCOPE:
+- Commit range: <range>
+- Files: <UI-relevant files from scout: CSS, components, templates, layouts>
+- Project type: <from scout>
+
+VISUAL INSPECTION (if chrome-devtools MCP available and app running):
+1. Navigate to affected pages
+2. Take screenshots (desktop + mobile viewport)
+3. Evaluate visual output against criteria below
+
+CODE INSPECTION (always):
+Review CSS, component, and layout files in the diff.
+
+REVIEW CRITERIA:
+
+1. **AI Slop Detection** — penalize generic patterns
+   - Generic gradient backgrounds (purple/blue over white cards)
+   - Template-default spacing, typography, and color choices
+   - Identical component styling across unrelated sections
+   - Stock placeholder content that survived to production
+   - Over-reliance on rounded corners + drop shadows + blur
+   - Generic hero sections with centered text over stock imagery
+   - No distinct visual identity or mood — indistinguishable from other AI output
+   - Excessive use of utility classes without semantic abstraction
+
+2. **Design Coherence**
+   - Consistent typography hierarchy (headings, body, captions)
+   - Spacing follows a defined scale (not random px values)
+   - Color palette is intentional, not default
+   - Components feel like parts of the same whole
+   - Distinct mood or identity (could you identify this app from a screenshot?)
+
+3. **Design Craft**
+   - Contrast ratios meet WCAG AA (4.5:1 text, 3:1 large text)
+   - Interactive elements have visible focus/hover/active states
+   - Loading, empty, and error states are designed (not default browser)
+   - Responsive behavior is intentional (not just broken desktop layout)
+   - Animations serve a purpose (feedback, orientation) not decoration
+
+4. **Code Patterns**
+   - Hard-coded colors instead of design tokens or CSS variables
+   - Inline styles that duplicate theme values
+   - Magic numbers for spacing/sizing (use scale)
+   - Duplicated styling across unrelated components
+   - Missing dark mode support where the project uses it
+
+AI SLOP SCORE: Rate the overall output on a 1-5 scale:
+  5 = Distinctive, clearly designed with intent
+  4 = Solid, some custom decisions visible
+  3 = Adequate but generic, could be any app
+  2 = Template-feeling, minimal custom design decisions
+  1 = Pure AI slop, generic patterns throughout
+
+FOCUS AREAS: <from scout>
+
+OUTPUT as JSON to stdout:
+```json
+{
+  \"reviewer\": \"design\",
+  \"summary\": \"1-2 sentence design quality assessment\",
+  \"slop_score\": 3,
+  \"findings\": [
+    {
+      \"path\": \"src/components/Hero.tsx\",
+      \"line\": 15,
+      \"side\": \"RIGHT\",
+      \"severity\": \"medium\",
+      \"size_estimate\": \"M\",
+      \"category\": \"ai-slop\",
+      \"body\": \"[Design] **medium** - ai-slop\\n\\nGeneric purple-to-blue gradient with centered white text. This hero section is indistinguishable from template defaults. Replace with project-specific colors and layout.\"
+    }
+  ]
+}
+```
+
+Severity guide:
+- critical: Design makes the app unusable or inaccessible
+- high: Significant design issue (WCAG failure, broken responsive, pure slop)
+- medium: Generic but functional (template defaults, no identity)
+- low: Polish opportunity (missing hover state, spacing inconsistency)
+
+Only flag genuine concerns. Focus on patterns, not individual style preferences.
+")
+````
+
 ---
 
 ## Phase 3.5: Adversarial Verification (`--adversarial`)
@@ -562,7 +658,8 @@ When `--format json` is specified, produce machine-readable output:
   "summaries": {
     "architecture": { "verdict": "pass", "summary": "Clean module boundaries" },
     "code": { "verdict": "issues", "summary": "2 unchecked errors" },
-    "security": { "verdict": "pass", "summary": "No vulnerabilities found" }
+    "security": { "verdict": "pass", "summary": "No vulnerabilities found" },
+    "design": { "verdict": "issues", "summary": "AI slop score 2/5, generic template patterns", "slop_score": 2 }
   },
   "findings": [
     {
@@ -640,6 +737,7 @@ Priority mapping:
 **Code Quality**: <PASS/ISSUES verdict + summary>
   (if domain-split: one sub-line per domain, e.g., "  frontend: PASS", "  backend: ISSUES - ...")
 **Security**: <PASS/ISSUES verdict + summary>
+**Design Quality** (if `d` included): <PASS/ISSUES verdict + summary + AI slop score>
 
 Run `bd ready` to see created issues.
 ````
@@ -685,6 +783,7 @@ REVIEW_BODY="## Automated PR Review
 **Architecture:** <arch_summary>
 **Code Quality:** <code_summary>
 **Security:** <security_summary>
+$(if d in --only: **Design Quality:** <design_summary> (AI slop score: <N>/5))
 
 ---
 *<N> inline comments below*"
@@ -730,6 +829,12 @@ gh api repos/$OWNER_REPO/pulls/$PR_NUMBER/reviews \
 
 # PR review, security only
 /dm-work:review --pr 123 --only s
+
+# Include design quality review (opt-in)
+/dm-work:review --only acsd
+
+# Design-only review (UI changes)
+/dm-work:review --only d
 
 # Automated/nightly: JSON output to file, no prompts, no beads
 /dm-work:review --format json --output-file review-findings.json --no-interactive --skip-beads
