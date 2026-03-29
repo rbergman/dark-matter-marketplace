@@ -232,7 +232,6 @@ Per council recommendation: wait for real review data across multiple sessions b
 - Adaptive reviewer count (need 20+ reviews to calibrate thresholds)
 - `.review-filter.md` per-repo customization (CLAUDE.md sufficient for now)
 - FP verification as default (current adversarial verification is heavyweight test-writing, not lightweight FP filtering)
-- Cost tracking / `--budget` flag
 - Incremental review memory
 
 ### 3.4 Two-Stage Subagent Review — DOCUMENTED
@@ -272,7 +271,6 @@ Pipeline cheat sheet added to orchestrator SKILL.md: SPEC → CONTRACT → IMPLE
 After running 20+ reviews across multiple projects, revisit:
 - **Adaptive reviewer count** — calibrate LOC thresholds
 - **Lightweight FP verification** — Sonnet pass to filter false positives
-- **Cost tracking** — `--budget` flag
 - **Incremental review memory** — don't re-report known issues
 - **Formal harness** — shell script or Agent SDK if skill-based pipeline hits limits
 - **GitHub bridge** — beads → GitHub issues (bd feature request)
@@ -304,9 +302,9 @@ Three brainstorming paths is too many:
 
 Council is used regularly — keep. Tiered-delegation is the decision framework — keep. The rest (lead, teammate, refinement, review, brainstorm, compositions) stays installed but gets evaluated over the next few sessions. Agent Teams maturity from Anthropic will inform this.
 
-### tokf Testing
+### Output Compression (RTK + tokf)
 
-Deliberately test in a build-heavy session. If it helps, promote in documentation. If not, archive.
+RTK installed as global baseline (zero-config). tokf available for per-project customization. Skill renamed from `dm-work:tokf` to `dm-work:output-compression` to cover both tools. Test in build-heavy sessions to validate actual savings.
 
 ### Cross-Project Retro
 

@@ -10,7 +10,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 **Related skills:**
 - **just-pro** - Build system patterns and templates
 - **mise** - Tool version management
-- **tokf** - CLI output compression for LLM context efficiency
+- **output-compression** - CLI output compression (RTK + tokf)
 - Timbers (`timbers init`) - Development reasoning ledger
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
@@ -291,25 +291,19 @@ Create `.mise.toml`:
 
 ---
 
-## Step 5.5: tokf Setup (Optional)
+## Step 5.5: Output Compression (Optional)
 
-If the user wants CLI output compression for LLM context efficiency:
+CLI output compression reduces build/test/git noise before it reaches LLM context. See **output-compression** skill for full details.
 
 ```bash
-# Install tokf
-brew install mpecan/tokf/tokf   # or: cargo install tokf, mise use -g tokf
+# Option 1: RTK (zero-config baseline — recommended)
+command -v rtk &>/dev/null && rtk init --global || echo "Install: brew install rtk"
 
-# Set up Claude Code hook (auto-filters Bash output)
-tokf hook install
-
-# Enable agent filter authoring
-tokf skill install
-
-# Verify
-tokf ls                          # List available filters
+# Option 2: tokf (per-project customization — add when RTK isn't enough)
+command -v tokf &>/dev/null && tokf hook install || echo "Install: brew install mpecan/tokf/tokf"
 ```
 
-Optionally create `.tokf/filters/` for project-specific filter overrides and commit it. See **tokf** skill for full configuration details.
+Either or both tools can be active. RTK handles most CLI noise automatically. Add tokf with project-local `.tokf/filters/` when you need surgical filtering for specific commands.
 
 ---
 
