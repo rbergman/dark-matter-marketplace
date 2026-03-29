@@ -55,6 +55,16 @@ npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
 # Configure lint-staged (formats only staged files on commit)
 npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,yml,yaml}": ["prettier --write"]}'
 
+# Create .prettierignore (prevent formatting machine-generated and non-TS files)
+cat > .prettierignore << 'EOF'
+coverage/
+dist/
+node_modules/
+.worktrees/
+.timbers/
+.beads/
+EOF
+
 # Verify
 npm run check
 ```
@@ -177,6 +187,7 @@ just check
 - Then `npm run check` runs typecheck + lint + test
 - Blocks commits with formatting issues, type errors, lint violations, or failing tests
 - Lives in `.git/hooks/pre-commit` alongside beads/timbers hooks (not husky)
+- `.prettierignore` must exclude `.timbers/` and `.beads/` — without this, lint-staged reformats timbers JSON during commit, but its stash/restore cycle puts the original format back in the working tree, creating perpetual `MM` diffs with no semantic content
 
 ---
 
