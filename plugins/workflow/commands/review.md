@@ -345,6 +345,20 @@ SCOPE:
 - Files: <security-relevant files: auth, input handling, *.tf, *.sh, env>
 - Project type: <from scout>
 
+EXCLUSIONS (do not flag findings in these categories for this project):
+<Scout determines project type from Phase 2, then applies defaults below.
+ Override: if AGENTS.md or CLAUDE.md has a '## Review Exclusions' section, use it instead.>
+
+Default exclusion rules by project type:
+- DoS / resource exhaustion → exclude unless project is a web-facing service
+- Rate limiting → exclude unless project has a public API
+- Memory safety → exclude unless project uses C/C++/Rust
+- Open redirect → exclude unless project has auth/login flows
+- Regex injection → exclude unless project accepts user-supplied regex
+- SSRF → exclude unless project does server-side URL fetching
+
+If a category is excluded, skip it entirely — do not mention it. Focus review time on categories that apply.
+
 REVIEW CHECKLIST:
 1. **Secrets Handling**
    - Hardcoded secrets, API keys, tokens

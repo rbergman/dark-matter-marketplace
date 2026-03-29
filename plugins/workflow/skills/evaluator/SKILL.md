@@ -128,12 +128,29 @@ The orchestrator processes evaluator output:
 - Use haiku model for code-only evaluation if criteria are simple
 - Use opus for browser-qa evaluation (needs to drive CDT tools effectively)
 
+## Platform-Specific Verification
+
+Not all projects use browser-qa. The evaluator should adapt:
+
+| Project type | Verification method | Evaluator behavior |
+|-------------|--------------------|--------------------|
+| **Standard web app** | browser-qa (CDT MCP) | Full runtime evaluation |
+| **WebGL / Canvas game** | Manual screenshots + human verification | Mark runtime criteria UNTESTABLE; take screenshots if CDT available for visual reference, but can't assert on canvas content |
+| **Native iOS/Android** | Maestro or platform-specific tools | Mark runtime criteria UNTESTABLE unless project has automated UI test tooling wired |
+| **CLI tool** | Bash execution + output assertion | Code-only evaluation; test commands via bash, not browser |
+| **API / backend** | curl / httpie + response assertion | Code-only for endpoints; evaluate_script or direct API calls |
+
+When runtime verification isn't possible, the evaluator should:
+1. Grade all code-verifiable criteria normally
+2. Mark platform-specific criteria as UNTESTABLE with the reason and recommended verification method
+3. Include a note: "Manual verification recommended for: [list criteria]"
+
 ## Integration Points
 
 | Component | How evaluator connects |
 |-----------|----------------------|
 | **Orchestrator** | Calls evaluator as Step 1.5 in post-subagent verification |
-| **Browser-qa** | Evaluator activates browser-qa skill for runtime testing |
+| **Browser-qa** | Evaluator activates browser-qa skill for standard web apps |
 | **Beads** | Reads acceptance criteria from bead; files new beads for failures |
 | **Sprint contracts** | Acceptance criteria in bead ARE the sprint contract |
 | **Post-merge review** | Post-merge command uses evaluator for closed beads |

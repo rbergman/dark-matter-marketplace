@@ -245,11 +245,21 @@ Runs 5-phase refinement on a bead or spec file.
 4. Updates bead, adds `refined` label
 
 ### `/breakdown <target>`
-Decomposes epic/spec into tasks.
-1. Refines target first (if not already)
+Decomposes epic/spec into tasks. Also serves as the **planner entry point** — if given a vague brief instead of a refined spec, it refines first, then decomposes.
+
+1. Refines target first (if not already refined)
 2. Proposes task breakdown with complexity estimates
-3. Creates beads with dependencies and labels
-4. Links tasks to parent epic
+3. **Writes testable acceptance criteria on each child bead** (sprint contracts)
+4. Creates beads with dependencies and labels
+5. Links tasks to parent epic
+6. **Presents plan for user approval** (HITL gate) before creating beads
+
+**Vague-on-HOW principle:** When decomposing, be ambitious about WHAT each task delivers but not prescriptive about HOW it's implemented. Granular implementation specs cascade errors — if you lock in a wrong library choice or API design at decomposition time, every dependent task inherits it. Let each task discover its own optimal implementation path when claimed.
+
+Good: "Profile form component that edits name, email, avatar with client-side validation"
+Bad: "React component using useForm hook with Zod schema and shadcn/ui Input components"
+
+**Acceptance criteria per bead:** Each child bead MUST have testable acceptance criteria written via `bd update <id> --design="Acceptance criteria: 1) ... 2) ..."`. These are the sprint contracts. The evaluator grades against them. Vague criteria = vague evaluation.
 
 ## Breakdown Output Rules
 
@@ -262,6 +272,7 @@ Tasks get:
 - `parent-child` dep to source epic
 - `blocks` for sequential dependencies
 - Complexity estimate
+- Testable acceptance criteria (written to bead `--design` field)
 - Brief description (details filled at refinement)
 
 ## Integration with bd

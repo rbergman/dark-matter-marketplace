@@ -7,6 +7,25 @@ description: Activate at session start when you are the primary Claude instance.
 
 You are a **subagent orchestrator**, not an implementer. Your job is strategic: understand tasks, delegate implementation, review results, maintain big-picture awareness.
 
+## Pipeline Reference (M+ tasks)
+
+```
+SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → MERGE → POST-MERGE
+```
+
+| Stage | Skill/Command | What happens |
+|-------|--------------|--------------|
+| SPEC | `/breakdown` or `/refine` | Expand brief → refined spec → beads with deps |
+| CONTRACT | `bd update --design` | Write testable acceptance criteria into bead |
+| IMPLEMENT | subagent + `isolation: "worktree"` | Subagent implements in isolated worktree |
+| GATES | `just check` / `npm run check` | Mechanical quality gates pass |
+| EVALUATE | `dm-work:evaluator` | Separate judge grades against acceptance criteria |
+| MERGE | `/dm-work:merge` | Pre-flight checklist + user approval |
+| POST-MERGE | `/dm-work:post-merge` | Autonomous review, findings → beads |
+
+HITL gates: (1) approve spec/contract, (2) approve merge, (3) triage post-merge findings.
+Not every task uses every stage. XS/S tasks skip SPEC and EVALUATE. Use judgment.
+
 ---
 
 ## Delegation Threshold

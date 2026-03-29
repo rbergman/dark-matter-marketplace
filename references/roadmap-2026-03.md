@@ -241,42 +241,41 @@ Clarified in orchestrator as explicit scope separation between intent review (sp
 
 ---
 
-## Phase 4: Harness + Review Optimization (Future)
+## Phase 4: Harness + Review Optimization — DONE (2026-03-28)
 
-**Goal:** For ambitious, multi-hour autonomous builds. Builds ON the Phase 1-3 infrastructure. Also: optimize the review pipeline with real usage data.
+**Goal:** Complete the pipeline entry point (planner), add review optimization, formalize the workflow.
 
-### 4.0 Review Pipeline Optimization (deferred from Phase 3)
+**Council review (2026-03-28):** Three-perspective council reviewed the design. Key adjustments:
+- Planner skill → enhanced /breakdown instead (avoids duplication)
+- Hard exclusion pre-filter simplified: defaults in security reviewer prompt, CLAUDE.md override
+- Pipeline formalization: cheat sheet in orchestrator, not separate doc
+- GitHub bridge: cut (beads feature, not DM scope)
+
+### 4.0 Hard Exclusion Pre-Filter — SHIPPED
+
+Default exclusions added to security reviewer prompt. Project-type-aware: DoS, rate limiting, memory safety, open redirect, regex injection, SSRF excluded when not applicable. Override via `## Review Exclusions` in AGENTS.md or CLAUDE.md.
+
+### 4.1 Planner → Enhanced /breakdown — SHIPPED
+
+Instead of a separate planner skill, enhanced `/breakdown` with:
+- Vague-on-HOW principle (ambitious on WHAT, not prescriptive on HOW)
+- Mandatory acceptance criteria on each child bead (sprint contracts)
+- HITL gate: plan presented for user approval before beads created
+- Works as planner entry point: vague brief → refine → decompose → beads
+
+### 4.2-4.3 Pipeline Formalization — SHIPPED
+
+Pipeline cheat sheet added to orchestrator SKILL.md: SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → MERGE → POST-MERGE with skill/command mapping and HITL gate placement.
+
+### Remaining Phase 4+ (Future)
 
 After running 20+ reviews across multiple projects, revisit:
-- **Hard exclusion pre-filter** — identify which finding categories are consistently noisy
-- **Adaptive reviewer count** — calibrate LOC thresholds for light/standard/deep/thorough
-- **Lightweight FP verification** — Sonnet pass to filter false positives (different from adversarial spec testing)
-- **`.review-filter.md`** — per-repo customization when CLAUDE.md proves insufficient
-- **Cost tracking** — `--budget` flag, per-review token stats in JSON output
-- **Incremental review memory** — store prior findings alongside review tags, don't re-report known issues
-
-### 4.1 Planner Agent
-
-Takes a brief prompt → expands to full spec → creates beads with dependency graph. Prompted to be ambitious on scope, vague on implementation (per Anthropic finding: granular spec errors cascade).
-
-Uses dialectical-refinement to harden the spec before work begins.
-
-### 4.2 Deterministic Orchestration
-
-The dm-pmgr philosophy, not the dm-pmgr code: deterministic orchestration with LLM only at the worker layer. The pipeline (spec → contract → implement → QA → review → evaluate → merge) is deterministic. Each stage has clear entry/exit criteria. HITL gates at defined points.
-
-Could be implemented as:
-- A dm-work skill that drives the pipeline (simplest)
-- A shell script that invokes CC in `--print` mode per stage (more control)
-- Claude Agent SDK (most capable, most complex)
-
-Start with the skill. Graduate to script/SDK if the skill hits limits.
-
-### 4.3 Beads as Sprint Plan
-
-The dependency graph IS the sprint plan. `bd ready` returns the next unblocked work. Acceptance criteria in beads ARE the sprint contracts. Evaluator grades against those criteria. This is already almost true — Phase 3 formalizes it.
-
-**GitHub integration:** Beads issues can map to GitHub issues/PRs. `bd` already has the infrastructure. Formalize the bridge: bead created → GH issue created, bead closed → GH issue closed, review findings → GH PR comments.
+- **Adaptive reviewer count** — calibrate LOC thresholds
+- **Lightweight FP verification** — Sonnet pass to filter false positives
+- **Cost tracking** — `--budget` flag
+- **Incremental review memory** — don't re-report known issues
+- **Formal harness** — shell script or Agent SDK if skill-based pipeline hits limits
+- **GitHub bridge** — beads → GitHub issues (bd feature request)
 
 ---
 

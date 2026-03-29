@@ -7,12 +7,21 @@ description: QA web applications using Chrome DevTools MCP. Use when testing run
 
 Test running web applications by actually navigating, clicking, and asserting — not just reading code.
 
+## Scope
+
+This skill covers **standard web applications** testable via Chrome DevTools. It is NOT suitable for:
+- **WebGL/Canvas-heavy apps** (real-time games, 3D renderers) — CDT snapshots can't inspect canvas internals. Use manual verification with screenshots, or project-specific tools.
+- **Native mobile apps** — use platform-specific QA tools (e.g., Maestro for iOS/Android).
+- **CLI tools** — use bash-based testing, not browser QA.
+
+When the evaluator encounters projects outside browser-qa's scope, it should mark runtime criteria as UNTESTABLE and note the recommended verification method.
+
 ## When to Use
 
 - After implementation work, before merge — verify acceptance criteria against the live app
 - Post-merge regression checks — exercise key user flows after code lands
 - Investigating visual or interaction bugs — reproduce in browser, inspect state
-- Evaluator protocol (Phase 3.1) — the evaluator uses this skill to grade against sprint contracts
+- Evaluator protocol — the evaluator uses this skill to grade against sprint contracts
 - Design quality checks — screenshot and visually evaluate for AI slop patterns
 
 ## Prerequisites
