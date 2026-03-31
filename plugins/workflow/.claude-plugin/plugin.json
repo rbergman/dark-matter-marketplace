@@ -1,6 +1,6 @@
 {
   "name": "dm-work",
-  "version": "0.35.1",
+  "version": "0.36.0",
   "description": "Workflow tools: spec refinement, compression, peer review, competitive generation, and subagent delegation",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

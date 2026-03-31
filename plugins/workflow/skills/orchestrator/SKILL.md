@@ -10,7 +10,7 @@ You are a **subagent orchestrator**, not an implementer. Your job is strategic: 
 ## Pipeline Reference (M+ tasks)
 
 ```
-SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → MERGE → POST-MERGE
+SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → SANITY → MERGE → POST-MERGE
 ```
 
 | Stage | Skill/Command | What happens |
@@ -20,11 +20,13 @@ SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → MERGE → POST-MERGE
 | IMPLEMENT | subagent + `isolation: "worktree"` | Subagent implements in isolated worktree |
 | GATES | `just check` / `npm run check` | Mechanical quality gates pass |
 | EVALUATE | `dm-work:evaluator` | Separate judge grades against acceptance criteria |
+| SANITY | auto (pre-commit hook) | Codex or Sonnet quick review on commit |
 | MERGE | `/dm-work:merge` | Pre-flight checklist + user approval |
 | POST-MERGE | `/dm-work:post-merge` | Autonomous review, findings → beads |
 
 HITL gates: (1) approve spec/contract, (2) approve merge, (3) triage post-merge findings.
 Not every task uses every stage. XS/S tasks skip SPEC and EVALUATE. Use judgment.
+Sanity check is automatic — fires on every code commit. Set `DM_SKIP_SANITY=1` to skip when work is already reviewed.
 
 ---
 
@@ -329,9 +331,29 @@ Run the evaluator (see `dm-work:evaluator`) to grade work against the bead's acc
 2. **Spot-check scope:** Did the subagent stay within OWN boundaries?
 3. **If gates fail:** Read the subagent report, fix or re-launch
 
+### Step 2.5: Sanity Check (automatic via pre-commit hook)
+
+A lightweight cross-model or Sonnet review runs automatically when you commit (via the PreToolUse sanity-review hook). It catches obvious bugs, forgotten debug code, and half-finished changes that the mechanical gates don't test.
+
+**You don't invoke this manually** — it fires on `git commit` if source code is staged. Configuration:
+- `DM_SANITY_REVIEWER=codex` — Codex CLI (cross-model, recommended if available)
+- `DM_SANITY_REVIEWER=sonnet` — Sonnet via `claude -p` (same-vendor, still useful)
+- `DM_SANITY_REVIEWER=off` — disable
+- Default: auto (Codex if installed, else Sonnet)
+
+**When already-reviewed work is being committed** (you ran intent review + evaluator + gates), set `DM_SKIP_SANITY=1` before committing to skip the redundant review:
+```bash
+DM_SKIP_SANITY=1 git commit -m "..."
+```
+
+**If the hook blocks with findings:**
+1. Read the findings. If you agree → fix and recommit (hook runs again on new diff, usually passes)
+2. If you disagree → set `DM_SKIP_SANITY=1` and recommit. Log your reasoning.
+3. Circuit breaker: after 2 blocked reviews on the same repo in a session, the hook becomes advisory (warns, doesn't block)
+
 ### Skip Conditions
 
-- **XS/S tasks:** Skip Step 1 (intent review) and Step 1.5 (evaluator). Mechanical gates (Step 2) are sufficient.
+- **XS/S tasks:** Skip Step 1 (intent review) and Step 1.5 (evaluator). Mechanical gates (Step 2) + sanity check (Step 2.5) are sufficient.
 - **Exploration/search subagents:** Skip all. No code changes to verify.
 - **No acceptance criteria:** Skip Step 1.5 (evaluator). Intent review + gates handle it.
 - **No CDT + clean intent review (COVERAGE: full, DRIFT: none, GAPS: none):** Skip Step 1.5 (evaluator adds no value without runtime testing).
