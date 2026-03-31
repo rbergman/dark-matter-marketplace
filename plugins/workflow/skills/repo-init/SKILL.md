@@ -378,7 +378,17 @@ This wires session-start context recovery and session-end enforcement. The DM pl
 
 ```bash
 bd init --server  # embedded mode requires CGO; use --server on macOS
+bd hooks install  # installs to .git/hooks/ (do NOT use --beads or --shared)
 ```
+
+After beads and timbers hooks are installed, append the auto-stage line to `.git/hooks/pre-commit` **outside** all marker blocks:
+
+```bash
+# After END BEADS INTEGRATION and any timbers markers:
+git add -f .beads/issues.jsonl 2>/dev/null
+```
+
+This auto-stages beads state with every commit. Quality gate hooks (lint-staged, etc.) go here too, outside the markers.
 
 ---
 

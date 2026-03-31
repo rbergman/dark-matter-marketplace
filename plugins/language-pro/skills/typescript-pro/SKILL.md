@@ -71,26 +71,50 @@ npm run check
 
 ### Pre-commit Hook
 
-Quality gates run via a git pre-commit hook. **Do not use husky** — it sets `core.hooksPath` which conflicts with beads and timbers hooks in `.git/hooks/`.
+Quality gates run via a git pre-commit hook. Everything lives in `.git/hooks/pre-commit` — do NOT use `core.hooksPath` redirects (`--beads` flag, `--shared` flag, or husky) in repos with multiple hook sources (beads + timbers + quality gates). Redirects silently bypass `.git/hooks/` and break all hooks not in the redirected directory.
 
-Add quality gates to `.git/hooks/pre-commit` outside the beads section markers (beads preserves content outside its markers on reinstall):
-
+**Hook installation order:**
 ```bash
-# After the END BEADS INTEGRATION marker (or at end of file if no beads):
-npx lint-staged
-npm run check
+bd hooks install              # creates beads markers in .git/hooks/pre-commit
+timbers hooks install         # adds timbers section (if using timbers)
+# Then manually append quality gates + beads auto-stage OUTSIDE all markers
 ```
 
-If beads is installed, run `bd hooks install` first — it creates the hook with section markers. Then append the quality gate lines after the `END BEADS INTEGRATION` marker.
+**Pre-commit hook structure** (four sections, in order):
+```bash
+# --- BEGIN BEADS INTEGRATION --- (managed by bd hooks install)
+# ... beads hook content ...
+# --- END BEADS INTEGRATION ---
+
+# Auto-stage beads state (outside markers — preserved across bd hooks install)
+git add -f .beads/issues.jsonl 2>/dev/null
+
+# Quality gates (outside markers — preserved across bd hooks install)
+npx lint-staged
+npm run check
+
+# --- BEGIN TIMBERS --- (managed by timbers hooks install, if present)
+# ... timbers hook content ...
+# --- END TIMBERS ---
+```
+
+**Why this order:** Beads runs first (fast, no deps). Auto-stage is a one-liner. Quality gates run last (slowest, may fail). Timbers is post-gate.
 
 If a project currently uses husky, migrate:
 ```bash
 npm uninstall husky
 rm -rf .husky
-git config --unset core.hooksPath
+git config --unset core.hooksPath    # critical — remove the redirect
 npm pkg delete scripts.prepare
-# Then reinstall beads hooks and add quality gates as above
-bd hooks install
+bd hooks install                      # installs to .git/hooks/ (default)
+# Then append quality gates after the beads markers
+```
+
+**Do not use `bd hooks install --beads` or `--shared`** — these set `core.hooksPath` which silently bypasses `.git/hooks/`. If you've already used them:
+```bash
+git config --unset core.hooksPath
+rm -rf .beads/hooks/ .beads-hooks/    # clean up redirected hooks
+bd hooks install                       # reinstall to .git/hooks/
 ```
 
 ### Monorepo Variant
@@ -110,6 +134,7 @@ npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --writ
 
 ```bash
 # .git/hooks/pre-commit (after beads markers):
+git add -f .beads/issues.jsonl 2>/dev/null
 npx lint-staged
 ```
 

@@ -33,7 +33,22 @@ File length, function length, and complexity limits exist to drive code toward c
 
 ## Beads
 
-Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, Beads auto-syncs state to `.beads/issues.jsonl` on every mutation; add `git add -f .beads/issues.jsonl` to your pre-commit hook so it travels with every commit. Use `bd remember "insight"` to persist factual learnings (library gotchas, API quirks, env behaviors) across sessions, and `bd memories <keyword>` to search them.
+Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, `bd remember "insight"` to persist factual learnings, and `bd memories <keyword>` to search them.
+
+### Sync
+
+Beads auto-flushes to `.beads/issues.jsonl` on every mutation and auto-imports after `git pull`. The only setup needed is auto-staging into git.
+
+**Add to `.git/hooks/pre-commit`** (outside any marker blocks):
+```bash
+git add -f .beads/issues.jsonl 2>/dev/null
+```
+
+With this, sync is fully automatic — `git commit` + `git push` at session end, `git pull` + `bd ready` at session start.
+
+**Do not use `bd hooks install --beads` or `--shared`** in repos with multiple hook sources (beads + timbers + quality gates). These set `core.hooksPath` which silently bypasses `.git/hooks/` and breaks all other hooks. Always use `bd hooks install` (default target: `.git/hooks/`).
+
+**Manual fallback** (if no pre-commit hook): `bd export -o .beads/issues.jsonl && git add -f .beads/issues.jsonl` (bare `bd export` goes to stdout!).
 
 ### Bead-First Workflow
 
