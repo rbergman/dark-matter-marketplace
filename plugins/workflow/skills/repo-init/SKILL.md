@@ -377,7 +377,7 @@ This wires session-start context recovery and session-end enforcement. The DM pl
 ## Step 8: Beads Initialization
 
 ```bash
-bd init
+bd init --server  # embedded mode requires CGO; use --server on macOS
 ```
 
 ---
@@ -428,7 +428,7 @@ Point user to language-specific setup:
 # Full manual init sequence
 git init
 # Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
-bd init
+bd init --server  # embedded mode requires CGO; use --server on macOS
 timbers init --yes --git-hooks && timbers onboard --target agents >> AGENTS.md
 mise use just@latest
 # Then follow language skill for specifics

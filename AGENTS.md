@@ -9,7 +9,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
-bd backup export-git      # Sync beads state to git
+bd export                 # Export beads state to .beads/issues.jsonl
 ```
 
 ## Non-Interactive Shell Commands
@@ -44,7 +44,7 @@ cp -rf source dest          # NOT: cp -r source dest
 ### Why bd?
 
 - Dependency-aware: Track blockers and relationships between issues
-- Git-friendly: Syncs via git backup branch (fast, conflict-safe)
+- Git-friendly: Syncs via git-tracked JSONL (`bd export` / `bd import`)
 - Agent-optimized: JSON output, ready work detection, discovered-from links
 - Prevents duplicate tracking systems and confusion
 
@@ -104,19 +104,20 @@ bd close bd-42 --reason "Completed" --json
 
 Every code change should trace back to a bead — this creates a full paper trail for session history, retros, and handoffs.
 
-### Sync (Git Backup)
+### Sync (JSONL Export/Import)
 
-bd syncs beads state via a dedicated `beads-backup` git branch — fast, conflict-safe, no Dolt remote needed.
+bd syncs beads state via git-tracked `.beads/issues.jsonl` — portable, human-readable, travels with the code.
 
 ```bash
-# Start of session — pull latest:
-bd backup fetch-git
+# Start of session (after git pull):
+bd import                # upserts from .beads/issues.jsonl
 
-# End of session — push changes:
-bd backup export-git
+# End of session (before git commit):
+bd export                # writes current state to .beads/issues.jsonl
+git add .beads/issues.jsonl
 ```
 
-Beads 0.61+ auto-detects your git remote. No manual remote configuration needed.
+Beads 0.63+ uses `bd export` / `bd import` for cross-machine sync. The JSONL file includes both issues and memories.
 
 ### Important Rules
 
@@ -141,8 +142,10 @@ For more details, see README.md and docs/QUICKSTART.md.
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
+   bd export
    git pull --rebase
-   bd backup export-git
+   git add .beads/issues.jsonl
+   git commit -m "Update beads state" --allow-empty
    git push
    git status  # MUST show "up to date with origin"
    ```
