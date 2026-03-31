@@ -77,10 +77,6 @@ Add quality gates to `.git/hooks/pre-commit` outside the beads section markers (
 
 ```bash
 # After the END BEADS INTEGRATION marker (or at end of file if no beads):
-# Skip quality gates on beads-backup branch
-if [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "beads-backup" ]; then
-  exit 0
-fi
 npx lint-staged
 npm run check
 ```
@@ -114,9 +110,6 @@ npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --writ
 
 ```bash
 # .git/hooks/pre-commit (after beads markers):
-if [ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null)" = "beads-backup" ]; then
-  exit 0
-fi
 npx lint-staged
 ```
 
