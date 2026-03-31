@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse hook: Run a lightweight sanity review on staged changes before commit.
-# Intercepts git commit commands. Uses Codex CLI or claude --print (Sonnet) as reviewer.
+# Intercepts git commit commands. Uses Codex CLI (cross-model, reads AGENTS.md natively)
+# or claude -p with Sonnet (reads CLAUDE.md/AGENTS.md as system context) as reviewer.
 #
 # Configuration (env vars):
 #   DM_SANITY_REVIEWER=codex|sonnet|off   (default: auto-detect)
@@ -77,7 +78,7 @@ if [ "$LOC" -gt "$MAX_LOC" ]; then
 fi
 
 # --- Circuit breaker ---
-REPO_HASH=$(echo "$PWD" | md5sum 2>/dev/null | cut -c1-8 || echo "default")
+REPO_HASH=$(echo "$PWD" | md5 2>/dev/null | cut -c1-8 || echo "$PWD" | md5sum 2>/dev/null | cut -c1-8 || echo "default")
 COUNTER_FILE="/tmp/dm-sanity-count-${REPO_HASH}"
 COUNT=0
 if [ -f "$COUNTER_FILE" ]; then
@@ -106,16 +107,31 @@ DIFF=$(git diff --cached 2>/dev/null || true)
 REVIEW_OUTPUT=""
 REVIEW_STATUS=0
 
+# Sonnet prompt — references CLAUDE.md/AGENTS.md which claude -p loads automatically
+SONNET_PROMPT="You are a sanity reviewer. The project's CLAUDE.md (loaded as system context) contains coding standards and conventions — apply them.
+
+Review the staged diff below for OBVIOUS issues only:
+- Bugs and logic errors
+- Forgotten debug/console.log code
+- Half-finished changes (TODOs that shouldn't ship)
+- Missing error handling on new code paths
+- Violations of project conventions from CLAUDE.md (file length limits, naming, architecture rules)
+
+If everything looks fine, respond with exactly 'LGTM'.
+If you find issues, list 1-3 specific concerns with file:line references. Be terse.
+
+Staged diff:
+$DIFF"
+
 case "$REVIEWER" in
   codex)
-    # Codex CLI review — cross-model sanity check
-    REVIEW_OUTPUT=$(echo "$DIFF" | timeout 60 codex review --stdin --quiet 2>&1) || REVIEW_STATUS=$?
+    # Codex CLI review — reads AGENTS.md natively, cross-model sanity check
+    REVIEW_OUTPUT=$(timeout 60 codex review --uncommitted 2>&1) || REVIEW_STATUS=$?
     # If Codex fails (not installed, usage exhausted, timeout), fall back to sonnet
-    if [ $REVIEW_STATUS -ne 0 ]; then
+    if [ $REVIEW_STATUS -ne 0 ] || [ -z "$REVIEW_OUTPUT" ]; then
       if command -v claude &>/dev/null; then
         REVIEWER="sonnet"
-        REVIEW_OUTPUT=$(echo "$DIFF" | timeout 45 claude -p --model claude-sonnet-4-6 \
-          "You are a quick sanity reviewer. Review this git diff for OBVIOUS issues only: bugs, logic errors, forgotten debug code, half-finished changes, missing error handling. If everything looks fine, respond with exactly 'LGTM'. If you find issues, list 1-3 specific concerns with file:line references. Be terse." 2>&1) || REVIEW_STATUS=$?
+        REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-sonnet-4-6 "$SONNET_PROMPT" 2>&1) || REVIEW_STATUS=$?
       else
         # No reviewer available — allow commit
         exit 0
@@ -126,8 +142,7 @@ case "$REVIEWER" in
     if ! command -v claude &>/dev/null; then
       exit 0
     fi
-    REVIEW_OUTPUT=$(echo "$DIFF" | timeout 45 claude -p --model claude-sonnet-4-6 \
-      "You are a quick sanity reviewer. Review this git diff for OBVIOUS issues only: bugs, logic errors, forgotten debug code, half-finished changes, missing error handling. If everything looks fine, respond with exactly 'LGTM'. If you find issues, list 1-3 specific concerns with file:line references. Be terse." 2>&1) || REVIEW_STATUS=$?
+    REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-sonnet-4-6 "$SONNET_PROMPT" 2>&1) || REVIEW_STATUS=$?
     ;;
   *)
     exit 0
