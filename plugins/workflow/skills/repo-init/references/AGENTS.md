@@ -33,7 +33,7 @@ File length, function length, and complexity limits exist to drive code toward c
 
 ## Beads
 
-Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, and `bd export` to sync beads state before committing. Use `bd remember "insight"` to persist factual learnings (library gotchas, API quirks, env behaviors) across sessions, and `bd memories <keyword>` to search them.
+Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, and `bd export -o .beads/issues.jsonl` to sync beads state before committing. Use `bd remember "insight"` to persist factual learnings (library gotchas, API quirks, env behaviors) across sessions, and `bd memories <keyword>` to search them.
 
 ### Bead-First Workflow
 

@@ -9,7 +9,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
-bd export                 # Export beads state to .beads/issues.jsonl
+bd export -o .beads/issues.jsonl  # Export beads state (bare bd export goes to stdout!)
 ```
 
 ## Non-Interactive Shell Commands
@@ -113,11 +113,11 @@ bd syncs beads state via git-tracked `.beads/issues.jsonl` — portable, human-r
 bd import                # upserts from .beads/issues.jsonl
 
 # End of session (before git commit):
-bd export                # writes current state to .beads/issues.jsonl
+bd export -o .beads/issues.jsonl   # -o required! bare bd export goes to stdout
 git add .beads/issues.jsonl
 ```
 
-Beads 0.63+ uses `bd export` / `bd import` for cross-machine sync. The JSONL file includes both issues and memories.
+Beads 0.63+ uses `bd export -o .beads/issues.jsonl` / `bd import` for cross-machine sync. Note: bare `bd export` writes to stdout, not file — always use `-o`. The JSONL file includes both issues and memories.
 
 ### Important Rules
 
@@ -142,7 +142,7 @@ For more details, see README.md and docs/QUICKSTART.md.
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
-   bd export
+   bd export -o .beads/issues.jsonl
    git pull --rebase
    git add .beads/issues.jsonl
    git commit -m "Update beads state" --allow-empty
