@@ -115,7 +115,7 @@ If none: "None — all work tracked in beads."
 - [ ] Quality gates passing
 - [ ] `/dm-work:review` or `/dm-team:review`
 - [ ] All beads closed
-- [ ] `bd export -o .beads/issues.jsonl`
+- [ ] `git add -f .beads/issues.jsonl`
 
 ## Next Steps
 
@@ -133,7 +133,7 @@ Write the snapshot to `history/snapshot.md` using the Write tool. Raw markdown, 
 ### 4. Sync beads
 
 ```bash
-bd export -o .beads/issues.jsonl 2>/dev/null
+git add -f .beads/issues.jsonl 2>/dev/null
 ```
 
 ### 5. Output to terminal

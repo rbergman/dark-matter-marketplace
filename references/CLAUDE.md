@@ -59,7 +59,7 @@ When creating worktrees for isolated feature work, always place them under `.wor
 
 ## Beads
 
-Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, and `bd export -o .beads/issues.jsonl` to sync beads state before committing.
+Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, Beads auto-syncs state to `.beads/issues.jsonl` on every mutation; add `git add -f .beads/issues.jsonl` to your pre-commit hook so it travels with every commit.
 
 ### Bead Detail Discipline
 

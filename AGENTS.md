@@ -9,7 +9,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
-bd export -o .beads/issues.jsonl  # Export beads state (bare bd export goes to stdout!)
+bd remember "insight"  # Persist learning across sessions
 ```
 
 ## Non-Interactive Shell Commands
@@ -104,20 +104,30 @@ bd close bd-42 --reason "Completed" --json
 
 Every code change should trace back to a bead — this creates a full paper trail for session history, retros, and handoffs.
 
-### Sync (JSONL Export/Import)
+### Sync
 
-bd syncs beads state via git-tracked `.beads/issues.jsonl` — portable, human-readable, travels with the code.
+Beads 0.63+ auto-syncs via git-tracked `.beads/issues.jsonl`:
 
+- **Auto-flush**: Every `bd` mutation (create, close, update, etc.) automatically writes to `.beads/issues.jsonl`. No manual export needed.
+- **Auto-import**: After `git pull` brings a newer `issues.jsonl`, the next `bd` command auto-imports. No manual import needed.
+- **Pre-commit hook**: Add `git add -f .beads/issues.jsonl 2>/dev/null` to your pre-commit hook to auto-stage beads state with every commit.
+
+With the pre-commit hook in place, sync is fully automatic:
 ```bash
-# Start of session (after git pull):
-bd import                # upserts from .beads/issues.jsonl
+# Session start: just pull and work
+git pull
+bd ready
 
-# End of session (before git commit):
-bd export -o .beads/issues.jsonl   # -o required! bare bd export goes to stdout
-git add .beads/issues.jsonl
+# Session end: just commit and push (hook stages issues.jsonl)
+git commit -m "your message"
+git push
 ```
 
-Beads 0.63+ uses `bd export -o .beads/issues.jsonl` / `bd import` for cross-machine sync. Note: bare `bd export` writes to stdout, not file — always use `-o`. The JSONL file includes both issues and memories.
+**Manual fallback** (if pre-commit hook isn't set up):
+```bash
+bd export -o .beads/issues.jsonl   # -o required! bare bd export goes to stdout
+git add -f .beads/issues.jsonl
+```
 
 ### Important Rules
 
@@ -142,10 +152,8 @@ For more details, see README.md and docs/QUICKSTART.md.
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
    ```bash
-   bd export -o .beads/issues.jsonl
    git pull --rebase
-   git add .beads/issues.jsonl
-   git commit -m "Update beads state" --allow-empty
+   git commit -m "sync beads state" --allow-empty
    git push
    git status  # MUST show "up to date with origin"
    ```

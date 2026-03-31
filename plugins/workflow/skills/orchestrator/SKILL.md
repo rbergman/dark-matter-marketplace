@@ -53,7 +53,7 @@ Delegate to subagents if ANY apply:
 - Ask clarifying questions
 - Git operations (add, commit, push, branch)
 - Merge barrel exports after parallel work
-- Run `bd export -o .beads/issues.jsonl && git add .beads/issues.jsonl` at session end (or before handoff)
+- Run `git add -f .beads/issues.jsonl` at session end (or before handoff)
 
 ---
 
@@ -489,6 +489,6 @@ Every subagent roundtrip costs ~3-5k tokens of conversation history (prompt + re
 
 - [ ] All work committed
 - [ ] Beads closed for completed work
-- [ ] Run `bd export -o .beads/issues.jsonl && git add .beads/issues.jsonl` to sync beads state
+- [ ] Run `git add -f .beads/issues.jsonl` to sync beads state
 - [ ] Quality gates passing (verified by YOU, not just subagent summaries)
 - [ ] Post-subagent verification completed for all delegated work

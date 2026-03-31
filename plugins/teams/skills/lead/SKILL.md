@@ -111,9 +111,9 @@ Lead owns bead state. Teammates read bead context but never modify it.
 | `bd claim <id>` | Lead |
 | `bd update <id>` | Lead |
 | `bd close <id>` | Lead (after team completes work) |
-| `bd export -o .beads/issues.jsonl` | Lead (session end) |
+| `git add -f .beads/issues.jsonl` | Lead (session end) |
 
-**Sync flow:** `bd ready` at session start to find work, create team tasks from bead items, `bd close` after team delivers, `bd export -o .beads/issues.jsonl` before cleanup.
+**Sync flow:** `bd ready` at session start to find work, create team tasks from bead items, `bd close` after team delivers, `git add -f .beads/issues.jsonl` before cleanup.
 
 ---
 
@@ -138,7 +138,7 @@ Lead owns bead state. Teammates read bead context but never modify it.
 - [ ] Shared files merged (barrel exports, configs)
 - [ ] Quality gates passing
 - [ ] Beads closed for completed work (`bd close`)
-- [ ] `bd export -o .beads/issues.jsonl` to sync beads state
+- [ ] `git add -f .beads/issues.jsonl` to sync beads state
 - [ ] All work committed
 - [ ] Team cleaned up
 
