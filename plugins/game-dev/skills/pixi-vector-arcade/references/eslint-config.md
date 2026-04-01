@@ -207,12 +207,12 @@ export default defineConfig({
 
 ## Pre-commit Hooks
 
-Quality gates run via `.git/hooks/pre-commit`. **Do not use husky** — it sets `core.hooksPath` which conflicts with beads and timbers hooks.
+Quality gates run via shared git hooks in `.githooks/` (committed to git, activated via `core.hooksPath`). **Do not use husky** — use the `.githooks/` pattern instead. **Do not run `bd hooks install`** — it writes to `.git/hooks/` which is bypassed.
 
-If beads is installed, run `bd hooks install` first, then append quality gates after the `END BEADS INTEGRATION` marker. Otherwise create the hook directly:
+Add quality gates to `.githooks/pre-commit` after the beads section:
 
 ```bash
-# .git/hooks/pre-commit (after beads section if present)
+# .githooks/pre-commit (after beads markers + beads export/stage)
 npx lint-staged
 npm run check
 ```

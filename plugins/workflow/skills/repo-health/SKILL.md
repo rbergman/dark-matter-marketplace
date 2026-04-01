@@ -110,21 +110,29 @@ Verify language-specific patterns are present for detected project type:
 | Go | `vendor/` (if vendoring), `bin/` |
 | Rust | `target/` |
 
-### 3.3 `core.hooksPath` conflicts (IMPORTANT)
+### 3.3 `core.hooksPath` check (IMPORTANT)
 
 ```bash
 git config core.hooksPath 2>/dev/null
 ```
 
-If set (typically to `.husky/`), this overrides `.git/hooks/` entirely — beads and timbers hooks installed there will never fire. Flag as IMPORTANT.
+**Expected:** `.githooks` (shared hooks pattern — hooks committed to git, all devs/agents get them on clone).
 
-**Fix:** Remove husky, unset `core.hooksPath`, and let beads own `.git/hooks/` with quality gates appended outside its section markers:
+**Problem values:**
+- `.husky/` — husky redirect, migrate away
+- `.beads/hooks/` or `.beads-hooks/` — beads-owned redirect, migrate to `.githooks/`
+- Not set — hooks are in `.git/hooks/` (local-only, not shared). Migrate to `.githooks/` for team/agent repos.
+
+**Fix (if not using `.githooks/` yet):**
 ```bash
-npm uninstall husky
-rm -rf .husky
-git config --unset core.hooksPath
-bd hooks install
-# Then append quality gates after END BEADS INTEGRATION marker
+# Migrate from husky:
+npm uninstall husky && rm -rf .husky && npm pkg delete scripts.prepare
+# Migrate from beads redirect:
+rm -rf .beads/hooks/ .beads-hooks/
+# Set up shared hooks:
+mkdir -p .githooks && git config core.hooksPath .githooks
+# Copy hook content into .githooks/ (beads markers + export/stage + gates + timbers)
+# Do NOT run bd hooks install — it writes to .git/hooks/ which is bypassed
 ```
 
 ### 3.4 Secrets in tracked files (CRITICAL)

@@ -71,51 +71,67 @@ npm run check
 
 ### Pre-commit Hook
 
-Quality gates run via a git pre-commit hook. Everything lives in `.git/hooks/pre-commit` — do NOT use `core.hooksPath` redirects (`--beads` flag, `--shared` flag, or husky) in repos with multiple hook sources (beads + timbers + quality gates). Redirects silently bypass `.git/hooks/` and break all hooks not in the redirected directory.
+Quality gates run via a git pre-commit hook. Use the **shared `.githooks/` pattern** — hooks are committed to git, every dev/agent gets them on clone.
 
-**Hook installation order:**
-```bash
-bd hooks install              # creates beads markers in .git/hooks/pre-commit
-timbers hooks install         # adds timbers section (if using timbers)
-# Then manually append quality gates + beads auto-stage OUTSIDE all markers
-```
+**Setup:**
+1. Create `.githooks/` at repo root with executable hook scripts
+2. Set `core.hooksPath` to `.githooks/` (via `just hooks` or `git config core.hooksPath .githooks`)
+3. Commit `.githooks/` to git
 
-**Pre-commit hook structure** (four sections, in order):
+**Do NOT use `bd hooks install` or `timbers hooks install`** — they write to `.git/hooks/` which git ignores when `core.hooksPath` is set. Edit `.githooks/` directly instead, keeping the same marker block structure so you can copy updated content from future beads/timbers versions.
+
+**Pre-commit hook structure** (`.githooks/pre-commit`, four sections in order):
 ```bash
-# --- BEGIN BEADS INTEGRATION --- (managed by bd hooks install)
+#!/bin/sh
+# --- BEGIN BEADS INTEGRATION --- (copy from bd hooks install output)
 # ... beads hook content ...
 # --- END BEADS INTEGRATION ---
 
-# Auto-stage beads state (outside markers — preserved across bd hooks install)
+# Beads sync — export state + stage for commit
+bd export -o .beads/issues.jsonl 2>/dev/null
 git add -f .beads/issues.jsonl 2>/dev/null
 
-# Quality gates (outside markers — preserved across bd hooks install)
+# Quality gates
 npx lint-staged
 npm run check
 
-# --- BEGIN TIMBERS --- (managed by timbers hooks install, if present)
+# --- BEGIN TIMBERS --- (copy from timbers hooks install output)
 # ... timbers hook content ...
 # --- END TIMBERS ---
 ```
 
-**Why this order:** Beads runs first (fast, no deps). Auto-stage is a one-liner. Quality gates run last (slowest, may fail). Timbers is post-gate.
+**Post-merge hook** (`.githooks/post-merge`):
+```bash
+#!/bin/sh
+# Import beads state from incoming changes
+bd import 2>/dev/null
+```
+
+**Why this order:** Beads runs first (fast, no deps). Export+stage captures mutations from the current session. Quality gates run last (slowest, may fail). Timbers is post-gate.
+
+**Justfile recipes:**
+```just
+hooks:
+    @current=$(git config --get core.hooksPath 2>/dev/null || true); \
+    if [ "$current" = ".githooks" ]; then \
+        echo "  hooks already configured"; \
+    else \
+        git config core.hooksPath .githooks; \
+        echo "  ✅ core.hooksPath set to .githooks"; \
+    fi
+```
+
+**New dev/agent onboarding:** `git clone <repo> && just setup` (which includes `just hooks`).
 
 If a project currently uses husky, migrate:
 ```bash
 npm uninstall husky
 rm -rf .husky
-git config --unset core.hooksPath    # critical — remove the redirect
 npm pkg delete scripts.prepare
-bd hooks install                      # installs to .git/hooks/ (default)
-# Then append quality gates after the beads markers
+# Move hook content to .githooks/, set core.hooksPath
 ```
 
-**Do not use `bd hooks install --beads` or `--shared`** — these set `core.hooksPath` which silently bypasses `.git/hooks/`. If you've already used them:
-```bash
-git config --unset core.hooksPath
-rm -rf .beads/hooks/ .beads-hooks/    # clean up redirected hooks
-bd hooks install                       # reinstall to .git/hooks/
-```
+**Do not use `bd hooks install --beads` or `--shared`** — these point `core.hooksPath` at beads-owned directories (`.beads/hooks/`, `.beads-hooks/`). The `.githooks/` pattern is repo-owned, which is the key difference.
 
 ### Monorepo Variant
 
@@ -133,7 +149,8 @@ npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --writ
 **Pre-commit: lint-staged only, no `npm run check`.** Full quality gates across all packages are too slow for pre-commit. Run lint-staged in the hook, run full gates via `just check` or CI.
 
 ```bash
-# .git/hooks/pre-commit (after beads markers):
+# .githooks/pre-commit (after beads markers):
+bd export -o .beads/issues.jsonl 2>/dev/null
 git add -f .beads/issues.jsonl 2>/dev/null
 npx lint-staged
 ```

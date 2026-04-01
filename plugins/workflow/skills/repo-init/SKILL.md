@@ -378,17 +378,21 @@ This wires session-start context recovery and session-end enforcement. The DM pl
 
 ```bash
 bd init --server  # embedded mode requires CGO; use --server on macOS
-bd hooks install  # installs to .git/hooks/ (do NOT use --beads or --shared)
 ```
 
-After beads and timbers hooks are installed, append the auto-stage line to `.git/hooks/pre-commit` **outside** all marker blocks:
+Set up shared hooks in `.githooks/` (committed to git, shared via `core.hooksPath`):
 
 ```bash
-# After END BEADS INTEGRATION and any timbers markers:
-git add -f .beads/issues.jsonl 2>/dev/null
+mkdir -p .githooks
+# Create pre-commit, post-merge, and other hooks in .githooks/
+# See typescript-pro skill for full hook structure
+chmod +x .githooks/*
+git config core.hooksPath .githooks
 ```
 
-This auto-stages beads state with every commit. Quality gate hooks (lint-staged, etc.) go here too, outside the markers.
+**Do NOT run `bd hooks install`** — it writes to `.git/hooks/` which is bypassed. Instead, copy the beads hook content (run `bd hooks install --force` once to see it, then copy the marker block into `.githooks/pre-commit`). Same for timbers.
+
+Add a `just hooks` recipe for onboarding (sets `core.hooksPath`). Add a `just doctor` check to verify it.
 
 ---
 
