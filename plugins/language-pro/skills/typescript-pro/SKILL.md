@@ -288,6 +288,7 @@ export default tseslint.config(
       'complexity': ['error', { max: 10 }],
       'sonarjs/cognitive-complexity': ['error', 15],
       'max-depth': ['error', 4],
+      'max-len': ['error', { code: 120, ignoreUrls: true, ignoreStrings: false, ignoreTemplateLiterals: false, ignoreRegExpLiterals: true }],
       'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
       'max-lines': ['error', { max: 400, skipComments: true }],
       'max-params': ['error', 4],
@@ -298,7 +299,7 @@ export default tseslint.config(
         '@typescript-eslint/no-unsafe-assignment',
         '@typescript-eslint/no-unsafe-argument',
         '@typescript-eslint/no-floating-promises',
-        'complexity', 'sonarjs/cognitive-complexity', 'max-lines-per-function', 'max-lines',
+        'complexity', 'sonarjs/cognitive-complexity', 'max-len', 'max-lines-per-function', 'max-lines',
       ],
       '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
 
@@ -345,18 +346,20 @@ export default tseslint.config(
 **When extraction is costly** (many locals to pass), use a context/options object. If splitting would duplicate state, the code may need a different decomposition axis (by entity rather than by phase).
 
 **Prohibited responses to limit violations:**
-- Combining statements onto single lines
+- Combining statements onto single lines to dodge file/function length limits (`max-len` at 120 catches this — the line limit and file limit work together)
 - Removing or shortening comments
 - Compressing whitespace or collapsing readable formatting
 - Shortening descriptive variable/function names
 - Inlining helper functions to reduce function count
+- Adding source files to `.prettierignore` so prettier won't expand them back
 
-Any of these trades one problem (length) for a worse one (readability). The goal is clean architecture, not metric compliance. Prettier enforces consistent formatting, so compressed code will be expanded back to its readable form — extraction is the only sustainable fix.
+Any of these trades one problem (length) for a worse one (readability). The goal is clean architecture, not metric compliance. Prettier enforces consistent formatting, so compressed code will be expanded back to its readable form — and `max-len` prevents the line-combining workaround entirely. Extraction is the only sustainable fix.
 
 ### Enforced Limits
 
 | Limit | Value | Purpose |
 |-------|-------|---------|
+| `max-len` | 120 chars | Prevent line-combining to dodge file/function limits |
 | `max-lines` | 400 code | Prevent god modules (comments excluded) |
 | `max-lines-per-function` | 60 | Single responsibility |
 | `complexity` | 10 | Cyclomatic complexity (branching paths) |
