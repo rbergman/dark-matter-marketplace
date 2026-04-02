@@ -57,6 +57,18 @@ npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,ym
 
 # Create .prettierignore (prevent formatting machine-generated and non-TS files)
 cat > .prettierignore << 'EOF'
+# ============================================================================
+# DO NOT ADD SOURCE FILES HERE TO WORK AROUND LINE LENGTH LIMITS.
+#
+# If prettier expansion pushes a file past max-lines (400) or
+# max-lines-per-function (60), the file needs to be DECOMPOSED — extract
+# functions, split into modules, rearchitect. That is the engineering fix.
+#
+# Adding source files here suppresses formatting without fixing the real
+# problem. The line limits are design signals, not obstacles to route around.
+# ============================================================================
+
+# Machine-generated / non-source (safe to exclude)
 coverage/
 dist/
 node_modules/
