@@ -244,6 +244,22 @@ class Pool<T> {
 }
 ```
 
+## Performance as Design Constraint
+
+Performance isn't just an engineering concern — it constrains design decisions. Feed these constraints back into design early:
+
+| Performance Constraint | Design Implication |
+|----------------------|-------------------|
+| Entity count cap (e.g., 500 at 60fps) | Limits enemy density, particle counts, projectile counts — affects encounter design |
+| Spatial hash cell size | Determines minimum meaningful distance between entities — affects spacing design |
+| Collision check budget | Limits simultaneous interacting entities — affects group combat design |
+| Draw call budget | Limits visual complexity per frame — affects VFX and juice design |
+| Memory budget | Limits world size and asset variety — affects content scope |
+
+**Design rule:** Establish performance budgets BEFORE designing encounters, particle effects, or entity populations. A design that requires 2000 entities at 60fps on a budget that supports 500 is not a performance problem — it's a design problem. See **encounter-design** and **systems-design** for design-level responses to performance constraints.
+
+---
+
 ## Checklist for Hot Path Code
 
 Before committing changes to per-frame code:
@@ -255,3 +271,13 @@ Before committing changes to per-frame code:
 - [ ] Scratch arrays used for temporary results
 - [ ] Return types are `readonly` for scratch buffers
 - [ ] Context objects are reused, not recreated
+
+---
+
+## Cross-References
+
+- **encounter-design** — Performance budgets constrain encounter density and enemy counts
+- **systems-design** — Performance is a system constraint that limits system interaction complexity
+- **game-feel** — Juice effects (particles, shakes) must respect per-frame budgets
+- **game-design** — Performance constraints should be stated as assumptions in feature proposals
+- **pixi-vector-arcade** — Implementation patterns that respect these constraints

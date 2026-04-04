@@ -97,6 +97,23 @@ How reward timing affects player behavior. These are the fundamental patterns un
 | World feeling alive | Variable Interval | Surprise creates stories |
 | Long-term retention | Layered (all four) | No single schedule sustains indefinitely |
 
+### Pity Systems (Bad Luck Protection)
+
+Pure variable ratio schedules can produce devastating dry streaks that feel unfair. Pity systems guarantee a minimum reward rate while preserving the excitement of variable rewards.
+
+| Type | Mechanism | Player Perception |
+|------|-----------|-------------------|
+| **Hard pity** | Guaranteed reward after N attempts (e.g., guaranteed rare at 90 pulls) | Safety net — "at worst, I need 90 tries" |
+| **Soft pity** | Probability increases with each unsuccessful attempt (e.g., base 1% rising to 5% after 50 attempts) | Invisible — feels like natural luck turning around |
+| **Pseudo-random** | Each failure increases the next success chance by a fixed amount; resets on success | Invisible — prevents both long dry streaks AND long hot streaks |
+| **Duplicate protection** | Already-owned items are removed from the pool or reduce in weight | Visible — "I won't get the same thing twice" |
+
+**Design rules:**
+- Soft pity is almost always better than hard pity — it feels like luck, not a timer
+- Communicate hard pity clearly (show the counter). Hide soft pity (let it feel organic).
+- Never reset pity across sessions, currency purchases, or game updates — that erodes trust
+- Pity should apply to ALL variable reward systems, not just premium ones
+
 ---
 
 ## Intrinsic vs. Extrinsic Motivation

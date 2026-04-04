@@ -214,6 +214,41 @@ Then follow up with: "What were you trying to do?" and "What happened next?"
 
 ---
 
+## Solo Developer Validation
+
+When you're building alone, you can't run traditional playtests during development. These techniques bridge the gap:
+
+### Self-Testing Techniques
+
+| Technique | How | What It Catches |
+|-----------|-----|-----------------|
+| **The 2-week break** | Play your own game after not touching it for 2 weeks | UX failures, forgotten controls, unclear objectives |
+| **The mute test** | Play with sound off | Audio-dependent information, missing visual feedback |
+| **The squint test** | Squint at the screen or reduce resolution | Visual clarity, contrast, UI readability |
+| **The record-and-review** | Record gameplay, watch it the next day | Pacing problems, dead time, repetitive patterns |
+| **The explain test** | Explain what you're doing out loud while playing | Logic gaps, unjustified assumptions, unclear goals |
+| **The wrong-hand test** | Play with your non-dominant hand | Input complexity, timing windows, control accessibility |
+
+### Recruiting First Testers
+
+When you're ready for external eyes (earlier than you think):
+
+1. **Friends/family who DON'T play games** — best for UX/clarity testing
+2. **Friends who play games in your genre** — best for feel/depth testing
+3. **Online communities** (itch.io, indie forums, Discord) — best for unbiased feedback
+4. **Start with 3 testers** — even 3 external players reveal more than 100 hours of self-play
+
+### Solo Metrics
+
+If you're a solo developer shipping updates:
+
+- Track your own play session length (are YOU getting bored?)
+- Count deaths/failures per section (is difficulty spiking where you don't intend?)
+- Time each section (is pacing matching your design?)
+- Screenshot every moment of confusion or frustration — these are your UX bugs
+
+---
+
 ## Cross-References
 
 - **game-design** — Playtest scenarios from the 5-Component Framework (new player, stress, skill, abuse, readability tests)

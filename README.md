@@ -120,7 +120,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Game design methodology across the full spectrum: vision, systems architecture, mechanics evaluation, balance, economy, motivation psychology, encounter design, narrative, experience design, player UX, progression, game feel, playtest design, performance optimization, and project bootstrapping.
+Comprehensive game development skills across 19 domains: vision, systems architecture, mechanics evaluation, balance, economy, motivation, encounters, narrative, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, performance optimization, and project bootstrapping.
 
 **Upstream (vision → structure):**
 
@@ -137,6 +137,10 @@ Game design methodology across the full spectrum: vision, systems architecture, 
 | `dm-game:encounter-design` | Skill | Spatial design, enemy behavior patterns, combat spaces, environmental flow, world structure |
 | `dm-game:motivation-design` | Skill | Reward psychology, SDT, reinforcement schedules, social motivation, ethical guardrails |
 | `dm-game:narrative-design` | Skill | Quest structure, branching narrative, environmental storytelling, dialogue, narrative pacing |
+| `dm-game:multiplayer-design` | Skill | Competitive balance, co-op, social systems, matchmaking, anti-toxicity, async multiplayer |
+| `dm-game:audio-design` | Skill | Audio stack architecture, adaptive music, spatial audio, sound as feedback system |
+| `dm-game:accessibility-design` | Skill | Four pillars (visual, auditory, motor, cognitive), implementation tiers, colorblind design |
+| `dm-game:data-driven-design` | Skill | Telemetry, funnel analysis, A/B testing, cohort analysis, metrics frameworks |
 
 **Evaluation & tuning (mechanics → feel):**
 

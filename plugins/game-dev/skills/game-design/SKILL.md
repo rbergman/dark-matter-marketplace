@@ -181,6 +181,10 @@ When proposing or critiquing a feature:
 | Spatial & AI design | **encounter-design** | Combat spaces, enemy behavior, environmental flow |
 | Story & quests | **narrative-design** | Quest structure, branching narrative, narrative as system |
 | Feedback & juice | **game-feel** | Juice checklists, timing, "why does this feel bad?" |
+| Audio systems | **audio-design** | Sound as information system, adaptive music, spatial audio |
+| Multiplayer | **multiplayer-design** | Competitive balance, co-op, social systems, matchmaking |
+| Accessibility | **accessibility-design** | Four pillars (visual, auditory, motor, cognitive), implementation tiers |
+| Analytics | **data-driven-design** | Telemetry, funnels, A/B testing, metrics frameworks |
 | Testing & validation | **playtest-design** | Question generation, observation protocols, metrics |
 | Per-frame performance | **game-perf** | Zero-allocation patterns for hot paths |
 | Project bootstrapping | **pixi-vector-arcade** | PixiJS 8 setup with vector aesthetics |
@@ -189,6 +193,8 @@ When proposing or critiquing a feature:
 
 For detailed guidance:
 
+- **`references/learning-path.md`** - Start here: tiered learning path, arcade game quick start, council role mapping, intuition bridge
+- **`references/worked-examples.md`** - Full pipeline examples: vision → systems → evaluation, diagnostic flows, council debate format
 - **`references/5-component-rubric.md`** - Full evaluation rubrics with signals, rules, knobs, acceptance tests
 - **`references/domain-guide.md`** - Combat, movement, camera, audio, UI/UX, progression, persistence domains
 - **`references/templates.md`** - Edge case enumeration, debugging flow, playtest scripts
