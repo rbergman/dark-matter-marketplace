@@ -7,7 +7,7 @@ description: "Engagement loop design, pacing frameworks, the experience triangle
 
 **Purpose:** Tools for designing, diagnosing, and improving the player *experience* — not the feature set. Games are systems that generate experiences; this skill helps you build better generators.
 
-**Influences:** Frameworks here draw on work by Tynan Sylvester (experience engineering, emergent systems), Celia Hodent (cognitive engagement), and Ian Schreiber (balance in service of fun).
+**Influences:** Frameworks here draw on experience engineering theory, cognitive engagement research, and systematic game balance methodology.
 
 ---
 
@@ -208,8 +208,13 @@ Three approaches to narrative, each with different design implications:
 
 ## Cross-References
 
-- **game-design** — 5-Component Framework for evaluating individual mechanics
+- **game-vision** — Upstream: defining experience pillars and target experience before designing loops
+- **systems-design** — How system interactions create the emergent experiences loops generate
+- **game-design** — 5-Component Framework for evaluating individual mechanics within loops
+- **motivation-design** — The psychology behind why engagement loops sustain (or fail to sustain) attention
+- **narrative-design** — Narrative integration modes in depth; story as system participant
 - **game-feel** — Feedback vertex of the Experience Triangle in detail
 - **player-ux** — Cognitive load management that underpins pacing
 - **progression-systems** — Session and meta loop pacing through difficulty and rewards
+- **encounter-design** — Spatial pacing and encounter rhythm within sessions
 - **playtest-design** — Testing whether the experience matches your intent

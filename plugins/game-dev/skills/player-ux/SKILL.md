@@ -7,7 +7,7 @@ description: "Cognitive load management, perception/attention/memory framework, 
 
 **Purpose:** Apply cognitive science to game interface and interaction design. The player's brain has hard constraints — limited attention, lossy perception, fragile memory. Design with those constraints, not against them.
 
-**Influences:** Frameworks here draw on work by Celia Hodent (neuroscience-grounded game UX), with supporting concepts from Tynan Sylvester (elegance, attention budgets) and established perceptual psychology (Gestalt principles, cognitive load theory).
+**Influences:** Frameworks here draw on neuroscience-grounded game UX research, with supporting concepts from experience engineering theory (elegance, attention budgets) and established perceptual psychology (Gestalt principles, cognitive load theory).
 
 ---
 
@@ -186,6 +186,9 @@ Total complexity budget
 
 - **game-design** — 5-Component Framework (Clarity component maps directly to UX)
 - **experience-design** — Pacing as cognitive load management over time
+- **encounter-design** — Spatial UX: environmental flow, landmark navigation, spatial readability
+- **narrative-design** — Dialogue and quest UX; cutscene pacing; information delivery
+- **motivation-design** — How UX friction affects player motivation and retention
 - **game-feel** — Feedback design that respects perception constraints
 - **playtest-design** — Testing UX with real players, structured observation
 - **progression-systems** — Onboarding as the first phase of the progression curve

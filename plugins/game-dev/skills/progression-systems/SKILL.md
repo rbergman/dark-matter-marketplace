@@ -7,7 +7,7 @@ description: "Difficulty curves, flow channel targeting, power curve math, unloc
 
 **Purpose:** Tools for designing how players grow in power, skill, and access over time. Good progression makes every session feel rewarding. Bad progression creates grind, frustration, or trivialized content.
 
-**Influences:** Frameworks here draw on work by Ian Schreiber and Brenda Romero (power curves, pacing math), Tynan Sylvester (accessibility/depth model), and Celia Hodent (flow channel, cognitive pacing), with roots in Csikszentmihalyi's flow theory.
+**Influences:** Frameworks here draw on systematic balance methodology (power curves, pacing math), experience engineering theory (accessibility/depth model), cognitive UX research (flow channel, cognitive pacing), and flow theory from positive psychology.
 
 ---
 
@@ -236,8 +236,12 @@ New content (mechanics, enemies, zones, abilities) should arrive at inflection p
 
 ## Cross-References
 
+- **motivation-design** — The *psychology* behind progression. This skill covers the *math*; motivation-design covers *why* players respond to progression and when extrinsic rewards help vs. hurt
+- **economy-design** — Progression economy: XP as currency, level-gated purchases, power-to-earning feedback loops
+- **systems-design** — How progression interacts with other systems; progression is typically the most critical system for retention
 - **game-balance** — Power curves must align with cost curves; balance changes affect progression feel
 - **experience-design** — Pacing and engagement loops at the macro level
+- **encounter-design** — Difficulty through encounter design rather than stat scaling
 - **player-ux** — Onboarding is the first phase of the progression curve; cognitive load constrains pacing
 - **game-feel** — Felt power is heavily influenced by feedback quality
 - **playtest-design** — Testing whether difficulty is in the flow channel for your target audience

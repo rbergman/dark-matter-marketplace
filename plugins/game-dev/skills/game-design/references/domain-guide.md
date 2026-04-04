@@ -1,8 +1,12 @@
 # Domain-Specific Design Guide
 
+> **Deep-dive skills:** Several domains below have dedicated skills for detailed treatment. See **encounter-design** (combat spaces, enemy behavior, environmental flow), **economy-design** (resource flows, currency architecture), **narrative-design** (quest structure, branching narrative), and **motivation-design** (reward psychology, retention).
+
 ## Combat Design
 
 **Core question:** Is the player fighting?
+
+> **Deep dive:** See **encounter-design** for combat space composition, enemy behavior design, encounter pacing, and group AI coordination.
 
 **Sub-domains:**
 - **Melee:** Spacing, hitbox/hurtbox clarity, commitment frames, cancel windows
@@ -103,6 +107,8 @@
 ## Actions & Interactions
 
 **Core question:** How does the player manipulate the world?
+
+> **Deep dive:** See **economy-design** for resource flow architecture, currency design, and sink/source modeling.
 
 **Context action types:**
 - Auto-trigger (proximity): High clarity risk — requires strong feedback on trigger zone

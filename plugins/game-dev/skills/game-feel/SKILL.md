@@ -7,7 +7,7 @@ description: "Juice checklists, feedback loop tightening, screen shake/particles
 
 **Purpose:** Make every player action feel responsive, satisfying, and communicative. Game feel is the difference between "it works" and "it feels great." These are the tools to close that gap.
 
-**Influences:** Frameworks here draw on work by Tynan Sylvester (feedback layering, emotional feedback), Celia Hodent (perception-action cycle, timing constraints), and cross-referenced game design literature on "juice" and responsive design.
+**Influences:** Frameworks here draw on feedback layering theory, cognitive perception-action cycle research, and game design literature on "juice" and responsive design.
 
 ---
 
@@ -206,6 +206,8 @@ All values below are **starting points** — tune through playtesting per the Nu
 
 - **game-design** — 5-Component Framework (Satisfaction and Clarity components are pure game feel)
 - **experience-design** — Feedback is one vertex of the Experience Triangle
+- **encounter-design** — How feel changes with spatial context and enemy behavior
 - **player-ux** — Perception constraints determine what feedback players can actually detect
+- **motivation-design** — Feedback as reward signal; feel drives intrinsic satisfaction
 - **game-perf** — Juice effects (particles, shakes) must respect per-frame performance budgets
 - **playtest-design** — "Does this feel good?" requires observation, not self-report

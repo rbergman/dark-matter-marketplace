@@ -7,7 +7,7 @@ description: "Economy tuning, progression math, transitive/intransitive systems,
 
 **Purpose:** Systematic tools for tuning numeric systems — items, economies, combat, progression — so that player choices remain meaningful and no single strategy dominates.
 
-**Influences:** Frameworks here draw on work by Ian Schreiber, Brenda Romero, and Tynan Sylvester in game balance and experience design.
+**Influences:** Frameworks here draw on systematic game balance methodology, iterative design practice, and experience engineering theory.
 
 ---
 
@@ -186,6 +186,10 @@ When balance needs adjustment mid-development:
 ## Cross-References
 
 - **game-design** — 5-Component Framework for evaluating if balance changes serve the player experience
+- **economy-design** — Deep economy architecture (sink/source modeling, currency design, inflation). This skill covers balance *within* economies; economy-design covers designing economies *from scratch*
+- **systems-design** — Balance changes in one system ripple through connected systems
 - **progression-systems** — Power curves interact directly with balance; changes in one affect the other
+- **motivation-design** — Reward psychology that drives player perception of "fairness"
 - **experience-design** — Balance exists to serve engagement, not mathematical purity
+- **encounter-design** — Enemy balance and encounter composition
 - **playtest-design** — Methods for gathering the data that informs balance decisions

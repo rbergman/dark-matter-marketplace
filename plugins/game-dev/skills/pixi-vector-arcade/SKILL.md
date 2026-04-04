@@ -677,5 +677,7 @@ Additional dependencies: `@pixi/ui` (runtime), `tweakpane` (devDependency, tree-
 
 ## Related Skills
 
-- **game-perf** - Detailed GC-free hot path patterns
-- **game-design** - 5-component framework for evaluating mechanics
+- **game-perf** — Detailed GC-free hot path patterns
+- **game-design** — 5-Component Framework for evaluating mechanics
+- **game-vision** — Define pillars and core loop before scaffolding
+- **systems-design** — Plan system architecture before implementing systems

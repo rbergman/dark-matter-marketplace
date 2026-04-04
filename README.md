@@ -120,17 +120,40 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Game design methodology, balance, experience design, player UX, progression, game feel, playtest design, performance optimization, and project bootstrapping.
+Game design methodology across the full spectrum: vision, systems architecture, mechanics evaluation, balance, economy, motivation psychology, encounter design, narrative, experience design, player UX, progression, game feel, playtest design, performance optimization, and project bootstrapping.
+
+**Upstream (vision → structure):**
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-game:game-vision` | Skill | Vision Stack: core fantasy, experience pillars, core loop crystallization, MVG definition |
+| `dm-game:systems-design` | Skill | System interaction matrices, emergence analysis, coupling evaluation, possibility space, cursed problems |
+
+**Design systems (structural architecture):**
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-game:economy-design` | Skill | Resource flow architecture, currency design, sink/source modeling, inflation, LiveOps economy |
+| `dm-game:encounter-design` | Skill | Spatial design, enemy behavior patterns, combat spaces, environmental flow, world structure |
+| `dm-game:motivation-design` | Skill | Reward psychology, SDT, reinforcement schedules, social motivation, ethical guardrails |
+| `dm-game:narrative-design` | Skill | Quest structure, branching narrative, environmental storytelling, dialogue, narrative pacing |
+
+**Evaluation & tuning (mechanics → feel):**
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-game:game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
-| `dm-game:game-balance` | Skill | Cost curves, transitive/intransitive systems, economy design, dominant strategy detection |
+| `dm-game:game-balance` | Skill | Cost curves, transitive/intransitive systems, economy balance, dominant strategy detection |
 | `dm-game:experience-design` | Skill | Engagement loops, experience triangle, emotion layering, pacing, "why isn't this fun?" diagnostic |
 | `dm-game:player-ux` | Skill | Cognitive load (perception/attention/memory), Gestalt UI principles, onboarding, accessibility |
 | `dm-game:progression-systems` | Skill | Power curves, flow channel, XP math, difficulty sandwich, unlock pacing, adaptive difficulty |
 | `dm-game:game-feel` | Skill | Juice checklists, feedback layers, perception-action cycle, timing reference, feel diagnostics |
 | `dm-game:playtest-design` | Skill | Question generation, observation protocols, metrics tracking, confirmation bias avoidance |
+
+**Implementation:**
+
+| Component | Type | Purpose |
+|-----------|------|---------|
 | `dm-game:game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
 | `dm-game:pixi-vector-arcade` | Skill | Bootstrap PixiJS 8 games with retro vector aesthetics, ECS-lite, pooling, spatial hashing |
 

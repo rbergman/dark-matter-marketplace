@@ -1,6 +1,6 @@
 {
   "name": "dm-game",
-  "version": "0.6.4",
-  "description": "Game development skills: design methodology, balance tuning, experience design, player UX, progression systems, game feel, playtest design, per-frame performance, and PixiJS 8 vector arcade bootstrapping",
+  "version": "1.0.0",
+  "description": "Game development skills: systems architecture, game vision, motivation psychology, encounter design, economy modeling, narrative systems, design methodology, balance tuning, experience design, player UX, progression systems, game feel, playtest design, per-frame performance, and PixiJS 8 vector arcade bootstrapping",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

@@ -7,7 +7,7 @@ description: "Question generation for playtests, what to observe vs. ask, metric
 
 **Purpose:** Get useful signal from playtests. Most playtest sessions are wasted — observers confirm what they already believe, ask leading questions, and draw conclusions from noise. This skill provides structured methods to avoid those traps.
 
-**Influences:** Frameworks here draw on work by Celia Hodent (UX research methodology, perception/attention/memory testing), Ian Schreiber and Brenda Romero (metrics-driven iteration, statistical validation), and Tynan Sylvester (emergent behavior observation, planning under uncertainty).
+**Influences:** Frameworks here draw on cognitive UX research methodology, metrics-driven iterative design practice, and experience engineering theory (emergent behavior observation, planning under uncertainty).
 
 ---
 
@@ -217,7 +217,12 @@ Then follow up with: "What were you trying to do?" and "What happened next?"
 ## Cross-References
 
 - **game-design** — Playtest scenarios from the 5-Component Framework (new player, stress, skill, abuse, readability tests)
+- **systems-design** — System health metrics (behavioral diversity, archetype formation) measured through playtesting
 - **player-ux** — The cognitive pillars (perception/attention/memory) drive the question generation framework
 - **game-balance** — Metrics-driven iteration for detecting and resolving balance problems
+- **economy-design** — Economy health monitoring metrics to track during playtests
 - **experience-design** — Testing whether the intended experience matches actual player experience
+- **motivation-design** — Testing retention and motivation through session length and return rate
+- **encounter-design** — Testing spatial readability and encounter fairness
+- **narrative-design** — Testing narrative comprehension and engagement
 - **game-feel** — "Does this feel good?" requires observation, not surveys

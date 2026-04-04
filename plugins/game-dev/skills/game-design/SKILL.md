@@ -9,7 +9,7 @@ description: Use when designing game mechanics, evaluating gameplay feel, tuning
 
 **Core principle:** Mechanics are code. Gameplay is the player's *experience* of that code. The goal is not to implement features, but to implement **Relevance**.
 
-**Influences:** The 5-Component Framework synthesizes principles from Tynan Sylvester (experience engineering), Celia Hodent (cognitive UX), and Ian Schreiber (balance methodology).
+**Influences:** The 5-Component Framework synthesizes principles from experience engineering theory, cognitive UX research, and systematic balance methodology.
 
 ---
 
@@ -35,10 +35,11 @@ For detailed evaluation rubrics, consult `references/5-component-rubric.md`.
 
 ### 1. Before Implementation
 
-1. Identify active domain(s) from `references/domain-guide.md`
-2. Evaluate against the 5-Component Filter
-3. Complete the State Machine Checklist if the feature involves player state changes
-4. Check the Numbers Policy before proposing any values
+1. **Check system context** — Which system does this feature participate in? What other systems does it interact with? (See **systems-design** for interaction analysis)
+2. Identify active domain(s) from `references/domain-guide.md`
+3. Evaluate against the 5-Component Filter
+4. Complete the State Machine Checklist if the feature involves player state changes
+5. Check the Numbers Policy before proposing any values
 
 ### 2. Numbers Policy (Mandatory)
 
@@ -46,7 +47,7 @@ When proposing ANY numeric value (timing windows, costs, speeds, damage, etc.), 
 
 **Option A — Source-backed:**
 - Cite a verifiable reference (GDC talk, postmortem, published analysis)
-- Example: "Coyote time of 80-150ms (Source: Maddy Thorson's Celeste postmortem)"
+- Example: "Coyote time of 80-150ms (Source: Celeste postmortem, GDC 2018)"
 
 **Option B — Starting value with test plan:**
 - Label explicitly as "Starting value"
@@ -160,14 +161,25 @@ When proposing or critiquing a feature:
 
 ## Related Skills
 
-After the 5-Component Filter identifies a weakness, go deeper:
+**Upstream** — before evaluating individual mechanics:
+
+| Area | Skill | When to Use |
+|------|-------|-------------|
+| Concept & vision | **game-vision** | Pillars, target experience, core loop crystallization, MVG |
+| System architecture | **systems-design** | System interactions, emergence analysis, possibility space |
+
+**Downstream** — after the 5-Component Filter identifies a weakness:
 
 | Area | Skill | When to Use |
 |------|-------|-------------|
 | Balance & economy | **game-balance** | Cost curves, dominant strategies, economy sinks/sources |
+| Economy architecture | **economy-design** | Currency design, sink/source modeling, inflation, LiveOps |
 | Engagement & pacing | **experience-design** | Core loops, emotion layering, "why isn't this fun?" |
+| Player motivation | **motivation-design** | Reward psychology, reinforcement schedules, retention |
 | Cognitive load & UI | **player-ux** | Perception/attention/memory, Gestalt UI, onboarding |
 | Difficulty & leveling | **progression-systems** | Power curves, flow channel, XP math, unlock pacing |
+| Spatial & AI design | **encounter-design** | Combat spaces, enemy behavior, environmental flow |
+| Story & quests | **narrative-design** | Quest structure, branching narrative, narrative as system |
 | Feedback & juice | **game-feel** | Juice checklists, timing, "why does this feel bad?" |
 | Testing & validation | **playtest-design** | Question generation, observation protocols, metrics |
 | Per-frame performance | **game-perf** | Zero-allocation patterns for hot paths |
