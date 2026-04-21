@@ -40,6 +40,15 @@ Use Agent Teams when:
 
 Teams are persistent. Teammates see each other's messages, react, challenge, and build on each other's work.
 
+## Planning Surface (Step 0)
+
+Before choosing a delegation mechanism, consider whether the *planning phase* needs a richer review surface:
+
+- **Simple/medium tasks:** Plan in the terminal as usual
+- **L/XL tasks with ambiguous scope:** Use `/ultraplan` to draft the plan in the cloud. Review with inline comments and emoji reactions on claude.ai, then teleport the plan back to the terminal for `/breakdown` → orchestrator delegation
+
+Ultraplan is a planning tool, not an execution tool. It doesn't replace any tier — it improves the input that feeds into delegation.
+
 ## Decision Questions
 
 Work through these in order:

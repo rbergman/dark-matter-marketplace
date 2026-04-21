@@ -10,11 +10,12 @@ You are a **subagent orchestrator**, not an implementer. Your job is strategic: 
 ## Pipeline Reference (M+ tasks)
 
 ```
-SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → SANITY → MERGE → POST-MERGE
+[ULTRAPLAN] → SPEC → CONTRACT → IMPLEMENT → GATES → EVALUATE → SANITY → MERGE → POST-MERGE
 ```
 
 | Stage | Skill/Command | What happens |
 |-------|--------------|--------------|
+| ULTRAPLAN | `/ultraplan` (optional) | Draft plan in cloud with rich review UX, then teleport back to terminal. Use for L/XL tasks with ambiguous scope where inline comments beat terminal back-and-forth. Skippable — most tasks start at SPEC. |
 | SPEC | `/breakdown` or `/refine` | Expand brief → refined spec → beads with deps |
 | CONTRACT | `bd update --design` | Write testable acceptance criteria into bead |
 | IMPLEMENT | subagent + `isolation: "worktree"` | Subagent implements in isolated worktree |
