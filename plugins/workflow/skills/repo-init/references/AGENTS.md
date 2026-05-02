@@ -33,26 +33,28 @@ File length, function length, and complexity limits exist to drive code toward c
 
 ## Beads
 
-Use `bd init --server` to initialize beads for this project (embedded mode requires CGO; use `--server` on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, `bd remember "insight"` to persist factual learnings, and `bd memories <keyword>` to search them.
+Use `bd init` to initialize beads for this project (embedded Dolt is the default in beads 1.0+ and works on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, `bd remember "insight"` to persist factual learnings, and `bd memories <keyword>` to search them.
 
 ### Sync
 
-Dolt is the local-only database. Remote sync uses git via JSONL. Shared git hooks handle export/import automatically:
+Dolt is the local-only database (embedded). Remote sync uses git via JSONL. With beads 1.0+, sync is automatic via built-in defaults:
 
-- **Pre-commit hook**: runs `bd export -o .beads/issues.jsonl` + `git add` — every commit carries current beads state
-- **Post-merge hook**: runs `bd import` — every pull loads incoming changes into local Dolt
+- `export.auto = true` — every `bd` mutation auto-writes `.beads/issues.jsonl` (60s throttled)
+- `export.git-add = true` — auto-stages the JSONL for the next commit
+- Pre-commit hook forces a flush (so each commit carries current state)
+- Post-merge hook imports incoming JSONL after `git pull`
 
-Hooks live in `.githooks/` (committed to git, shared via `core.hooksPath`). **Do NOT run `bd hooks install` or `timbers hooks install`** — they write to `.git/hooks/` which is bypassed when `core.hooksPath` is set. Edit `.githooks/` directly.
+Hooks live in `.beads/hooks/` (committed to git, managed by `bd hooks install`). `bd init` sets `core.hooksPath = .beads/hooks` automatically. `timbers hooks install` detects this and appends into the same hook files alongside the beads section. Quality gates go between the BEADS and TIMBERS marker sections — content outside markers is preserved across reinstalls.
 
 With hooks installed, sync is fully automatic:
 - Session start: `git pull` + `bd ready`
 - Session end: `git commit` + `git push`
 
-New dev/agent onboarding: `git clone <repo> && just setup` (sets `core.hooksPath`).
+New dev/agent onboarding: `git clone <repo> && bd hooks install --force --beads` (or via `just hooks`). `bd init` is only for first-time setup of a new repo.
 
-**Manual fallback** (if hooks aren't set up): `bd export -o .beads/issues.jsonl && git add -f .beads/issues.jsonl` (bare `bd export` goes to stdout!).
+**Do NOT** use `bd dolt push/pull` or `bd dolt remote` — sync is via git+JSONL, not Dolt remotes.
 
-**Do NOT** use `bd dolt push/pull` or `bd dolt remote` — no Dolt remote is configured or needed.
+**Manual fallback** (if auto-export is disabled or you need a forced flush mid-session): `bd export -o .beads/issues.jsonl` (bare `bd export` writes to stdout — always pass `-o`).
 
 ### Bead-First Workflow
 

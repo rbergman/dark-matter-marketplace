@@ -83,67 +83,69 @@ npm run check
 
 ### Pre-commit Hook
 
-Quality gates run via a git pre-commit hook. Use the **shared `.githooks/` pattern** — hooks are committed to git, every dev/agent gets them on clone.
+Quality gates run via a git pre-commit hook. With beads 1.0+, hooks live in **`.beads/hooks/`** (committed to git, managed by `bd hooks install --beads`). Beads, timbers, and your quality gates all coexist in the same hook file via section markers — content outside markers is preserved across reinstalls.
 
 **Setup:**
-1. Create `.githooks/` at repo root with executable hook scripts
-2. Set `core.hooksPath` to `.githooks/` (via `just hooks` or `git config core.hooksPath .githooks`)
-3. Commit `.githooks/` to git
+1. `bd init` (creates `.beads/hooks/` and sets `core.hooksPath = .beads/hooks`)
+2. `timbers hooks install` (detects `core.hooksPath`, appends into existing files alongside beads)
+3. Add quality gates between the BEADS and TIMBERS marker sections — they're preserved across `bd hooks install --force` and `timbers hooks install` reruns
 
-**Do NOT use `bd hooks install` or `timbers hooks install`** — they write to `.git/hooks/` which git ignores when `core.hooksPath` is set. Edit `.githooks/` directly instead, keeping the same marker block structure so you can copy updated content from future beads/timbers versions.
-
-**Pre-commit hook structure** (`.githooks/pre-commit`, four sections in order):
+**Pre-commit hook structure** (`.beads/hooks/pre-commit`):
 ```bash
-#!/bin/sh
-# --- BEGIN BEADS INTEGRATION --- (copy from bd hooks install output)
-# ... beads hook content ...
-# --- END BEADS INTEGRATION ---
+#!/usr/bin/env sh
+# --- BEGIN BEADS INTEGRATION v1.0.x ---  (managed — do not edit)
+# ... bd hooks run pre-commit shim ...
+# --- END BEADS INTEGRATION v1.0.x ---
 
-# Beads sync — export state + stage for commit
-bd export -o .beads/issues.jsonl 2>/dev/null
-git add -f .beads/issues.jsonl 2>/dev/null
+# Quality gates (preserved across reinstalls — outside markers)
+if [ -f .git/MERGE_HEAD ]; then
+  echo "Merge commit — skipping lint-staged"
+else
+  npx lint-staged
+fi
+if command -v just >/dev/null 2>&1 && [ -f justfile ]; then
+  just check
+else
+  npm run check
+fi
 
-# Quality gates
-npx lint-staged
-npm run check
-
-# --- BEGIN TIMBERS --- (copy from timbers hooks install output)
-# ... timbers hook content ...
-# --- END TIMBERS ---
+# --- timbers section (managed by timbers hooks install)
+# ... timbers hook run pre-commit shim ...
+# --- end timbers section ---
 ```
 
-**Post-merge hook** (`.githooks/post-merge`):
-```bash
-#!/bin/sh
-# Import beads state from incoming changes
-bd import 2>/dev/null
-```
+**Why this order:** Beads runs first (fast: bd's internal hook handles auto-export+stage of `.beads/issues.jsonl`). Quality gates run next (slowest, may fail — but `bd export` already happened, so beads state is captured even if gates fail and the commit aborts). Timbers runs last (post-gate, post-export).
 
-**Why this order:** Beads runs first (fast, no deps). Export+stage captures mutations from the current session. Quality gates run last (slowest, may fail). Timbers is post-gate.
+**Auto-export defaults (beads 1.0+):**
+- `export.auto = true` — every `bd` mutation writes `.beads/issues.jsonl` (60s throttled)
+- `export.git-add = true` — auto-stages it
+- The pre-commit hook forces a flush, so commits always carry current state
 
-**Justfile recipes:**
+**Justfile recipe:**
 ```just
 hooks:
+    @bd hooks install --force --beads >/dev/null && echo "  ✅ beads hooks installed"
+    @if command -v timbers >/dev/null 2>&1; then \
+        timbers hooks install >/dev/null && echo "  ✅ timbers hooks installed"; \
+    fi
     @current=$(git config --get core.hooksPath 2>/dev/null || true); \
-    if [ "$current" = ".githooks" ]; then \
-        echo "  hooks already configured"; \
-    else \
-        git config core.hooksPath .githooks; \
-        echo "  ✅ core.hooksPath set to .githooks"; \
+    if [ "$current" != ".beads/hooks" ]; then \
+        git config core.hooksPath .beads/hooks; \
+        echo "  ✅ core.hooksPath fixed to .beads/hooks (was $current)"; \
     fi
 ```
+
+**Note on `core.hooksPath`:** `bd hooks install --force` may set this to an absolute path. Force it relative — worktrees share repo config, and an absolute path won't resolve from a worktree's working dir.
 
 **New dev/agent onboarding:** `git clone <repo> && just setup` (which includes `just hooks`).
 
 If a project currently uses husky, migrate:
 ```bash
-npm uninstall husky
-rm -rf .husky
-npm pkg delete scripts.prepare
-# Move hook content to .githooks/, set core.hooksPath
+npm uninstall husky && rm -rf .husky && npm pkg delete scripts.prepare
+bd hooks install --force --beads
+git config core.hooksPath .beads/hooks
+# Move any custom hook content into .beads/hooks/<hook> outside the BEADS markers
 ```
-
-**Do not use `bd hooks install --beads` or `--shared`** — these point `core.hooksPath` at beads-owned directories (`.beads/hooks/`, `.beads-hooks/`). The `.githooks/` pattern is repo-owned, which is the key difference.
 
 ### Monorepo Variant
 
@@ -161,11 +163,11 @@ npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --writ
 **Pre-commit: lint-staged only, no `npm run check`.** Full quality gates across all packages are too slow for pre-commit. Run lint-staged in the hook, run full gates via `just check` or CI.
 
 ```bash
-# .githooks/pre-commit (after beads markers):
-bd export -o .beads/issues.jsonl 2>/dev/null
-git add -f .beads/issues.jsonl 2>/dev/null
+# .beads/hooks/pre-commit (between BEADS markers and timbers section):
 npx lint-staged
 ```
+
+(beads 1.0+ auto-exports + auto-stages `.beads/issues.jsonl` on every mutation; the manual export+stage lines older docs showed are no longer needed.)
 
 For mixed-language monorepos without workspaces, detect which packages have staged files:
 
@@ -233,7 +235,7 @@ just check
 - lint-staged formats only staged files via Prettier (no whole-repo formatting)
 - Then `npm run check` runs typecheck + lint + test
 - Blocks commits with formatting issues, type errors, lint violations, or failing tests
-- Lives in `.git/hooks/pre-commit` alongside beads/timbers hooks (not husky)
+- Lives in `.beads/hooks/pre-commit` alongside beads/timbers hooks (not husky, not `.git/hooks/`)
 - `.prettierignore` must exclude `.timbers/` and `.beads/` — without this, lint-staged reformats timbers JSON during commit, but its stash/restore cycle puts the original format back in the working tree, creating perpetual `MM` diffs with no semantic content
 
 ---

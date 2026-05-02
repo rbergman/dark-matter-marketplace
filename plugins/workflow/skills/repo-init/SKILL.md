@@ -377,22 +377,37 @@ This wires session-start context recovery and session-end enforcement. The DM pl
 ## Step 8: Beads Initialization
 
 ```bash
-bd init --server  # embedded mode requires CGO; use --server on macOS
+bd init  # embedded Dolt is the default and works on macOS in 1.0+
 ```
 
-Set up shared hooks in `.githooks/` (committed to git, shared via `core.hooksPath`):
+`bd init` does several things automatically in beads 1.0+:
+- Creates `.beads/embeddeddolt/` (data, gitignored) and `.beads/hooks/` (committed shims)
+- Sets `core.hooksPath = .beads/hooks` (relative)
+- Installs `bd setup claude` integration (CLAUDE.md beads section + `.claude/settings.json`)
+- Enables `export.auto = true` and `export.git-add = true` — every `bd` mutation auto-exports `.beads/issues.jsonl` and stages it (60s throttle; pre-commit hook forces a flush)
+
+After `bd init`, install timbers hooks (they detect `core.hooksPath` and append into `.beads/hooks/pre-commit` "alongside beads hook"):
 
 ```bash
-mkdir -p .githooks
-# Create pre-commit, post-merge, and other hooks in .githooks/
-# See typescript-pro skill for full hook structure
-chmod +x .githooks/*
-git config core.hooksPath .githooks
+timbers hooks install
 ```
 
-**Do NOT run `bd hooks install`** — it writes to `.git/hooks/` which is bypassed. Instead, copy the beads hook content (run `bd hooks install --force` once to see it, then copy the marker block into `.githooks/pre-commit`). Same for timbers.
+Quality gates and any other custom hook content go OUTSIDE the `--- BEGIN/END BEADS INTEGRATION ---` and `--- BEGIN/END TIMBERS ---` markers — `bd hooks install --force` and `timbers hooks install` both preserve user content outside their managed sections.
 
-Add a `just hooks` recipe for onboarding (sets `core.hooksPath`). Add a `just doctor` check to verify it.
+**Hook structure** (`.beads/hooks/pre-commit`):
+```
+# --- BEGIN BEADS INTEGRATION v1.0.x ---  (managed by bd hooks install)
+# --- END BEADS INTEGRATION v1.0.x ---
+
+# Quality gates (lint-staged, just check, etc.) — preserved across reinstalls
+
+# --- timbers section (managed by timbers hooks install)
+# --- end timbers section ---
+```
+
+Add a `just hooks` recipe for onboarding that re-runs `bd hooks install --force --beads` (idempotent — preserves user content). Verify with `bd hooks list` (shows shim version per hook) and `git config core.hooksPath` (should be `.beads/hooks`).
+
+**Note on `core.hooksPath`:** `bd hooks install --force` may set this to an absolute path on first install. Fix to relative manually if needed: `git config core.hooksPath .beads/hooks` — relative is required for worktrees, which share repo config.
 
 ---
 
@@ -442,8 +457,9 @@ Point user to language-specific setup:
 # Full manual init sequence
 git init
 # Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
-bd init --server  # embedded mode requires CGO; use --server on macOS
-timbers init --yes --git-hooks && timbers onboard --target agents >> AGENTS.md
+bd init                                  # embedded Dolt is the default (1.0+)
+timbers init --yes --git-hooks           # appends into .beads/hooks/ alongside beads
+timbers onboard --target agents >> AGENTS.md
 mise use just@latest
 # Then follow language skill for specifics
 ```

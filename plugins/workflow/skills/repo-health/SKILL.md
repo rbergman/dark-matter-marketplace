@@ -116,24 +116,31 @@ Verify language-specific patterns are present for detected project type:
 git config core.hooksPath 2>/dev/null
 ```
 
-**Expected:** `.githooks` (shared hooks pattern — hooks committed to git, all devs/agents get them on clone).
+**Expected:** `.beads/hooks` (relative). Beads 1.0+ owns `core.hooksPath` and writes shim scripts to `.beads/hooks/`. Timbers detects this and appends into the same hook files. Quality gates go between the BEADS and TIMBERS marker sections.
 
 **Problem values:**
 - `.husky/` — husky redirect, migrate away
-- `.beads/hooks/` or `.beads-hooks/` — beads-owned redirect, migrate to `.githooks/`
-- Not set — hooks are in `.git/hooks/` (local-only, not shared). Migrate to `.githooks/` for team/agent repos.
+- `.githooks` — old "shared hooks umbrella" pattern (pre-1.0); migrate to `.beads/hooks/`
+- `.beads-hooks/` — old `bd hooks install --shared` location (pre-1.0); migrate to `.beads/hooks/`
+- An ABSOLUTE path (e.g. `/Users/.../​.beads/hooks`) — breaks worktrees that share repo config; force relative
+- Not set — hooks are in `.git/hooks/` (local-only, not shared). Run `bd hooks install --force --beads` for any beads-using repo.
 
-**Fix (if not using `.githooks/` yet):**
+**Fix:**
 ```bash
 # Migrate from husky:
 npm uninstall husky && rm -rf .husky && npm pkg delete scripts.prepare
-# Migrate from beads redirect:
-rm -rf .beads/hooks/ .beads-hooks/
-# Set up shared hooks:
-mkdir -p .githooks && git config core.hooksPath .githooks
-# Copy hook content into .githooks/ (beads markers + export/stage + gates + timbers)
-# Do NOT run bd hooks install — it writes to .git/hooks/ which is bypassed
+
+# Migrate from .githooks/ or .beads-hooks/:
+git rm -r --cached .githooks/ 2>/dev/null
+rm -rf .beads-hooks/ .githooks/
+bd hooks install --force --beads
+git config core.hooksPath .beads/hooks  # force relative
+
+# If timbers is also installed, append its section:
+command -v timbers >/dev/null 2>&1 && timbers hooks install
 ```
+
+After migration, manually port quality gates (lint-staged, just check, etc.) into `.beads/hooks/pre-commit` BETWEEN the `--- END BEADS INTEGRATION ---` line and the `--- timbers section ---` block. They'll be preserved across reinstalls.
 
 ### 3.4 Secrets in tracked files (CRITICAL)
 
@@ -154,30 +161,34 @@ command -v bd >/dev/null 2>&1 && echo "installed" || echo "not installed"
 [ -d .beads ] && echo "initialized" || echo "not initialized"
 ```
 
-### 4.2 Beads version and Dolt dependency (IMPORTANT)
+### 4.2 Beads version (IMPORTANT)
 
 ```bash
 bd --version 2>/dev/null
-command -v dolt >/dev/null 2>&1 && echo "dolt installed" || echo "dolt missing"
 ```
 
-Beads 0.58+ requires Dolt as its storage backend. Check both:
+Beads 1.0+ uses embedded Dolt by default — no external `dolt` binary required, no server daemon to manage. Check:
 
-- If beads version is below 0.60: flag as IMPORTANT — upgrade needed (`brew upgrade steveyegge/beads/bd`)
-- If dolt is not installed: flag as IMPORTANT — required dependency (`brew install dolt`)
+- If beads version is below 1.0: flag as IMPORTANT — upgrade strongly recommended (`brew upgrade gastownhall/tap/beads`). 1.0 brings auto-export defaults, blessed embedded mode on macOS, hook auto-install, and worktree-aware path resolution.
+- If `bd hooks list` reports shim version older than the installed `bd --version`: flag as IMPORTANT — run `bd hooks install --force --beads` to refresh shims.
 - If both present and current: PASSED
+
+External `dolt` binary is only needed for repos still in server mode. Server mode is OPTIONAL in 1.0+ — embedded is the default. Migration recipe (server → embedded): `bd export -o .beads/issues.jsonl && bd dolt stop && mv .beads/dolt .beads/dolt.server-backup && bd init --reinit-local --discard-remote --from-jsonl --prefix <p> --non-interactive --destroy-token=DESTROY-<p>`.
 
 ### 4.3 If beads installed but not initialized (IMPORTANT)
 
 Suggest `bd init` for project repos. Skip for config/docs-only repos.
 
-### 4.4 If beads initialized — run doctor (NICE)
+### 4.4 If beads initialized — run health checks (NICE)
 
 ```bash
-bd doctor 2>/dev/null
+bd doctor 2>/dev/null         # works in server mode; outputs an error message in embedded mode
+bd ping 2>/dev/null            # connectivity (works in both modes)
+bd hooks list 2>/dev/null      # shim version per hook
+bd lint 2>/dev/null | head     # convention drift (works in embedded mode)
 ```
 
-Surface any warnings or failures.
+`bd doctor` is a doorstop in embedded mode in 1.0.3 — surface its checks via the alternatives above. Surface any warnings or failures from any of these commands.
 
 ### 4.5 `.beads/` gitignore check (IMPORTANT)
 
@@ -198,13 +209,13 @@ grep -q "^backup/" .beads/.gitignore 2>/dev/null && echo "backup/: present" || e
 
 If either is missing → flag as IMPORTANT. `dolt-monitor.pid.lock` goes after `dolt-monitor.pid`. `backup/` is the local backup directory (auto-generated, should not be committed).
 
-### 4.6 Dolt server port check (IMPORTANT)
+### 4.6 Dolt mode check (NICE)
 
 ```bash
-bd dolt show 2>/dev/null | grep 'Port:'
+grep dolt_mode .beads/metadata.json 2>/dev/null
 ```
 
-Beads 0.60+ uses OS-assigned ephemeral ports. If port is 3307 (pre-0.59 hardcoded) or a fixed hash-derived port (0.59), flag as IMPORTANT — upgrade to beads 0.60+ for automatic ephemeral port assignment.
+Beads 1.0+ uses embedded Dolt by default. If `dolt_mode` is `server`, the repo predates the 1.0 default; embedded is recommended for solo + remote-agent use (no daemon, no port management, smaller storage). For high-concurrency parallel-write workloads (CI farms), server mode is still preferred. See 4.2 for the migration recipe.
 
 ---
 
