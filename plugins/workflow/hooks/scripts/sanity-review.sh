@@ -51,12 +51,6 @@ if [ -n "$MERGE_HEAD_PATH" ] && [ -f "$MERGE_HEAD_PATH" ]; then
   exit 0
 fi
 
-# Beads-backup branch
-BRANCH=$(git branch --show-current 2>/dev/null || echo "")
-if [ "$BRANCH" = "beads-backup" ]; then
-  exit 0
-fi
-
 # No staged changes
 STAGED=$(git diff --cached --name-only 2>/dev/null || true)
 if [ -z "$STAGED" ]; then

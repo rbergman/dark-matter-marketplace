@@ -218,7 +218,7 @@ bd worktree remove .worktrees/feature-auth
 
 Worktrees created with `bd worktree create` share the main repo's Dolt database via `.beads/redirect`. This is the correct behavior — all worktrees see the same beads data.
 
-If a worktree was created with `git worktree add` instead, it gets an independent empty Dolt DB. Fix by deleting the worktree's `.beads/dolt/` and creating a `.beads/redirect` file pointing to the main repo's `.beads/`.
+If a worktree was created with `git worktree add` instead, it gets an independent empty Dolt DB. Fix by deleting the worktree's `.beads/dolt/` and `.beads/embeddeddolt/` (whichever is present), then creating a `.beads/redirect` file containing the relative path to the main repo's `.beads/` (e.g., `../../.beads`).
 
 ---
 

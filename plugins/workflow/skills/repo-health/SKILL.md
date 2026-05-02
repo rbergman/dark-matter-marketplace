@@ -192,22 +192,27 @@ bd lint 2>/dev/null | head     # convention drift (works in embedded mode)
 
 ### 4.5 `.beads/` gitignore check (IMPORTANT)
 
-Beads 0.58+ stores data in `.beads/dolt/` and creates `.beads/.gitignore` automatically to exclude dolt data and runtime files. Check that this internal gitignore exists:
+Beads 1.0+ stores data in `.beads/embeddeddolt/` (embedded mode, default) or `.beads/dolt/` (server mode), and creates a complete `.beads/.gitignore` automatically. Check both that the internal gitignore exists and that it covers the active mode:
 
 ```bash
 [ -f .beads/.gitignore ] && echo "beads gitignore exists" || echo "beads gitignore missing"
+grep -q "^embeddeddolt/" .beads/.gitignore 2>/dev/null && echo "embeddeddolt: present" || echo "embeddeddolt: missing"
+grep -q "^backup/" .beads/.gitignore 2>/dev/null && echo "backup: present" || echo "backup: missing"
 ```
 
-If missing → flag as IMPORTANT. Suggest running any `bd` command to trigger auto-creation, or manually create `.beads/.gitignore` with `dolt/` entry.
+If missing or incomplete → flag as IMPORTANT. Run `bd doctor --fix --yes` (server mode) or `bd init --reinit-local --from-jsonl` (embedded mode, preserves data) to regenerate.
 
-Also verify these entries are in `.beads/.gitignore` (not auto-added during upgrade):
+Also verify the repo's ROOT `.gitignore` does not over-exclude `.beads/`. Some pre-1.0 repos had `.beads/*` with allowlist exceptions for `issues.jsonl` and `.gitignore` only — those exclude the now-required `.beads/hooks/`, `config.yaml`, and `metadata.json`. Allowlist must include:
 
-```bash
-grep -q "dolt-monitor.pid.lock" .beads/.gitignore 2>/dev/null && echo "pid.lock: present" || echo "pid.lock: missing"
-grep -q "^backup/" .beads/.gitignore 2>/dev/null && echo "backup/: present" || echo "backup/: missing"
 ```
-
-If either is missing → flag as IMPORTANT. `dolt-monitor.pid.lock` goes after `dolt-monitor.pid`. `backup/` is the local backup directory (auto-generated, should not be committed).
+!.beads/issues.jsonl
+!.beads/.gitignore
+!.beads/config.yaml
+!.beads/metadata.json
+!.beads/README.md
+!.beads/hooks/
+!.beads/hooks/**
+```
 
 ### 4.6 Dolt mode check (NICE)
 
