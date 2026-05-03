@@ -28,6 +28,8 @@ Identify:
 
 **Note on shared repos and the global-CLAUDE.md dedup rule:** the reference template suggests dropping content already covered by `~/.claude/CLAUDE.md` (Prime Directive, Quality Gates, Role). That dedup is correct for *solo* repos, but **AGENTS.md is checked in and read by other contributors who don't share the user's global config**. For shared repos, keep concise versions of those foundational sections (especially Gall's Law / Prime Directive) at the repo level — terser than the reference, but present. Ask the user up front: "Is this repo shared with other contributors?" If yes, keep concise foundational sections. If solo, dedup against global is fine.
 
+**Note on beads sync model — ask before recommending changes:** beads 1.0+ supports two sync models. (1) Embedded Dolt + git+JSONL transport (default for `bd init`): `bd dolt push/pull` doesn't apply. (2) Server Dolt + Dolt remote (`bd init --server`, used in multi-agent coordination like Gastown): `bd dolt push/pull` *is* the sync mechanism. Before adding any "don't use bd dolt push/pull" override, **check which model this repo uses** — look for `.beads/dolt/` (embedded) vs `.beads/server/` or a configured Dolt remote. If embedded+git: a "doesn't apply to this repo's embedded+git setup" note above any tool-injected `bd dolt push` references is appropriate. If server+remote: leave the injection alone — it's correct guidance. If unclear: ask the user.
+
 ### 3. Show the plan before editing
 
 Format:

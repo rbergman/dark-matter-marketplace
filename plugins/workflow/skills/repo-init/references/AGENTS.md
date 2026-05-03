@@ -81,7 +81,7 @@ Repo-wide conventions worth stating once (not covered by injections):
 
 - **Bead-first workflow:** when ad hoc work appears (bug, feature, task) without an existing bead, create one before implementing. Every code change should trace back to a bead.
 - **Bead detail discipline:** every bead has an imperative title, a description that lets a cold session start work, explicit dependencies, and a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc and call out architectural decisions.
-- **Sync model:** beads syncs across machines via **git, not a beads remote**. `.beads/issues.jsonl` is the source of truth (committed); `.beads/dolt/` is a local cache (gitignored). Don't run `bd dolt push/pull`.
+- **Sync model (verify per repo):** beads supports two sync models. **Embedded Dolt + git+JSONL transport** (the default in 1.0+, used by this repo unless `bd init --server` was run): `.beads/issues.jsonl` is the source of truth (committed); `.beads/dolt/` is a local cache (gitignored). Sync is automatic via pre-commit/post-merge hooks; `bd dolt push/pull` doesn't apply (no Dolt remote configured). **Server Dolt + Dolt remote** (`bd init --server`, used in multi-agent coordination scenarios like Gastown): a central Dolt server is authoritative; `bd dolt push/pull` is the sync mechanism. Check `bd init` flags / Dolt remote config to know which model this repo uses.
 
 ---
 
