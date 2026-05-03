@@ -26,6 +26,8 @@ Identify:
 - **Conflicts** — places where this repo's content disagrees with the reference. These need a *judgment call*, not a silent overwrite. Flag them.
 - **Project-specific content to preserve** — Settled Decisions, project description, domain-specific conventions, language/framework specifics, anything referencing this repo's actual code. The reference template won't know about these.
 
+**Note on shared repos and the global-CLAUDE.md dedup rule:** the reference template suggests dropping content already covered by `~/.claude/CLAUDE.md` (Prime Directive, Quality Gates, Role). That dedup is correct for *solo* repos, but **AGENTS.md is checked in and read by other contributors who don't share the user's global config**. For shared repos, keep concise versions of those foundational sections (especially Gall's Law / Prime Directive) at the repo level — terser than the reference, but present. Ask the user up front: "Is this repo shared with other contributors?" If yes, keep concise foundational sections. If solo, dedup against global is fine.
+
 ### 3. Show the plan before editing
 
 Format:

@@ -149,7 +149,7 @@ Items marked SETTLED should not be revisited unless the user explicitly asks.
 
 For personal prefs that should work across worktrees, use imports: `@~/.claude/my-project-instructions.md` in your `CLAUDE.local.md`.
 
-**Deduplication:** If your `~/.claude/CLAUDE.md` already covers Prime Directive, Quality Gates, or Role sections, remove those sections from this file. Per-repo AGENTS.md should contain only project-specific content. Cross-repo policies belong in `~/.claude/rules/`.
+**Deduplication:** Cross-repo policies (universal preferences, personal style) belong in `~/.claude/CLAUDE.md` or `~/.claude/rules/`. Per-repo AGENTS.md should focus on project-specific content. **For shared repos**, keep concise versions of foundational sections (especially Gall's Law / Prime Directive, Quality Gates) — other contributors won't share your global config, and the repo file should stand on its own. **For solo repos**, dedup against global is fine; let the global file be the source of truth.
 
 ---
 
