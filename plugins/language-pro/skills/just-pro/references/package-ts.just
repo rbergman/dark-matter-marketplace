@@ -1,8 +1,11 @@
 # TypeScript Package Justfile
-# Thin wrapper around npm scripts for consistent just interface
+# Direct tool invocation via PATH export for self-contained recipes
 #
 # Usage from package: just --list
 # Usage from root: just web <recipe>
+
+# Put node_modules/.bin on PATH so recipes call tools directly (no npx overhead)
+export PATH := "./node_modules/.bin:" + env_var("PATH")
 
 # === Default ===
 
@@ -21,39 +24,42 @@ setup:
 # === Quality Gates ===
 
 # Run all checks (typecheck, lint, test, vulnerability audit)
-check:
-    npm run check
+check: typecheck lint test
     npm audit --omit=dev --audit-level=high
+
+# Fast gate — Stop hook, iterative dev (drop audit)
+check-fast: typecheck lint test
+    @echo "Fast checks passed"
 
 # === Format & Lint ===
 
 # Lint code
 lint:
-    npm run lint
+    eslint .
 
 # Auto-fix lint issues
 lint-fix:
-    npm run lint:fix
+    eslint . --fix
 
 # Type check
 typecheck:
-    npm run typecheck
+    tsc --noEmit
 
 # === Test ===
 
 # Run tests
 test:
-    npm test
+    vitest run
 
 # Run tests in watch mode
 test-watch:
-    npm run test:watch
+    vitest --watch
 
 # === Build ===
 
 # Build for production
 build:
-    npm run build
+    tsc
 
 # === Run ===
 

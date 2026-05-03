@@ -1,6 +1,6 @@
 ---
 name: game-feel
-description: "Juice checklists, feedback loop tightening, screen shake/particles/sound timing, the perception-action cycle, and 'why does this feel bad?' diagnostics. Use PROACTIVELY when implementing player actions, combat hits, collectibles, UI transitions, or any moment where the player should *feel* something."
+description: "Juice, feedback layering, screen shake/particles/sound timing, the perception-action cycle, and 'why does this feel bad?' diagnostics. Use when implementing player actions, combat hits, collectibles, UI transitions, weapon impacts, jumps, dashes, or any moment where the player should *feel* something; when a mechanic functionally works but feels mushy, slow, or unsatisfying; or when playtesters say 'it's missing something.' Covers timing reference numbers (frames per response phase), feedback channels (visual/audio/haptic/screen), and the diagnostic ladder for feel problems."
 ---
 
 # Game Feel

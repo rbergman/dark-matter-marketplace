@@ -1,11 +1,11 @@
 ---
-description: Review and align steering files (CLAUDE.md, AGENTS.md) with Claude Opus 4.6 prompting best practices
+description: Review and align steering files (CLAUDE.md, AGENTS.md) with Claude Opus 4.7 prompting best practices
 argument-hint: "[file paths]"
 ---
 
 # Align Steering Files
 
-Review steering files and skill definitions for alignment with Claude Opus 4.6 prompting best practices, then apply fixes.
+Review steering files and skill definitions for alignment with Claude Opus 4.7 prompting best practices, then apply fixes.
 
 ## Arguments
 
@@ -21,7 +21,7 @@ Apply each check to every steering file. For each issue found, edit the file dir
 
 ### 1. Soften aggressive triggers
 
-Opus 4.6 follows instructions more precisely than older models. Aggressive language that compensated for undertriggering now causes overtriggering.
+Opus 4.7 follows instructions more literally than 4.6 and earlier. Aggressive language that compensated for undertriggering now causes overtriggering.
 
 | Find | Replace with |
 |------|-------------|
@@ -44,7 +44,7 @@ For each constraint that lacks motivation, add a brief reason. If the reason is 
 
 ### 3. Remove anti-laziness prompting
 
-Opus 4.6 is proactive by default. Instructions that pushed older models to be thorough will cause over-exploration.
+Opus 4.7 is proactive by default and tends to spawn fewer subagents than 4.6 unless asked. Instructions that pushed older models to be thorough will cause over-exploration; conversely, instructions discouraging delegation may now over-restrict.
 
 Remove or soften:
 - "If in doubt, use [tool]" — causes overtriggering
@@ -55,12 +55,13 @@ Remove or soften:
 
 ### 4. Remove redundancy with native behavior
 
-Opus 4.6 does these natively. Instructions about them add context cost without benefit:
+Opus 4.7 does these natively. Instructions about them add context cost without benefit:
 
 - Parallel tool calls (native — remove unless tuning aggression level)
-- Concise communication style (native — remove unless asking for MORE detail)
+- Response-length calibration (native — remove "be concise" / "be thorough" boilerplate; tune effort level instead)
 - Reading files before editing (native — remove)
 - Using available tools (native — remove "Use your tools" type instructions)
+- User-facing progress updates during long agentic traces (native — remove "summarize after every N tool calls")
 
 ### 5. Tell what to do, not what not to do
 
@@ -105,7 +106,9 @@ When reviewing SKILL.md frontmatter descriptions:
 - Make descriptions distinctive and immediately recognizable
 
 **Before:** "This skill provides patterns for setting up just in projects."
-**After:** "Patterns for setting up just (command runner). Use PROACTIVELY when creating build systems, setting up new repos, or when the user asks about justfile configuration."
+**After:** "Patterns for setting up just (command runner). Use when creating build systems, setting up new repos, or when the user asks about justfile configuration."
+
+Note: drop "PROACTIVELY" wording. Imperative "Use when..." is sufficient and avoids the directive framing that read as instructing the model rather than describing triggers.
 
 ### 10. Explain reasoning behind constraints
 

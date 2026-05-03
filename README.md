@@ -42,10 +42,9 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
-| dm-tool | Tool design patterns | `dm-tool:agent-dx-cli` |
 | dm-work | Workflow tools | `dm-work:orchestrator` |
 
-Commands use `/dm-work:command` format (e.g., `/dm-work:rotate`).
+Commands use `/dm-work:command` format (e.g., `/dm-work:merge`).
 
 ---
 
@@ -58,10 +57,8 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
-│   ├── tooling/       # dm-tool: CLI/MCP/API design for agents
 │   └── workflow/      # dm-work: orchestration, specs, subagents
 ├── references/        # Non-installable reference materials
-│   ├── CLAUDE.md      # Global Claude instructions
 │   ├── workflow.md    # Human guide to the dev loop
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lsp-setup.md   # LSP configuration and troubleshooting
@@ -70,6 +67,8 @@ dark-matter-marketplace/
 │   └── testing-agent-teams.md  # Testing guide for dm-team plugin
 └── README.md
 ```
+
+> **Removed in May 2026 spring cleaning:** `dm-tool` plugin (single skill `agent-dx-cli`) was deleted. If the CLI-design-for-agents content is needed again, recover it from git history (last commit before deletion).
 
 ---
 
@@ -92,12 +91,10 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 |-----------|------|---------|
 | `dm-work:orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
 | `dm-work:subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
-| `dm-work:dialectical-refinement` | Skill | Transform ambiguous specs into implementable work items through adversarial refinement |
 | `dm-work:worktrees` | Skill | Git worktrees for isolated workspaces — bd worktree commands with beads integration |
 | `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
 | `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
-| `dm-work:tdd` | Skill | Test-driven development — write failing test first, then minimal code to pass |
-| `dm-work:mise` | Skill | Modern dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
+| `dm-work:mise` | Skill | Dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
 | `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
@@ -106,17 +103,19 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
 | `dm-work:session-retro` | Skill | End-of-session self-improvement — convert friction, mistakes, and discoveries into persistent rules and memories |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
-| `/dm-work:refine` | Command | Sharpen individual work items |
-| `/dm-work:compress` | Command | Compress documents for token-efficient agent consumption |
-| `/dm-work:rotate` | Command | Session rotation — snapshot + save + /copy + /clear + paste to resume |
+| `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
 | `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |
 | `/dm-work:review` | Command | Parallel arch/code/security/design review with adversarial spec verification — local (beads) or PR (GH comments) |
 | `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
-| `/dm-work:advice` | Command | Get architectural guidance |
+| `/dm-work:advice` | Command | Generate a second-opinion brief for an external agent with no prior context |
+| `/dm-work:align-steering` | Command | Modernize CLAUDE.md / AGENTS.md / SKILL.md against Claude Opus 4.7 prompting guidance |
+| `/dm-work:align-agents` | Command | Align a repo's AGENTS.md with the dm-work reference template — diff/merge, never replace |
 | `/dm-work:subagent` | Command | Delegate work to a single subagent |
 | `/dm-work:compete` | Command | Competitive generation — spawn N agents on same spec, compare by metrics, merge winner |
 | `/dm-work:subagents` | Command | Orchestrate multiple subagents with dependency awareness |
+
+> Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Document compression and verbosity tuning use the model's native calibration plus `effort` levels.
 
 ### dm-game (game-dev/)
 
@@ -188,29 +187,16 @@ Agent Teams patterns for multi-agent coordination, deliberation, and collaborati
 }
 ```
 
-**When to use dm-team vs dm-work:** dm-work uses `Task()` subagents — fire-and-forget workers that report back to the orchestrator. dm-team uses Agent Teams — persistent teammates with their own context windows that message each other directly, self-claim tasks, and collaborate. Use dm-work for focused result-only delegation. Use dm-team when agents need to discuss, challenge each other, or coordinate. See `dm-team:tiered-delegation` for the full decision framework.
+**When to use dm-team vs dm-work:** dm-work uses `Task()` subagents — fire-and-forget workers that report back to the orchestrator. dm-team uses Agent Teams — persistent teammates with their own context windows that message each other directly, self-claim tasks, and collaborate. Use dm-work for focused result-only delegation. Use dm-team when agents need to discuss, challenge each other, or coordinate. See the "Teams vs Subagents vs Direct" table inside `dm-team:lead` for the decision framework.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-team:lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, beads integration |
+| `dm-team:lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, common team shapes, beads integration |
 | `dm-team:teammate` | Skill | Teammate protocol — file ownership, self-claiming, inter-agent communication |
 | `dm-team:council` | Skill | Multi-perspective deliberation (LLM Council pattern) for decisions and trade-offs |
-| `dm-team:refinement` | Skill | Live adversarial spec refinement through teammate debate |
 | `dm-team:review` | Skill | Collaborative code review where reviewers discuss and challenge findings |
-| `dm-team:brainstorm` | Skill | Multi-perspective brainstorming with simultaneous exploration |
-| `dm-team:tiered-delegation` | Skill | Decision framework: when to use Agent Teams vs subagents vs single session |
-| `dm-team:compositions` | Skill | Reusable team templates and beads-teams bridge patterns |
 | `/dm-team:council` | Command | Spawn a deliberation council for a decision or topic |
-| `/dm-team:refine` | Command | Team-based adversarial spec refinement |
 | `/dm-team:review` | Command | Collaborative team code review |
-
-### dm-tool (tooling/)
-
-Patterns for designing tools that agents can use effectively.
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `dm-tool:agent-dx-cli` | Skill | CLI design patterns: minimal ceremony, JSON output, context injection, batch ops, error handling |
 
 ---
 
@@ -244,7 +230,6 @@ claude plugin install dm-arch@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
 claude plugin install dm-team@dark-matter-marketplace
-claude plugin install dm-tool@dark-matter-marketplace
 claude plugin install dm-work@dark-matter-marketplace
 ```
 

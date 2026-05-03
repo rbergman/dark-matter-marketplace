@@ -1,6 +1,8 @@
-# GLOBAL INSTRUCTIONS
+# PROJECT INSTRUCTIONS
 
-## Prime Directive
+## Prime Directive — Gall's Law
+
+> *"A complex system that works is invariably found to have evolved from a simple system that worked. A complex system designed from scratch never works and cannot be patched up to make it work. You have to start over with a working simple system."* — John Gall
 
 **Always grow complexity from a simple system that already works.**
 
@@ -15,67 +17,71 @@ In practice:
 - Make only small, verifiable changes
 - Push back when requests ignore this: *Begin → Learn → Succeed → then add complexity*
 
----
-
-## Quality Gates
-
-Pre-existing failures are still our problem. Compile/lint/typecheck/test failures must be resolved before work is complete — regardless of origin. "Already broken" is not an excuse; it's usually our prior miss.
-
-Fix failing gates before declaring work complete.
-
-### Responding to Length/Complexity Violations
-
-File length, function length, and complexity limits exist to drive code toward clean decomposition. When you hit a limit, **extract logical sections into well-named companion files and functions** — don't compress code to fit.
-
-**Prohibited:** combining statements onto single lines, removing comments, compressing whitespace, shortening descriptive names. The goal is clean architecture, not metric compliance.
+This applies to features, refactors, infrastructure, and the codebase as a whole. When tempted to design a "proper" version up front, build the smallest working slice first and let it grow.
 
 ---
 
-## Beads
+## Software Engineering Practices
 
-Use `bd init` to initialize beads for this project (embedded Dolt is the default in beads 1.0+ and works on macOS). Use `bd ready` to find available work, `bd close <id>` to complete, `bd remember "insight"` to persist factual learnings, and `bd memories <keyword>` to search them.
+### Commit hygiene and cadence
 
-### Sync
+- **One logical change per commit.** A commit should compile, pass gates, and be revertable in isolation. If the diff spans unrelated concerns, split it.
+- **Right-sized commits.** Roughly one bead = one commit for XS/S work; M+ work may produce a few related commits. Don't batch hours of work into one mega-commit; don't fragment a single coherent change across five.
+- **Conventional Commits.** Use `type(scope): subject` — `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`, `style:`, `build:`, `ci:`. Imperative subject, ≤72 chars. Body explains *why* when the diff doesn't make it obvious.
+- **Reference beads in the body**, not the subject (`Closes bd-abc-123` / `Refs bd-abc-124`).
 
-Dolt is the local-only database (embedded). Remote sync uses git via JSONL. With beads 1.0+, sync is automatic via built-in defaults:
+### Quality gates per commit
 
-- `export.auto = true` — every `bd` mutation auto-writes `.beads/issues.jsonl` (60s throttled)
-- `export.git-add = true` — auto-stages the JSONL for the next commit
-- Pre-commit hook forces a flush (so each commit carries current state)
-- Post-merge hook imports incoming JSONL after `git pull`
+If pre-commit hooks already run lint/typecheck/test, trust them and don't re-run manually. If hooks are missing, partial, or skipped (e.g. WIP commits behind a flag), run `just check` (or the project's equivalent) yourself before committing. **Pre-existing failures are still our problem** — "already broken" is not an excuse, and is usually our prior miss.
 
-Hooks live in `.beads/hooks/` (committed to git, managed by `bd hooks install`). `bd init` sets `core.hooksPath = .beads/hooks` automatically. `timbers hooks install` detects this and appends into the same hook files alongside the beads section. Quality gates go between the BEADS and TIMBERS marker sections — content outside markers is preserved across reinstalls.
+When file/function/complexity limits trigger, **extract logical sections into well-named companion files** rather than compressing code to fit. Don't combine statements onto one line, strip comments, or shorten names to satisfy a metric.
 
-With hooks installed, sync is fully automatic:
-- Session start: `git pull` + `bd ready`
-- Session end: `git commit` + `git push`
+### just as the primary DX interface
 
-New dev/agent onboarding: `git clone <repo> && bd hooks install --force --beads` (or via `just hooks`). `bd init` is only for first-time setup of a new repo.
+`just` is the canonical command runner for both humans and agents in this repo. Treat the justfile as the contract:
 
-**Do NOT** use `bd dolt push/pull` or `bd dolt remote` — sync is via git+JSONL, not Dolt remotes.
+- All common workflows belong as `just` recipes — `just check`, `just build`, `just test`, `just fmt`, `just lint`, `just hooks`, project-specific tasks
+- New repeatable commands → add a recipe rather than documenting raw shell
+- Keep recipes short and self-explanatory; agents will read them
+- When a recipe changes, the change is the documentation
 
-**Manual fallback** (if auto-export is disabled or you need a forced flush mid-session): `bd export -o .beads/issues.jsonl` (bare `bd export` writes to stdout — always pass `-o`).
+If a workflow only exists as a shell snippet in a doc, it's not really a workflow yet — promote it to `just`.
 
-### Bead-First Workflow
+### Output compression: rtk and tokf
 
-When the user raises ad hoc work (a bug, feature request, or task) that doesn't have an existing bead, **create one before starting implementation**. This ensures every code change traces back to a bead, making session history, retros, and handoffs reliable.
+When available, use `rtk` (Rust Token Killer) and `tokf` (per-project filter) to compress noisy command output before it reaches the agent's context. Both are transparent: agents call commands normally and the wrappers handle compression.
 
-### Bead Detail Discipline
+- **rtk** is the global baseline (npm/git/build output → 60-90% token reduction)
+- **tokf** is per-project for repo-specific noise patterns
+- Available? Use them. Not installed? Don't block on it; the work still proceeds.
 
-When creating beads, **capture ample detail** so work can resume with high fidelity in any future session — even one with no prior context.
+See `dm-work:output-compression` for setup.
 
-Every bead must include:
-- **Clear title** in imperative form ("Implement X", "Fix Y")
-- **Description** with enough context to start work cold: what, why, acceptance criteria
-- **Dependencies** explicitly linked (`bd dep add`)
-- **Complexity estimate** (xs/s/m/l/xl)
+### Pause-for-review cadence
 
-For m+ complexity beads, also include:
-- Link to a plan doc (`docs/plans/YYYY-MM-DD-<topic>.md`) with full breakdown
-- Key architectural decisions and constraints
-- Relevant file paths and current state
+After every **M or larger** feature lands (M+ bead closed, code merged), pause and run a review pass before starting the next M+ chunk. Either:
 
-**The test**: Could a fresh session with zero conversation history pick up this bead and make meaningful progress? If not, add more detail.
+- `/dm-work:review` for parallel arch/code/security reviewers, or
+- A generic subagent review of the recent diff with explicit scope ("read ONLY the diff and the OWN files"), plus an optional Codex second-opinion via the codex plugin for cross-model coverage
+
+The goal is to catch drift, accumulated debt, and integration gaps before they compound. XS/S work doesn't need this; M+ does.
+
+---
+
+## Beads & Timbers
+
+This repo uses **beads** (`bd`) for task tracking and **timbers** for commit-reasoning logs. Both tools inject their own usage instructions during init:
+
+- `bd init` runs `bd setup claude` which adds a beads usage section to your steering files and configures `.claude/settings.json`
+- `timbers init --git-hooks` installs hooks; `timbers onboard --target agents >> AGENTS.md` appends usage guidance
+
+**Follow the instructions those tools inject** — they own their respective domains. Don't duplicate that content here; let `bd setup claude` and `timbers onboard` be the source of truth so they stay current as the tools evolve.
+
+Repo-wide conventions worth stating once (not covered by injections):
+
+- **Bead-first workflow:** when ad hoc work appears (bug, feature, task) without an existing bead, create one before implementing. Every code change should trace back to a bead.
+- **Bead detail discipline:** every bead has an imperative title, a description that lets a cold session start work, explicit dependencies, and a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc and call out architectural decisions.
+- **Sync model:** beads syncs across machines via **git, not a beads remote**. `.beads/issues.jsonl` is the source of truth (committed); `.beads/dolt/` is a local cache (gitignored). Don't run `bd dolt push/pull`.
 
 ---
 
@@ -90,7 +96,7 @@ At session start, activate one of these based on your coordination needs:
 | Standard delegation | `dm-work:orchestrator` | Task() subagents |
 | Complex multi-agent work | `dm-team:lead` | [Agent Teams](https://code.claude.com/docs/en/agent-teams) |
 
-Both establish delegation thresholds, quality gates, and file ownership boundaries. See `dm-team:tiered-delegation` for the decision framework. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json.
+Both establish delegation thresholds, quality gates, and file ownership boundaries. See the "Teams vs Subagents vs Direct" table inside `dm-team:lead` for the decision framework. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json.
 
 If you are a **subagent** (delegated by an orchestrator), activate `dm-work:subagent`.
 If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:teammate`.
@@ -103,11 +109,7 @@ When creating worktrees for isolated feature work, always place them under `.wor
 
 ## Session Recovery
 
-If the user pastes a session snapshot as their first message, use it as your starting context — it contains all prior state, decisions, and next steps. Confirm recovery: "Recovered session from snapshot. [brief summary of where we left off]"
-
-If no pasted snapshot but `history/snapshot.md` exists, read it as a fallback, then delete it: `rm history/snapshot.md`
-
-Snapshots are created by `/dm-work:rotate`. The paste-based workflow is: `/copy` → `/clear` → paste into new session.
+Claude Code carries native session continuity (rewind, compact, resume). For cross-session state, beads is the source of truth: `bd ready` and `bd show <id>` reconstruct what's in flight. If the user pastes any prior snapshot as their first message, treat it as starting context and confirm: "Recovered session. [brief summary of where we left off]"
 
 ---
 

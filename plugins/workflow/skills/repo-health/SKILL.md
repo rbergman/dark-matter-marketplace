@@ -69,7 +69,7 @@ Report each missing category separately.
 wc -l CLAUDE.md AGENTS.md 2>/dev/null
 ```
 
-- If either exceeds 100 lines → flag as IMPORTANT, suggest `/compress`
+- If either exceeds 100 lines → flag as IMPORTANT, suggest trimming or moving content into skills
 - Estimate token cost: `bytes / 4`
 
 ### 2.3 CLAUDE.md / AGENTS.md duplication (IMPORTANT)
@@ -77,9 +77,9 @@ wc -l CLAUDE.md AGENTS.md 2>/dev/null
 If both files exist:
 
 1. **Check symlinks first** — run `readlink CLAUDE.md` and `readlink AGENTS.md`
-2. If either is a symlink to the other → **PASSED** ("unified via symlink — zero-maintenance dedup")
+2. If either is a symlink to the other → also run `test -e <symlink>` to verify the target exists. If it does → **PASSED** ("unified via symlink — zero-maintenance dedup"). If the symlink is dangling → flag as IMPORTANT (broken link masquerading as a passing check).
 3. If both are regular files → check for content overlap (shared headings, similar line counts)
-4. If overlap detected → flag as IMPORTANT, suggest **either** a stub pattern or symlink as valid dedup strategies — don't prescribe one over the other
+4. If overlap detected → flag as IMPORTANT and suggest **converting to a symlink** (`mv CLAUDE.md CLAUDE.md.bak && ln -s AGENTS.md CLAUDE.md` after confirming AGENTS.md is canonical) as the preferred fix, with the stub pattern (`echo "See @AGENTS.md" > CLAUDE.md`) as the fallback for filesystems without symlink support.
 
 ### 2.4 Global config duplication (NICE)
 
@@ -431,7 +431,7 @@ Three configs:
 
 #### Python — check against `python-pro/references/`
 
-**`pyproject.toml`** ruff section vs `pyproject-ruff.toml` reference:
+**`pyproject.toml`** ruff section vs `python-pro/references/pyproject-template.toml`:
 
 | Check | What to look for | Severity |
 |-------|-----------------|----------|
@@ -526,7 +526,7 @@ Detected: <language(s)>, <project-type>
 | Check | Status | Fix |
 |-------|--------|-----|
 | .claudeignore covers lock files | Missing Cargo.lock | Add pattern? |
-| CLAUDE.md size | 147 lines (~920 tokens) | Run /compress? |
+| CLAUDE.md size | 147 lines (~920 tokens) | Trim or move sections to skills |
 | Quality gates recipe | No `just check` recipe | Add to justfile? |
 | TypeScript strict mode | `"strict": false` in tsconfig | Enable strict? |
 | Test infrastructure | No test files found | See typescript-pro skill |
@@ -561,7 +561,7 @@ For each finding with an available fix, ask the user:
 
 - **Create files** (.claudeignore, .gitignore): generate from templates, show diff, confirm
 - **Add patterns**: append to existing file, show what will be added, confirm
-- **Compress**: invoke `/compress` on oversized files
+- **Trim oversized files**: prune low-value sections; move topical workflows into skills (loaded on demand) instead of CLAUDE.md (loaded every session)
 - **Initialize tools**: run `bd init`, `timbers init` with confirmation
 - **Fix `max-lines` skip options**: If `max-lines` uses `skipBlankLines` or `skipComments`, apply this migration:
   1. Remove skip options: change to `'max-lines': ['error', { max: 400 }]`

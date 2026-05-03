@@ -66,8 +66,6 @@ Players who are blind, have low vision, are colorblind, or are photosensitive.
 | Photosensitive content | No flashing above 3Hz, option to disable screen effects | WCAG 2.3.1 |
 | Motion-intensive effects | Motion reduction toggle (camera shake, screen bob, parallax) | WCAG 2.3.3 |
 
-**Key insight:** "Colorblind mode" is not one feature — it's a design philosophy. See the dedicated Colorblind Design section below.
-
 ### Pillar 2: Auditory
 
 Players who are deaf, hard of hearing, or playing without sound.
@@ -80,8 +78,6 @@ Players who are deaf, hard of hearing, or playing without sound.
 | Mixed audio levels | Independent volume sliders per channel (music, SFX, voice, ambient) | XAG 107 |
 | Directional audio cues | Visual directional indicators (damage direction, footstep radar) | GAG advanced |
 | Voice chat dependency | Text chat alternative, ping systems, visual callouts | XAG 107 |
-
-**Key insight:** If a player can complete your game on mute and still understand everything that happened, your auditory accessibility is solid.
 
 ### Pillar 3: Motor
 
@@ -96,8 +92,6 @@ Players with limited mobility, dexterity, or stamina — including temporary con
 | Complex simultaneous inputs | Simplification options, sequential alternatives | GAG advanced |
 | Fixed sensitivity | Adjustable dead zones, sensitivity curves, acceleration | XAG 104 |
 | No one-handed play | Alternative control schemes, copilot mode | GAG advanced |
-
-**Key insight:** RSI alone affects a significant percentage of working adults. Motor accessibility isn't a niche — it's an aging population and an increasingly common workplace injury.
 
 ### Pillar 4: Cognitive
 
@@ -114,53 +108,45 @@ Players with cognitive disabilities, learning differences, ADHD, anxiety — or 
 | Distressing content | Content warnings, option to skip/reduce intensity | GAG intermediate |
 | Complex navigation | Minimap, breadcrumbs, "return to path" button | GAG intermediate |
 
-**Key insight:** Cognitive accessibility has the broadest overlap with general UX quality. Every player has moments of divided attention, fatigue, or confusion. Designing for cognitive accessibility makes the game better for everyone — this is where accessibility and the work in **player-ux** (cognitive load management) directly converge.
+Cognitive accessibility has the broadest overlap with general UX quality — this is where accessibility and **player-ux** (cognitive load management) directly converge.
 
 ---
 
 ## Implementation Tiers
 
-Not everything ships in v1. Prioritize by reach and effort. These tiers are ordered by the ratio of players impacted to implementation cost.
+Prioritize by ratio of players impacted to implementation cost.
 
-### Tier 1: Must-Have
+### Tier 1: Must-Have (Ship Before Launch)
 
-Ship these before launch. Each addresses a large population or represents a baseline expectation on modern platforms.
+| Pillar | Feature | Why Tier 1 |
+|--------|---------|------------|
+| Visual | No color-only information | ~8-10% of males colorblind; free if designed in |
+| Visual | Scalable text (min 28px at 1080p) | Large-screen and mobile players need this |
+| Visual | Contrast ratios (4.5:1 text, 3:1 UI) | WCAG AA baseline |
+| Visual | Motion reduction option | Vestibular disorders affect ~35% of adults over 40 |
+| Motor | Remappable controls (every input) | Platform certification requirement |
+| Motor | Toggle/hold for sustained inputs | Minimal cost, major RSI/mobility impact |
+| Auditory | Subtitles with speaker identification | ~15% of adults have hearing loss |
+| Auditory | Independent volume sliders | Standard player expectation |
+| Cognitive | Difficulty options | Benefits the widest player range |
+| Cognitive | Pauseable gameplay | Essential for parents, interruptions, anxiety |
+| Cognitive | Clear objective/waypoint system | Reduces frustration universally |
 
-| # | Pillar | Feature | Why Tier 1 |
-|---|--------|---------|------------|
-| 1 | Visual | No color-only information | ~8-10% of males are colorblind; costs nothing if designed in from the start |
-| 2 | Visual | Scalable text (minimum 28px body at 1080p) | Large-screen and mobile players both need this |
-| 3 | Visual | Minimum contrast ratios (4.5:1 text, 3:1 UI) | WCAG AA baseline; benefits all lighting conditions |
-| 4 | Motor | Remappable controls (every input) | Platform certification requirement on many consoles |
-| 5 | Motor | Toggle/hold option for sustained inputs | Minimal implementation cost, major RSI/mobility impact |
-| 6 | Auditory | Subtitles with speaker identification | ~15% of adults have some hearing loss |
-| 7 | Auditory | Independent volume sliders (music, SFX, voice) | Standard player expectation |
-| 8 | Cognitive | Difficulty options (at minimum: easy/normal/hard) | Benefits the widest range of players |
-| 9 | Cognitive | Pauseable gameplay | Essential for parents, people with interruptions, anxiety |
-| 10 | Cognitive | Clear objective/waypoint system | Reduces frustration across all player types |
-| 11 | Visual | Motion reduction option | Vestibular disorders affect ~35% of adults over 40 |
+### Tier 2: Should-Have (First Major Update)
 
-**Gut check:** If your game lacks any Tier 1 item, you're excluding a measurable percentage of your audience before they encounter any gameplay.
+| Pillar | Feature | Why Tier 2 |
+|--------|---------|------------|
+| Visual | High contrast mode | Growing platform expectation |
+| Visual | Independent UI scaling | Important for complex HUDs |
+| Motor | Adjustable timing windows | Major motor accessibility lever |
+| Motor | One-handed control scheme | Temporary injury, one-arm holds |
+| Auditory | Visual sound indicators | Essential for deaf/HoH in action games |
+| Auditory | Descriptive captions | Ambient narrative for deaf/HoH |
+| Cognitive | Adjustable game speed | Broad benefit; doubles as difficulty lever |
+| Cognitive | Tutorial replay from menu | Low cost, high value |
+| Cognitive | Content warnings | Increasingly expected; trivial to implement |
 
-### Tier 2: Should-Have
-
-Ship these in the first major update if not at launch. Each addresses a significant player population or represents growing industry expectation.
-
-| # | Pillar | Feature | Why Tier 2 |
-|---|--------|---------|------------|
-| 1 | Visual | High contrast mode | Growing platform expectation (iOS, Android, Xbox all offer system-level) |
-| 2 | Visual | Independent UI scaling | Separate from text scaling; important for complex HUDs |
-| 3 | Motor | Adjustable timing windows | Significant impact for motor-impaired players; benefits difficulty tuning |
-| 4 | Motor | One-handed control scheme | Enables play during temporary injury, while holding a child, etc. |
-| 5 | Auditory | Visual sound indicators (directional, threat) | Important for deaf/HoH players in action games |
-| 6 | Auditory | Descriptive captions [door creaking open] | Goes beyond subtitles to convey ambient narrative |
-| 7 | Cognitive | Adjustable game speed | Broad benefit; doubles as difficulty lever |
-| 8 | Cognitive | Tutorial replay from menu | Low implementation cost, high value for returning players |
-| 9 | Cognitive | Content warnings for distressing scenes | Increasingly expected; trivial to implement |
-
-### Tier 3: Best-in-Class
-
-These represent industry leadership. Pursue them when Tiers 1-2 are solid.
+### Tier 3: Best-in-Class (Industry Leadership)
 
 | Pillar | Feature | Notes |
 |--------|---------|-------|
@@ -176,7 +162,7 @@ These represent industry leadership. Pursue them when Tiers 1-2 are solid.
 
 ## Colorblind Design
 
-Colorblind design deserves dedicated treatment because it's common, frequently implemented poorly, and fixable at the design level rather than through post-hoc filters.
+Common, frequently implemented poorly, and fixable at the design level rather than through post-hoc filters.
 
 ### Prevalence and Types
 
@@ -186,31 +172,20 @@ Colorblind design deserves dedicated treatment because it's common, frequently i
 | Deuteranopia/deuteranomaly | Green perception | Green-red, green-brown, green-yellow | ~5% |
 | Tritanopia/tritanomaly | Blue perception | Blue-yellow, blue-green | ~0.01% |
 
-**Combined:** roughly 1 in 12 males and 1 in 200 females have some form of color vision deficiency. In a game with 1 million players, that's approximately 40,000-80,000 affected players.
+**Combined:** roughly 1 in 12 males and 1 in 200 females have some form of color vision deficiency.
 
 ### The Design Rule
 
-**Never use color as the sole channel for information.** Every color distinction must be paired with at least one redundant channel:
-
-| Redundant Channel | Example |
-|-------------------|---------|
-| **Shape** | Team indicators use circle vs. triangle, not just red vs. blue |
-| **Pattern** | Rarity uses different border patterns, not just color tints |
-| **Text/Label** | Status effects show names, not just colored icons |
-| **Position** | Ally vs. enemy indicators differ in screen placement |
-| **Size** | Threat level uses icon size in addition to color |
-| **Brightness** | Even if hues are confused, light vs. dark remains distinguishable |
+**Never use color as the sole channel for information.** Pair every color distinction with shape, pattern, text, position, size, or brightness. Examples: team indicators use circle vs. triangle (not just red vs. blue), rarity uses border patterns (not just color tints), status effects show names (not just colored icons).
 
 ### Implementation Approaches (Worst to Best)
 
-| Approach | Method | Problems |
-|----------|--------|----------|
-| **Hue shift** | Rotate the color palette | Breaks art direction, doesn't fix the underlying design, often creates new conflicts |
-| **Palette swap** | Offer 3-4 preset colorblind palettes | Better, but requires maintenance and still color-dependent |
-| **Symbol overlay** | Add shapes/patterns on top of color coding | Good redundancy, but can feel like an afterthought |
-| **Universal design** | Design the base palette to be distinguishable by all types | Best — no "mode" needed, lower maintenance, benefits everyone |
-
-**The goal is to eliminate the need for a "colorblind mode" entirely** by designing the default palette and information architecture to work for all vision types.
+| Approach | Problems |
+|----------|----------|
+| **Hue shift** (rotate palette) | Breaks art direction, creates new conflicts |
+| **Palette swap** (preset palettes) | Requires maintenance, still color-dependent |
+| **Symbol overlay** (shapes on top of color) | Good redundancy, but feels bolted on |
+| **Universal design** (base palette works for all) | Best — no "mode" needed, benefits everyone |
 
 ### Contrast Requirements
 
@@ -223,16 +198,11 @@ Colorblind design deserves dedicated treatment because it's common, frequently i
 
 ### Testing Colorblind Design
 
-- Simulate protanopia, deuteranopia, AND tritanopia during development — not as a pre-launch checkbox
-- Use built-in OS simulators (macOS: Accessibility > Display > Color Filters; Windows: Color Filters)
-- Test every screen where color conveys meaning: minimaps, inventory rarity, health bars, team indicators, status effects, loot beams, quest markers
-- If you can't distinguish two elements in any simulation mode, players can't either — fix the design
+Simulate all three types during development using OS-level filters (macOS: Accessibility > Display > Color Filters; Windows: Color Filters). Test every screen where color conveys meaning — minimaps, rarity indicators, health bars, team colors, status effects, quest markers. If you can't distinguish two elements in simulation, players can't either.
 
 ---
 
 ## Difficulty and Assist Systems
-
-Difficulty options are accessibility features. Treating them as separate concerns leads to games that are technically "accessible" but practically unplayable for many.
 
 ### Difficulty Is an Access Ramp
 
@@ -253,16 +223,9 @@ Simple Easy/Medium/Hard presets are better than nothing, but granular options gi
 | Aim assist | Auto-aim strength, snap-to-target | Motor + precision accessibility |
 | Puzzle hints | Hint frequency and directness | Cognitive accessibility without skipping content |
 
-### Content Locking Rules
+### Content Locking
 
-| Lockable Behind Difficulty | Not Lockable Behind Difficulty |
-|---------------------------|-------------------------------|
-| Achievements/trophies | Story content |
-| Cosmetic rewards | Game areas or levels |
-| Leaderboard eligibility | Narrative endings |
-| Challenge-specific titles | Core mechanics or abilities |
-
-**Design rule:** A player who completes the game on any difficulty setting should see the full story. Locking narrative content behind difficulty is not "rewarding skill" — it's punishing disability.
+**Never lock story, areas, or abilities behind difficulty.** Achievements, cosmetics, and leaderboard eligibility are fine difficulty gates — narrative content is not.
 
 ### Adaptive Difficulty
 
@@ -272,7 +235,7 @@ Invisible adjustment based on player performance — the most accessible approac
 
 ## Subtitle and Caption Design
 
-Subtitles seem simple but have a deep design space. Bad subtitles are worse than no subtitles because they create false confidence that deaf/HoH players are getting the full experience.
+Bad subtitles are worse than none — they create false confidence that deaf/HoH players are getting the full experience.
 
 ### Subtitle Requirements
 
@@ -288,15 +251,15 @@ Subtitles seem simple but have a deep design space. Bad subtitles are worse than
 
 ### Caption Design (Beyond Subtitles)
 
-Captions describe non-speech audio that carries meaning. They're essential for deaf/HoH players to understand ambient narrative, threat awareness, and atmosphere.
+Captions describe non-speech audio — essential for deaf/HoH ambient narrative and threat awareness.
 
-| Audio Type | Caption Format | Example |
-|------------|---------------|---------|
-| Environmental sounds | [description] in brackets | [distant thunder] |
-| Directional sounds | [description, direction] | [footsteps approaching from behind] |
-| Music/mood shifts | Italic description | *tense orchestral music builds* |
-| Sound effects (gameplay) | [description, intensity] | [alarm blaring] |
-| Off-screen speech | Speaker: "dialogue" with [off-screen] | Guard [off-screen]: "Did you hear something?" |
+| Audio Type | Example |
+|------------|---------|
+| Environmental | [distant thunder], [rain on metal roof] |
+| Directional | [footsteps approaching from behind] |
+| Music/mood | *tense orchestral music builds* |
+| Gameplay SFX | [alarm blaring], [shield breaking] |
+| Off-screen speech | Guard [off-screen]: "Did you hear something?" |
 
 ### Scaling Reference
 
@@ -306,16 +269,14 @@ Scale proportionally with resolution: 24px minimum at 1080p → 48px at 4K. Reco
 
 ## Input Accessibility
 
-Input design is where motor accessibility lives or dies. Every hardcoded binding is a barrier; every "hold to sprint" without a toggle option is a pain point for someone.
-
 ### Remapping Requirements
 
 - **Every** input must be remappable — no exceptions for "core" actions
-- Support remapping per-context (menu controls vs. gameplay controls can differ)
+- Support per-context remapping (menu vs. gameplay can differ)
 - Allow multiple inputs bound to the same action
-- Show current bindings in tutorials and prompts (don't show "Press X" if the player rebound X to B)
-- Detect and warn about conflicts, but allow them (the player knows their needs)
-- Persist bindings across sessions (save to profile, not just session state)
+- Show current bindings in tutorials (don't show "Press X" if rebound to B)
+- Detect and warn about conflicts, but allow them
+- Persist bindings across sessions
 
 ### Toggle vs. Hold
 
@@ -350,7 +311,7 @@ For mobile/touch-enabled games: minimum 44x44px touch targets (48x48px recommend
 
 ## Testing Accessibility
 
-Accessibility testing is not the same as general playtesting. General playtest recruitment ("any 5 players") will almost never surface accessibility barriers because most testers don't have the disabilities that expose them.
+Accessibility testing is not general playtesting — "any 5 players" won't surface accessibility barriers.
 
 ### Testing Methods
 
@@ -364,15 +325,13 @@ Accessibility testing is not the same as general playtesting. General playtest r
 
 ### Simulation Testing Checklist
 
-Run these simulations regularly during development:
-
-- [ ] Play through with sound muted — can you complete every objective?
-- [ ] Play through with colorblind simulation (all three types) — can you distinguish all meaningful elements?
-- [ ] Play through with one hand — is it physically possible? (even if hard)
-- [ ] Play through with text at minimum size on a TV-distance display — can you read everything?
-- [ ] Play through a photosensitive check — any flashing above 3Hz?
-- [ ] Attempt every action with keyboard-only (no mouse) — are any features inaccessible?
-- [ ] Set difficulty to easiest — can a player who struggles with timing/precision complete the game?
+- [ ] Sound muted — can you complete every objective?
+- [ ] Colorblind simulation (all three types) — can you distinguish all meaningful elements?
+- [ ] One hand only — is it physically possible?
+- [ ] Minimum text size at TV distance — can you read everything?
+- [ ] Photosensitive check — any flashing above 3Hz?
+- [ ] Keyboard-only (no mouse) — are any features inaccessible?
+- [ ] Easiest difficulty — can a player struggling with timing/precision finish the game?
 
 ### Recruiting Players with Disabilities
 
@@ -383,8 +342,6 @@ See **playtest-design** for general methodology, but treat accessibility testing
 ---
 
 ## Accessibility Health Check
-
-Use these checklists to audit a game's accessibility at each tier. These are not exhaustive — they're the highest-impact items.
 
 ### Tier 1 Checklist (Must-Have)
 
@@ -419,35 +376,33 @@ Use these checklists to audit a game's accessibility at each tier. These are not
 
 ## Anti-Patterns
 
-These are common approaches that look like accessibility effort but fail in practice.
-
-| Anti-Pattern | Why It Fails | Better Approach |
-|-------------|-------------|-----------------|
-| Single "Accessibility Mode" toggle | Too broad — bundles unrelated features; players need some options but not others | Individual toggles per feature |
-| Colorblind mode = hue shift filter | Doesn't fix the design; creates new color conflicts; looks washed out | Redesign the palette for universal clarity; use redundant channels |
-| "Git gud" as response to difficulty requests | Dismisses legitimate accessibility needs as skill issues | Offer options; never gatekeep the experience |
-| Unskippable cutscenes | Players with attention/cognitive needs may lose focus; players with photosensitivity may be at risk | Always skippable (or at minimum, pauseable) |
-| Rapid button-mashing with no alternative | Excludes motor-impaired players entirely | Provide hold-to-complete or auto-complete alternative |
-| Tiny text with no scaling option | Excludes low-vision players and anyone on a large-screen display | Always support text scaling with a generous range |
-| "We'll add accessibility later" | Architecture decisions made without accessibility in mind are expensive to retrofit | Design accessible from the start — it's cheaper |
-| Accessibility settings buried in sub-menus | Players who need these features can't find them | Surface key options in first-run setup; dedicated accessibility section in main settings |
-| Fixed subtitle appearance | One size/color/position doesn't work for all screens, distances, or vision levels | Adjustable font size, background opacity, color, and position |
-| Audio-only threat indicators | Deaf players get killed by things they can't perceive | Pair every audio threat cue with a visual indicator |
-| Time-limited text (auto-advancing dialogue) | Slow readers, dyslexic players, and non-native speakers miss content | Player-paced dialogue advancement (press to continue) |
+| Anti-Pattern | Better Approach |
+|-------------|-----------------|
+| Single "Accessibility Mode" toggle | Individual toggles per feature — players need some but not all |
+| Colorblind mode = hue shift filter | Redesign palette for universal clarity; use redundant channels |
+| "Git gud" as response to accessibility requests | Offer options; never gatekeep the experience |
+| Unskippable cutscenes | Always skippable or pauseable |
+| Rapid button-mashing with no alternative | Hold-to-complete or auto-complete alternative |
+| Tiny text, no scaling | Always support text scaling with a generous range |
+| "We'll add accessibility later" | Design accessible from the start — retrofitting is expensive |
+| Accessibility settings buried in sub-menus | Surface in first-run setup; dedicated section in main settings |
+| Fixed subtitle appearance | Adjustable font size, background opacity, color, and position |
+| Audio-only threat indicators | Pair every audio cue with a visual indicator |
+| Auto-advancing dialogue | Player-paced advancement (press to continue) |
 
 ---
 
 ## Cross-References
 
-| Skill | Intersection with Accessibility |
-|-------|---------------------------------|
-| **player-ux** | Cognitive load management directly overlaps with cognitive accessibility; perception framework informs visual accessibility |
-| **game-feel** | Feedback design (screen shake, flash, camera effects) must include motion reduction options; juice that excludes is anti-accessible |
-| **encounter-design** | Encounter difficulty and pacing are primary levers for motor and cognitive accessibility |
-| **progression-systems** | Adaptive difficulty is invisible accessibility; flow channel targeting serves all players |
-| **game-design** | The 5-Component Filter's Clarity component overlaps with cognitive and visual accessibility |
-| **experience-design** | Pacing and engagement loops must account for players who need more time or different input patterns |
-| **playtest-design** | Accessibility testing requires specialized recruitment beyond standard playtest methods |
-| **narrative-design** | Subtitle/caption design, content warnings, and dialogue pacing are shared concerns |
-| **multiplayer-design** | Communication accessibility (text chat, ping systems, visual callouts) and competitive fairness with assist features |
-| **game-balance** | Difficulty parameters and assist features affect balance — granular options need balance passes too |
+| Skill | Intersection |
+|-------|-------------|
+| **player-ux** | Cognitive load overlaps cognitive accessibility; perception framework informs visual |
+| **game-feel** | Juice/feedback must include motion reduction; screen shake needs opt-out |
+| **encounter-design** | Difficulty and pacing are primary motor/cognitive accessibility levers |
+| **progression-systems** | Adaptive difficulty is invisible accessibility; flow channel targeting |
+| **game-design** | 5-Component Filter Clarity overlaps cognitive/visual accessibility |
+| **experience-design** | Pacing must accommodate players needing more time or different inputs |
+| **playtest-design** | Accessibility testing needs specialized recruitment |
+| **narrative-design** | Subtitles/captions, content warnings, dialogue pacing |
+| **multiplayer-design** | Communication accessibility, competitive fairness with assists |
+| **game-balance** | Granular difficulty parameters need their own balance passes |

@@ -78,20 +78,20 @@ Good challenges: CLI tools with subcommands, parsers, concurrent data processing
 
 *(Optional: inject yourself into challenge selection if you want more control over what gets tested.)*
 
-### 3. Stress Test with srt
+### 3. Stress Test in an Isolated Worktree
 
 Ask Claude to:
 
 - **Act as orchestrator**
-- **Use the srt skill** to configure and run a sandboxed subagent
+- **Spawn a subagent with `isolation: "worktree"`** so the test runs in a fresh tree
 - **Have the subagent solve the challenge**, following the new skill strictly
 - **Apply relevant arch skills** as appropriate to the challenge
 - **Record ergonomics friction** encountered during development
 
 Example:
 ```
-Using the srt skill, run a sandboxed subagent to implement the
-challenge in /tmp/test-python.
+Spawn a worktree-isolated subagent to implement the
+challenge in a scratch directory.
 
 Have the subagent follow python-pro strictly, applying
 solid-architecture patterns where appropriate.
@@ -102,6 +102,8 @@ Record friction:
 - Quality gate failures and what caused them
 - Tooling issues or missing configuration
 ```
+
+For unattended runs, use Claude Code's headless `claude -p` with `--permission-mode auto` and `--allowedTools` scoping.
 
 ### 4. QA Assessment
 
@@ -170,6 +172,6 @@ Update the skill based on findings. Re-run the stress test.
 ## Related
 
 - **dm-lang:go-pro** — Reference template for language skills
-- **dm-work:srt** — Sandbox configuration for stress testing
+- **dm-work:worktrees** — Worktree isolation for stress testing
 - **dm-work:orchestrator** — Orchestrator patterns for delegation
 - **dm-arch:solid-architecture** — Architecture patterns to layer on top

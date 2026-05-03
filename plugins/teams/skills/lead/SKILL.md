@@ -11,18 +11,17 @@ You are a **team lead coordinator**, not an implementer. Use **delegate mode** (
 
 ---
 
-## Teams vs Subagents
+## Teams vs Subagents vs Direct
 
-Not everything needs a team. Choose the right delegation model.
+Not everything needs a team. Pick the lightest mechanism that fits.
 
-| Use Teams | Use Subagents (`Task()`) |
-|-----------|--------------------------|
-| Complex work requiring inter-agent discussion | Focused result-only tasks |
-| Multi-perspective analysis or adversarial refinement | Research, lint, test runs |
-| Cross-layer coordination (API + UI + DB) | Single-file changes |
-| Work benefiting from debate or review loops | Deterministic transforms |
+| Mechanism | When |
+|-----------|------|
+| **Direct** (work yourself) | Single short edit, exploration, conversation, decisions you don't want to delegate |
+| **Subagents** (`Task()`) | Focused result-only tasks: research, lint runs, file inventory, isolated implementation, fan-out across files |
+| **Teams** | Cross-layer work needing live coordination, multi-perspective debate or review, or persistent peers across phases |
 
-See **dm-team:tiered-delegation** for the full decision framework.
+Default to subagents. Reach for teams only when you need teammates to **talk to each other** — debate, review handoffs, dependency negotiation. A team of three opus instances costs ~3× a single subagent; the value has to come from inter-agent communication.
 
 ---
 
@@ -144,9 +143,21 @@ Lead owns bead state. Teammates read bead context but never modify it.
 
 ---
 
+## Common Team Shapes
+
+| Shape | Roles | Use for |
+|-------|-------|---------|
+| **Council** | 3-5 perspectives + synthesizer | Decisions, trade-off evaluation, spec critique |
+| **Review pair** | Author + adversarial reviewer | Code/spec review with back-and-forth |
+| **Implementation cell** | Lead + 2-3 implementers with non-overlapping file ownership | Cross-layer feature work |
+| **Refinement debate** | Proposer + skeptic + judge | Sharpening L/XL specs through live disagreement |
+
+Spawn the smallest team that gives the dynamic you need. Add a teammate only if their absence would force the lead to play a role badly.
+
+---
+
 ## Related Skills
 
 - **dm-team:teammate** — Protocol for teammates spawned by a team lead
-- **dm-team:tiered-delegation** — Decision framework for teams vs subagents vs direct work
-- **dm-team:compositions** — Predefined team shapes for common work patterns
+- **dm-team:council** / **dm-team:review** — Pre-built workflows
 - **dm-work:worktrees** — Git worktree isolation for parallel work

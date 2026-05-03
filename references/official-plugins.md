@@ -146,7 +146,7 @@ Security best practices and guidance for code review.
 | Code cleanup | code-simplifier | dm-lang:* for language-specific standards |
 | Plugin creation | plugin-dev | - |
 | Debugging | - | dm-work:debugging |
-| TDD | - | dm-work:tdd |
+| TDD | - | global `test-driven-development` skill |
 | Quality enforcement | - | dm-work hooks (block --no-verify, run gates on stop) |
 
 ---

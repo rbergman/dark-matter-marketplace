@@ -1,6 +1,6 @@
 ---
 name: typescript-pro
-description: Expert TypeScript developer specializing in advanced type system usage, full-stack development, and build optimization. Use PROACTIVELY when working on any TypeScript code - implementing features, reviewing configurations, or debugging type errors, even if not explicitly requested. Applies unless a more specific subagent role overrides.
+description: Strict TypeScript with zero-any tolerance, no-unsafe-* lints, floating-promise prevention, and disciplined type-system usage. Use when implementing, debugging, refactoring, or reviewing TypeScript code; resolving type errors; configuring tsconfig/ESLint/Prettier; setting up React/Next/Express patterns; eliminating any/unknown drift; or evaluating advanced generics, conditional types, and inference. Applies to any TypeScript work unless a more specific role overrides.
 ---
 
 # TypeScript Pro
@@ -244,97 +244,18 @@ just check
 
 ### eslint.config.js Template
 
-When creating a new project, use this complete template — omitting rules allows `any` to leak through the codebase.
+When creating a new project, copy `references/eslint.config.js` from this skill — it's the canonical template. Omitting rules allows `any` to leak through the codebase.
 
-```javascript
-import tseslint from 'typescript-eslint';
-import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
-import sonarjs from 'eslint-plugin-sonarjs';
+The template enforces four rule families:
 
-export default tseslint.config(
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
-  sonarjs.configs.recommended,
-  {
-    files: ['src/**/*.ts', 'src/**/*.tsx'],
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    plugins: {
-      '@eslint-community/eslint-comments': eslintComments,
-    },
-    rules: {
-      // === TYPE SAFETY (non-negotiable) ===
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-unsafe-argument': 'error',
-      '@typescript-eslint/no-unsafe-assignment': 'error',
-      '@typescript-eslint/no-unsafe-call': 'error',
-      '@typescript-eslint/no-unsafe-member-access': 'error',
-      '@typescript-eslint/no-unsafe-return': 'error',
-      '@typescript-eslint/no-unsafe-type-assertion': 'error',
-      '@typescript-eslint/no-non-null-assertion': 'error',
+| Family | Purpose | Key rules |
+|--------|---------|-----------|
+| Type safety | Block `any` and unsafe-* drift | `no-explicit-any`, `no-unsafe-{argument,assignment,call,member-access,return,type-assertion}`, `no-non-null-assertion` |
+| Promises | Catch unhandled async | `no-floating-promises`, `no-misused-promises`, `require-await`, `promise-function-async` |
+| Complexity (extraction signal) | Force decomposition by responsibility, not compression | `complexity: 10`, `sonarjs/cognitive-complexity: 15`, `max-depth: 4`, `max-len: 120`, `max-lines-per-function: 60`, `max-lines: 400`, `max-params: 4` |
+| Disable governance | Stop ad-hoc disabling of critical rules | `@eslint-community/eslint-comments/no-restricted-disable` blocks disabling type-safety, promise, and complexity rules without an explicit override |
 
-      // === PROMISES ===
-      '@typescript-eslint/no-floating-promises': ['error', { ignoreVoid: true, ignoreIIFE: true }],
-      '@typescript-eslint/no-misused-promises': 'error',
-      '@typescript-eslint/require-await': 'error',
-      '@typescript-eslint/promise-function-async': 'error',
-
-      // === COMPLEXITY LIMITS ===
-      // These limits exist to trigger EXTRACTION into well-named companion
-      // files/functions — NOT to compress code, remove comments, combine
-      // statements, or shorten names. When violated, decompose by responsibility.
-      'complexity': ['error', { max: 10 }],
-      'sonarjs/cognitive-complexity': ['error', 15],
-      'max-depth': ['error', 4],
-      'max-len': ['error', { code: 120, ignoreUrls: true, ignoreStrings: false, ignoreTemplateLiterals: false, ignoreRegExpLiterals: true }],
-      'max-lines-per-function': ['error', { max: 60, skipBlankLines: true, skipComments: true }],
-      'max-lines': ['error', { max: 400, skipComments: true }],
-      'max-params': ['error', 4],
-
-      // === BLOCK DISABLING CRITICAL RULES ===
-      '@eslint-community/eslint-comments/no-restricted-disable': ['error',
-        '@typescript-eslint/no-explicit-any',
-        '@typescript-eslint/no-unsafe-assignment',
-        '@typescript-eslint/no-unsafe-argument',
-        '@typescript-eslint/no-floating-promises',
-        'complexity', 'sonarjs/cognitive-complexity', 'max-len', 'max-lines-per-function', 'max-lines',
-      ],
-      '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
-
-      // === COMMENTS ===
-      '@typescript-eslint/ban-ts-comment': ['error', {
-        'ts-expect-error': 'allow-with-description',
-        'ts-ignore': true,
-        'ts-nocheck': true,
-        minimumDescriptionLength: 10,
-      }],
-
-      // === CONSISTENCY ===
-      '@typescript-eslint/explicit-module-boundary-types': 'error',
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-    },
-  },
-  // Relax for tests
-  {
-    files: ['**/*.test.ts', '**/*.spec.ts'],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      'max-lines-per-function': 'off',
-      'max-lines': 'off',
-      'complexity': 'off',
-      'sonarjs/cognitive-complexity': 'off',
-      '@eslint-community/eslint-comments/no-restricted-disable': 'off',
-    },
-  },
-  { ignores: ['dist/', 'node_modules/', 'coverage/', '*.js', '*.cjs', '*.mjs'] },
-);
-```
+Tests (`**/*.test.ts`, `**/*.spec.ts`) relax `any`, complexity, and line limits.
 
 ### Responding to Limit Violations
 

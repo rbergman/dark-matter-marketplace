@@ -1,6 +1,6 @@
 ---
 name: game-perf
-description: "Optimize game code for per-frame performance and GC pressure. Use PROACTIVELY when editing game loops, update functions, render code, or any code that runs every frame. Identifies allocation anti-patterns and provides zero-allocation alternatives."
+description: "Per-frame performance and GC-pressure optimization for JS/TS game code. Use when editing game loops, update functions, render passes, physics steps, particle systems, or any code that runs every frame; when diagnosing jank, frame drops, or stuttering; when allocations show up in flame graphs; or when the user mentions frame budget, hot paths, or 'feels janky'. Identifies common allocation anti-patterns (spread in loops, .map/.filter chains in update, closures captured per frame) and provides pooled / pre-allocated alternatives."
 ---
 
 # Game Performance Optimization

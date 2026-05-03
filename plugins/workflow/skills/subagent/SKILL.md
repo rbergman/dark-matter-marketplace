@@ -28,7 +28,7 @@ You are a **subagent** — delegated by an orchestrator to implement a specific 
 | Summary (1-5 lines) | Return to orchestrator |
 | Implementation details | `history/<bead-id>.md` or `history/session.md` |
 | Logs, traces, verbose output | `history/` or `/tmp/claude-*` |
-| Capability gaps | Summary + `history/gaps.log` |
+| Capability gaps | Summary line |
 
 ### Summary Format
 

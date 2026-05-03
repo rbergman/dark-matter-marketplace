@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "dm-lang",
-      "description": "Expert language skills: Go, Rust, TypeScript, just - idiomatic patterns, type systems, and build tools",
+      "description": "Expert language skills: Go, Rust, TypeScript, Python, Just - idiomatic patterns, type systems, and build tools",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/language-pro",
@@ -22,7 +22,7 @@
     },
     {
       "name": "dm-game",
-      "description": "Game development: design framework, balance tuning, experience design, player UX, progression, game feel, playtest design, and performance optimization",
+      "description": "Comprehensive game development skills: vision, systems, mechanics evaluation, balance, economy, motivation, encounters, narrative, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, per-frame performance, and PixiJS 8 bootstrapping",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/game-dev",
@@ -30,26 +30,18 @@
     },
     {
       "name": "dm-work",
-      "description": "Workflow tools: orchestration, spec refinement, compression, peer review, and subagent delegation",
+      "description": "Workflow tools: orchestration, subagent delegation, spec breakdown, peer review, competitive generation, evaluator-judge protocol, browser QA, repo init/health, worktrees, and session retros",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/workflow",
       "category": "development"
     },
-{
+    {
       "name": "dm-team",
-      "description": "Agent Teams patterns: multi-agent coordination, deliberation, and collaborative workflows (experimental)",
+      "description": "Agent Teams patterns: lead/teammate roles, council deliberation, and collaborative review (experimental)",
       "version": "0.1.0",
       "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/teams",
-      "category": "development"
-    },
-    {
-      "name": "dm-tool",
-      "description": "Tool design patterns: building CLIs, MCPs, and APIs that agents can use effectively",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
-      "source": "./plugins/tooling",
       "category": "development"
     }
   ]

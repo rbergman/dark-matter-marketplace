@@ -1,6 +1,6 @@
 ---
 name: game-balance
-description: "Economy tuning, progression math, transitive/intransitive systems, cost curves, and dominant strategy detection. Use when designing item stats, pricing systems, combat numbers, upgrade trees, or any system where game objects have numeric attributes that must relate fairly to each other."
+description: "Numeric balance across game objects with stats — cost curves, transitive vs intransitive systems, dominant strategy detection, sandbagging signals, and anti-degenerate-strategy levers. Use when designing item or weapon stats, pricing storefronts, combat damage/HP/range numbers, upgrade trees, character classes, faction asymmetry, or anywhere two objects have numeric attributes that should relate fairly. Apply when playtesters say 'X is just better,' 'one path always wins,' or 'I never use Y.' Pairs with economy-design (currency flow) and progression-systems (curves over time)."
 ---
 
 # Game Balance

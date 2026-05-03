@@ -193,13 +193,21 @@ history/
 Copy the AGENTS.md template from this skill's `references/AGENTS.md` to the project root, then create a symlink so Claude Code discovers it automatically:
 
 ```bash
-cp <skill-install-path>/references/AGENTS.md ./AGENTS.md
+cp "${CLAUDE_PLUGIN_ROOT}/skills/repo-init/references/AGENTS.md" ./AGENTS.md
 ln -s AGENTS.md CLAUDE.md
 ```
 
-AGENTS.md is the canonical file; CLAUDE.md is a symlink so Claude Code discovers it automatically.
+AGENTS.md is the canonical file; CLAUDE.md is a symlink so Claude Code discovers it automatically. Verify after creation: `readlink CLAUDE.md` should print `AGENTS.md`, and `test -e CLAUDE.md` should succeed (catches dangling symlinks).
 
 Customize the template for the specific project (update project description, add project-specific conventions).
+
+**Symlink fallback (Windows or FS without symlink support):** if `ln -s` fails or symlinks aren't usable, use the stub pattern instead — keep AGENTS.md canonical and make CLAUDE.md a one-line stub:
+
+```bash
+echo "See @AGENTS.md" > CLAUDE.md
+```
+
+Claude Code's `@path` import resolves the reference at session start. Higher maintenance than a symlink (two real files) but works everywhere.
 
 ### CLAUDE.local.md (personal project prefs)
 

@@ -1,6 +1,6 @@
 ---
 name: game-design
-description: Use when designing game mechanics, evaluating gameplay feel, tuning game systems, reviewing player experience, debugging why something feels wrong, balancing combat, designing progression, or working on any player-facing game feature. Provides a constraint system for evaluating mechanics with focus on player experience over feature completion.
+description: The mechanic-level evaluation toolkit — apply the 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) to any individual mechanic. Use when designing or evaluating a single mechanic, reviewing whether a feature pulls its weight, debugging why a specific action feels off, comparing alternative implementations of the same mechanic, or doing a first-pass critique on a player-facing feature. For session-level pacing or emotional arcs see experience-design; for moment-to-moment juice see game-feel; for system-of-systems interactions see systems-design. This skill is the per-mechanic lens.
 ---
 
 # Game Design Framework
@@ -193,7 +193,6 @@ When proposing or critiquing a feature:
 
 For detailed guidance:
 
-- **`references/learning-path.md`** - Start here: tiered learning path, arcade game quick start, council role mapping, intuition bridge
 - **`references/worked-examples.md`** - Full pipeline examples: vision → systems → evaluation, diagnostic flows, council debate format
 - **`references/5-component-rubric.md`** - Full evaluation rubrics with signals, rules, knobs, acceptance tests
 - **`references/domain-guide.md`** - Combat, movement, camera, audio, UI/UX, progression, persistence domains

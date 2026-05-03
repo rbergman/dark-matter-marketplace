@@ -66,7 +66,7 @@ Start with an idea, spec, or task. Talk with Claude until you're aligned on what
 
 1. **Discuss until clear** — Don't rush to implementation. Make sure you and Claude agree on the goal.
 2. **Point to skills** — If the work involves specific domains (TypeScript, game design, etc.), tell Claude to activate relevant skills.
-3. **Refine if needed** — For complex or ambiguous specs, use `/dm-work:breakdown` or `/dm-work:refine` to sharpen the requirements.
+3. **Sharpen if needed** — For complex or ambiguous specs, use `/dm-work:breakdown` to decompose into beads, and run a generic subagent review to surface gaps before committing to an approach.
 
 ### Phase 2: Task Breakdown
 
@@ -82,8 +82,9 @@ Let Claude orchestrate while subagents implement.
 
 1. **Use `/subagents`** — This handles multiple beads with dependency awareness. It degrades to single-subagent mode when appropriate.
 2. **Review results** — Check what subagents produced before committing.
-3. **Commit incrementally** — One commit per completed unit. Don't batch.
-4. **For worktree work** — Use `/merge` when ready to integrate. It enforces a pre-flight checklist (quality gates, review, beads closed).
+3. **Commit incrementally** — One logical change per commit, Conventional Commits format (`type(scope): subject`), reference beads in the body. Roughly one bead = one commit for XS/S; M+ may produce a few related commits. Quality gates run via pre-commit hooks where installed; otherwise run `just check` before committing.
+4. **Pause after each M+ feature lands** — Run `/dm-work:review` (or a scope-bound subagent review of the diff, optionally with a Codex second opinion) before starting the next M+ chunk. Catches drift before it compounds.
+5. **For worktree work** — Use `/merge` when ready to integrate. It enforces a pre-flight checklist (quality gates, review, beads closed).
 
 ### Agent Teams Alternative (Experimental)
 
@@ -101,10 +102,9 @@ Agent Teams spawns persistent teammates (each a full Claude Code session) that m
 
 1. **Activate `dm-team:lead`** — instead of `dm-work:orchestrator`
 2. **Use `/dm-team:review`** — reviewers discuss and challenge findings
-3. **Use `/dm-team:refine`** — live adversarial debate instead of sequential pipeline
-4. **Use `/dm-team:council`** — multi-perspective deliberation on decisions
+3. **Use `/dm-team:council`** — multi-perspective deliberation on decisions
 
-See `dm-team:tiered-delegation` for when to use teams vs subagents. Agent Teams uses significantly more tokens than subagents — each teammate is a separate Claude instance.
+See the "Teams vs Subagents vs Direct" table inside `dm-team:lead` for the decision framework. Agent Teams uses significantly more tokens than subagents — each teammate is a separate Claude instance.
 
 **Review commands:** Both `/dm-work:review` (isolated parallel subagents) and `/dm-team:review` (team with cross-examination) exist. Use dm-work for routine reviews; use dm-team when cross-examination adds value (large features, risky changes). Same flags and output format. See `multi-agent-coordination.md` for the full comparison.
 
@@ -123,34 +123,19 @@ Good pause points:
 - Phase transition (convergence → breakdown, breakdown → execution)
 - Natural stopping point in discussion
 
-### Session Rotation (Preferred)
+### Session Pause and Recovery
 
-When you're ready to pause:
+Claude Code now has native checkpointing. When you're ready to pause or branch:
 
-```
-1. Run /dm-work:rotate
-2. Run /copy
-3. Run /clear
-4. Paste the snapshot as your first message in the new session
-```
+- `/rewind` — open the rewind menu to restore conversation, code, or both to a prior checkpoint, or summarize from a chosen message
+- `/clear` — reset context between unrelated tasks
+- `/compact <focus>` — focused compaction when you want to continue the same task with less history
 
-`/dm-work:rotate` generates a high-fidelity snapshot, saves it to `history/snapshot.md`, and pushes beads to remote. The snapshot captures: git/beads state, active work, conversation context (decisions, trade-offs, failed approaches), loose ends not yet in beads, and specific next steps.
-
-Pass special instructions as arguments: `/dm-work:rotate focus on the auth refactor next`.
-
-The pasted snapshot is the primary recovery mechanism. The file on disk (`history/snapshot.md`) is a fallback for when clipboard is lost.
-
-### Emergency Recovery
-
-If you run out of context before you can take a snapshot:
-
-1. **If `/compact` still works:** Run it, then run `/dm-work:rotate`. Then `/copy` → `/clear` → paste to recover.
-
-2. **If you can't even `/compact`:** Start fresh. Read bead state with `bd ready` and `bd show` to recover context. This is rare if you follow the 80k rule.
+Beads carries persistent state across sessions, so a clean `bd close` + commit + `git push` is usually sufficient to walk away. On resume, `bd ready` and `bd show <id>` recover the relevant context.
 
 ### Compaction
 
-**Rotate before compaction whenever possible.** Proactive rotation at 80k preserves full fidelity. But sometimes Claude needs to compact once mid-task — finishing a heavy `/subagents` run or wrapping up an Agent Teams session. That's fine. One compaction is acceptable; hitting the hard context wall and losing a turn mid-work is worse.
+Compaction summarizes the conversation so older detail can be dropped. Prefer `/clear` between unrelated tasks; reach for `/compact <focus>` only when you need to continue the same thread with less history.
 
 **Avoid multiple compactions.** Each is lossy; stacking them degrades quality fast. If a session has already compacted once and context is climbing again, rotate immediately rather than risking a second compaction.
 
@@ -176,19 +161,18 @@ The key insight: **external state (beads) + explicit summaries (rotation) + dele
 | Situation | Action |
 |-----------|--------|
 | New idea or vague spec | Conversation to convergence |
-| Low confidence in spec | `/dm-work:breakdown` or `/dm-work:refine` |
+| Low confidence in spec | `/dm-work:breakdown` plus a generic subagent review pass |
 | Ready to implement | Create beads, then `/subagents` |
 | Context at 80-150k | Start looking for pause point |
-| Ready to pause | `/dm-work:rotate` → `/copy` → `/clear` → paste |
-| Context critical | Emergency: compact then `/dm-work:rotate` |
+| Ready to pause | Native `/rewind` for branching, or `/clear` between tasks |
+| Context critical | Native `/compact <focus>` |
 | Worktree ready to merge | `/dm-work:merge` — pre-flight checklist |
 | Task complete | Review, commit, close bead |
-| Starting new session | Paste snapshot, or `bd ready` if no snapshot |
+| Starting new session | `bd ready` for available work |
 | Interactive sandboxing | Run `/sandbox` to enable native sandbox |
-| CLI/autonomous runs | Configure `.srt.json`, run with srt |
 | Complex multi-agent work | Activate `dm-team:lead`, use Agent Teams |
 | Decision needs debate | `/dm-team:council` |
-| Spec needs adversarial refinement | `/dm-team:refine` (team) or `/dm-work:refine` (subagent) |
+| Spec sharpening | Generic subagent review pass + Codex second-opinion as needed |
 
 ---
 
@@ -239,81 +223,17 @@ This opens a menu to enable sandboxing. Once enabled:
 - Has escape hatch — commands can use `dangerouslyDisableSandbox` to break out
 - Global config (`settings.json`), not per-project
 
-### CLI/Autonomous: srt
+### CLI/Autonomous
 
-For unattended execution — CI/CD, batch processing, or `-p` prompts — use [srt](https://github.com/anthropic-experimental/sandbox-runtime):
-
-| Feature | `/sandbox` | srt |
-|---------|------------|-----|
-| Mode | Interactive only | CLI/autonomous |
-| Escape hatch | Yes | No (stricter) |
-| Config | Global settings.json | Per-project .srt.json |
-| Install | Built-in | `npm install -g @anthropic-ai/sandbox-runtime` |
-
-Both use the same OS primitives (macOS seatbelt, Linux bubblewrap), so security guarantees are equivalent when escape hatch isn't used.
-
----
-
-## Autonomous Runs with srt
-
-For unattended execution — CI/CD, batch processing, or DX testing — use srt to run Claude with `--dangerously-skip-permissions` safely.
-
-### When to Use Autonomous Mode
-
-| Scenario | Why autonomous |
-|----------|----------------|
-| CI/CD code review | No human to click "allow" |
-| Batch repo updates | Process N repos without N interactions |
-| DX stress testing | Test skills in isolated `/tmp` environments |
-| Long-running tasks | Let Claude work overnight unattended |
-
-### Quick Setup
-
-```bash
-# Install srt
-npm install -g @anthropic-ai/sandbox-runtime
-
-# Create project config
-cat > .srt.json << 'EOF'
-{
-  "network": {
-    "allowedDomains": ["api.anthropic.com", "github.com", "*.github.com"]
-  },
-  "filesystem": {
-    "denyRead": ["~/.ssh", "~/.gnupg", "~/.aws/credentials"],
-    "allowWrite": [".", "/tmp"]
-  }
-}
-EOF
-
-# Run sandboxed
-srt -s .srt.json -c 'claude --dangerously-skip-permissions \
-  --no-session-persistence \
-  --strict-mcp-config --mcp-config "{\"mcpServers\":{}}" \
-  -p "Build and test the project"'
-```
-
-### Combining with the Workflow
-
-Autonomous runs complement the interactive workflow:
-
-1. **Interactive**: Convergence, spec refinement, architecture decisions
-2. **Autonomous**: Execution of well-defined tasks via srt
-3. **Interactive**: Review results, commit, close beads
-
-For complex tasks, you might alternate — converge interactively, let Claude execute autonomously, review and refine interactively.
-
-See **autonomous-runs.md** for full configuration and the **`dm-work:srt` skill** for ecosystem-specific allowlists.
+For unattended execution use Claude Code's headless `claude -p` with `--permission-mode auto`. Auto mode runs a classifier in front of every action, blocking scope escalation and unknown-infrastructure operations while letting routine work proceed without prompts. For non-interactive runs auto mode aborts after repeated blocks rather than prompting, which matches CI semantics. Combine with `--allowedTools` to scope a batch run.
 
 ---
 
 ## Related
 
 - **`/sandbox`** — Claude Code's built-in sandbox for interactive sessions
+- **Auto mode** (`--permission-mode auto`) — classifier-gated autonomous execution
 - **`dm-work:orchestrator` skill** — Claude's instructions for being an orchestrator
 - **`dm-work:subagent` skill** — Claude's instructions for being a subagent
-- **`dm-work:srt` skill** — Sandbox Runtime configuration for CLI/autonomous runs
 - **`CLAUDE.md`** — Minimal global instructions pointing to these skills
-- **`autonomous-runs.md`** — Full guide to sandboxed autonomous Claude
 - **`dm-team:lead` skill** — Claude's instructions for being an Agent Teams lead
-- **`dm-team:tiered-delegation` skill** — When to use teams vs subagents

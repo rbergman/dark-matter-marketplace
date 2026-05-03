@@ -35,7 +35,7 @@ Resolve the specification from (in priority order):
 3. `$ARGUMENTS` — treat remaining arguments as spec text
 4. **None found** — use AskUserQuestion to prompt for a spec
 
-The spec should have testable acceptance criteria. If it's vague or purely aspirational, warn the user and suggest running `/dm-work:refine` first to sharpen it into something measurable.
+The spec should have testable acceptance criteria. If it's vague or purely aspirational, warn the user and ask them to sharpen it into something measurable before continuing.
 
 ---
 
@@ -220,6 +220,4 @@ git branch -d compete-1 compete-2 compete-3 2>/dev/null
 ## Related
 
 - **dm-work:worktrees** — worktree management that competitors use for isolation
-- **dm-work:tdd** — test-driven approach that competitors can follow
 - **dm-work:orchestrator** — delegation patterns for managing parallel agents
-- `/dm-work:refine` — sharpen vague specs before competing on them

@@ -1,6 +1,6 @@
 ---
 name: player-ux
-description: "Cognitive load management, perception/attention/memory framework, Gestalt principles for game UI, onboarding design, and accessibility checklists. Use when designing UI/HUD, writing tutorials, debugging 'confusing' feedback, evaluating accessibility, or when players can't figure out what to do."
+description: "Cognitive load management for players: perception/attention/memory framework, Gestalt principles for game UI, signal-noise discipline on the HUD, onboarding ramp design, and tooltip/affordance patterns. Use when designing UI or HUD layouts, writing tutorials or first-time-user flows, evaluating whether players can read the screen at a glance, debugging 'confusing' feedback, deciding what information goes where (HUD, pause, codex, none), or when playtesters say 'I didn't know I could do that' or 'I missed that this happened.' For deeper accessibility work see accessibility-design."
 ---
 
 # Player UX

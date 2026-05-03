@@ -1,6 +1,6 @@
 ---
 name: just-pro
-description: Patterns for setting up just (command runner) in projects. Use PROACTIVELY when creating build systems, setting up new repos, or when the user asks about just/justfile configuration. Covers both simple single-project repos and monorepos with hierarchical justfile modules.
+description: Patterns for setting up just (command runner) in projects. Use when creating build systems, setting up new repos, organizing build/test/lint recipes, or when the user asks about just/justfile configuration. Covers both simple single-project repos and monorepos with hierarchical justfile modules, mise integration, and conventional recipe naming (check, build, test, lint, fmt).
 ---
 
 # Justfile Skill
@@ -125,7 +125,7 @@ In single-package repos, `just check` can run in a pre-commit hook. In monorepos
 
 ### Fast Check (Stop Hook Gate)
 
-The dm-work Stop hook runs quality gates after every turn. If `just check` is slow (>10s), add a `check-fast` recipe that drops the slowest steps. The hook prefers `check-fast` when available, falling back to `check`.
+The dm-work Stop hook (`run-gates-on-stop.sh`) runs quality gates after every turn. It auto-detects: `just check-fast` → `just check` → `npm run check`, in that order. If `just check` is slow (>10s), add a `check-fast` recipe that drops the slowest steps — no additional hook configuration needed.
 
 Profile first to find what's slow — usually production builds and coverage, not tests:
 
@@ -289,9 +289,34 @@ fix:
 
 ### TypeScript/Node Projects
 
+Always export `node_modules/.bin` onto PATH so recipes can call tools directly without `npx` (slow) or `npm run` (loses justfile's value as a unified interface):
+
+```just
+export PATH := "./node_modules/.bin:" + env_var("PATH")
+```
+
+With this, recipes call `tsc`, `eslint`, `vitest` etc. directly. Without it, every recipe either needs `npx` (adds startup overhead) or delegates to `npm run` (making just a thin pass-through).
+
 Two approaches:
 
-**Option A**: Thin wrapper (recommended for consistency)
+**Option A**: Direct invocation (recommended — self-contained recipes)
+```just
+export PATH := "./node_modules/.bin:" + env_var("PATH")
+
+check: typecheck lint test
+    @echo "All checks passed"
+
+typecheck:
+    tsc --noEmit
+
+lint:
+    eslint .
+
+test:
+    vitest run
+```
+
+**Option B**: Thin wrapper (simpler, delegates to package.json scripts)
 ```just
 # packages/web/justfile
 check:
@@ -302,13 +327,6 @@ lint:
 
 test:
     npm test
-```
-
-**Option B**: Direct delegation from root (simpler)
-```just
-# Root justfile - no web module
-ts-web-check:
-    cd packages/web && npm run check
 ```
 
 ### Rust Projects
@@ -392,6 +410,38 @@ setup:
     mise install
     @echo "Toolchain ready"
 ```
+
+---
+
+## Token-Efficient Recipes
+
+When RTK is installed, justfile recipes can use it as a binary wrapper to get compressed output in CI, shell scripts, and non-Claude-Code contexts — not just inside Claude Code's PreToolUse hook.
+
+The pattern: try RTK first, fall back to the raw command if RTK isn't available:
+
+```just
+# Token-efficient typecheck — compressed output when rtk is available
+typecheck:
+    #!/usr/bin/env bash
+    if command -v rtk &>/dev/null; then
+        rtk tsc --noEmit
+    else
+        tsc --noEmit
+    fi
+
+# Token-efficient test run
+test:
+    #!/usr/bin/env bash
+    if command -v rtk &>/dev/null; then
+        rtk vitest run
+    else
+        vitest run
+    fi
+```
+
+This works because `rtk <command>` acts as a transparent wrapper — it runs the command and filters the output through RTK's compression. The PreToolUse hook only fires inside Claude Code; the wrapper pattern gives you compression everywhere.
+
+See **output-compression** skill for RTK setup and gotchas.
 
 ---
 

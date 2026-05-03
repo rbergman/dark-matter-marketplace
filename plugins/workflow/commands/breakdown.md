@@ -18,8 +18,8 @@ $ARGUMENTS - Either an epic bead ID (e.g., `bd-42`, `silica-state-bvt`) or a fil
 2. Set bd workspace context: `bd set-context /path/to/workspace`
 
 3. Pre-refinement check:
-   - If bead has `needs-refinement` label, run `/refine` first
-   - If spec document lacks clear scope/acceptance criteria, run refinement pass
+   - If spec lacks clear scope/acceptance criteria, sharpen it inline before decomposing
+   - For ambiguous specs, run a generic subagent review pass and fold findings in
 
 ### Analysis
 
@@ -155,7 +155,7 @@ After creating all beads:
 
 **Next Steps:**
 - Claim bd-101 to begin implementation
-- Run `/refine bd-102` before claiming (complexity: l)
+- bd-102 is complexity: l — sharpen acceptance criteria before claiming
 ```
 
 ## External Specs

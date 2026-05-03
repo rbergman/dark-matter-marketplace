@@ -20,7 +20,7 @@ Current /dm-work:review spawns 3 isolated subagents that report back independent
 - Complex PRs touching multiple domains
 - Security-sensitive changes where arch context matters
 - When previous reviews produced conflicting findings
-- For dm-work:review's use cases, see tiered-delegation — simple reviews are fine with subagents
+- For straightforward reviews use `/dm-work:review` (subagent-based) — reach for the team variant only when reviewers genuinely benefit from challenging each other
 
 ## Team composition
 
@@ -99,5 +99,5 @@ New addition: "Review Discussion Notes" section captures inter-reviewer debates 
 
 ## Related
 
-- **dm-work:review** — subagent alternative
-- **dm-team:compositions** — review team template
+- **dm-work:review** — subagent alternative for straightforward reviews
+- **dm-team:lead** — team coordination protocol

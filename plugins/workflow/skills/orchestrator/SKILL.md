@@ -16,7 +16,7 @@ You are a **subagent orchestrator**, not an implementer. Your job is strategic: 
 | Stage | Skill/Command | What happens |
 |-------|--------------|--------------|
 | ULTRAPLAN | `/ultraplan` (optional) | Draft plan in cloud with rich review UX, then teleport back to terminal. Use for L/XL tasks with ambiguous scope where inline comments beat terminal back-and-forth. Skippable — most tasks start at SPEC. |
-| SPEC | `/breakdown` or `/refine` | Expand brief → refined spec → beads with deps |
+| SPEC | `/breakdown` | Expand brief → refined spec → beads with deps |
 | CONTRACT | `bd update --design` | Write testable acceptance criteria into bead |
 | IMPLEMENT | subagent + `isolation: "worktree"` | Subagent implements in isolated worktree |
 | GATES | `just check` / `npm run check` | Mechanical quality gates pass |
@@ -82,7 +82,6 @@ Before launching a subagent, **proactively determine all applicable skills**. Do
 | Architecture decisions | `dm-arch:solid-architecture`, `dm-arch:data-oriented-architecture` |
 | Game mechanics | `dm-game:game-design` |
 | Game hot paths (JS/TS) | `dm-game:game-perf` |
-| Spec refinement | `dm-work:dialectical-refinement` |
 
 **Rules:**
 - Include ALL skills that apply — more is better than fewer
@@ -151,7 +150,7 @@ Before launching any M+ subagent, verify these eight items. Vague delegation is 
 | 7 | Lint context included | Are codebase-specific lint rules/gotchas included? Check `bd memories` and AGENTS.md. |
 | 8 | Skills specified | Have you proactively selected ALL applicable skills (language, architecture, domain)? |
 
-If any check fails, fix the prompt before launching. Log to `history/checkpoint-effectiveness.log` if the checklist caught a real issue (see Checkpoint Effectiveness Tracking).
+If any check fails, fix the prompt before launching.
 
 ### Architect Gate (M+ tasks with structural impact)
 
@@ -207,8 +206,6 @@ RETURN: 5 one-line answers + VERDICT (proceed / constrain / redesign) + 1 senten
 ")
 ```
 
-Log `ARCH_GATE_CATCH` when the gate identifies a real structural issue, `ARCH_GATE_PASS` routinely (1 in 5). See Checkpoint Effectiveness Tracking.
-
 ---
 
 ## Token Efficiency Rules
@@ -219,7 +216,7 @@ Log `ARCH_GATE_CATCH` when the gate identifies a real structural issue, `ARCH_GA
 |-----------------|-------|
 | Summary (1-5 lines) | Return to orchestrator |
 | Details, logs, traces | `history/` dir or `/tmp/claude-*` fallback |
-| Capability gaps | Include in summary + append to `history/gaps.log` |
+| Capability gaps | Include in summary |
 
 **Rules:**
 - Summaries: what changed, what worked, what failed, blockers
@@ -309,7 +306,7 @@ DETAIL: <1 sentence if rework needed>
 **Decision tree:**
 - VERDICT=accept → proceed to Step 1.5 (if applicable) or Step 2
 - VERDICT=rework → send GAPS back to original subagent for targeted fix
-- If you disagree with the reviewer's verdict, override it but log the disagreement (see Checkpoint Effectiveness Tracking)
+- If you disagree with the reviewer's verdict, override it.
 
 ### Step 1.5: Evaluator (when browser-qa available or criteria require runtime testing)
 
@@ -407,82 +404,11 @@ Task(subagent_type="general-purpose", model="opus", ...)
 
 ---
 
-## Checkpoint Effectiveness Tracking
+## Context Pressure
 
-The pre-delegation checklist and post-return intent review are new protocols. Track their effectiveness so we can tune or drop them based on evidence.
+Council deliberations and parallel subagent fan-outs are the heaviest operations. After a council deliberation persist its output to `history/` and use native `/rewind` or `/clear` before implementing — the persisted summary is sufficient context.
 
-**Log file:** `history/checkpoint-effectiveness.log`
-
-**When to log (append one line per event):**
-
-| Event | Log it when... |
-|-------|----------------|
-| `CHECKLIST_CATCH` | Pre-delegation checklist caught a real issue (wrong layer, missing requirement, vague ownership) |
-| `CHECKLIST_PASS` | Checklist passed without changes (routine confirmation) — log only 1 in 5 to avoid noise |
-| `ARCH_GATE_CATCH` | Architect gate identified a real structural issue (wrong pattern, coupling risk, interface problem) |
-| `ARCH_GATE_PASS` | Architect gate passed without concerns — log only 1 in 5 to avoid noise |
-| `REVIEW_CATCH` | Intent reviewer flagged a real gap that led to rework |
-| `REVIEW_FALSE_POS` | Intent reviewer flagged something but you overrode it as incorrect |
-| `REVIEW_MISS` | You discovered an intent gap AFTER accepting reviewed work (the reviewer missed it) |
-| `REVIEW_PASS` | Reviewer said accept and you agreed — log only 1 in 5 |
-
-**Format:**
-```
-[DATE] [EVENT] task=<bead-id> size=<xs/s/m/l/xl> detail=<brief description>
-```
-
-**Example entries:**
-```
-[2026-02-10] CHECKLIST_CATCH task=abc-123 size=m detail=prompt targeted controller layer, bug was in service
-[2026-02-10] REVIEW_CATCH task=abc-124 size=l detail=subagent missed error handling requirement from bead
-[2026-02-10] REVIEW_FALSE_POS task=abc-125 size=m detail=reviewer flagged refactor as drift, was intentional cleanup
-```
-
-**Session-end review:** At session end, glance at the log. If you notice patterns (e.g., reviewer false positives dominating, or checklist never catching anything), mention it to the user. This is how we decide whether these checkpoints earn their keep.
-
----
-
-## Capability Gap Reporting
-
-When you or subagents encounter gaps, log them.
-
-**Triggers:**
-- Domain knowledge had to be researched
-- Workflow repeated 2+ times manually
-- Wished for specific expertise
-- Built a workaround for missing capability
-
-**Format:**
-```
-[DATE] [agent|skill] NAME: description | trigger: what prompted this
-```
-
-**Log to:** `history/gaps.log` (or `/tmp/claude-gaps.log` fallback)
-
-Review gaps at session end to identify missing skills/agents.
-
----
-
-## Context Budget Awareness
-
-Every subagent roundtrip costs ~3-5k tokens of conversation history (prompt + response). Monitor your budget:
-
-| Activity | Approximate cost | Cumulative risk |
-|----------|-----------------|-----------------|
-| Council deliberation (3 councilors) | 25-35k tokens | High — rotate after |
-| 3 parallel implementation subagents | 12-18k tokens | Medium |
-| 3 intent review subagents | 9-12k tokens | Medium |
-| Session overhead (system prompt, CLAUDE.md, skills) | 15-20k tokens | Fixed |
-
-**Rules of thumb:**
-- After a council deliberation, **rotate before implementing** (council output is in `history/`)
-- After 5+ subagent roundtrips, consider whether remaining work fits in context
-- If you feel context pressure (compaction warnings, sluggish responses), rotate immediately via `/rotate`
-- Subagent prompts should be concise — include task + boundaries + gate, not full bead history
-
-**Scope-bound code reviewers:** When launching `feature-dev:code-reviewer` or intent review subagents, explicitly constrain what they read:
-- "Read ONLY the diff and the OWN files listed. Do NOT explore neighboring files."
-- This prevents reviewers from reading themselves into context overflow.
+When launching code reviewers or intent reviewers, scope what they read: "Read ONLY the diff and the OWN files listed. Do NOT explore neighboring files." This prevents reviewers from reading themselves into context overflow.
 
 ---
 

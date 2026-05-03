@@ -1,6 +1,6 @@
 ---
 name: python-pro
-description: Expert Python developer specializing in modern tooling (uv, ruff, pyright), type safety, and clean module design. Use PROACTIVELY when working on any Python code - implementing features, designing APIs, debugging issues, or reviewing code quality, even if not explicitly requested. Applies unless a more specific subagent role overrides.
+description: Modern Python with uv, ruff, pyright, strict typing, and clean module design. Use when implementing, debugging, refactoring, or reviewing Python code; designing module boundaries; setting up Python projects; resolving type errors; tightening pyproject.toml; choosing between dataclasses and Pydantic; or working with async code, pytest, or packaging. Applies to any Python work unless a more specific role overrides.
 ---
 
 # Python Pro

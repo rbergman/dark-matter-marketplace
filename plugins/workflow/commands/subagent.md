@@ -49,7 +49,6 @@ OWNERSHIP:
 DELIVERABLES:
 - Working code passing quality gates
 - Do NOT commit or close beads
-- Write detailed report to: history/subagent-reports/<bead-id>.md
 - Return ONLY the minimal response format below
 
 RESPONSE FORMAT (return ONLY this, nothing else):
@@ -60,7 +59,7 @@ FILES_CHANGED: <comma-separated list>
 TESTS: <pass count> / <total> | skipped
 SUMMARY: <1-2 sentences max>
 COMMIT_MSG: <ready-to-use commit message, 1 line>
-REPORT: history/subagent-reports/<bead-id>.md
+DETAILS: <inline notes if status != success, otherwise omit>
 ```
 ~~~
 
@@ -73,7 +72,7 @@ Before launching, verify against the orchestrator's pre-delegation checklist:
 - [ ] Gate command named exactly
 - [ ] Exit criteria unambiguous
 
-If any check fails, fix the prompt first. Log catches to `history/checkpoint-effectiveness.log`.
+If any check fails, fix the prompt first.
 
 ## 5. Launch
 
@@ -95,11 +94,9 @@ Task(subagent_type="<type>", model="opus", description="<3-5 words>", prompt="<p
    - Run quality gates yourself: `just check` or `npm run check`
    - If gates pass, proceed to commit
 4. If STATUS=partial|failed:
-   - Read `history/subagent-reports/<bead-id>.md` for details
+   - Read DETAILS in the response; ask the subagent for more if needed
    - Fix or re-launch
 5. Commit: `git add . && bd close <id> --reason "..." && git commit -m "<COMMIT_MSG from response>"`
-
-**Log review outcomes** to `history/checkpoint-effectiveness.log` (see orchestrator skill: Checkpoint Effectiveness Tracking).
 
 ## Parallel Safety
 

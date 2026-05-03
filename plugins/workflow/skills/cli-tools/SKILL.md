@@ -1,6 +1,6 @@
 ---
 name: cli-tools
-description: Power CLI tools (fd, rg, jq, yq, sd, xargs, bat, delta) for when built-in tools are insufficient. Use for complex file ops, data manipulation, or parallel execution.
+description: Power CLI tools (fd, rg, jq, yq, sd, xargs, bat, delta) for when built-in tools fall short. Use when searching across many files, transforming JSON/YAML, doing structural search-and-replace, fanning work out in parallel, diffing across history, or chaining commands that would be awkward with grep/find/sed alone. Covers safe defaults (--null/-0 for paths with spaces, jq error handling, fd vs find performance), composition idioms (rg → fd → xargs pipelines), and when each tool is faster or clearer than the POSIX equivalent.
 ---
 
 # CLI Power Tools

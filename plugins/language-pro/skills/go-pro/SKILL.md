@@ -1,6 +1,6 @@
 ---
 name: go-pro
-description: Expert Go developer specializing in idiomatic patterns, concurrency, error handling, and clean package design. Use PROACTIVELY when working on any Go code - implementing features, designing APIs, debugging issues, or reviewing code quality, even if not explicitly requested. Applies unless a more specific subagent role overrides.
+description: Idiomatic Go with proper error handling, concurrency patterns, slog, generics, and clean package design. Use when implementing, debugging, refactoring, or reviewing Go code; designing package boundaries; resolving race conditions or goroutine leaks; setting up table-driven tests; choosing between channels and mutexes; or tuning module layout. Applies to any Go work unless a more specific role overrides.
 ---
 
 # Go Pro

@@ -1,6 +1,6 @@
 ---
 name: progression-systems
-description: "Difficulty curves, flow channel targeting, power curve math, unlock pacing, reward scheduling, and XP/level formulas. Use when designing level-up systems, tuning difficulty ramps, pacing content unlocks, implementing adaptive difficulty, or when players report 'too easy', 'too hard', or 'grindy'."
+description: "Difficulty curves, flow-channel targeting, power-curve math, unlock pacing, reward scheduling, XP/level formulas, and prestige/new-game-plus loops. Use when designing level-up or progression systems, tuning a difficulty ramp, deciding when to unlock content or abilities, implementing adaptive difficulty, choosing between linear/quadratic/exponential curves, or when players report 'too easy,' 'too hard,' 'grindy,' or 'plateaus too long.' For the psychology of why progression motivates see motivation-design; for stat balance between simultaneously-available items see game-balance."
 ---
 
 # Progression Systems

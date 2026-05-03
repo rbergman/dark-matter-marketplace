@@ -56,7 +56,6 @@ Task(...) Task(...) Task(...)
 
 Each subagent prompt follows `/subagent` template with:
 - Explicit OWN/READ boundaries
-- Report file path: `history/subagent-reports/<bead-id>.md`
 - RESPONSE FORMAT requirement (minimal structured output)
 
 ## 5. Collect Results (CONTEXT-EFFICIENT)
@@ -75,7 +74,7 @@ Each subagent prompt follows `/subagent` template with:
 ```
 
 4. **If all success:** Proceed to intent review
-5. **If any failed:** Read ONLY that report, fix or re-launch
+5. **If any failed:** Use the failure DETAILS in that subagent's response, fix or re-launch
 
 ## 6. Intent Review (M+ tasks)
 
@@ -97,7 +96,6 @@ DETAIL: <1 sentence if rework>
 
 - VERDICT=accept for all → proceed to merge
 - Any VERDICT=rework → send gaps back, re-launch targeted fix
-- Log outcomes to `history/checkpoint-effectiveness.log`
 
 ## 7. Merge & Complete (BATCH)
 
@@ -114,7 +112,7 @@ DETAIL: <1 sentence if rework>
 ## 8. Handle Failures
 
 - Don't let one failure block parallel work
-- Read failed subagent's report file for details
+- Inspect the failed subagent's DETAILS or re-engage it for specifics
 - Fix or re-launch failed subagent only
 - If unexpected conflicts: revert one, re-run serial
 
@@ -123,8 +121,7 @@ DETAIL: <1 sentence if rework>
 If thorough review needed before commit:
 ```
 Task(subagent_type="feature-dev:code-reviewer", prompt="
-Review changes from parallel subagents:
-- Reports: history/subagent-reports/n7vy.2.md, history/subagent-reports/1s08.2.md
+Review the parallel subagent diffs in <files>.
 - Focus: integration issues, missed edge cases
 - Return: PASS/FAIL + issues list (if any)
 ")

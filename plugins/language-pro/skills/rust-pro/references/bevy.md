@@ -154,6 +154,6 @@ struct GameState {
 }
 
 #[derive(Component, Default)]
-#[require(Transform, Visibility)]  // Bevy 0.15+
+#[require(Transform, Visibility)]  // Bevy 0.15+ (still current as of 0.17)
 struct Player;
 ```

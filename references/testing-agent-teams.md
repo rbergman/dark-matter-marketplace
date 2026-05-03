@@ -48,13 +48,6 @@ Verify: team created, teammates spawned, tasks assigned, file ownership respecte
 Verify: 3+ teammates spawned with different perspectives, debate occurs, synthesis produced.
 ```
 
-### team-refine
-```
-Create a bead with a vague spec: bd create --title="Add caching to the API" --type=feature
-/dm-team:refine <bead-id>
-Verify: complexity assessed as l/xl, team spawned, debate occurs, refined spec produced.
-```
-
 ### review
 ```
 Make some changes on a feature branch.

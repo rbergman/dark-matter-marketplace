@@ -27,7 +27,7 @@ When facing decisions where multiple valid perspectives exist, spawn a deliberat
 
 3 perspectives minimum, 5 maximum. Tailor roles to the specific decision.
 
-All councilors use opus for maximum depth of reasoning. The council is designed for quality over speed — if you need fast iteration, use dialectical-refinement instead.
+All councilors use opus for maximum depth of reasoning. The council is designed for quality over speed — for fast iteration, talk to a single subagent instead.
 
 ## Debate Protocol
 
@@ -125,13 +125,12 @@ Future option: cross-model councils (e.g., Codex, Gemini) via driver plugins cou
 
 ## Anti-patterns
 
-- Spawning a council for trivial decisions (use tiered-delegation)
+- Spawning a council for trivial decisions (use a single subagent or decide directly)
 - All teammates agreeing immediately (reframe perspectives to create genuine tension)
 - Council as delay tactic (set time/round limits)
 - Ignoring dissent (always record minority positions)
 
 ## Related Skills
 
-- **dm-team:compositions** — council team template
-- **dm-team:tiered-delegation** — when to use council vs simpler delegation
-- **dm-work:dialectical-refinement** — sequential alternative to parallel council debate
+- **dm-team:lead** — team coordination protocol; spawn councilors as teammates
+- **dm-work:advice** — single-agent second-opinion brief (cheaper alternative)

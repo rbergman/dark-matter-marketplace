@@ -1,6 +1,6 @@
 ---
 name: experience-design
-description: "Engagement loop design, pacing frameworks, the experience triangle, emotion layering, and meaningful choice evaluation. Use when designing core loops, evaluating why gameplay feels flat, structuring emotional arcs, or answering 'why isn't this fun?'"
+description: "Engagement loop design, pacing frameworks, the Experience Triangle (mechanics + dynamics + aesthetics), emotion layering across a session, and evaluating whether choices feel meaningful. Use when designing the core loop, structuring an emotional arc across 5-30 min sessions, debugging 'feels flat' or 'feels samey' play, evaluating whether decisions matter, planning peaks and valleys of intensity, or when playtesters describe sessions as 'fine but forgettable.' Sits one level above game-design (mechanic-level) and one below game-vision (north-star-level)."
 ---
 
 # Experience Design

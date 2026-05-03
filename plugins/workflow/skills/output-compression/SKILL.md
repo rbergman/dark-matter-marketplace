@@ -16,7 +16,7 @@ Two tools serve this purpose with different trade-offs:
 | **Setup** | `rtk init --global` | `tokf hook install` |
 | **Custom filters** | Built-in only (30+ commands) | TOML per-project + Lua scripting (61+ built-in) |
 | **Per-repo config** | No | `.tokf/filters/` committed with repo |
-| **Multi-tool support** | Claude Code, Cursor, Gemini, Codex, Copilot, etc. | Claude Code focused |
+| **Multi-tool support** | Claude Code, Cursor, Gemini, Codex, Copilot, etc. | Claude Code hook + CLI filter (`tokf filter < input`) |
 | **Best for** | Global baseline across all repos | Surgical filtering when defaults aren't enough |
 
 **Use RTK as the global baseline.** Add tokf when RTK's defaults don't handle a specific output pattern (e.g., test coverage tables overflowing Bash limits).
@@ -76,6 +76,11 @@ RTK installs a PreToolUse hook that rewrites Bash commands transparently. Four c
 - No custom filters — built-in only
 - Built-in CC tools (Read, Grep, Glob) bypass the hook
 - If a specific output pattern isn't handled well, no per-project override — use tokf
+
+### Gotchas
+
+- **`rtk lint src` breaks with positional args.** RTK rewrites/dispatches in a way that treats positional args like `src` as npm package names (npx tries to fetch them). Call `rtk lint` with no positional args and let ESLint's `files:` config handle scope. Same applies to other tools where positional directory args are optional.
+- **Binary wrapper mode**: `rtk <command>` works outside Claude Code — in justfile recipes, CI, shell scripts. See **just-pro** "Token-Efficient Recipes" for the pattern.
 
 ---
 

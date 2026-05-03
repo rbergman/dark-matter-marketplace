@@ -1,6 +1,6 @@
 ---
 name: mise
-description: Modern dev tool version management with mise. Use when setting up repos, managing tool versions, or when users ask about nvm/pyenv/goenv alternatives.
+description: Dev-tool and runtime version management with mise — the modern replacement for nvm, pyenv, goenv, rbenv, and asdf. Use when setting up a new repo, pinning Node/Python/Go/Rust/Bun versions, configuring per-project tool versions via .mise.toml or .tool-versions, wiring direnv-style env loading, debugging "wrong version active" errors, or migrating off legacy version managers. Covers mise.toml schema, env hooks, task definitions, and integration with just and CI.
 ---
 
 # Mise: Modern Dev Tool Management

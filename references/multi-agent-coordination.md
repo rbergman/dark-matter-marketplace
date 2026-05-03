@@ -39,7 +39,7 @@ One Claude session delegates focused tasks to ephemeral workers via `Task()`. Wo
 - `dm-work:subagent` — worker role
 - `/dm-work:subagent`, `/dm-work:subagents` — delegation commands
 - `/dm-work:review` — parallel isolated reviewers
-- `/dm-work:refine` — sequential adversarial refinement
+- `/dm-work:advice` — single-agent second-opinion brief
 
 ---
 
@@ -76,11 +76,9 @@ One Claude session (the lead) spawns persistent teammate sessions that communica
 
 ### Relevant skills
 
-- `dm-team:lead` — team lead role
+- `dm-team:lead` — team lead role (includes "Teams vs Subagents vs Direct" decision table and common team shapes)
 - `dm-team:teammate` — teammate role
-- `dm-team:tiered-delegation` — when to use teams vs subagents
-- `dm-team:compositions` — reusable team templates
-- `/dm-team:council`, `/dm-team:refine`, `/dm-team:review` — team commands
+- `/dm-team:council`, `/dm-team:review` — team commands
 
 ### Setup
 
@@ -178,7 +176,7 @@ Council/Refine (teams)  →  Breakdown (beads)  →  Implement (subagents)  → 
 | Quick research task | Subagents (Explore agent) |
 | Single file fix | Direct (no delegation needed) |
 
-See `dm-team:tiered-delegation` for the full decision framework between subagents and teams.
+See the "Teams vs Subagents vs Direct" table in `dm-team:lead` for the decision framework.
 
 ### Review: Subagents vs Teams
 

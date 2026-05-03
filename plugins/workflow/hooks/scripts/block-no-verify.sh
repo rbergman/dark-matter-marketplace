@@ -14,8 +14,10 @@ if [ -z "$COMMAND" ]; then
   exit 0
 fi
 
-# Only check commands that actually contain the flags
-if ! echo "$COMMAND" | grep -qE -- '--no-verify|--no-gpg-sign'; then
+# Strip quoted strings so flags inside values don't trigger false positives
+# (e.g. --notes "text mentioning --no-verify" should not block).
+UNQUOTED=$(echo "$COMMAND" | sed "s/'[^']*'//g" | sed 's/"[^"]*"//g')
+if ! echo "$UNQUOTED" | grep -qE -- '--no-verify|--no-gpg-sign'; then
   exit 0
 fi
 

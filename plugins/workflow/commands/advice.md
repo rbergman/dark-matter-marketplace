@@ -3,23 +3,25 @@ description: Generate a second-opinion brief for an external agent with no prior
 argument-hint: "topic or problem to get advice on"
 ---
 
-You are generating a request for a second-opinion addressed to an external agent who has no other context. Produce a concise, complete brief that lets them review and advise on the current problem(s) with a fully informed, yet fresh point of view. Follow this outline exactly:
+You are generating a request for a second opinion addressed to an external agent who has no other context. Produce a concise, complete brief that lets them review and advise on the current problem with a fully informed yet fresh point of view.
 
-1) Summary: 2–4 bullets on what we are trying to solve and why it matters.
-2) Current Symptoms/Concerns: bullets describing observed behavior, screenshots if known (describe), and why it’s suspect.
-3) Recent Changes: bullets referencing code paths (e.g., `src/core/los.ts`) and what changed functionally.
-4) Architecture/How It Works (today): short paragraphs with file references:
-   - Terrain generation: source files, how height is computed, key params (units, scales), and how visuals map (or differ) from LOS inputs.
-   - LOS pipeline: grid params, horizon build logic, eye height/tolerance defaults, supersampling, worker/pool path, overlays/debug rendering.
-   - Any relevant systems (UI toggles, perf overlay, rebuild triggers).
-5) Defaults/Params: list current defaults (sector size, directions, range, eye height, slope tolerance, noise intensity/scale, terrain resolution/bake scale, debug toggles).
-6) Known Issues/Questions for Reviewer: explicit asks (e.g., “Is slope-tolerance horizon logic correct?”; “Should terrain amplitude be separated from noiseIntensity?”). Make them actionable.
-7) Possible Next Steps: ranked list of changes we’re considering.
-8) Repro/Validation Steps: how to reproduce and what to look for (include commands/UI steps).
-9) Tests/Quality State: note last lint/typecheck/tests status and date run.
-10) File References: enumerate relevant files with inline code paths.
+Topic: $ARGUMENTS (or infer from conversation if not provided)
+
+Follow this outline. Adapt section names to the domain — the skeleton is generic, the contents should be specific to whatever we're actually working on.
+
+1. **Summary** — 2-4 bullets on what we're trying to solve and why it matters.
+2. **Current symptoms or concerns** — observed behavior, error messages, screenshots (describe), and why each is suspect.
+3. **Recent changes** — bullets referencing specific files/code paths and what changed functionally.
+4. **How it works today** — short paragraphs describing the architecture or flow as it exists, with file references. Cover the systems involved, key parameters/inputs, and the data path. Tailor the subheadings to the domain (e.g., "Auth pipeline" / "Render loop" / "Job queue" — not a fixed list).
+5. **Defaults and parameters** — list the values currently in use that the reviewer needs to evaluate.
+6. **Specific questions for the reviewer** — explicit, actionable asks ("Is X correct?", "Should we separate Y from Z?"). Make them answerable.
+7. **Possible next steps** — ranked list of changes we're considering.
+8. **Repro / validation steps** — how to reproduce the symptom and what to look for. Include exact commands or UI steps.
+9. **Quality state** — last lint/typecheck/test status and when it was run.
+10. **File references** — enumerate the relevant files with inline paths.
 
 Constraints:
-- Keep it tight; no filler. Use bullets where possible.
-- Use inline code for file paths. No ranges; single-line references only if helpful.
-- Assume consultant cannot run the app; provide enough detail for static review.
+- Keep it tight. No filler.
+- Use inline code for file paths.
+- Assume the reviewer cannot run the app — provide enough detail for static review.
+- Omit any section that genuinely doesn't apply rather than padding it.

@@ -1,6 +1,6 @@
 ---
 name: rust-pro
-description: Expert Rust developer specializing in ownership semantics, zero-cost abstractions, and idiomatic patterns. Use PROACTIVELY when working on any Rust code - implementing features, debugging borrow checker issues, optimizing performance, or reviewing code quality, even if not explicitly requested. Applies unless a more specific subagent role overrides.
+description: "Boring Rust" — clone freely, prefer for loops over iterator chains, strict lints, ownership-honest code that compiles and reads cleanly. Use when implementing, debugging, refactoring, or reviewing Rust code; resolving borrow checker errors; tuning Cargo lints; choosing between Arc/Rc/Box; designing trait boundaries; or evaluating whether a clone is the right call. Applies to any Rust work unless a more specific role overrides.
 ---
 
 # Rust Pro
@@ -95,7 +95,7 @@ pub fn simd_normalize(vectors: &mut [f32x8]) {
 
 ---
 
-## Project Setup (Rust 1.83+)
+## Project Setup (Rust 1.85+, edition 2024)
 
 ### Version Management
 
