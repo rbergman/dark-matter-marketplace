@@ -9,6 +9,8 @@ The canonical reference is `${CLAUDE_PLUGIN_ROOT}/skills/repo-init/references/AG
 
 Target file: $ARGUMENTS (or `./AGENTS.md` if no arg)
 
+> **If this command was loaded from an older session:** consider running `/reload-plugins` before proceeding so you pick up the latest version of this command. The guidance below evolves; stale loads produce stale advice.
+
 ## Steps
 
 ### 1. Read both files first
@@ -26,9 +28,23 @@ Identify:
 - **Conflicts** — places where this repo's content disagrees with the reference. These need a *judgment call*, not a silent overwrite. Flag them.
 - **Project-specific content to preserve** — Settled Decisions, project description, domain-specific conventions, language/framework specifics, anything referencing this repo's actual code. The reference template won't know about these.
 
+**Note on Skills Available / proactive-skill-selection lists:** the reference template doesn't include one, but **don't strip an existing list** if the repo has one. They're a load-bearing orchestrator delegation cheatsheet — they tell Claude which skills apply to which work without forcing skill-description re-reads each time. Keep as-is unless the list is stale (references deleted skills like `dm-work:tdd`, `dm-work:dialectical-refinement`, or `dm-tool:*` — those should be removed). If the list is missing, don't add one mechanically; ask the user whether the repo would benefit from one.
+
 **Note on shared repos and the global-CLAUDE.md dedup rule:** the reference template suggests dropping content already covered by `~/.claude/CLAUDE.md` (Prime Directive, Quality Gates, Role). That dedup is correct for *solo* repos, but **AGENTS.md is checked in and read by other contributors who don't share the user's global config**. For shared repos, keep concise versions of those foundational sections (especially Gall's Law / Prime Directive) at the repo level — terser than the reference, but present. Ask the user up front: "Is this repo shared with other contributors?" If yes, keep concise foundational sections. If solo, dedup against global is fine.
 
-**Note on beads sync model — ask before recommending changes:** beads 1.0+ supports two sync models. (1) Embedded Dolt + git+JSONL transport (default for `bd init`): `bd dolt push/pull` doesn't apply. (2) Server Dolt + Dolt remote (`bd init --server`, used in multi-agent coordination like Gastown): `bd dolt push/pull` *is* the sync mechanism. Before adding any "don't use bd dolt push/pull" override, **check which model this repo uses** — look for `.beads/dolt/` (embedded) vs `.beads/server/` or a configured Dolt remote. If embedded+git: a "doesn't apply to this repo's embedded+git setup" note above any tool-injected `bd dolt push` references is appropriate. If server+remote: leave the injection alone — it's correct guidance. If unclear: ask the user.
+**Note on beads sync model — neither setup is "wrong"; identify which applies.** Beads 1.0+ supports two sync models, both fully valid:
+
+- **Embedded Dolt + git+JSONL transport** — the default for `bd init`. `.beads/issues.jsonl` is the source of truth; hooks auto-export/import. `bd dolt push/pull` doesn't apply because no Dolt remote is configured.
+- **Server Dolt + Dolt remote** — `bd init --server`, used in multi-agent coordination scenarios like Gastown. A central Dolt server is authoritative; `bd dolt push/pull` *is* the sync mechanism and is the correct guidance.
+
+If you see `bd dolt push/pull` in a tool-injected BEADS INTEGRATION block AND in the user's `~/.claude/CLAUDE.md` you find a "DO NOT use bd dolt push/pull" rule, **this is not a contradiction** — the global rule reflects the user's typical embedded+git setup; the injection is correct for server-Dolt setups; the question is just which model this specific repo uses.
+
+How to tell:
+- Run `ls .beads/` — embedded shows `dolt/`, server typically shows `server/` or no local Dolt dir
+- Run `bd config get` (or check `.beads/config.toml`) for sync-related settings
+- Look at `bd init` invocation in repo history if available
+
+If embedded+git: add a positive-framing override section ABOVE the BEADS INTEGRATION block stating the correct model and noting the injected `bd dolt push` references "apply to server-Dolt setups, not this repo's embedded+git setup." Don't call them wrong, contradictory, or legacy — they're just for a different setup. If server+remote: leave the injection alone — it's the right guidance. If unclear: ask the user before writing anything.
 
 ### 3. Show the plan before editing
 
