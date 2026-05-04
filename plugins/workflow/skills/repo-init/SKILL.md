@@ -442,7 +442,15 @@ This sets up:
 
 Timbers captures the *reasoning* behind commits — the "why" that git log can't tell you. Entries are files in `.timbers/` that sync via regular `git push`.
 
-Skip if the project is trivial or short-lived.
+**Optional:** Create `.timbersignore` at repo root to extend the default skip rules (lockfiles, reverts are already skipped by default in v0.19+). Use gitignore-style patterns for files that should never require a timbers entry:
+
+```
+# Generated files that don't need reasoning documented
+*.generated.ts
+db/migrations/*.sql
+```
+
+Skip timbers entirely if the project is trivial or short-lived.
 
 ---
 

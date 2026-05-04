@@ -1,6 +1,6 @@
 {
   "name": "dm-work",
-  "version": "0.40.5",
+  "version": "0.40.6",
   "description": "Workflow tools: orchestration, subagent delegation, spec breakdown, peer review, competitive generation, evaluator-judge protocol, browser QA, repo init/health, worktrees, mise/just/output-compression tooling, and session retros",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

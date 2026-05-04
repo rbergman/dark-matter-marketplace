@@ -5,17 +5,28 @@
 
 set -euo pipefail
 
-# Find project root by looking for common markers
+# Find project root anchored to git toplevel (not nearest ancestor with a marker).
+# This prevents misdetection when $PWD is inside a vendored submodule or nested
+# package that has its own package.json/Cargo.toml but isn't the real project.
 find_project_root() {
-  local dir="$PWD"
-  while [ "$dir" != "/" ]; do
-    if [ -f "$dir/justfile" ] || [ -f "$dir/package.json" ] || [ -f "$dir/Cargo.toml" ] || [ -f "$dir/go.mod" ]; then
-      echo "$dir"
-      return
-    fi
-    dir=$(dirname "$dir")
-  done
-  echo ""
+  # Prefer superproject root when inside a submodule; fall back to toplevel
+  local git_root
+  git_root=$(git -C "$PWD" rev-parse --show-superproject-working-tree 2>/dev/null || true)
+  if [ -z "$git_root" ]; then
+    git_root=$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || true)
+  fi
+
+  if [ -z "$git_root" ]; then
+    echo ""
+    return
+  fi
+
+  # Only use the git root if it contains a recognized project marker
+  if [ -f "$git_root/justfile" ] || [ -f "$git_root/package.json" ] || [ -f "$git_root/Cargo.toml" ] || [ -f "$git_root/go.mod" ]; then
+    echo "$git_root"
+  else
+    echo ""
+  fi
 }
 
 PROJECT_ROOT=$(find_project_root)
