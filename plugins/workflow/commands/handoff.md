@@ -7,6 +7,8 @@ Write a high-fidelity session handoff covering everything a new session needs to
 
 If `$ARGUMENTS` is provided, weave those instructions into the handoff prominently.
 
+**Before writing the handoff**: review in-progress beads and close any whose work is actually done. Run `bd list --status=in_progress` (filter to the current actor/branch if there's noise), then `bd close <id1> <id2> ...` for any that finished during this session. Stale `in_progress` state corrupts the next session's `bd ready` view and misleads the resumer about what's still active. If a bead is half-done, leave it open but note its real state in the handoff under section 1.
+
 Cover, in order, only the sections that apply (skip rather than pad):
 
 1. **Where we are** — current branch, worktree (if any), bead(s) in progress, last commit/state

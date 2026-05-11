@@ -1,4 +1,7 @@
 {
+  "enabledPlugins": {
+    "dm-game@dark-matter-marketplace": false
+  },
   "permissions": {
     "allow": [
       "Bash(xargs:*)",

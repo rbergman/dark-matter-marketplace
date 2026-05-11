@@ -32,6 +32,22 @@ Skip if the session was trivial (single quick fix, pure Q&A).
 
 ---
 
+## Step 0: Close Completed Beads
+
+Before scanning for findings, reconcile bead state. Stale `in_progress` beads
+are the most common source of next-session confusion — they corrupt `bd ready`
+and mislead the resumer about what's still active.
+
+1. `bd list --status=in_progress` — see what's claimed
+2. For each: did this session actually finish the work? If yes, `bd close <id>`.
+   You can close many at once: `bd close <id1> <id2> ...`.
+3. For half-done work, leave it open but make sure its description/notes
+   reflect real state — not the state from when it was claimed.
+
+This is a 30-second pass and prevents the most common handoff bug.
+
+---
+
 ## Step 1: Scan for Findings
 
 Review the conversation for patterns in these categories:

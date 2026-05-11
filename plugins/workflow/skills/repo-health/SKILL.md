@@ -169,7 +169,7 @@ bd --version 2>/dev/null
 
 Beads 1.0+ uses embedded Dolt by default — no external `dolt` binary required, no server daemon to manage. Check:
 
-- If beads version is below 1.0: flag as IMPORTANT — upgrade strongly recommended (`brew upgrade gastownhall/tap/beads`). 1.0 brings auto-export defaults, blessed embedded mode on macOS, hook auto-install, and worktree-aware path resolution.
+- If beads version is below 1.0: flag as IMPORTANT — upgrade strongly recommended (`brew upgrade beads`). 1.0 brings auto-export defaults, blessed embedded mode on macOS, hook auto-install, and worktree-aware path resolution.
 - If `bd hooks list` reports shim version older than the installed `bd --version`: flag as IMPORTANT — run `bd hooks install --force --beads` to refresh shims.
 - If both present and current: PASSED
 

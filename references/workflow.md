@@ -12,7 +12,7 @@ In Claude Code settings, enable showing context usage in the status line. This m
 
 ### Install Beads
 
-[Beads](https://github.com/steveyegge/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
+[Beads](https://github.com/gastownhall/beads) provides external state that survives session boundaries. It's optional but highly recommended — it enables reliable handoffs between sessions.
 
 Beads 0.58+ requires **Dolt** as its storage backend:
 
@@ -21,10 +21,10 @@ Beads 0.58+ requires **Dolt** as its storage backend:
 brew install dolt
 
 # Install beads (pick one)
-curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+brew install beads
+# or: curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash
 # or: npm install -g @beads/bd
-# or: brew install steveyegge/beads/bd
-# or: go install github.com/steveyegge/beads/cmd/bd@latest
+# or: go install github.com/steveyegge/beads/cmd/bd@latest   # module path stayed at steveyegge after the org move
 
 # Verify both
 dolt version
