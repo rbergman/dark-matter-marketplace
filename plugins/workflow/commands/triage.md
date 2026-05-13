@@ -5,7 +5,20 @@ argument-hint: "--pr <number>"
 
 # Triage PR Review Comments
 
-Pull review comments from a GitHub PR, triage (accept/reject), and create beads for accepted items. Counterpart to `/dm-work:review --pr` which *gives* reviews.
+Pull review comments from a GitHub PR, triage, and act on each. Counterpart to `/dm-work:review --pr` which *gives* reviews.
+
+## Triage Philosophy
+
+LLM execution is cheap. The pre-LLM default of "accept all → bead → defer" leaves easy wins on the floor. **Every real review comment gets one of two outcomes in the same session: fixed or tracked.** "Non-blocking" means "not required for this PR to merge correctly," not "safe to ignore."
+
+Sort every comment into one tier and act on it now:
+
+- **Tier 1 — blocking** (critical/high): fix on this branch before the PR can merge.
+- **Tier 2 — real, in-scope, cheap**: fix on this branch in the same PR. "Cheap" means *all* of: single function or tightly local call site; no new abstraction; no new dependency; no schema, migration, public API, persisted data, or protocol change; no test infrastructure or harness change. If any fails, treat as tier 3.
+- **Tier 3 — real but out-of-scope, design-dependent, or larger than this PR**: file a bead with enough detail to act on later without re-reading the PR (file paths, concrete failure mode, what good looks like, exit criteria). Reply on the PR pointing to the bead.
+- **Tier 4 — "maybe" observations**: reject. Reply briefly with the reason. Don't file unless there's a concrete bug, test gap, risk, or decision to resolve.
+
+The phases below describe the *mechanics* — fetching comments, posting replies, creating beads. Apply the tier framework above when deciding how each comment is processed; do not default accepted comments to beads.
 
 ## Arguments
 

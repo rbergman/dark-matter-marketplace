@@ -774,6 +774,20 @@ git tag -f "$TAG" HEAD
 
 This moves (or creates) the review tag to HEAD so the next `/review` starts from here.
 
+### Acting on Findings
+
+LLM execution is cheap. Pre-LLM, "everything → bead → defer" was rational; now it leaves easy wins on the floor. **Every real review finding gets one of two outcomes in the same session: fixed or tracked.** "Non-blocking" means "not required for this commit to be correct," not "safe to ignore."
+
+Filing fewer, sharper findings is the goal. Triage:
+
+- **Tier 0 — filtered observations:** reviewer-side maybes (no concrete failure mode, test gap, risk, or decision) are dropped before being filed. If tier-0 entries show up in the report, treat them as tier 4.
+- **Tier 1 — blocking** (critical/high): fix before closing the originating work bead. Don't merge or hand off with these open.
+- **Tier 2 — real, in-scope, cheap**: fix immediately while the context is hot. "Cheap" means *all* of: single function or tightly local call site; no new abstraction; no new dependency; no schema, migration, public API, persisted data, or protocol change; no test infrastructure or harness change. If any fails, treat as tier 3.
+- **Tier 3 — real but out-of-scope, design-dependent, or larger than the current bead**: file a bead before moving on. The bead description must stand on its own — concrete failure mode, affected files/surfaces, what good looks like, exit criteria — so a future session can act without re-reading the review.
+- **Tier 4 — speculative survivors**: drop. Don't clutter beads without a concrete bug, test gap, risk, or decision.
+
+Bias toward fixing (tiers 1+2) over filing. After fixing, close the corresponding beads (`bd close <id> --reason="fixed in <commit>"`) so the queue stays accurate.
+
 ### PR Mode
 
 **Step 1: Show preview** of what will be posted (same format as local inline report, without bead references)

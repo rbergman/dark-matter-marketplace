@@ -28,10 +28,17 @@ plugins/<name>/
 ├── .claude-plugin/
 │   └── plugin.json      # Name, version, description
 ├── skills/              # SKILL.md files (auto-invoked)
+│   └── <skill>/
+│       └── references/  # Optional, SHIPS with the plugin
 ├── commands/            # Slash commands
 ├── agents/              # Subagent definitions
 └── hooks/               # Event hooks
 ```
+
+**References — what ships and what doesn't:**
+
+- `plugins/<plugin>/skills/<skill>/references/` — **ships** with the plugin. Use this when a skill or command needs to load reference content at runtime. Accessible to the skill via `references/<file>.md` (relative) or `${CLAUDE_PLUGIN_ROOT}/skills/<skill>/references/<file>.md`.
+- `/references/` at the marketplace root — **does NOT ship**. Human-facing repo docs only. Never link from a SKILL.md or command.md into this directory; if content is needed at runtime, move it under the appropriate skill.
 
 ## Cross-References
 

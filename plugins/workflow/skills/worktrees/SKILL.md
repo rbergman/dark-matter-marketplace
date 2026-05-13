@@ -81,6 +81,44 @@ This way all worktrees load the same personal preferences from a single source. 
 
 ---
 
+## Beads in Worktrees
+
+Beads stores issue state in the primary repo's `.beads/embeddeddolt/` (gitignored) and exports the transport to `.beads/issues.jsonl` (committed). Running `bd` from a linked worktree shares the same database — that's correct — but the JSONL export still lands relative to the primary checkout, and any mutation dirties files that are visible across all worktrees.
+
+**Ownership rule.** The agent who runs a mutating `bd` command (`bd create` / `update` / `close` / `remember` / `dep`) **owns** the resulting `.beads/issues.jsonl` change:
+
+1. Batch the JSONL change into the same logical commit as the code change that motivated it. If it must stand alone, land it from primary as `chore(beads): ...`.
+2. **Never commit `MM .beads/issues.jsonl` you didn't author.** Leave it for the owning agent unless you're explicitly coordinating.
+
+**JSONL commit discipline.** Hooks help but aren't sufficient — auto-export can succeed while the hook's internal `git add` fails. After any bead mutation:
+
+```bash
+git status --short                 # verify .beads/issues.jsonl is staged ('M ', not 'MM' or ' M')
+bd export -o .beads/issues.jsonl   # explicit re-export if needed
+git add .beads/issues.jsonl        # restage if 'MM' (export happened after staging)
+```
+
+`MM .beads/issues.jsonl` means the export landed *after* staging — restage before committing.
+
+**Recovery for abandoned worktree mutations.** `git restore .beads/issues.jsonl` resets *only* the exported transport file; the actual bead state lives in the gitignored embedded Dolt database. Behavior depends on what you want:
+
+- **Keep the bead change, just not as a JSONL edit yet:** `git restore .beads/issues.jsonl` is fine. The Dolt state survives, and the next `bd export` reproduces it. Don't panic-revert thinking `git restore` undid the bead work.
+- **Discard the bead change too:** `git restore` alone is insufficient — the next `bd export` (from any worktree, including the one that originally mutated) will re-emit the mutation back into the JSONL. You must reverse the mutation in Dolt first: `bd update <id> --status=open` to undo a close, `bd close <id>` to retire a stray `bd create`, etc. Then re-export and verify `git status` is clean.
+
+---
+
+## Before Stepping Away from a Worktree
+
+A shared filesystem means one worktree's broken WIP can fail another worktree's quality gates (Stop hooks, `just check-fast`, etc.). When pausing or ending a session in a worktree, leave it in one of three states:
+
+1. **Committed** — even a `wip:` commit is fine. Captures intent and clears the working tree.
+2. **Stashed** — `git stash -u` captures untracked work too.
+3. **Clean** — `git status --short` shows no entries.
+
+Never strand a broken-compile or failing-lint state in a shared worktree. The next agent (you, a teammate, or a future session) inherits the filesystem.
+
+---
+
 ## After Creation
 
 ### 1. Enter Worktree
