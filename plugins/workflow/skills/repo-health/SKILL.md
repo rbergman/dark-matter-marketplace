@@ -179,6 +179,22 @@ External `dolt` binary is only needed for repos still in server mode. Server mod
 
 Suggest `bd init` for project repos. Skip for config/docs-only repos.
 
+### 4.3a Fresh clone with no database (IMPORTANT)
+
+When a repo has `.beads/issues.jsonl` committed but no embedded database (`.beads/embeddeddolt/`) or server database — the typical fresh-clone state — `bd ready` and friends will fail with "no beads database found". The fix is **not** `bd init` (which mints a new identity and can clobber prefix/metadata) and **not** `bd import` (which requires the DB to already exist). The right command is:
+
+```bash
+bd bootstrap                          # auto-detects .beads/issues.jsonl, recreates the embedded DB
+bd config set beads.role maintainer   # or "contributor" for OSS contributors who shouldn't commit beads changes
+```
+
+Detection:
+```bash
+[ -f .beads/issues.jsonl ] && [ ! -d .beads/embeddeddolt ] && [ ! -d .beads/dolt ] && echo "fresh clone — needs bd bootstrap"
+```
+
+If detected → flag as IMPORTANT and recommend the bootstrap sequence above.
+
 ### 4.4 If beads initialized — run health checks (NICE)
 
 ```bash

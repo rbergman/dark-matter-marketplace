@@ -77,6 +77,15 @@ This repo uses **beads** (`bd`) for task tracking and **timbers** for commit-rea
 
 **Follow the instructions those tools inject** — they own their respective domains. Don't duplicate that content here; let `bd setup claude` and `timbers onboard` be the source of truth so they stay current as the tools evolve.
 
+**Fresh clone onboarding.** A new clone of this repo has `.beads/issues.jsonl` committed but no local database (the embedded Dolt directory is gitignored, so it doesn't travel through git). Running `bd ready` on a first clone will fail with "no beads database found". The fix is one command:
+
+```bash
+bd bootstrap                          # auto-detects .beads/issues.jsonl, recreates the embedded DB
+bd config set beads.role maintainer   # or "contributor" if you're an outside contributor who shouldn't commit beads changes
+```
+
+`bd bootstrap` is non-destructive and the right tool here — `bd init` would mint a new identity, and `bd import` requires the DB to already exist. Set the role once after bootstrap to silence the role-config warning permanently.
+
 Repo-wide conventions worth stating once (not covered by injections):
 
 - **Bead-first workflow:** when ad hoc work appears (bug, feature, task) without an existing bead, create one before implementing. Every code change should trace back to a bead.
