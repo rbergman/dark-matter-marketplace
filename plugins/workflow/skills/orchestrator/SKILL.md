@@ -51,6 +51,7 @@ Delegate to subagents if ANY apply:
 - Claim/update/close beads (`bd` CLI)
 - **Open a bead before implementing ad hoc work** — when the user raises a task that doesn't have an existing bead, create one (`bd create`) before starting implementation. This creates a paper trail: every code change traces back to a bead, making session history, retros, and handoffs reliable.
 - **Bead detail discipline** — every bead has (1) an imperative title, (2) a description that lets a cold session start work without context (concrete failure mode or goal, affected files/surfaces, exit criteria), (3) explicit dependencies, and (4) a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc and call out architectural decisions. A bead whose reviewer has to scroll the conversation to understand it is not done.
+- **Memories are local-only (beads 1.0.4+).** `bd remember` writes to the embedded Dolt DB but does NOT propagate via `.beads/issues.jsonl` — default `bd export` and the pre-commit hook flush both exclude memories. Treat `bd memories` as a per-clone store of factual learnings; for knowledge that should reach other devs/clones, write it into AGENTS.md, `.claude/rules/`, or commit it as code/docs.
 - Review and commit subagent work
 - Ask clarifying questions
 - Git operations (add, commit, push, branch)

@@ -169,7 +169,7 @@ bd --version 2>/dev/null
 
 Beads 1.0+ uses embedded Dolt by default — no external `dolt` binary required, no server daemon to manage. Check:
 
-- If beads version is below 1.0: flag as IMPORTANT — upgrade strongly recommended (`brew upgrade beads`). 1.0 brings auto-export defaults, blessed embedded mode on macOS, hook auto-install, and worktree-aware path resolution.
+- If beads version is below 1.0.4: flag as IMPORTANT — upgrade strongly recommended (`brew upgrade beads`). 1.0 brought auto-export defaults, blessed embedded mode on macOS, hook auto-install, and worktree-aware path resolution. **1.0.4 additionally removes the embedded-mode flock (concurrent bd safe), adds `bd -C <path>`, and hardens hook auto-import after pull/checkout.** `bd init --force` is deprecated in 1.0.4 → use `--reinit-local` (with `--discard-remote` if you mean it).
 - If `bd hooks list` reports shim version older than the installed `bd --version`: flag as IMPORTANT — run `bd hooks install --force --beads` to refresh shims.
 - If both present and current: PASSED
 
@@ -204,7 +204,7 @@ bd hooks list 2>/dev/null      # shim version per hook
 bd lint 2>/dev/null | head     # convention drift (works in embedded mode)
 ```
 
-`bd doctor` is a doorstop in embedded mode in 1.0.3 — surface its checks via the alternatives above. Surface any warnings or failures from any of these commands.
+`bd doctor` is a doorstop in embedded mode in 1.0.x (verified through 1.0.4: outputs "not yet supported in embedded mode" and runs no checks) — surface its checks via the alternatives above. Surface any warnings or failures from any of these commands.
 
 ### 4.5 `.beads/` gitignore check (IMPORTANT)
 
