@@ -178,11 +178,10 @@ The key insight: **external state (beads) + explicit summaries (rotation) + dele
 
 ## Quality Enforcement Hooks
 
-The dm-work plugin includes three Claude Code hooks that enforce quality automatically:
+The dm-work plugin includes two Claude Code hooks that enforce quality automatically:
 
 | Hook | Event | What it does |
 |------|-------|--------------|
-| **block-no-verify** | PreToolUse (Bash) | Blocks `--no-verify` and other gate-bypass flags |
 | **flag-config-edit** | PostToolUse (Edit/Write) | Flags edits to settings.json, .claude files, and other config |
 | **run-gates-on-stop** | Stop | Auto-detects project type and runs quality gates before session ends |
 

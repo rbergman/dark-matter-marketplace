@@ -147,7 +147,7 @@ Security best practices and guidance for code review.
 | Plugin creation | plugin-dev | - |
 | Debugging | - | dm-work:debugging |
 | TDD | - | global `test-driven-development` skill |
-| Quality enforcement | - | dm-work hooks (block --no-verify, run gates on stop) |
+| Quality enforcement | - | dm-work hooks (run gates on stop, flag config edits) |
 
 ---
 
