@@ -384,6 +384,73 @@ This wires session-start context recovery and session-end enforcement. The DM pl
 
 ## Step 8: Beads Initialization
 
+Beads supports two sync modes. Pick one before running `bd init` for a new project. Per upstream's [`docs/SYNC_CONCEPTS.md`](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md), canonical (`refs/dolt/data`) is the recommended mode for new repos; legacy (JSONL-in-git) is supported for compatibility with existing repos that use it.
+
+### Sync mode at a glance
+
+| | **Canonical** (recommended for new repos) | **Legacy** (JSONL-in-git, for existing repos) |
+|---|---|---|
+| Source of truth | Dolt state in `refs/dolt/data` git ref namespace on origin | `.beads/issues.jsonl` (committed) |
+| `.beads/issues.jsonl` role | Passive local export (viewer, interchange, backup) — gitignored | Cross-clone transport — committed |
+| Sync commands | `bd dolt push` (after bead work) / `bd dolt pull` (after `git pull`) | Pre-commit auto-export + post-merge auto-import hooks |
+| Config | `sync.remote` set in `.beads/config.yaml`; `export.auto = false` | `export.auto = true`, `export.git-add = true` |
+| Fresh-clone onboarding | `bd bootstrap` (auto-detects `refs/dolt/data` on origin) | `bd bootstrap` (auto-detects committed JSONL) |
+| PR noise | None — bead state never appears in branch diffs | Every bead mutation produces JSONL diff |
+
+`bd bootstrap` is the universal entry point for both modes — it auto-detects which the repo is in. Prefer it over `bd init` / `bd import` for cloning.
+
+### Canonical mode (recommended)
+
+```bash
+# 1. Initialize beads — auto-detects git origin and sets sync.remote
+bd init
+
+# 2. Seed refs/dolt/data on the git remote (publishes Dolt history)
+bd dolt push
+
+# 3. Disable JSONL auto-export — JSONL is no longer your sync channel
+bd config set export.auto false
+bd config set export.git-add false
+
+# 4. Gitignore the JSONL exports (local view, not transport)
+cat >> .beads/.gitignore <<'EOF'
+issues.jsonl
+sync_base.jsonl
+EOF
+
+# 5. Set your role and confirm
+bd config set beads.role maintainer  # or "contributor" for outside contributors
+bd dolt remote list                   # should show origin
+```
+
+**Daily flow:**
+- After making bead changes: `bd dolt push`
+- After `git pull` (peer may have pushed bead work): `bd dolt pull`
+- New clones: `bd bootstrap` — clones Dolt history from `refs/dolt/data` automatically
+
+`bd dolt push` is **load-bearing** under canonical mode — it's the sync. It is not optional and not a no-op. Treat any `~/.claude/CLAUDE.md` or per-repo directive that forbids `bd dolt push` as a hard conflict requiring user attention.
+
+**Verifying sync cleanliness.** `bd dolt push` doubles as the divergence verifier: it's a no-op (`Push complete.` with no chunks transferred) when local Dolt already matches `refs/dolt/data` on origin, ships unpushed state otherwise, and surfaces auth / divergence / offline errors via stderr. **Do not reach for `bd dolt status` for this check** — in beads 1.0.4 it reports only engine info + data dir, nothing about remote-divergence state. Run `bd dolt push` at session-close, pre-merge, or anywhere you need "is canonical sync clean?" — no chunks transferred = clean.
+
+**If you wire `bd dolt push` / `bd dolt pull` into git hooks (pre-push / post-merge): surface failures, don't swallow them.** The naive `bd dolt push 2>/dev/null || true` pattern silently regresses what JSONL transport made visible (sync failures used to show up as merge conflicts on `.beads/issues.jsonl`; under canonical they vanish into the void if hidden). Use a tempfile + warning pattern that doesn't block the git op:
+
+```sh
+# pre-push (mirror for post-merge with bd dolt pull):
+if command -v bd >/dev/null 2>&1; then
+  _bd_err=$(mktemp -t bd-dolt-push.err.XXXXXX 2>/dev/null || echo /tmp/bd-dolt-push.err)
+  if ! bd dolt push 2>"$_bd_err"; then
+    echo >&2 "beads: 'bd dolt push' failed (continuing with git push); see $_bd_err"
+    echo >&2 "       or run 'bd dolt push' manually after resolving (often: 'bd dolt pull' first)."
+  else
+    rm -f "$_bd_err"
+  fi
+fi
+```
+
+The dev gets feedback, the git op still completes, and the failure log survives for diagnosis.
+
+### Legacy mode (JSONL-in-git, for existing repos)
+
 ```bash
 bd init  # embedded Dolt is the default and works on macOS in 1.0+
 ```
@@ -394,7 +461,9 @@ bd init  # embedded Dolt is the default and works on macOS in 1.0+
 - Installs `bd setup claude` integration (CLAUDE.md beads section + `.claude/settings.json`)
 - Enables `export.auto = true` and `export.git-add = true` — every `bd` mutation auto-exports `.beads/issues.jsonl` and stages it (60s throttle; pre-commit hook forces a flush)
 
-After `bd init`, install timbers hooks (they detect `core.hooksPath` and append into `.beads/hooks/pre-commit` "alongside beads hook"):
+### Hooks and timbers (both modes)
+
+After `bd init`, install timbers hooks if used (they detect `core.hooksPath` and append into `.beads/hooks/pre-commit` alongside the beads hook):
 
 ```bash
 timbers hooks install
@@ -416,6 +485,18 @@ Quality gates and any other custom hook content go OUTSIDE the `--- BEGIN/END BE
 Add a `just hooks` recipe for onboarding that re-runs `bd hooks install --force --beads` (idempotent — preserves user content). Verify with `bd hooks list` (shows shim version per hook) and `git config core.hooksPath` (should be `.beads/hooks`).
 
 **Note on `core.hooksPath`:** `bd hooks install --force` may set this to an absolute path on first install. Fix to relative manually if needed: `git config core.hooksPath .beads/hooks` — relative is required for worktrees, which share repo config.
+
+### Migration: legacy → canonical
+
+If an existing legacy-mode repo wants to move to canonical:
+
+1. `bd dolt push` — seeds `refs/dolt/data` on origin from current local Dolt state
+2. `git rm --cached .beads/issues.jsonl` and add the file to `.beads/.gitignore`
+3. `bd config set export.auto false && bd config set export.git-add false`
+4. Commit the gitignore + JSONL removal
+5. Peer clones run `bd dolt pull` once to refresh local Dolt; they're now on canonical
+
+Do this as a deliberate one-time migration, not a side-effect of other work.
 
 ---
 
@@ -454,6 +535,36 @@ Skip timbers entirely if the project is trivial or short-lived.
 
 ---
 
+## Step 8.7: Multi-Account GitHub Auth (Optional)
+
+If the user works across multiple GitHub identities (personal + work, multiple orgs), per-repo SSH-key routing is necessary for canonical-mode beads sync to work — `bd dolt push` uses the standard `git@github.com:` URL and needs the right key.
+
+The legacy pattern was `Host github.<alias>` blocks in `~/.ssh/config` with rewritten remote URLs, but that locks the SSH alias into team-shared config and breaks for anyone else.
+
+**Modern git-native pattern: `includeIf` in `~/.gitconfig`.**
+
+```ini
+# ~/.gitconfig
+[includeIf "gitdir:~/Projects/<org>/"]
+    path = ~/.gitconfig-<org>
+```
+
+```ini
+# ~/.gitconfig-<org>
+[user]
+    email = you@<org>-domain
+[core]
+    sshCommand = "ssh -i ~/.ssh/<org>_key -o IdentitiesOnly=yes -F /dev/null"
+```
+
+Any git operation under `~/Projects/<org>/` uses the per-account key. All URLs stay standard `git@github.com:org/repo.git` (no `Host github.<alias>` rewrites), so `bd dolt push`, `gh`, and other tooling work transparently.
+
+The `-o IdentitiesOnly=yes -F /dev/null` flags matter — without them, ssh may try other keys first and trip GitHub's bad-key rate limiter.
+
+Skip if the user only has one GitHub identity.
+
+---
+
 ## Step 9: Next Steps
 
 Point user to language-specific setup:
@@ -470,10 +581,20 @@ Point user to language-specific setup:
 ## Quick Reference
 
 ```bash
-# Full manual init sequence
+# Full manual init sequence — pick canonical or legacy at the bd step (see Step 8)
 git init
 # Create .gitignore, .claudeignore, AGENTS.md, CLAUDE.md symlink, justfile, .mise.toml, .envrc.example
-bd init                                  # embedded Dolt is the default (1.0+)
+
+# Canonical sync mode (recommended for new repos):
+bd init
+bd dolt push                             # seed refs/dolt/data on origin
+bd config set export.auto false
+bd config set export.git-add false
+echo -e "issues.jsonl\nsync_base.jsonl" >> .beads/.gitignore
+
+# OR legacy sync mode (JSONL-in-git, for compatibility):
+# bd init  # embedded Dolt default with export.auto=true
+
 timbers init --yes --git-hooks           # appends into .beads/hooks/ alongside beads
 timbers onboard --target agents >> AGENTS.md
 mise use just@latest

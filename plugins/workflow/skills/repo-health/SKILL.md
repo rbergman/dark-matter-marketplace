@@ -181,19 +181,37 @@ Suggest `bd init` for project repos. Skip for config/docs-only repos.
 
 ### 4.3a Fresh clone with no database (IMPORTANT)
 
-When a repo has `.beads/issues.jsonl` committed but no embedded database (`.beads/embeddeddolt/`) or server database — the typical fresh-clone state — `bd ready` and friends will fail with "no beads database found". The fix is **not** `bd init` (which mints a new identity and can clobber prefix/metadata) and **not** `bd import` (which requires the DB to already exist). The right command is:
+A fresh clone has no local Dolt DB (it's gitignored). `bd ready` will fail with "no beads database found" until you hydrate Dolt. The universal fix is `bd bootstrap` — it auto-detects whichever sync mode the repo uses.
+
+**Detection — fresh-clone-specific (this check only fires when no local DB exists yet; for general mode detection on an established repo, use 4.3b below):**
 
 ```bash
-bd bootstrap                          # auto-detects .beads/issues.jsonl, recreates the embedded DB
-bd config set beads.role maintainer   # or "contributor" for OSS contributors who shouldn't commit beads changes
+# Canonical mode: refs/dolt/data exists on origin, no local DB
+git ls-remote origin "refs/dolt/data" 2>/dev/null | grep -q . && [ ! -d .beads/embeddeddolt ] && [ ! -d .beads/dolt ] && echo "fresh clone, canonical mode — bd bootstrap clones from refs/dolt/data"
+
+# Legacy mode: committed JSONL but no local DB
+[ -f .beads/issues.jsonl ] && [ ! -d .beads/embeddeddolt ] && [ ! -d .beads/dolt ] && echo "fresh clone, legacy mode — bd bootstrap imports from JSONL"
 ```
 
-Detection:
+If either is detected → flag as IMPORTANT and recommend:
+
 ```bash
-[ -f .beads/issues.jsonl ] && [ ! -d .beads/embeddeddolt ] && [ ! -d .beads/dolt ] && echo "fresh clone — needs bd bootstrap"
+bd bootstrap                          # auto-detects the right source
+bd config set beads.role maintainer   # or "contributor" for outside contributors
 ```
 
-If detected → flag as IMPORTANT and recommend the bootstrap sequence above.
+`bd bootstrap` is the right tool regardless of mode. `bd init` would mint a new identity; `bd import` requires the DB to already exist.
+
+### 4.3b Sync mode (INFO)
+
+Identify which sync mode the repo uses so other checks (gitignore, hooks, end-of-session discipline) can apply the right recipe:
+
+```bash
+bd dolt remote list 2>/dev/null | grep -q .  && echo "canonical (refs/dolt/data)"
+git ls-files .beads/issues.jsonl 2>/dev/null | grep -q . && echo "legacy (JSONL-in-git)"
+```
+
+Record the detected mode. Both can be active across repos a user works in — don't assume.
 
 ### 4.4 If beads initialized — run health checks (NICE)
 
@@ -206,9 +224,13 @@ bd lint 2>/dev/null | head     # convention drift (works in embedded mode)
 
 `bd doctor` is a doorstop in embedded mode in 1.0.x (verified through 1.0.4: outputs "not yet supported in embedded mode" and runs no checks) — surface its checks via the alternatives above. Surface any warnings or failures from any of these commands.
 
+**Canonical-mode sync verification — do NOT use `bd dolt status`.** In beads 1.0.4 the command outputs only engine info (`Dolt engine: embedded`) and the data directory path — nothing about whether local Dolt matches `refs/dolt/data` on origin. The verifier is `bd dolt push` itself: no-op (`Push complete.` with no chunks) when in sync, ships unpushed state otherwise, errors clearly via stderr. Recommend `bd dolt push` for "is canonical sync clean?" checks at session-close or pre-merge time.
+
 ### 4.5 `.beads/` gitignore check (IMPORTANT)
 
-Beads 1.0+ stores data in `.beads/embeddeddolt/` (embedded mode, default) or `.beads/dolt/` (server mode), and creates a complete `.beads/.gitignore` automatically. Check both that the internal gitignore exists and that it covers the active mode:
+`.beads/.gitignore` covers the local-data directories that should never be committed. The required contents depend on which sync mode is active (see 4.3b).
+
+**Both modes — always present:**
 
 ```bash
 [ -f .beads/.gitignore ] && echo "beads gitignore exists" || echo "beads gitignore missing"
@@ -216,9 +238,16 @@ grep -q "^embeddeddolt/" .beads/.gitignore 2>/dev/null && echo "embeddeddolt: pr
 grep -q "^backup/" .beads/.gitignore 2>/dev/null && echo "backup: present" || echo "backup: missing"
 ```
 
-If missing or incomplete → flag as IMPORTANT. Run `bd doctor --fix --yes` (server mode) or `bd init --reinit-local --from-jsonl` (embedded mode, preserves data) to regenerate.
+**Canonical mode adds — JSONL is a local export, not transport:**
 
-Also verify the repo's ROOT `.gitignore` does not over-exclude `.beads/`. Some pre-1.0 repos had `.beads/*` with allowlist exceptions for `issues.jsonl` and `.gitignore` only — those exclude the now-required `.beads/hooks/`, `config.yaml`, and `metadata.json`. Allowlist must include:
+```bash
+grep -q "^issues.jsonl$" .beads/.gitignore 2>/dev/null && echo "issues.jsonl: ignored (correct)" || echo "issues.jsonl: NOT ignored (should be ignored under canonical)"
+grep -q "^sync_base.jsonl$" .beads/.gitignore 2>/dev/null && echo "sync_base.jsonl: ignored (correct)" || echo "sync_base.jsonl: NOT ignored (should be ignored under canonical)"
+```
+
+If the repo is in canonical mode but JSONL is tracked or allow-listed in root `.gitignore`, flag as IMPORTANT — every bead mutation will produce PR noise.
+
+**Legacy mode requires JSONL to be tracked**, so the root `.gitignore` allowlist must include:
 
 ```
 !.beads/issues.jsonl
@@ -229,6 +258,10 @@ Also verify the repo's ROOT `.gitignore` does not over-exclude `.beads/`. Some p
 !.beads/hooks/
 !.beads/hooks/**
 ```
+
+Some pre-1.0 legacy repos had `.beads/*` with allowlist exceptions for `issues.jsonl` and `.gitignore` only — those exclude the now-required `.beads/hooks/`, `config.yaml`, and `metadata.json`. Verify the full allowlist above.
+
+If `.beads/.gitignore` itself is missing or incomplete → flag as IMPORTANT. Run `bd init --reinit-local --from-jsonl` (embedded mode, preserves data) or `bd doctor --fix --yes` (server mode) to regenerate.
 
 ### 4.6 Dolt mode check (NICE)
 

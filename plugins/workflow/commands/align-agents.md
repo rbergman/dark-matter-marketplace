@@ -32,12 +32,19 @@ Identify:
 
 **Note on shared repos and the global-CLAUDE.md dedup rule:** the reference template suggests dropping content already covered by `~/.claude/CLAUDE.md` (Prime Directive, Quality Gates, Role). That dedup is correct for *solo* repos, but **AGENTS.md is checked in and read by other contributors who don't share the user's global config**. For shared repos, keep concise versions of those foundational sections (especially Gall's Law / Prime Directive) at the repo level — terser than the reference, but present. Ask the user up front: "Is this repo shared with other contributors?" If yes, keep concise foundational sections. If solo, dedup against global is fine.
 
-**Note on beads `bd dolt push/pull` references in injected blocks — leave them alone.** As of beads 1.0.3 (fix #3194), `bd dolt push` and `bd dolt pull` are safe to run on every setup. When a Dolt remote is configured they sync against it; when no remote is configured (the typical embedded+git case) they exit 0 with an informational message rather than erroring. The commands are not mode-specific.
+**Note on beads `bd dolt push/pull` references — leave injected blocks alone, and treat anti-`bd dolt push` directives as hard CONFLICTs.**
+
+Beads has two sync modes per upstream's [`SYNC_CONCEPTS.md`](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md):
+
+- **Canonical (`refs/dolt/data`):** `bd dolt push` and `bd dolt pull` are the **primary sync commands** — load-bearing, not optional. The repo's bead state lives in `refs/dolt/data` and only propagates via these commands.
+- **Legacy (JSONL-in-git):** `bd dolt push/pull` exit 0 with an informational message when no Dolt remote is configured (per fix #3194 in 1.0.3) — safe to call but not the active sync path. The committed JSONL is.
+
+In both modes, `bd dolt push/pull` are safe-to-call. Under canonical mode they're load-bearing.
 
 This means:
-- **Don't add an override paragraph above the BEADS INTEGRATION block.** Earlier guidance in this command suggested doing so for embedded+git repos. That guidance was wrong — the injection is correct on every setup.
-- **Don't treat `bd dolt push` references in injected blocks as bugs, contradictions, or stale.** They're intentional safe-to-call instructions.
-- **If a global `~/.claude/CLAUDE.md` says "DO NOT use bd dolt push/pull,"** that line predates fix #3194 and is now stale. Surface it as a CONFLICT — the user should update or remove that global directive. Don't propagate the prohibition into the repo file.
+- **Don't add an override paragraph above the BEADS INTEGRATION block.** Earlier guidance suggested doing so for embedded+git repos. That guidance was wrong — the injection is correct on every setup.
+- **Don't treat `bd dolt push` references in injected blocks as bugs, contradictions, or stale.** They're intentional sync-or-no-op instructions.
+- **If a global `~/.claude/CLAUDE.md` says "DO NOT use bd dolt push/pull,"** surface it as a hard CONFLICT requiring user attention — not a stale-note warning. Under canonical mode that directive breaks sync entirely; under legacy mode it's just stale. Either way, the user should update or remove that global directive. Don't propagate the prohibition into the repo file.
 - **If a repo's AGENTS.md already has an override paragraph from earlier alignment runs**, flag it for removal — it's noise now, not protection.
 
 ### 3. Show the plan before editing

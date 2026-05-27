@@ -83,7 +83,17 @@ This way all worktrees load the same personal preferences from a single source. 
 
 ## Beads in Worktrees
 
-Beads stores issue state in the primary repo's `.beads/embeddeddolt/` (gitignored) and exports the transport to `.beads/issues.jsonl` (committed). Running `bd` from a linked worktree shares the same database — that's correct — but the JSONL export still lands relative to the primary checkout, and any mutation dirties files that are visible across all worktrees.
+Worktrees share the primary repo's `.beads/embeddeddolt/` (gitignored) via `.beads/redirect`. `bd worktree create` sets this up automatically. Running `bd` from any linked worktree mutates the same Dolt DB — that's the correct behavior, and it's mode-agnostic (works the same under canonical and legacy sync).
+
+**What differs between modes is the JSONL discipline.**
+
+### Canonical mode (refs/dolt/data sync)
+
+No per-worktree JSONL discipline needed — `.beads/issues.jsonl` is gitignored and never committed. After bead work in any worktree, `bd dolt push` (from any worktree) pushes `refs/dolt/data` to origin. No cross-worktree contamination of working trees.
+
+### Legacy mode (JSONL-in-git transport)
+
+The JSONL export still lands relative to the primary checkout, and any mutation dirties files visible across all worktrees. The discipline below applies only to legacy-mode repos.
 
 **Ownership rule.** The agent who runs a mutating `bd` command (`bd create` / `update` / `close` / `remember` / `dep`) **owns** the resulting `.beads/issues.jsonl` change:
 
@@ -104,6 +114,8 @@ git add .beads/issues.jsonl        # restage if 'MM' (export happened after stag
 
 - **Keep the bead change, just not as a JSONL edit yet:** `git restore .beads/issues.jsonl` is fine. The Dolt state survives, and the next `bd export` reproduces it. Don't panic-revert thinking `git restore` undid the bead work.
 - **Discard the bead change too:** `git restore` alone is insufficient — the next `bd export` (from any worktree, including the one that originally mutated) will re-emit the mutation back into the JSONL. You must reverse the mutation in Dolt first: `bd update <id> --status=open` to undo a close, `bd close <id>` to retire a stray `bd create`, etc. Then re-export and verify `git status` is clean.
+
+If a legacy-mode repo wants out of this discipline, see the **repo-init** skill's "Migration: legacy → canonical" recipe.
 
 ---
 

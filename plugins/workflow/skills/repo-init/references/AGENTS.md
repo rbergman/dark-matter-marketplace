@@ -77,40 +77,39 @@ This repo uses **beads** (`bd`) for task tracking and **timbers** for commit-rea
 
 **Follow the instructions those tools inject** — they own their respective domains. Don't duplicate that content here; let `bd setup claude` and `timbers onboard` be the source of truth so they stay current as the tools evolve.
 
-**Fresh clone onboarding.** A new clone of this repo has `.beads/issues.jsonl` committed but no local database (the embedded Dolt directory is gitignored, so it doesn't travel through git). Running `bd ready` on a first clone will fail with "no beads database found". The fix is one command:
+**Fresh clone onboarding.** A new clone needs to hydrate its local Dolt DB before `bd ready` works. The universal command is:
 
 ```bash
-bd bootstrap                          # auto-detects .beads/issues.jsonl, recreates the embedded DB
-bd config set beads.role maintainer   # or "contributor" if you're an outside contributor who shouldn't commit beads changes
+bd bootstrap                          # auto-detects the right source (refs/dolt/data, JSONL, or backup)
+bd config set beads.role maintainer   # or "contributor" for outside contributors
 ```
 
-`bd bootstrap` is non-destructive and the right tool here — `bd init` would mint a new identity, and `bd import` requires the DB to already exist. Set the role once after bootstrap to silence the role-config warning permanently.
+`bd bootstrap` is non-destructive and works for both sync modes (described below). `bd init` would mint a new identity and `bd import` requires the DB to already exist — use `bootstrap`. Set the role once to silence the role-config warning permanently.
 
 Repo-wide conventions worth stating once (not covered by injections):
 
 - **Bead-first workflow:** when ad hoc work appears (bug, feature, task) without an existing bead, create one before implementing. Every code change should trace back to a bead.
 - **Bead detail discipline:** every bead has an imperative title, a description that lets a cold session start work, explicit dependencies, and a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc and call out architectural decisions.
 - **Beads baseline: 1.0.4+.** Pin via `brew upgrade beads` etc. 1.0.4 removes the embedded-mode flock (concurrent bd processes are now safe), adds `bd -C <path>` for cross-cwd invocations, and hardens hook auto-import after pull/checkout. `bd init --force` is deprecated in 1.0.4 — use `--reinit-local` (and `--discard-remote` if you mean it).
-- **Sync model:** beads supports two sync configurations on the same set of commands. The defaults in 1.0+ use embedded Dolt + git+JSONL transport — `.beads/issues.jsonl` is the source of truth (committed); `.beads/dolt/` is a local cache (gitignored); sync runs through the pre-commit / post-merge hooks. Server Dolt + Dolt remote (`bd init --server`) is the alternative used in multi-agent coordination scenarios like Gastown. **`bd dolt push/pull` work in either configuration**: when a Dolt remote is configured they sync against it; when no remote is configured (the typical embedded+git case) they exit 0 with an informational message. As of beads 1.0.3 / fix #3194 the commands are safe to run on every setup — leave the injected BEADS INTEGRATION block alone and don't write override paragraphs that tell agents to skip those commands. They no-op gracefully.
+- **Sync model:** beads has two operating modes per upstream's [`SYNC_CONCEPTS.md`](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md). Both can be active across repos you work in — check per-repo before assuming a mode.
+  - **Canonical (`refs/dolt/data` sync).** Dolt state lives in the `refs/dolt/data` git ref namespace on the same git remote as the code — invisible to branch trees, never appears in PR diffs. `.beads/issues.jsonl` is a **passive export** (viewer / interchange / backup), gitignored when this mode is active. Sync: `bd dolt push` (after meaningful bead work) and `bd dolt pull` (after `git pull` or as needed). `sync.remote` is set in `.beads/config.yaml`. Fresh clones onboard via `bd bootstrap`, which auto-detects `refs/dolt/data` on origin and hydrates Dolt directly. **`bd dolt push` is load-bearing under this mode — it's the sync, not a no-op.**
+  - **Legacy (JSONL-in-git transport).** `.beads/issues.jsonl` is committed and serves as cross-clone transport. `export.auto = true` + `export.git-add = true` auto-flush and stage the JSONL on every `bd` mutation. Pre-commit hook handles staging; post-merge hook runs `bd import` to load incoming changes. This is what older repos (and pre-canonical `dm-work:repo-init` defaults) produce.
+  - **Detection** (figure out which mode this repo is in — `bd dolt remote list` is the authoritative check):
+    ```bash
+    bd dolt remote list                # has a remote → canonical mode
+    git ls-files .beads/issues.jsonl   # tracked → legacy mode
+    ```
 - **Memory sync model (1.0.4+): local only.** `bd remember` writes to the embedded Dolt DB (gitignored). `bd export` excludes memories by default (security: they may contain sensitive agent context); the pre-commit hook flush and 60-second auto-export both follow that default, so memories do **not** propagate via `.beads/issues.jsonl`. There is an `export.include-memories` config key but as of 1.0.4 it's accepted-but-not-wired. Treat `bd remember` as a per-clone learning store, not a team-shared one. For knowledge that should propagate, use AGENTS.md, `.claude/rules/`, or commit it as code/docs. The `--include-memories` flag on a manual `bd export` works if you genuinely need to ship memories across clones (review for sensitive content first).
 
 ---
 
-## Role
+## Workflow
 
-**You are an orchestrator, not an implementer.**
+Follow the **Disciplined Development Loop** from your global AGENTS.md / CLAUDE.md: intake → orient → plan → implement → validate → gate → review → maintain context → re-align → handoff. Each substantial change moves through those steps; trivial fixes skip the heavyweight ones but keep their intent.
 
-At session start, activate one of these based on your coordination needs:
+Delegate to subagents via `Task()` when work is parallelizable, benefits from a fresh context window, or naturally splits along file-ownership lines. Otherwise work directly. Don't perform skill-activation rituals at session start — invoke skills only when they match the task at hand.
 
-| Situation | Skill | Mechanism |
-|-----------|-------|-----------|
-| Standard delegation | `dm-work:orchestrator` | Task() subagents |
-| Complex multi-agent work | `dm-team:lead` | [Agent Teams](https://code.claude.com/docs/en/agent-teams) |
-
-Both establish delegation thresholds, quality gates, and file ownership boundaries. See the "Teams vs Subagents vs Direct" table inside `dm-team:lead` for the decision framework. Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` in settings.json.
-
-If you are a **subagent** (delegated by an orchestrator), activate `dm-work:subagent`.
-If you are a **teammate** (in an Agent Teams configuration), activate `dm-team:teammate`.
+For Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), see `dm-team:lead` and `dm-team:teammate`. Teams fit when agents need to discuss, challenge, or coordinate across turns; subagents fit fire-and-forget delegation.
 
 ### Worktrees
 
