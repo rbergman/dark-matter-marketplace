@@ -42,7 +42,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
-| dm-work | Workflow tools | `dm-work:orchestrator` |
+| dm-work | Workflow tools | `dm-work:browser-qa` |
 
 Commands use `/dm-work:command` format (e.g., `/dm-work:merge`).
 
@@ -57,13 +57,10 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
-│   └── workflow/      # dm-work: orchestration, specs, subagents
+│   └── workflow/      # dm-work: spec breakdown, review, merge, devloop, alignment
 ├── references/        # Non-installable reference materials
-│   ├── workflow.md    # Human guide to the dev loop
 │   ├── official-plugins.md  # Official Anthropic plugins guide
-│   ├── lsp-setup.md   # LSP configuration and troubleshooting
 │   ├── lang-skill-adaptation.md  # Adapting skills + DX testing
-│   ├── multi-agent-coordination.md  # Three tiers: subagents vs Agent Teams vs Gastown
 │   └── testing-agent-teams.md  # Testing guide for dm-team plugin
 └── README.md
 ```
@@ -89,19 +86,11 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-work:orchestrator` | Skill | Activate at session start — delegation protocols, subagent templates, token efficiency |
-| `dm-work:subagent` | Skill | Activate when delegated — terse returns, file boundaries, escalation rules |
-| `dm-work:worktrees` | Skill | Git worktrees for isolated workspaces — bd worktree commands with beads integration |
-| `dm-work:brainstorming` | Skill | Collaborative design dialogue — questions, approaches, incremental validation |
-| `dm-work:debugging` | Skill | Systematic debugging — root cause before fixes, no random patching |
 | `dm-work:mise` | Skill | Dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
-| `dm-work:cli-tools` | Skill | Power CLI tools (fd, rg, jq, yq, sd, bat, delta) for when built-ins are insufficient |
-| `dm-work:repo-health` | Skill | Audit repo config against CC and workflow best practices — severity-rated report with auto-fix |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
-| `dm-work:session-retro` | Skill | End-of-session self-improvement — convert friction, mistakes, and discoveries into persistent rules and memories |
 | `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
@@ -111,9 +100,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:advice` | Command | Generate a second-opinion brief for an external agent with no prior context |
 | `/dm-work:align-steering` | Command | Modernize CLAUDE.md / AGENTS.md / SKILL.md against Claude Opus 4.7 prompting guidance |
 | `/dm-work:align-agents` | Command | Align a repo's AGENTS.md with the dm-work reference template — diff/merge, never replace |
-| `/dm-work:subagent` | Command | Delegate work to a single subagent |
-| `/dm-work:compete` | Command | Competitive generation — spawn N agents on same spec, compare by metrics, merge winner |
-| `/dm-work:subagents` | Command | Orchestrate multiple subagents with dependency awareness |
+| `/dm-work:devloop` | Command | Iterate a queue (beads / IDs / markdown checklist) with full DoD per item — designed to wrap inside `/loop` for unattended progress |
 
 > Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Document compression and verbosity tuning use the model's native calibration plus `effort` levels.
 
@@ -206,12 +193,9 @@ Non-installable materials for reference and sharing.
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Global instructions — prime directive, role selection (orchestrator or team lead), beads guidance |
-| `workflow.md` | Human guide to the development loop (80k rule, session rotation, beads) |
+| `CLAUDE.md` | Global instructions — personality, prime directive, quality gates, disciplined development loop, beads guidance |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
-| `lsp-setup.md` | LSP configuration, verification, and troubleshooting for all languages |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
-| `multi-agent-coordination.md` | Three tiers: subagents vs Agent Teams vs Gastown |
 | `testing-agent-teams.md` | Testing guide for the dm-team plugin |
 
 ---
@@ -237,12 +221,13 @@ claude plugin install dm-work@dark-matter-marketplace
 
 ## Philosophy
 
-See `references/workflow.md` for the full workflow, but the core ideas:
+Core ideas (see `~/.claude/CLAUDE.md` for the full Disciplined Development Loop):
 
-1. **Orchestrator model** — You strategize, Claude orchestrates, agents implement (subagents for focused tasks, Agent Teams for collaborative work)
-2. **Context is precious** — Delegate to preserve it; checkpoint to manage it
-3. **External state** — Use beads to track work outside the conversation
-4. **Rotate before compaction** — One compaction is OK if needed, but multiple compound information loss
+1. **Gall's Law** — Always grow complexity from a simple system that already works. Minimal slices first; speculative architecture last.
+2. **Quality gates are sacred** — Pre-existing failures are still our problem. "Already broken" is not an excuse.
+3. **Delegate when useful** — Spawn `Task()` subagents for parallel work or fresh context; Agent Teams (`dm-team`) for collaboration that needs cross-examination. Otherwise work directly — 1M context handles most tasks.
+4. **External state via beads** — `bd` survives session boundaries; conversation context doesn't.
+5. **Review is non-negotiable** — Any substantive implementation gets an independent review pass before close; the implementer owns the fixes.
 
 ### Developer Experience (DX)
 
@@ -252,7 +237,6 @@ The plugins include opinionated DX tooling that works together:
 |------|-------|---------|
 | [mise](https://mise.jdx.dev) | `dm-work:mise` | Version management for all languages/tools — replaces nvm, pyenv, goenv |
 | [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
-| CLI tools | `dm-work:cli-tools` | fd, rg, jq, yq, sd, bat, delta — power tools when built-ins aren't enough |
 | [RTK](https://rtk-ai.app) + [tokf](https://tokf.net) | `dm-work:output-compression` | CLI output compression — RTK for global baseline, tokf for per-project customization |
 
 **The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.

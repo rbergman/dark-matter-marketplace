@@ -376,7 +376,7 @@ Write to `.claude/settings.local.json`:
 }
 ```
 
-This wires session-start context recovery and session-end enforcement. The DM plugin skills (orchestrator, subagent, language skills) are available globally from the plugin install — this file adds project-specific hooks.
+This wires session-start context recovery and session-end enforcement. DM plugin skills (browser-qa, evaluator, repo-init, language skills, architecture skills) are available globally from the plugin install — this file adds project-specific hooks.
 
 **Customize per-project:** Add project-specific SessionStart commands (e.g., `bd prime` if beads is initialized), adjust Stop hook timeout for heavy gate suites.
 

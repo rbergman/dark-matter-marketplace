@@ -57,14 +57,17 @@ When available, use `rtk` (Rust Token Killer) and `tokf` (per-project filter) to
 
 See `dm-work:output-compression` for setup.
 
-### Pause-for-review cadence
+### Independent review is non-negotiable
 
-After every **M or larger** feature lands (M+ bead closed, code merged), pause and run a review pass before starting the next M+ chunk. Either:
+All substantive implementation work — yours or a subagent's — gets an independent review pass before close. Gates and review catch different problems; green gates don't substitute for review. The implementer owns the fixes (review identifies; the author who shipped the change remediates).
 
-- `/dm-work:review` for parallel arch/code/security reviewers, or
-- A generic subagent review of the recent diff with explicit scope ("read ONLY the diff and the OWN files"), plus an optional Codex second-opinion via the codex plugin for cross-model coverage
+Choose the review mechanism by scope:
 
-The goal is to catch drift, accumulated debt, and integration gaps before they compound. XS/S work doesn't need this; M+ does.
+- `/dm-work:review` for parallel arch/code/security/design reviewers on a meaningful diff
+- A scope-bound subagent review ("read ONLY the diff and the OWN files") for narrower changes, optionally paired with a Codex second-opinion for cross-model coverage
+- For loop-driven queue work, `/dm-work:devloop --review-mode diff|full` runs the review as part of each item's Definition of Done
+
+The goal is to catch drift, accumulated debt, and integration gaps before they compound. Trivial fixes (typo, comment-only) skip review; anything changing runtime behavior, contracts, or shipped surfaces does not.
 
 ---
 
@@ -113,7 +116,7 @@ For Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), see `dm-team:lead` a
 
 ### Worktrees
 
-When creating worktrees for isolated feature work, always place them under `.worktrees/` in the repo root. Ensure `.worktrees/` is in `.gitignore` before creating. See `dm-work:worktrees` for the full workflow.
+When creating worktrees for isolated feature work, always place them under `.worktrees/` in the repo root. Ensure `.worktrees/` is in `.gitignore` before creating. Use `bd worktree create <name>` for beads-integrated workflow (auto-claims a bead, links the worktree, and tracks merge readiness), or `git worktree add` for raw git.
 
 ---
 
@@ -125,14 +128,16 @@ Claude Code carries native session continuity (rewind, compact, resume). For cro
 
 ## Session Orientation
 
-Before starting any work, verify your context:
+Before starting any work, run the **Orient** step from the Disciplined Development Loop:
 
 1. **Branch:** `git branch --show-current` — confirm you're on the expected branch
 2. **Worktree:** `git worktree list` — are you in a worktree or the main repo?
-3. **Confirm with user:** "I'm on branch X in [worktree/main]. Is this where you want me working?"
-4. **Check beads:** `bd ready` — what work is available?
+3. **Working tree state:** `git status` — clean? any leftover state from a prior session?
+4. **Confirm with user:** "I'm on branch X in [worktree/main]. Is this where you want me working?"
+5. **Check beads:** `bd ready` — what work is available?
+6. **Read project context:** `AGENTS.md` (or `CLAUDE.md` if that's the project's convention)
 
-Skipping orientation risks working on the wrong branch, which wastes entire sessions silently.
+Skipping orientation risks working on the wrong branch — or on top of stale uncommitted state from another session — which wastes entire sessions silently.
 
 ---
 

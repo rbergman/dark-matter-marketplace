@@ -107,19 +107,6 @@ Firebase project management, app creation, and configuration.
 
 ---
 
-## Language Server Protocol (LSP)
-
-See [lsp-setup.md](./lsp-setup.md) for detailed LSP configuration.
-
-| Plugin | Language | Binary Required |
-|--------|----------|-----------------|
-| typescript-lsp | TypeScript/JavaScript | `typescript-language-server` |
-| gopls-lsp | Go | `gopls` |
-| rust-analyzer-lsp | Rust | `rust-analyzer` |
-| pyright-lsp | Python | `pyright` |
-
----
-
 ## Security
 
 ### security-guidance
@@ -142,10 +129,9 @@ Security best practices and guidance for code review.
 | Task | Official Plugin | dm-* Complement |
 |------|-----------------|-----------------|
 | Code review | feature-dev:code-reviewer | `/dm-work:review` (parallel reviewers) or `/dm-team:review` (collaborative) |
-| Feature development | feature-dev | dm-work:orchestrator for delegation |
+| Feature development | feature-dev | `Task()` subagents for parallel delegation |
 | Code cleanup | code-simplifier | dm-lang:* for language-specific standards |
 | Plugin creation | plugin-dev | - |
-| Debugging | - | dm-work:debugging |
 | TDD | - | global `test-driven-development` skill |
 | Quality enforcement | - | dm-work hooks (run gates on stop, flag config edits) |
 

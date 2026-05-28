@@ -172,6 +172,6 @@ Update the skill based on findings. Re-run the stress test.
 ## Related
 
 - **dm-lang:go-pro** — Reference template for language skills
-- **dm-work:worktrees** — Worktree isolation for stress testing
-- **dm-work:orchestrator** — Orchestrator patterns for delegation
 - **dm-arch:solid-architecture** — Architecture patterns to layer on top
+- For worktree isolation, use the Agent tool's native `isolation: "worktree"` option (or `bd worktree` for persistent feature branches)
+- For delegation, spawn a `Task()` subagent with a focused brief

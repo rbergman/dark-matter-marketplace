@@ -160,4 +160,4 @@ Spawn the smallest team that gives the dynamic you need. Add a teammate only if 
 
 - **dm-team:teammate** — Protocol for teammates spawned by a team lead
 - **dm-team:council** / **dm-team:review** — Pre-built workflows
-- **dm-work:worktrees** — Git worktree isolation for parallel work
+- `bd worktree` / `git worktree` — Worktree isolation for parallel work
