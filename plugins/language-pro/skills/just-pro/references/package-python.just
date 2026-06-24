@@ -34,11 +34,11 @@ fix:
     uv run ruff check --fix .
     uv run ruff format .
 
-# Run all checks (lint + typecheck + test)
+# Run all checks (lint + typecheck + tests with coverage floor)
 check:
     uv run ruff check .
     uv run pyright
-    uv run pytest
+    uv run pytest --cov=src --cov-fail-under=70
 
 # Run linter only
 lint:
@@ -52,9 +52,13 @@ typecheck:
 test *args:
     uv run pytest {{args}}
 
-# Run tests with coverage
+# Run tests with coverage report
 test-cov:
     uv run pytest --cov=src --cov-report=term-missing --cov-report=html
+
+# Gate: tests + coverage floor (exits non-zero below threshold; adjust as needed)
+coverage-check:
+    uv run pytest --cov=src --cov-fail-under=70
 
 # Watch tests (requires pytest-watch)
 test-watch:

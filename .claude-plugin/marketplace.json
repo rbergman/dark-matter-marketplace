@@ -6,41 +6,31 @@
   "plugins": [
     {
       "name": "dm-lang",
-      "description": "Expert language skills: Go, Rust, TypeScript, Python, Just - idiomatic patterns, type systems, and build tools",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Expert language skills: Go, Rust, TypeScript, Python, Just - idiomatic patterns, type systems, and build tools",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/language-pro",
       "category": "development"
     },
     {
       "name": "dm-arch",
-      "description": "Architecture patterns: SOLID principles, composition, data-oriented design, and module organization",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Architecture patterns: SOLID principles, composition, data-oriented design, and module organization",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/architecture",
       "category": "development"
     },
     {
       "name": "dm-game",
-      "description": "Comprehensive game development skills: vision, systems, mechanics evaluation, balance, economy, motivation, encounters, narrative, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, per-frame performance, and PixiJS 8 bootstrapping",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Comprehensive game development skills: vision, systems, mechanics evaluation, balance, economy, motivation, encounters, narrative, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, per-frame performance, and PixiJS 8 bootstrapping",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/game-dev",
       "category": "development"
     },
     {
       "name": "dm-work",
-      "description": "Workflow tools: orchestration, subagent delegation, spec breakdown, peer review, competitive generation, evaluator-judge protocol, browser QA, repo init/health, worktrees, and session retros",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Workflow tools: orchestration, subagent delegation, spec breakdown, peer review, competitive generation, evaluator-judge protocol, browser QA, repo init/health, worktrees, and session retros",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/workflow",
       "category": "development"
     },
     {
       "name": "dm-team",
-      "description": "Agent Teams patterns: lead/teammate roles, council deliberation, and collaborative review (experimental)",
-      "version": "0.1.0",
-      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Agent Teams patterns: lead/teammate roles, council deliberation, and collaborative review (experimental)",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/teams",
       "category": "development"
     }

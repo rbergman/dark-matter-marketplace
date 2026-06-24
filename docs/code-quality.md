@@ -49,11 +49,10 @@ real bug-signal it carries:
 | Complexity / size (below) | functions and files that have outgrown a single responsibility | Architectural |
 | Boundary types (`explicit-module-boundary-types`) | unstated public contracts | Policy call |
 
-Type and lint aren't the whole gate. `just check` runs the **test suite** too,
-and the TS, Go, and simple-repo templates add a **coverage floor** (70%) right
-in the `check` recipe — so on those, "done" means typed, linted, tested, *and*
-covered. (Coverage is wired per language template; the Rust/Python `check`
-recipes run tests but leave the threshold for you to add.)
+Type and lint aren't the whole gate. Every language template wires a **coverage
+floor** (70%) straight into the `check` recipe alongside the test run — so
+"done" means typed, linted, tested, *and* covered. Bump the threshold per
+project; 70% is the floor, not the ceiling.
 
 The complexity family is the part most enterprise setups don't push as hard on:
 

@@ -16,6 +16,7 @@ setup:
     -mise trust 2>/dev/null  # Allow .mise.toml config (ignore if mise absent)
     -mise install 2>/dev/null
     cargo build
+    command -v cargo-llvm-cov >/dev/null 2>&1 || cargo install cargo-llvm-cov --locked
     @echo "Rust toolchain ready"
 
 # === Build ===
@@ -57,6 +58,14 @@ test:
 test-verbose:
     cargo test -- --nocapture
 
+# Run tests with a coverage report (requires cargo-llvm-cov; setup installs it)
+coverage:
+    cargo llvm-cov
+
+# Gate: coverage floor (exits non-zero below threshold; adjust as needed)
+coverage-check:
+    cargo llvm-cov --fail-under-lines 70
+
 # === Security ===
 
 # Check for vulnerabilities (requires cargo-audit: cargo install cargo-audit)
@@ -69,8 +78,8 @@ audit-ci:
 
 # === Quality Gates ===
 
-# Run all checks (fmt, lint, test) - use before commits
-check: fmt lint test
+# Run all checks (fmt, lint, tests + coverage floor) - use before commits
+check: fmt lint coverage-check
     @echo "All Rust checks passed"
 
 # === Clean ===
