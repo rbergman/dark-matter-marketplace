@@ -107,6 +107,7 @@ export default tseslint.config(
         'sonarjs/cognitive-complexity',
         'max-lines-per-function',
         'max-lines',
+        'max-len',
       ],
 
       // Require eslint-disable comments to have descriptions
@@ -140,6 +141,17 @@ export default tseslint.config(
 
       // File length - prevent god modules (comments excluded so docs aren't penalized)
       'max-lines': ['error', { max: 400, skipComments: true }],
+
+      // Line length - hard cap. Prettier formats to printWidth (100); this is the
+      // ceiling that also blocks combining statements onto one line to dodge the
+      // file/function length limits above. Unbreakable lines (URLs, strings) exempt.
+      'max-len': ['error', {
+        code: 120,
+        ignoreUrls: true,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true,
+        ignoreRegExpLiterals: true,
+      }],
 
       // Maximum parameters - use options objects for complex APIs
       'max-params': ['error', 4],
@@ -247,6 +259,7 @@ export default tseslint.config(
       // Allow longer test functions and files
       'max-lines-per-function': 'off',
       'max-lines': 'off',
+      'max-len': 'off',
       'complexity': 'off',
       'sonarjs/cognitive-complexity': 'off',
       'max-depth': 'off',

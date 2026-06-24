@@ -23,8 +23,8 @@ setup:
 
 # === Quality Gates ===
 
-# Run all checks (typecheck, lint, test, vulnerability audit)
-check: typecheck lint test
+# Run all checks (typecheck, lint, tests + coverage floor, vulnerability audit)
+check: typecheck lint coverage-check
     npm audit --omit=dev --audit-level=high
 
 # Fast gate — Stop hook, iterative dev (drop audit)
@@ -50,6 +50,14 @@ typecheck:
 # Run tests
 test:
     vitest run
+
+# Run tests with a coverage report (requires @vitest/coverage-v8)
+coverage:
+    vitest run --coverage
+
+# Gate: tests + coverage floor (exits non-zero below threshold; adjust as needed)
+coverage-check:
+    vitest run --coverage --coverage.thresholds.lines=70 --coverage.thresholds.functions=70 --coverage.thresholds.branches=70 --coverage.thresholds.statements=70
 
 # Run tests in watch mode
 test-watch:

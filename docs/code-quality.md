@@ -49,16 +49,17 @@ real bug-signal it carries:
 | Complexity / size (below) | functions and files that have outgrown a single responsibility | Architectural |
 | Boundary types (`explicit-module-boundary-types`) | unstated public contracts | Policy call |
 
-Type and lint aren't the whole gate. `just check` also runs the **test suite**,
-and the Go/simple-repo templates add a **coverage floor** (70%) right in the
-`check` recipe — so on those, "done" means typed, linted, tested, *and*
-covered. (Coverage is wired per language template; the TS/Rust/Python `check`
+Type and lint aren't the whole gate. `just check` runs the **test suite** too,
+and the TS, Go, and simple-repo templates add a **coverage floor** (70%) right
+in the `check` recipe — so on those, "done" means typed, linted, tested, *and*
+covered. (Coverage is wired per language template; the Rust/Python `check`
 recipes run tests but leave the threshold for you to add.)
 
 The complexity family is the part most enterprise setups don't push as hard on:
 
 | Limit | Value | Why |
 |-------|-------|-----|
+| `max-len` | 120 | hard line-length cap (Prettier formats to 100; this also blocks line-combining) |
 | `max-lines` | 400 | no god modules (comments excluded) |
 | `max-lines-per-function` | 60 | single responsibility |
 | `complexity` | 10 | cyclomatic — branching paths |
@@ -71,10 +72,10 @@ Two things make these limits a design tool rather than a straitjacket:
 - **They're extraction signals, not compression targets.** A function over 60
   lines means *decompose by responsibility* — extract named functions, split
   into a companion module. It does **not** mean shorten the variable names or
-  jam statements onto one line — Prettier (`printWidth: 100`) just reformats
-  combined lines straight back, so that dodge buys nothing. And the critical
-  rules can't be silenced with an ad-hoc `eslint-disable` (the disable itself is
-  linted).
+  jam statements onto one line — `max-len` (120) errors on the over-long line,
+  and Prettier (`printWidth: 100`) reformats combined lines straight back, so
+  that dodge buys nothing. And the critical rules can't be silenced with an
+  ad-hoc `eslint-disable` (the disable itself is linted).
 - **Tests get a relaxed profile**, and there's a deliberate exceptions path for
   the rest. The point is to make the easy thing correct, not to make every file
   pass at any cost.

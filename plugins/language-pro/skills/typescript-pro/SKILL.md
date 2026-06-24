@@ -44,13 +44,14 @@ Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates 
 ```bash
 # Initialize
 npm init -y
-npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest
+npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest @vitest/coverage-v8
 
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
 npm pkg set scripts.lint="eslint src/"
 npm pkg set scripts.test="vitest run"
-npm pkg set scripts.check="npm run typecheck && npm run lint && npm run test"
+npm pkg set scripts.coverage="vitest run --coverage --coverage.thresholds.lines=70 --coverage.thresholds.functions=70 --coverage.thresholds.branches=70 --coverage.thresholds.statements=70"
+npm pkg set scripts.check="npm run typecheck && npm run lint && npm run coverage"
 
 # Configure lint-staged (formats only staged files on commit)
 npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,yml,yaml}": ["prettier --write"]}'
