@@ -4,13 +4,11 @@
 #
 # Philosophy: Correctness over cleverness. One way to do things. Local reasoning.
 #
-# This config enforces strict complexity limits, explicit error handling, and
-# bans patterns that cause agents to produce incorrect or unmaintainable code.
+# Pairs with cargo_lints.toml (the [lints] section for Cargo.toml). This file
+# holds thresholds and disallowed-item lists; severities live in [lints].
 #
-# Tiers:
-#   - Default code: Strict rules, agent-generated
-#   - #[hot_path]: Relaxed complexity, flagged for review
-#   - #[human_authored]: Skipped entirely (agent cannot modify)
+# Every key here is validated against stable clippy — an unknown key is a hard
+# error that disables clippy entirely, so do not add keys without verifying.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # ─────────────────────────────────────────────────────────────────────────────────
@@ -22,21 +20,50 @@
 cognitive-complexity-threshold = 15
 
 # Function length: Rust is more verbose than Go, allow slightly more
-# 50 lines is ~equivalent to Go's 40 statements given Rust's syntax
 too-many-lines-threshold = 50
 
 # Arguments: more than 5 parameters = use a config struct
 too-many-arguments-threshold = 5
 
-# Struct fields: large structs should be decomposed
-# (Not directly configurable in clippy, enforced via code review)
+# Nesting depth: deeper than 4 levels = extract a function
+excessive-nesting-threshold = 4
 
 # Type complexity: deeply nested generics are unreadable
 type-complexity-threshold = 250
 
 # ─────────────────────────────────────────────────────────────────────────────────
-# NAMING & STYLE
+# TEST RELAXATIONS (no #![allow] preamble needed in test code)
 # ─────────────────────────────────────────────────────────────────────────────────
+# Panic-style assertions are the point of tests. These keys relax the panic
+# lints inside #[cfg(test)] code only — production code stays fully strict.
+
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+allow-indexing-slicing-in-tests = true
+allow-print-in-tests = true
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# DISALLOWED ITEMS (mechanically enforced bans; severity set in cargo_lints.toml)
+# ─────────────────────────────────────────────────────────────────────────────────
+
+disallowed-types = [
+    { path = "std::cell::RefCell", reason = "runtime borrow panics; restructure so &mut works" },
+    { path = "std::cell::Cell", reason = "interior mutability hides data flow; restructure" },
+]
+
+disallowed-macros = [
+    { path = "tokio::select", reason = "cancellation bugs; use structured concurrency (try_join_all, JoinSet)" },
+    { path = "futures::select", reason = "cancellation bugs; use structured concurrency" },
+]
+
+# ─────────────────────────────────────────────────────────────────────────────────
+# NAMING
+# ─────────────────────────────────────────────────────────────────────────────────
+
+# Idents of this length or SHORTER are flagged (min_ident_chars lint):
+# 2 means names must be >= 3 chars unless allowlisted below
+min-ident-chars-threshold = 2
 
 # Single-char names only for these well-known patterns
 single-char-binding-names-threshold = 4
@@ -49,77 +76,32 @@ allowed-idents-below-min-chars = [
     "s",                    # string slice in simple contexts
     "f",                    # file, or function in higher-order contexts
     "e",                    # error in catch contexts
+    "id",                   # identifiers
+    "dx", "dy", "dz", "dt", # deltas
+    "tx", "rx",             # channel sender/receiver
     "_",                    # explicitly ignored
 ]
 
-# Minimum identifier length (prevents lazy naming)
-min-ident-chars-threshold = 3
-
 # ─────────────────────────────────────────────────────────────────────────────────
-# ERROR HANDLING
+# SIZE THRESHOLDS
 # ─────────────────────────────────────────────────────────────────────────────────
 
-# These are configured via allow/warn/deny in lib.rs, not here
-# See the lib.rs template below for:
-# - unwrap_used (deny outside tests)
-# - expect_used (deny outside tests)
-# - panic (deny)
-# - unwrap_in_result (deny)
+# Enum variants larger than this should Box their payload (large_enum_variant)
+enum-variant-size-threshold = 200
 
-# ─────────────────────────────────────────────────────────────────────────────────
-# LINE LENGTH
-# ─────────────────────────────────────────────────────────────────────────────────
+# Types this size or smaller: pass by value, impl Copy (trivially_copy_pass_by_ref)
+trivial-copy-size-limit = 16
 
-# 120 is reasonable for modern displays while keeping diffs readable
-# Slightly shorter than Go's 140 because Rust benefits from more vertical space
-single-line-string-threshold = 120
+# Types larger than this: pass by reference (large_types_passed_by_value)
+pass-by-value-size-limit = 256
 
-# ─────────────────────────────────────────────────────────────────────────────────
-# DOCUMENTATION
-# ─────────────────────────────────────────────────────────────────────────────────
-
-# Public items must be documented (enforced in lib.rs via #![warn(missing_docs)])
-# Private items: optional but encouraged for complex logic
+# Futures larger than this should be boxed (large_futures)
+future-size-threshold = 16384
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # MSRV (Minimum Supported Rust Version)
 # ─────────────────────────────────────────────────────────────────────────────────
 
-# Set to current stable to allow modern idioms
-# Update this when you update your toolchain
-msrv = "1.83.0"
-
-# ─────────────────────────────────────────────────────────────────────────────────
-# MACRO & DERIVE CONFIGURATION
-# ─────────────────────────────────────────────────────────────────────────────────
-
-# Standard derive macros are always allowed
-# Custom derives must be from blessed crates (see documentation)
-
-# ─────────────────────────────────────────────────────────────────────────────────
-# ASYNC CONFIGURATION
-# ─────────────────────────────────────────────────────────────────────────────────
-
-# Future size limit before boxing is recommended
-# Large futures on the stack cause performance issues
-future-size-threshold = 16384
-
-# ─────────────────────────────────────────────────────────────────────────────────
-# ADDITIONAL THRESHOLDS
-# ─────────────────────────────────────────────────────────────────────────────────
-
-# Maximum enum variants before considering alternative designs
-enum-variant-name-threshold = 3
-enum-variant-size-threshold = 200
-
-# Trivial copy size (types this size or smaller should impl Copy if possible)
-trivial-copy-size-limit = 16
-
-# Pass by value threshold (larger = always pass by reference)
-pass-by-value-size-limit = 256
-
-# Vector initialization: suggest with_capacity if allocating more than this
-vec-box-size-threshold = 4096
-
-# Literal suffixes: require explicit type suffixes on ambiguous literals
-literal-representation-threshold = 16384
+# Floor for suggested idioms. 1.85 = edition 2024 baseline; raise to match
+# your project's actual MSRV.
+msrv = "1.85"

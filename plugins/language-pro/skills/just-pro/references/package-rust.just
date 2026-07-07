@@ -17,6 +17,7 @@ setup:
     -mise install 2>/dev/null
     cargo build
     command -v cargo-llvm-cov >/dev/null 2>&1 || cargo install cargo-llvm-cov --locked
+    command -v cargo-audit >/dev/null 2>&1 || cargo install cargo-audit --locked
     @echo "Rust toolchain ready"
 
 # === Build ===
@@ -45,7 +46,7 @@ lint:
 
 # Auto-fix clippy issues
 fix:
-    cargo clippy --fix --allow-dirty
+    cargo clippy --fix --allow-dirty --all-targets
     cargo fmt --all
 
 # === Test ===
@@ -68,7 +69,7 @@ coverage-check:
 
 # === Security ===
 
-# Check for vulnerabilities (requires cargo-audit: cargo install cargo-audit)
+# Check for vulnerabilities (cargo-audit installed by setup)
 audit:
     cargo audit
 

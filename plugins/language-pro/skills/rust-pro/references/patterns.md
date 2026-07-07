@@ -144,26 +144,27 @@ impl Client<Authenticated> {
 
 ## Iterator Patterns
 
-### Functional Transformations
+### Chains for pure transforms, loops for effects
 
 ```rust
-// GOOD: Iterator chains
+// GOOD: pure transformation → iterator chain (no side effects, no ?)
 let total_damage: f32 = probes
     .iter()
-    .filter(|p| p.archetype == ProbeArchetype::Reaper)
-    .filter(|p| p.faction == target_faction)
-    .map(|p| p.damage * p.mutation_bonus())
+    .filter(|probe| probe.archetype == ProbeArchetype::Reaper)
+    .filter(|probe| probe.faction == target_faction)
+    .map(|probe| probe.damage * probe.mutation_bonus())
     .sum();
 
-// BAD: Manual loop
-let mut total_damage = 0.0;
+// GOOD: body propagates errors or mutates state → for loop
 for probe in &probes {
-    if probe.archetype == ProbeArchetype::Reaper {
-        if probe.faction == target_faction {
-            total_damage += probe.damage * probe.mutation_bonus();
-        }
-    }
+    let target = resolve_target(probe)?;
+    combat_log.record(probe, target)?;
 }
+
+// BAD: side effects smuggled into a chain
+probes.iter().for_each(|probe| {
+    combat_log.record_unchecked(probe); // effects belong in a for loop
+});
 ```
 
 ### Custom Iterators
@@ -279,14 +280,14 @@ use rayon::prelude::*;
 // Parallel map
 let results: Vec<_> = probes
     .par_iter()
-    .map(|p| expensive_calculation(p))
+    .map(expensive_calculation)
     .collect();
 
 // Parallel filter + map
 let reapers: Vec<_> = probes
     .par_iter()
-    .filter(|p| p.archetype == ProbeArchetype::Reaper)
-    .map(|p| p.clone())
+    .filter(|probe| probe.archetype == ProbeArchetype::Reaper)
+    .cloned()
     .collect();
 ```
 

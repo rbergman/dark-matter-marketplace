@@ -2,17 +2,28 @@
 # BORING RUST: Cargo.toml [lints] Section
 # ═══════════════════════════════════════════════════════════════════════════════
 #
-# Add this to your Cargo.toml. This is an alternative to putting lint attributes
-# in lib.rs - it's cleaner for workspaces and easier to audit.
+# Add this to your Cargo.toml. Pairs with clippy.toml (thresholds + disallowed
+# lists live there; severities live here).
 #
 # For workspaces, put this in the root Cargo.toml under [workspace.lints],
 # then add `[lints] workspace = true` to each member's Cargo.toml.
+#
+# Escape hatch: `#[expect(lint_name, reason = "...")]` on the smallest scope
+# possible. Never blanket #[allow] in production code — expect self-cleans
+# (it errors when the lint no longer fires) and the reason is mandatory
+# (allow_attributes_without_reason below).
+#
+# Every lint name here is validated against stable clippy. CI gate runs with
+# `-D warnings`, so "warn" tiers still block merges; the warn/deny split only
+# changes local iteration feedback.
 # ═══════════════════════════════════════════════════════════════════════════════
 
 [lints.rust]
 # ─────────────────────────────────────────────────────────────────────────────────
 # SAFETY & CORRECTNESS
 # ─────────────────────────────────────────────────────────────────────────────────
+# unsafe: deny (not forbid) so a dedicated, human-approved module can re-allow
+# locally with #![allow(unsafe_code, reason = "...")]. See SKILL.md.
 unsafe_code = "deny"
 unsafe_op_in_unsafe_fn = "deny"
 unused_must_use = "deny"
@@ -22,7 +33,6 @@ unused_results = "deny"
 # FUTURE COMPATIBILITY
 # ─────────────────────────────────────────────────────────────────────────────────
 future_incompatible = { level = "deny", priority = -1 }
-rust_2024_compatibility = { level = "warn", priority = -1 }
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # DOCUMENTATION & DEBUG IMPLS
@@ -54,6 +64,7 @@ cargo = { level = "warn", priority = -1 }
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # --- Panic Prevention (The core of Boring Rust) ---
+# Test code is exempt via allow-*-in-tests keys in clippy.toml.
 unwrap_used = "deny"
 expect_used = "deny"
 panic = "deny"
@@ -63,6 +74,14 @@ indexing_slicing = "deny"
 unreachable = "deny"
 todo = "deny"
 unimplemented = "deny"
+
+# --- Suppression Discipline ---
+# Every allow/expect must carry reason = "..." — no silent suppressions.
+allow_attributes_without_reason = "deny"
+
+# --- Unsafe Discipline (for the sanctioned unsafe module only) ---
+undocumented_unsafe_blocks = "deny"   # every unsafe block needs // SAFETY:
+multiple_unsafe_ops_per_block = "deny"
 
 # --- Error Handling ---
 map_err_ignore = "deny"
@@ -86,18 +105,21 @@ fn_to_numeric_cast_any = "deny"
 ptr_as_ptr = "deny"
 lossy_float_literal = "deny"
 
-# --- Complexity ---
+# --- Complexity (thresholds in clippy.toml) ---
 cognitive_complexity = "deny"
 too_many_lines = "deny"
 too_many_arguments = "deny"
+excessive_nesting = "deny"
 
 # --- Async ---
+# future_not_send: allow at crate level if you deliberately use a
+# single-threaded runtime (LocalSet); otherwise it catches real bugs.
 future_not_send = "deny"
 large_futures = "deny"
 
 # --- Debug Code ---
 dbg_macro = "deny"
-print_stdout = "deny"
+print_stdout = "deny"   # use tracing; CLI output fns get #[expect(..., reason)]
 print_stderr = "deny"
 use_debug = "deny"
 
@@ -109,11 +131,15 @@ shadow_unrelated = "deny"
 string_slice = "deny"
 mixed_read_write_in_expression = "deny"
 
-# --- Banned Patterns ---
+# --- Banned Patterns (lists in clippy.toml) ---
+disallowed_types = "deny"    # RefCell, Cell
+disallowed_macros = "deny"   # select!
+disallowed_methods = "deny"
 impl_trait_in_params = "deny"
 wildcard_imports = "deny"
 same_name_method = "deny"
 multiple_inherent_impl = "deny"
+mod_module_files = "deny"    # foo.rs + foo/ layout; no mod.rs files
 exit = "deny"
 mem_forget = "deny"
 rc_buffer = "deny"
@@ -122,7 +148,7 @@ mutex_atomic = "deny"
 clone_on_ref_ptr = "deny"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# WARN: Should fix, but don't block iteration
+# WARN: Fix before merge (-D warnings in CI), but don't block local iteration
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # --- Performance ---
@@ -134,13 +160,13 @@ manual_string_new = "warn"
 
 # --- Style ---
 semicolon_if_nothing_returned = "warn"
-separated_literal_suffix = "warn"
-unseparated_literal_suffix = "warn"
+unseparated_literal_suffix = "warn"   # 2_u64, not 2u64
 string_add = "warn"
 string_add_assign = "warn"
 verbose_file_reads = "warn"
 
-# --- Naming ---
+# --- Naming (thresholds in clippy.toml) ---
+min_ident_chars = "warn"
 module_name_repetitions = "warn"
 similar_names = "warn"
 
@@ -150,7 +176,7 @@ missing_panics_doc = "warn"
 missing_safety_doc = "warn"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ALLOW: Explicitly permitted (pedantic/nursery overrides)
+# ALLOW: Explicitly permitted (pedantic/nursery/cargo overrides)
 # ═══════════════════════════════════════════════════════════════════════════════
 module_inception = "allow"
 must_use_candidate = "allow"
@@ -161,3 +187,5 @@ significant_drop_tightening = "allow"
 option_if_let_else = "allow"
 significant_drop_in_scrutinee = "allow"
 multiple_crate_versions = "allow"
+cargo_common_metadata = "allow"   # flip to warn when publishing to crates.io
+suboptimal_flops = "allow"        # mul_add is clever, not boring, and changes FP rounding

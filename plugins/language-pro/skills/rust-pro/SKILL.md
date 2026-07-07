@@ -1,6 +1,6 @@
 ---
 name: rust-pro
-description: "Boring Rust" — clone freely, prefer for loops over iterator chains, strict lints, ownership-honest code that compiles and reads cleanly. Use when implementing, debugging, refactoring, or reviewing Rust code; resolving borrow checker errors; tuning Cargo lints; choosing between Arc/Rc/Box; designing trait boundaries; or evaluating whether a clone is the right call. Applies to any Rust work unless a more specific role overrides.
+description: "Boring Rust" — clone freely, simple control flow, max-strictness lints with mechanical enforcement, ownership-honest code that compiles and reads cleanly. Use when implementing, debugging, refactoring, or reviewing Rust code; resolving borrow checker errors; tuning Cargo lints; choosing between Arc/Rc/Box; designing trait boundaries; or evaluating whether a clone is the right call. Applies to any Rust work unless a more specific role overrides.
 ---
 
 # Rust Pro
@@ -16,10 +16,11 @@ Senior-level Rust expertise following "Boring Rust" principles. Correctness over
 ## Core Standards
 
 **Required:**
-- All clippy warnings treated as errors
-- **NO `unwrap()` or `expect()` in production code** — use `.context("...")?`
-- **NO `unsafe` without `#[human_authored]` designation**
+- All clippy warnings treated as errors (`-D warnings` in the gate)
+- **NO `unwrap()` or `expect()` in production code** — use `.context("...")?` (tests are exempt via clippy.toml, not via allow attributes)
+- **NO `unsafe` without explicit human approval** — isolated in a dedicated module, every block `// SAFETY:`-documented (mechanically enforced)
 - **NO panic paths** — indexing, unreachable, todo, unimplemented all banned
+- **NO silent suppressions** — every `#[expect]`/`#[allow]` carries `reason = "..."` (denied otherwise)
 - Exhaustive match — no wildcard `_` on enums you control
 - rustfmt enforced on all code
 - Documentation on all public APIs
@@ -33,28 +34,22 @@ Senior-level Rust expertise following "Boring Rust" principles. Correctness over
 
 ---
 
-## The Three Tiers
+## Strictness Model
 
-### Tier 1: Default (Strict)
+One strict default, with two real escape hatches. (Everything here uses stable Rust mechanisms — no custom attributes, no pretend enforcement.)
 
-All agent-generated code. Maximum guardrails.
+### Default: full strictness
+
+All code, all the time. The shipped `clippy.toml` + `[lints]` config enforces:
 
 ```rust
-// Complexity limits enforced:
-// - Cognitive complexity: 15 max
-// - Function lines: 50 max
-// - Arguments: 5 max
+// Complexity ceilings: cognitive 15, function lines 50, args 5, nesting 4
 
-// Error handling: Always with context
+// Error handling: always with context
 let config = load_config(path)
     .context("failed to load configuration")?;
 
-// Iteration: for loops by default (not iterator chains)
-for item in collection {
-    process(item)?;
-}
-
-// Matching: Exhaustive, no wildcards
+// Matching: exhaustive, no wildcards
 match state {
     State::Active => handle_active()?,
     State::Pending => handle_pending()?,
@@ -63,35 +58,37 @@ match state {
 }
 ```
 
-### Tier 2: `#[hot_path]` (Relaxed)
+Test code (`#[cfg(test)]`) is automatically exempt from the panic lints (`unwrap`, `expect`, `panic!`, indexing) via `allow-*-in-tests` keys in `clippy.toml` — write natural test assertions, no preamble needed.
 
-Performance-critical code. Flagged for human review.
+### Escape hatch 1: `#[expect]` with reason
+
+For justified local relaxations (hot paths, invariants the checker can't see). `#[expect]` beats `#[allow]` because it **self-cleans**: if the lint stops firing, the attribute becomes an error and gets removed.
 
 ```rust
-#[hot_path]
-pub fn process_batch(records: &[Record]) -> Result<Summary, Error> {
-    // Allowed: iterators, borrowing, fewer clones
-    records.iter()
-        .filter(|r| r.is_valid())
-        .try_fold(Summary::default(), |mut acc, r| {
-            acc.add(r)?;
-            Ok(acc)
-        })
+#[expect(clippy::indexing_slicing, reason = "hot path: index bounded by loop above")]
+fn sample(pixels: &[Rgba], idx: usize) -> Rgba {
+    pixels[idx]
 }
 ```
 
-**Relaxations:** Cognitive complexity 20, function lines 75, iterator chains allowed.
+Rules: smallest possible scope (never module-wide in production code), `reason` mandatory (`allow_attributes_without_reason` is denied), and the reason states the invariant — not "clippy is wrong".
 
-### Tier 3: `#[human_authored]` (Unrestricted)
+### Escape hatch 2: the unsafe module (human sign-off required)
 
-Agent cannot modify, only call. For unsafe, SIMD, complex generics.
+`unsafe_code` is **deny** (not forbid) so exactly one sanctioned pattern can re-enable it:
 
 ```rust
-#[human_authored]
-pub fn simd_normalize(vectors: &mut [f32x8]) {
-    // Agent treats as black box
+// src/simd_ops.rs — human-approved unsafe island
+#![allow(unsafe_code, reason = "SIMD intrinsics; reviewed by <name> <date>")]
+
+/// Normalizes vectors in place using AVX2.
+pub fn normalize(vectors: &mut [f32]) {
+    // SAFETY: alignment verified by caller contract; length checked above
+    unsafe { ... }
 }
 ```
+
+Agents do not create or modify these modules without explicit human direction. `undocumented_unsafe_blocks` (every block needs `// SAFETY:`) and `multiple_unsafe_ops_per_block` are denied, so sloppy unsafe can't slip in even with sign-off.
 
 ---
 
@@ -99,9 +96,11 @@ pub fn simd_normalize(vectors: &mut [f32x8]) {
 
 ### Version Management
 
-Pin Rust toolchain with [mise](https://mise.jdx.dev): `mise use rust@1.83` (creates `.mise.toml` — commit it, complements rustup). Team members run `mise install`. See **mise** skill for setup.
+Pin the Rust toolchain with [mise](https://mise.jdx.dev): `mise use rust@latest` (resolves and pins current stable in `.mise.toml` — commit it, complements rustup). Team members run `mise install`. See **mise** skill for setup.
 
 Alternatively, use `rust-toolchain.toml` (rustup-native) if you prefer not to add mise as a dependency.
+
+The lint config assumes 1.85+ (edition 2024 baseline); keep `msrv` in `clippy.toml` aligned with your actual floor.
 
 ### New Project Quick Start
 
@@ -118,7 +117,7 @@ cargo new project-name && cd project-name
 # For build system, invoke just-pro skill
 
 # Verify
-just check   # Or: cargo clippy && cargo test
+just check   # Or: cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
 ```
 
 ### Developer Onboarding
@@ -144,7 +143,7 @@ cargo build                 # Get dependencies
 **Invoke the `just-pro` skill** for build system setup. It covers:
 - Simple repos vs monorepos
 - Hierarchical justfile modules
-- Rust-specific templates
+- Rust-specific templates (`references/package-rust.just`)
 
 **Why just?** Consistent toolchain frontend between agents and humans.
 
@@ -155,15 +154,17 @@ cargo build                 # Get dependencies
 **Auto-Fix First:**
 
 ```bash
-just fix             # Or: cargo clippy --fix && cargo fmt
+just fix             # Or: cargo clippy --fix --allow-dirty --all-targets && cargo fmt --all
 ```
 
 **Verification:**
 ```bash
-just check           # Or: cargo clippy --all-targets -- -D warnings && cargo test
+just check           # fmt + clippy -D warnings + tests with coverage floor
 ```
 
-Use `--all-targets` to lint tests, examples, and benches too.
+Use `--all-targets` so tests, examples, and benches are linted too.
+
+**Supply chain:** `just audit` runs `cargo audit` against the RustSec advisory DB (CI: `just audit-ci`). For license/source/duplicate policy on top of advisories, graduate to [`cargo-deny`](https://github.com/EmbarkStudios/cargo-deny).
 
 ---
 
@@ -195,6 +196,26 @@ pub fn load_config(path: &Path) -> anyhow::Result<Config> {
 let user = users.get(&id)
     .ok_or_else(|| Error::NotFound { id: id.clone() })?;
 ```
+
+### Iteration: loops for effects, chains for pure transforms
+
+The shipped lint set (pedantic) pushes *toward* idiomatic iterator use — fighting it with manual loops everywhere loses. The boring rule:
+
+```rust
+// Pure transformation, short and linear → iterator chain
+let total: f32 = probes.iter()
+    .filter(|probe| probe.faction == target)
+    .map(|probe| probe.damage)
+    .sum();
+
+// Body propagates errors (?) or mutates state → for loop
+for record in records {
+    let parsed = parse(record).context("bad record")?;
+    store.insert(parsed)?;
+}
+```
+
+Limits for chains: no nested closures, no side effects inside closures, no `try_fold`/`scan` cleverness when a `for` loop reads plainly. When in doubt, write the loop.
 
 ### State Machines
 
@@ -248,7 +269,8 @@ let config = ServerConfig::builder()
 pub struct UserId(String);
 
 impl UserId {
-    pub fn new(raw: impl Into<String>) -> Result<Self, ValidationError> {
+    // Explicit generic, not `impl Into<String>` (impl_trait_in_params is denied)
+    pub fn new<S: Into<String>>(raw: S) -> Result<Self, ValidationError> {
         let s = raw.into();
         if s.is_empty() {
             return Err(ValidationError::Empty("user_id"));
@@ -285,27 +307,30 @@ pub async fn fetch_all(client: &Client, ids: Vec<UserId>) -> Result<Vec<User>, E
 // BANNED: Complex lifetime bounds in async
 async fn bad<'a>(data: &'a [u8]) -> &'a str { ... }
 
-// BANNED: select!, manual Poll
+// BANNED: select! (disallowed-macros), manual Poll
 ```
 
-### Test File Separation
+### Tests
+
+Panic-style assertions are automatically allowed in `#[cfg(test)]` code (via `clippy.toml`) — no allow preamble:
 
 ```rust
-// src/parser.rs - production code only, keeps file small
+// src/parser.rs
 #[cfg(test)]
-#[path = "parser_tests.rs"]
+#[path = "parser_tests.rs"]  // separate file keeps production files small
 mod tests;
 
-// src/parser_tests.rs - can have test relaxations
-#![allow(clippy::unwrap_used, clippy::expect_used)]
+// src/parser_tests.rs
 use super::*;
 
 #[test]
-fn test_parser() {
-    let result = parse("input").unwrap();
+fn parses_valid_input() {
+    let result = parse("input").unwrap();  // fine in tests
     assert_eq!(result, expected);
 }
 ```
+
+Inline `mod tests` is fine for small files; switch to the `#[path]` companion file when the production file approaches its size target. One behavior per test; name describes the behavior. Property-based tests (proptest) for parsers and invariants — see `references/patterns.md`.
 
 ### Project Organization
 
@@ -323,6 +348,8 @@ project/
 └── justfile
 ```
 
+Module layout is `foo.rs` + `foo/` — `mod.rs` files are denied (`mod_module_files`).
+
 **File size targets:** Production < 300 LOC (code, excluding comments), Tests < 500 LOC.
 
 ### Responding to Limit Violations
@@ -336,25 +363,28 @@ project/
 
 **When extraction is costly:** Many locals to pass — consider a context struct or builder pattern.
 
-**Prohibited responses to limit violations:** combining statements onto single lines, removing or shortening comments, compressing whitespace, shortening descriptive names, inlining helpers. The goal is clean architecture, not metric compliance.
+**Prohibited responses to limit violations:** combining statements onto single lines, removing or shortening comments, compressing whitespace, shortening descriptive names, inlining helpers, and `#[expect]`-ing the complexity lint. The goal is clean architecture, not metric compliance.
 
 ---
 
 ## Banned Patterns
 
+Mechanically enforced by the shipped config unless noted:
+
 | Banned | Why | Alternative |
 |--------|-----|-------------|
-| `.unwrap()` | Panics | `.context("...")?` |
-| `.expect("msg")` | Panics | `.context("msg")?` |
+| `.unwrap()` / `.expect()` | Panics | `.context("...")?` (tests exempt) |
 | `array[i]` | Panics | `.get(i).ok_or(Error::Index)?` |
-| `unsafe { }` | Correctness | `#[human_authored]` module |
+| `unsafe { }` | Correctness | Human-approved unsafe module with `// SAFETY:` docs |
+| `#[allow]` without reason | Silent drift | `#[expect(lint, reason = "...")]` |
 | `impl Trait` in params | Hides types | `<T: Trait>` explicit |
-| `macro_rules!` | Complexity | Functions or generics |
-| `RefCell<T>` | Runtime borrow | Restructure with `&mut` |
-| Complex lifetimes | Agent confusion | Clone or restructure |
-| `select!` | Cancellation bugs | Structured concurrency |
+| `RefCell<T>` / `Cell<T>` | Runtime borrow panics | Restructure with `&mut` |
+| `select!` | Cancellation bugs | Structured concurrency (`try_join_all`, `JoinSet`) |
 | Wildcard `_` match | Silent failures | Explicit variants |
-| Iterator chains (Tier 1) | Harder to debug | `for` loops |
+| `mod.rs` files | Two layouts = zero layouts | `foo.rs` + `foo/` |
+| `dbg!`, `println!` debugging | Ships noise | `tracing` |
+| `macro_rules!` | Complexity (convention, not lint) | Functions or generics |
+| Complex lifetimes | Agent confusion (convention) | Clone or restructure |
 
 ---
 
@@ -364,9 +394,9 @@ project/
 - Fighting the borrow checker — redesign data flow instead
 - Deep trait hierarchies mimicking OOP
 - Over-generic code hurting compile times
-- `#[allow(...)]` without `// JUSTIFICATION:` comment
 - Stringly-typed APIs — use enums and newtypes
 - Interior mutability (`RefCell`, `Cell`) in agent code
+- Iterator chains with side-effecting closures — that's a `for` loop wearing a costume
 
 ---
 
@@ -378,10 +408,12 @@ project/
 | Errors (app) | `anyhow` | With `.context()` |
 | Builder | `bon` | Derive-based |
 | Serialization | `serde` | Standard |
-| Async runtime | `tokio` | Blessed subset only |
+| Async runtime | `tokio` | Blessed subset only (no `select!`) |
 | HTTP client | `reqwest` | High-level |
 | Logging | `tracing` | Structured |
 | CLI | `clap` | Derive mode |
+| Data parallelism | `rayon` | `par_iter` for CPU-bound work |
+| Property tests | `proptest` | Parsers, invariants |
 
 ---
 
@@ -389,19 +421,20 @@ project/
 
 **Before writing code:**
 1. Read `Cargo.toml` for dependencies and lint configuration
-2. Check `clippy.toml` for complexity thresholds
+2. Check `clippy.toml` for complexity thresholds and disallowed items
 3. Identify existing patterns in the codebase to follow
 
 **When writing code:**
 1. Handle all errors with `.context("what you were doing")?`
-2. Use `for` loops, not iterator chains (unless `#[hot_path]`)
+2. `for` loops for effectful iteration; short pure chains are fine
 3. Clone freely to satisfy borrow checker — optimize later
 4. Match exhaustively — no wildcard `_` on your own enums
+5. Suppress a lint only with `#[expect(lint, reason = "...")]` at the smallest scope
 
 **Before committing:**
 1. Run `just check` (standard for projects using just)
-2. Fallback: `cargo clippy -- -D warnings && cargo test`
-3. Ensure no `#[allow]` without justification comment
+2. Fallback: `cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`
+3. Never weaken the lint config to make a gate pass — decompose or justify with `#[expect]`
 
 ---
 
@@ -412,32 +445,22 @@ project/
 Clippy and rustfmt walk up directory trees looking for config files. A rogue config in a parent directory (like `/tmp`) can break your project.
 
 **Symptoms:**
-- `unknown field` errors from clippy
-- Wall of "unstable feature" warnings from rustfmt
+- `unknown field` errors from clippy (an unknown clippy.toml key is a **hard error** — clippy stops linting entirely)
+- Wall of "unstable feature" warnings from rustfmt (nightly-only options on stable)
 - Unexpected lint behavior
 
-**Fix:** Create project-local configs to prevent inheritance:
-
-```toml
-# clippy.toml - prevents inheriting parent configs
-# (empty file is valid)
-```
-
-```toml
-# rustfmt.toml - minimal stable config
-edition = "2024"
-```
+**Fix:** Project-local `clippy.toml` and `rustfmt.toml` (this skill's references) prevent inheritance. Keep them stable-clean: verify any new clippy.toml key against `cargo clippy` output and any rustfmt option against the stable list before committing.
 
 ### Edition 2024
 
-`cargo init` now defaults to edition 2024. If referencing older templates, update them.
+`cargo init` defaults to edition 2024. If referencing older templates, update them. Note `style_edition` in rustfmt.toml is separate from the language edition in Cargo.toml.
 
 ---
 
 ## References
 
-- `references/clippy.toml` — Boring Rust clippy configuration
-- `references/cargo_lints.toml` — Cargo.toml [lints] section
-- `references/rustfmt.toml` — Formatting rules
+- `references/clippy.toml` — thresholds, test relaxations, disallowed items (validated on stable)
+- `references/cargo_lints.toml` — Cargo.toml [lints] section (validated on stable)
+- `references/rustfmt.toml` — stable-only formatting rules
 - `references/patterns.md` — Additional Rust patterns
 - `references/bevy.md` — Bevy ECS patterns (game development)
