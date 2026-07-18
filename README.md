@@ -57,7 +57,7 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, perf optimization
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
-│   └── workflow/      # dm-work: spec breakdown, review, merge, devloop, alignment
+│   └── workflow/      # dm-work: review, merge, devloop, alignment
 ├── references/        # Non-installable reference materials
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   ├── lang-skill-adaptation.md  # Adapting skills + DX testing
@@ -91,7 +91,6 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
-| `/dm-work:breakdown` | Command | Decompose specs into granular tasks |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
 | `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |

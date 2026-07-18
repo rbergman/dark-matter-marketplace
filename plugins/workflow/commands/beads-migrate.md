@@ -9,7 +9,7 @@ Migrate a legacy-mode beads repo (where `.beads/issues.jsonl` is committed and s
 
 Source of truth: [upstream SYNC_CONCEPTS.md](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md).
 
-**Reversibility:** Migration is reversible up to `git push`. After push, peer clones need `bd dolt pull` once to pick up the new sync.
+**Reversibility:** Migration is reversible until Phase 2.2 (`bd dolt push` to origin). After that point, peers can observe `refs/dolt/data` on origin even if you abort the migration commit locally. Plan accordingly.
 
 **Idempotency:** Safe to re-run. Steps already applied are detected and skipped.
 
@@ -29,9 +29,14 @@ git remote get-url origin                      # require origin exists
 git ls-files .beads/issues.jsonl               # if EMPTY: already migrated → exit 0
 bd dolt remote list | grep -q origin && \
   [ -z "$(git ls-files .beads/issues.jsonl)" ] && echo "already canonical"
+git worktree list                              # surface sibling worktrees
 ```
 
 If working tree is dirty: stop. Don't mix migration with other work.
+
+**Multi-agent / multi-worktree quiescence.** Migration mutates `.beads/embeddeddolt/` and `.beads/hooks/` — both shared across all worktrees. If sibling worktrees exist, confirm with the user that other agents are quiesced and have no unflushed bd mutations. If unsure, stop.
+
+**Where to run.** Prefer a dedicated worktree (e.g. `.worktrees/tooling-beads-migrate/`) over primary. Mutating work belongs in worktrees per the project convention; migration is no exception.
 
 ---
 
@@ -64,6 +69,8 @@ This is the first network-touching phase. If it fails, abort cleanly — no loca
    bd dolt remote list  # verify
    ```
    Known quirk: `bd dolt remote add` occasionally writes a wrong path. If `bd dolt remote list` shows something other than `origin <git-url>`, edit `.beads/config.yaml` directly to set `sync.remote:` to the git origin URL.
+
+   **Note on config.yaml propagation.** If `.beads/config.yaml` is gitignored in this repo (check `git check-ignore .beads/config.yaml`), the `sync.remote` setting does not propagate via git. Peer clones must either run `bd dolt remote add origin <url>` themselves or rely on `bd bootstrap` (which auto-detects `refs/dolt/data` on origin and sets the remote). Covered in Phase 10.
 
 2. **Push current Dolt state to `refs/dolt/data` on origin:**
    ```bash
@@ -106,7 +113,17 @@ This is the first network-touching phase. If it fails, abort cleanly — no loca
 
 ## Phase 4 — Hooks
 
-With `export.auto=false`, the beads-managed pre-commit hook reads config at runtime and skips the JSONL auto-export. Verify and refresh shims:
+With `export.auto=false`, the beads-managed pre-commit hook reads config at runtime and skips the JSONL auto-export. Refresh shims after surfacing any custom patches first.
+
+**Preflight — surface custom patches inside BEADS markers.** Some repos have applied repo-specific fixup patches to mitigate legacy-mode bugs (e.g., vellum's `DISABLED-BY-VELLUM-UNR` markers on post-merge / post-checkout). Force-install silently overwrites these.
+
+```bash
+grep -lE 'DISABLED-BY-|# (vellum|strike|[a-z-]+):' .beads/hooks/* 2>/dev/null
+```
+
+For each hit, surface the patch to the user. Most are obsolete under canonical mode (they were patching legacy-mode bugs that no longer apply). Ask the user to confirm the patches are obsolete before proceeding. Do NOT force-install if the user hasn't acknowledged the patches.
+
+Once cleared, refresh shims:
 
 ```bash
 bd hooks install --force --beads      # refresh BEADS marker block
@@ -150,16 +167,30 @@ Update AGENTS.md (or CLAUDE.md if that's the project's convention). Diff and mer
 
 ## Phase 6 — Clean up legacy JSONL-discipline artifacts (user-confirmed)
 
-If Phase 1 found any of:
-- `scripts/bd-export-owned.sh`, `bd-sync-import.sh`, `bd-jsonl-guard.sh`, `install-*-hooks.sh`
-- Justfile recipes wrapping the above
-- Custom `.beads/hooks/commit-msg` enforcing JSONL scope
-- Custom `.beads/hooks/post-merge` / `post-checkout` / `post-rewrite` doing `bd-sync-import --auto`
+Real repos have a superset of any list this skill could enumerate. Sweep liberally — surface everything `bd-*`-shaped or hook-shaped for user disposition. Err on showing too much, not too little; a missed legacy script becomes silent technical debt the user can't easily find later.
+
+```bash
+# Custom scripts under scripts/
+ls scripts/bd-* 2>/dev/null
+
+# Justfile recipes referencing bd-* helpers
+grep -E '\bbd-[a-z-]+' justfile 2>/dev/null | grep -v '^#'
+
+# Custom hooks (anything beyond the beads-managed marker blocks)
+ls .beads/hooks/ 2>/dev/null | grep -v -E '^(README|\.gitignore)$'
+```
+
+Typical legacy-mode artifacts that should be deleted:
+- Per-bead-scope guards (`bd-export-owned`, `bd-jsonl-guard`, `bd-sync-import`, `bd-audit`, `install-<repo>-hooks`)
+- Justfile recipes wrapping the above (`just bd-export-owned`, `just bd-sync-import`, `just bd-audit`)
+- Custom `commit-msg` enforcing JSONL bead-id scope
+- Custom `post-merge` / `post-checkout` / `post-rewrite` doing `bd-sync-import --auto`
 - `prepare-commit-msg` / `post-commit` automation for JSONL auto-export-on-message-parse
+- `.beads/hooks/<event>` files with `DISABLED-BY-<repo>` no-op patches (Phase 4 should have already flagged these)
 
-Surface each. Under canonical mode none are needed. Ask user: **delete / archive / keep**. Default recommendation: delete.
+For each item: ask user **delete / archive / keep**. Default recommendation: delete.
 
-If the user keeps them, surface that the scripts will silently no-op or misbehave under canonical mode (e.g., `bd-export-owned` will write a JSONL that's gitignored).
+If the user keeps any, warn that the scripts will silently no-op or misbehave under canonical mode (e.g., `bd-export-owned` will write a JSONL that's gitignored; custom commit-msg guards will run against empty staged diffs).
 
 ---
 
@@ -220,10 +251,72 @@ Show the diff and proposed commit to user BEFORE pushing. Push is the point of n
 
 After push, hand off:
 
-- **Peer clones** need to run `bd dolt pull` once to pick up the migration. Or re-clone (`bd bootstrap` auto-detects canonical mode).
-- **Daily flow:** `bd dolt push` after bead work; `bd dolt pull` after `git pull`. Both safe to run anytime — no-ops when in sync.
+- **Peer clones** must run the Phase 10 playbook (NOT just `bd dolt pull`). Their pre-existing `.beads/embeddeddolt/` has no shared history with origin's freshly-created `refs/dolt/data`, so a plain `bd dolt pull` either diverges or no-ops without reconciling. Send peers the Phase 10 instructions.
+- **Daily flow** (after Phase 10 on each clone): `bd dolt push` after bead work; `bd dolt pull` after `git pull`. Both safe to run anytime — no-ops when in sync.
 - **Verification:** `bd dolt push` is also the divergence verifier (no chunks transferred = clean). Do NOT use `bd dolt status` — it reports only engine info, nothing about sync state.
 - **Failed pushes:** `bd dolt push` failures surface clearly on stderr (auth, network, divergence). If divergence: usually `bd dolt pull` first, then re-push.
+
+---
+
+## Phase 10 — Peer clone playbook (after sender pushes)
+
+After the migration lands on origin, peer clones need to migrate their own local state. Their pre-existing `.beads/embeddeddolt/` has NO shared history with origin's freshly-created `refs/dolt/data`. The fix is to rename the old local Dolt aside and let `bd bootstrap` hydrate fresh from `refs/dolt/data`.
+
+**⚠️ This step discards any local-Dolt state not also in `refs/dolt/data`.** Peers with unflushed local bead mutations will lose them. Run the preflight first.
+
+### Preflight (mandatory — skipping risks silent data loss)
+
+```bash
+# 1. Inspect local state vs JSONL/Dolt
+git status --short .beads/                 # any uncommitted bd-related changes?
+bd ready                                   # what does local Dolt currently think is open?
+
+# 2. Working tree clean
+git status --short
+
+# 3. No active sibling worktrees
+git worktree list                          # if other worktrees present, quiesce them first
+
+# 4. Fetch the migration's refs/dolt/data WITHOUT importing — to inspect divergence
+git fetch origin "refs/dolt/data:refs/dolt/data-incoming" 2>&1
+git log --oneline refs/dolt/data-incoming  # peek at the incoming history
+```
+
+If `bd ready` shows beads in states (closed / claimed / updated) that won't survive a re-bootstrap from origin: STOP. Sender side should `bd dolt push` from a clone that has those mutations, OR the peer should manually port them (open / close / update the relevant beads after bootstrap). Don't run the playbook with unflushed state.
+
+### Playbook
+
+```bash
+# 1. Tidy and align
+git checkout main && git pull --ff-only
+
+# 2. Refresh hooks BEFORE bootstrap. Hooks operate on git, not Dolt — safe pre-bootstrap;
+#    running them first means the post-bootstrap state is clean immediately.
+just hooks                                 # or: bd hooks install --force --beads
+
+# 3. Rename old local Dolt aside (preserves it as recovery insurance)
+mv .beads/embeddeddolt .beads/embeddeddolt.pre-migration
+
+# 4. Hydrate fresh from refs/dolt/data
+bd bootstrap --yes
+
+# 5. Verify
+bd dolt remote list                        # should show origin <git-url>
+bd ready                                   # should match expectations (peer-side)
+bd dolt push                               # should be no-op ("Push complete." with no chunks)
+```
+
+### Cleanup (after verification)
+
+```bash
+# Once confident the hydrated Dolt is correct, remove the preserved copy
+rm -rf .beads/embeddeddolt.pre-migration
+
+# Also clean up the inspection ref from preflight
+git update-ref -d refs/dolt/data-incoming 2>/dev/null || true
+```
+
+Leave the `.pre-migration` directory in place for at least a few days as recovery insurance — disk cost is minimal and reverting is easy if something looks off later.
 
 ---
 
@@ -234,6 +327,8 @@ Stop and surface to user when any of these fire:
 - `bd --version` below 1.0.4
 - `dolt_mode` is `server` (different migration path, out of scope)
 - Working tree dirty
+- Sibling worktrees present and sender can't confirm they're quiesced
+- Custom patches detected inside BEADS markers (`DISABLED-BY-*`, `# <repo>:`) and user hasn't acknowledged
 - `bd dolt remote add` doesn't take effect (wrong-path quirk) — let user fix `.beads/config.yaml` directly
 - `bd dolt push` fails
 - `git ls-remote origin refs/dolt/data` empty after push
@@ -241,6 +336,11 @@ Stop and surface to user when any of these fire:
 - Custom JSONL-discipline scripts found and user hasn't confirmed disposition
 - Any verification step in Phase 7 fails
 - Working tree becomes unexpectedly dirty mid-migration
+
+**Peer side (Phase 10):**
+- `bd ready` shows local Dolt state that wouldn't survive a re-bootstrap from origin — peer has unflushed mutations
+- `git fetch refs/dolt/data:refs/dolt/data-incoming` fails
+- `bd bootstrap --yes` fails or produces unexpected state
 
 ---
 

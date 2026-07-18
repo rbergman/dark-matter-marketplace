@@ -1,6 +1,6 @@
 {
   "name": "dm-work",
-  "version": "0.44.0",
-  "description": "Workflow tools: spec breakdown, peer review, evaluator-judge protocol, browser QA, repo init, mise/output-compression tooling, and queue-grinding loops",
+  "version": "0.45.0",
+  "description": "Workflow tools: peer review, evaluator-judge protocol, browser QA, repo init, mise/output-compression tooling, and queue-grinding loops",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }
