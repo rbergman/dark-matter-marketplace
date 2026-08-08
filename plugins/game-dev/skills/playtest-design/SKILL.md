@@ -240,13 +240,10 @@ If you're a solo developer shipping updates:
 
 ## Cross-References
 
-- **game-design** — Playtest scenarios from the 5-Component Framework (new player, stress, skill, abuse, readability tests)
-- **systems-design** — System health metrics (behavioral diversity, archetype formation) measured through playtesting
-- **player-ux** — The cognitive pillars (perception/attention/memory) drive the question generation framework
-- **game-balance** — Metrics-driven iteration for detecting and resolving balance problems
-- **economy-design** — Economy health monitoring metrics to track during playtests
-- **experience-design** — Testing whether the intended experience matches actual player experience
-- **motivation-design** — Testing retention and motivation through session length and return rate
-- **encounter-design** — Testing spatial readability and encounter fairness
-- **narrative-design** — Testing narrative comprehension and engagement
-- **game-feel** — "Does this feel good?" requires observation, not surveys
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **moment-capture** — Capture felt reactions verbatim as they happen
+- **data-driven-design** — The quantitative half of the same question
+- **player-ux** — What to look for, and why self-report misses it

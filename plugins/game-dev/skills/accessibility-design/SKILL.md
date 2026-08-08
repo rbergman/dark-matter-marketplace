@@ -102,35 +102,49 @@ Cognitive accessibility has the broadest overlap with general UX quality — thi
 
 Prioritize by ratio of players impacted to implementation cost.
 
-### Tier 1: Must-Have (Ship Before Launch)
+### Tier 1 — Must-Have (ship before launch)
 
-| Pillar | Feature | Why Tier 1 |
-|--------|---------|------------|
-| Visual | No color-only information | ~8-10% of males colorblind; free if designed in |
-| Visual | Scalable text (min 28px at 1080p) | Large-screen and mobile players need this |
-| Visual | Contrast ratios (4.5:1 text, 3:1 UI) | WCAG AA baseline |
-| Visual | Motion reduction option | Vestibular disorders affect ~35% of adults over 40 |
-| Motor | Remappable controls (every input) | Platform certification requirement |
-| Motor | Toggle/hold for sustained inputs | Minimal cost, major RSI/mobility impact |
-| Auditory | Subtitles with speaker identification | ~15% of adults have hearing loss |
-| Auditory | Independent volume sliders | Standard player expectation |
-| Cognitive | Difficulty options | Benefits the widest player range |
-| Cognitive | Pauseable gameplay | Essential for parents, interruptions, anxiety |
-| Cognitive | Clear objective/waypoint system | Reduces frustration universally |
+Each line is checkable, and carries why it is Tier 1.
 
-### Tier 2: Should-Have (First Major Update)
+- [ ] **No information conveyed by colour alone.** Every colour distinction has a
+      redundant channel (shape, icon, text, position). ~8% of men and ~0.5% of
+      women of northern-European descent have a colour-vision deficiency; free if
+      designed in, expensive to retrofit.
+- [ ] **Text scales to at least 28px at 1080p** — body text, UI labels, item
+      descriptions. *Starting value; test at your actual target viewing distance.*
+- [ ] **Contrast meets WCAG AA** — 4.5:1 for text, 3:1 for UI components.
+- [ ] **Motion reduction option** for camera shake, screen effects, parallax.
+      Roughly 35% of US adults over 40 have experienced vestibular dysfunction
+      (NIDCD); this is not a niche setting.
+- [ ] **No flashing above 3Hz**, or a reliable reduce/skip option. Photosensitive
+      epilepsy — this one can cause physical harm.
+- [ ] **Every input remappable.** No hardcoded bindings. Also a platform
+      certification requirement on major consoles.
+- [ ] **Toggle/hold option for every sustained input.** Minimal cost, large RSI
+      and mobility impact.
+- [ ] **Subtitles with speaker identification.** ~15% of adults have some hearing
+      loss.
+- [ ] **Independent volume sliders** for music, SFX, and voice at minimum.
+- [ ] **Difficulty options** — three presets, or granular parameters. Benefits the
+      widest range of players of anything on this list.
+- [ ] **Pauseable at any time** during gameplay. Exception: competitive
+      multiplayer. Essential for parents, interruptions, and anxiety.
+- [ ] **Clear objective/waypoint system**, toggleable off for players who prefer
+      to navigate unaided.
+- [ ] **Tutorials are clear and dismissible.**
 
-| Pillar | Feature | Why Tier 2 |
-|--------|---------|------------|
-| Visual | High contrast mode | Growing platform expectation |
-| Visual | Independent UI scaling | Important for complex HUDs |
-| Motor | Adjustable timing windows | Major motor accessibility lever |
-| Motor | One-handed control scheme | Temporary injury, one-arm holds |
-| Auditory | Visual sound indicators | Essential for deaf/HoH in action games |
-| Auditory | Descriptive captions | Ambient narrative for deaf/HoH |
-| Cognitive | Adjustable game speed | Broad benefit; doubles as difficulty lever |
-| Cognitive | Tutorial replay from menu | Low cost, high value |
-| Cognitive | Content warnings | Increasingly expected; trivial to implement |
+### Tier 2 — Should-Have (first major update)
+
+- [ ] Colourblind simulation tested for protanopia, deuteranopia, and tritanopia
+- [ ] Full screen-reader support for menus
+- [ ] Adjustable text speed and dialogue auto-advance
+- [ ] Camera sensitivity, FOV, and motion-blur controls
+- [ ] Input timing windows adjustable (hold duration, double-tap gap, QTE windows)
+- [ ] Captions for non-speech audio, not just dialogue
+- [ ] Aim assist or targeting assist as an option
+- [ ] Visual indicators for directional audio cues
+- [ ] Save-anywhere, or generous checkpointing
+- [ ] Reduced-complexity UI mode
 
 ### Tier 3: Best-in-Class (Industry Leadership)
 
@@ -329,36 +343,7 @@ See **playtest-design** for general methodology, but treat accessibility testing
 
 ## Accessibility Health Check
 
-### Tier 1 Checklist (Must-Have)
-
-- [ ] No information conveyed by color alone — every color distinction has a redundant channel
-- [ ] Text scales to at least 28px at 1080p — body text, UI labels, item descriptions
-- [ ] Contrast ratios meet WCAG AA — 4.5:1 for text, 3:1 for UI
-- [ ] All controls are remappable — no hardcoded bindings
-- [ ] Toggle/hold option exists for every sustained input
-- [ ] Subtitles are available with speaker identification
-- [ ] Independent volume controls for music, SFX, voice (minimum)
-- [ ] At least three difficulty options, or granular difficulty parameters
-- [ ] Game can be paused at any time during gameplay (exception: competitive multiplayer)
-- [ ] Clear objective/waypoint system is available (can be toggled off for players who prefer exploration)
-- [ ] Motion reduction option exists (camera shake, screen effects, parallax)
-- [ ] No flashing content above 3Hz, or a reliable skip/reduce option
-- [ ] Tutorials explain mechanics clearly and can be dismissed
-
-### Tier 2 Checklist (Should-Have)
-
-- [ ] High contrast mode available for UI elements
-- [ ] UI scales independently from game resolution
-- [ ] Timing windows for QTE/parry/dodge are adjustable
-- [ ] One-handed control scheme is possible (even if simplified)
-- [ ] Visual indicators exist for all gameplay-relevant sounds
-- [ ] Descriptive captions available for non-speech audio
-- [ ] Game speed is adjustable (0.5x-1.0x minimum)
-- [ ] Tutorials can be replayed from the menu
-- [ ] Content warnings precede distressing scenes
-- [ ] Subtitle font size, background opacity, and position are adjustable
-
----
+The Tier 1 and Tier 2 lists above are the checklist. Run them directly.
 
 ## Anti-Patterns
 
@@ -380,15 +365,10 @@ See **playtest-design** for general methodology, but treat accessibility testing
 
 ## Cross-References
 
-| Skill | Intersection |
-|-------|-------------|
-| **player-ux** | Cognitive load overlaps cognitive accessibility; perception framework informs visual |
-| **game-feel** | Juice/feedback must include motion reduction; screen shake needs opt-out |
-| **encounter-design** | Difficulty and pacing are primary motor/cognitive accessibility levers |
-| **progression-systems** | Adaptive difficulty is invisible accessibility; flow channel targeting |
-| **game-design** | 5-Component Filter Clarity overlaps cognitive/visual accessibility |
-| **experience-design** | Pacing must accommodate players needing more time or different inputs |
-| **playtest-design** | Accessibility testing needs specialized recruitment |
-| **narrative-design** | Subtitles/captions, content warnings, dialogue pacing |
-| **multiplayer-design** | Communication accessibility, competitive fairness with assists |
-| **game-balance** | Granular difficulty parameters need their own balance passes |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **player-ux** — The cognitive-load layer this extends
+- **audio-design** — Audio as an accessibility channel, and its failure modes
+- **game-feel** — Redundant feedback channels are an access requirement

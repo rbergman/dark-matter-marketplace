@@ -306,61 +306,38 @@ Does expert play look qualitatively different from novice play?
 
 ## Anti-Patterns
 
-### Feature-First Thinking
+All five failure modes this skill used to list separately — feature-first
+thinking, system isolation, complexity hoarding, the 15-system trap, and
+content-over-systems — are the same mistake seen from different angles:
+**adding breadth where depth was needed.** Listing them separately implied five
+diagnoses when there is one.
 
-**Symptom:** Design discussions center on "what feature do we add next?" instead of "what happens when systems collide?"
+**Symptom:** players say "there's a lot to do but it all feels the same."
+Design discussions ask "what feature next?" rather than "what happens when these
+collide?" The design document lists twelve systems. The response to shallowness
+is more content.
 
-**Consequence:** Each feature is a silo. The game accumulates breadth without depth. Players say "there's a lot to do but it all feels the same."
+**Why it happens:** breadth is legible and depth is not. A new system is a
+visible deliverable; deepening an interaction between two existing systems is
+invisible on a roadmap and produces a better game.
 
-**Fix:** Redirect every feature discussion through the interaction matrix. "Where does this system connect?"
+**Fix:** subtract a system. Invest the freed budget in interactions between the
+survivors. Repeat until every remaining system is excellent. Route every feature
+proposal through the interaction matrix and the Three-Gate Filter before it
+reaches a backlog.
 
-### System Isolation
+**The one genuinely distinct failure** is the inverse, and it is rarer:
+*over-coupling*. A system that touches everything is a god-system — brittle,
+untunable, impossible to test in isolation. If one system appears in most cells
+of the matrix, decompose it.
 
-**Symptom:** Each system is self-contained with clean inputs and outputs but no interaction with other systems.
-
-**Consequence:** Technically excellent engineering that produces a shallow game. The systems are modular in the wrong way — modular for code maintainability instead of modular for play depth.
-
-**Fix:** Loose coupling for code, tight coupling for play. Systems should be independently deployable but not independently experienced.
-
-### Complexity Hoarding
-
-**Symptom:** Adding systems because "more systems = more depth."
-
-**Consequence:** Each system is shallow because development budget is spread thin. Players are overwhelmed by breadth and never discover the depth of any single system.
-
-**Fix:** Subtract a system. Invest the freed budget in deepening interactions between the remaining ones. Repeat until every system is excellent.
-
-### The 15-System Trap
-
-**Symptom:** The design document lists every system the game could possibly have. Combat, crafting, building, farming, fishing, cooking, trading, taming, sailing, diplomacy, research, religion, weather, seasons, breeding...
-
-**Consequence:** None of them ship at quality. The game is a mile wide and an inch deep.
-
-**Fix:** Pick the 3-5 systems your experience pillars require. Build those. Ship. Add more only if the core is already deep.
-
-### Content Over Systems
-
-**Symptom:** When the game feels shallow, the response is "add more content" (more levels, more items, more quests) instead of "deepen interactions."
-
-**Consequence:** Temporary engagement bump followed by the same shallowness. Content is consumed; systems are played.
-
-**Fix:** Before adding content, check the interaction matrix. If interactions are weak, no amount of content will create depth. Deepen systems first, then fill them with content.
-
----
 
 ## Cross-References
 
-| Area | Skill | When to Go There |
-|------|-------|-------------------|
-| Individual mechanic evaluation | **game-design** | Evaluating a single mechanic with the 5-Component Filter before it enters the system architecture |
-| Vision and pillars | **game-vision** | Defining experience pillars that drive system selection — do this before building the interaction matrix |
-| Engagement loops | **experience-design** | Designing the core loop that systems serve — systems exist to make the loop deep |
-| Numeric balance between systems | **game-balance** | Tuning the numbers at system boundaries — cost curves, economy flow, dominant strategies |
-| Reward and motivation systems | **motivation-design** | Designing reinforcement schedules and reward structures that operate across systems |
-| Resource flow and currencies | **economy-design** | Deep dive on sink/source balance, inflation control, and currency design within the economic system |
-| Encounter and enemy behavior | **encounter-design** | Designing spatial and AI behavior systems that interact with combat, stealth, and exploration |
-| Narrative as a system | **narrative-design** | When narrative isn't just wrapper but a system with its own interactions (quest structures, branching) |
-| Difficulty and progression | **progression-systems** | Power curves and flow channel — progression is typically the highest-priority supporting system |
-| Feedback and juice | **game-feel** | Making system interactions feel good at the moment-to-moment level |
-| Player cognitive load | **player-ux** | When system count or interaction complexity exceeds player attention budget |
-| Validation | **playtest-design** | Testing whether the system architecture produces the depth you designed for |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-vision** — Pillars first — systems are derived from them, not invented
+- **mechanic-ablation** — Prove a system affects outcomes before defending it
+- **game-balance** — Tune the numbers at system boundaries

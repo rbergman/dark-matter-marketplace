@@ -375,16 +375,10 @@ Evaluate every encounter before shipping:
 
 ## Cross-References
 
-| Area | Skill | When to Use |
-|------|-------|-------------|
-| Mechanic evaluation | **game-design** | 5-Component Filter before encounter ships — is it clear, motivated, responsive? |
-| Engagement and session pacing | **experience-design** | Encounter pacing within the larger session and campaign arc |
-| Enemy stat balance | **game-balance** | Cost curves for enemy stats, dominant strategy detection in player loadouts |
-| Combat feedback | **game-feel** | Hit impact, telegraph timing, juice — does combat *feel* right? |
-| Cognitive load | **player-ux** | Is the encounter readable? Are enemy types distinguishable? Is the UI helping? |
-| Difficulty and progression | **progression-systems** | Flow channel targeting, power curves, adaptive difficulty |
-| Observation and testing | **playtest-design** | Testing whether encounters play as designed, what to observe |
-| System interactions | **systems-design** | When enemies interact with game systems in emergent ways |
-| Reward psychology | **motivation-design** | Loot placement, risk/reward in encounter resource design |
-| Quest and story structure | **narrative-design** | When encounters serve narrative purpose, environmental storytelling integration |
-| Economy integration | **economy-design** | When encounters are resource sources/sinks in the game economy |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **systems-design** — Encounters are where systems meet the player
+- **game-feel** — Moment-to-moment feel inside the encounter
+- **playtest-design** — Whether it reads the way you think it does

@@ -17,6 +17,15 @@ this skill will not be enough and should not be treated as a starting point.
 
 ---
 
+**Sources:** Leaderboard layering, ghost data and offline-vulnerability
+guardrails are conventions of the practice with no single origin — treat every
+rule here as a heuristic with its test attached, and every number as posture B
+under the Numbers Policy. The anti-snowball framing generalises comeback-mechanic
+discussion from competitive design (David Sirlin and others); the 30% threshold
+is explicitly a working value, flagged as such where it appears.
+
+---
+
 ## Asynchronous interaction
 
 Async multiplayer solves the scheduling problem — your players are never online
@@ -143,3 +152,14 @@ signal. In rough order of value per unit of work:
 Everything above works at a population of one. Anything requiring simultaneous
 players does not, and a social feature that needs a crowd you do not have is a
 dead feature that still costs maintenance.
+
+---
+
+## Cross-References
+
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **motivation-design** — Relatedness, and why social features retain
+- **simulation-first-design** — Determinism is what makes seeds and ghosts possible

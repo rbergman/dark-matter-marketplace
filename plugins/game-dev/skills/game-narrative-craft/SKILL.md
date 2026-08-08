@@ -380,3 +380,15 @@ Run against any drafted passage.
 - **experience-design** — session-level pacing and emotional arc.
 - **player-ux** — where information lives on screen, which is the delivery half
   of the information-state problem.
+
+---
+
+## Cross-References
+
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **narrative-design** — Architecture and branch budget: the layer above
+- **cosmic-horror-register** — Tone, and the template for other registers
+- **generated-content-quality** — When the writing happens at volume

@@ -459,15 +459,10 @@ the audio design is contributing real value.
 
 ## Cross-References
 
-- **game-feel** — Feedback layers and timing tables; audio onset timing within the
-  perception-action cycle
-- **encounter-design** — Spatial awareness requirements; audio cues for threat
-  positioning and encounter pacing
-- **accessibility-design** — Complete accessibility framework; audio accessibility
-  sits within broader inclusive design
-- **experience-design** — Emotion design and pacing arcs; audio is a primary tool
-  for both
-- **player-ux** — Perception pillars; audio as a channel in the player's information
-  processing model
-- **narrative-design** — Dialogue systems, voice acting, and how audio serves story
-  delivery
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-feel** — Audio is a feedback channel before it is decoration
+- **accessibility-design** — What happens when the audio channel is unavailable
+- **player-ux** — Attention budget constrains how much audio can carry

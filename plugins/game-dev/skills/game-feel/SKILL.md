@@ -192,10 +192,10 @@ All values below are **starting points** — tune through playtesting per the Nu
 
 ## Cross-References
 
-- **game-design** — 5-Component Framework (Satisfaction and Clarity components are pure game feel)
-- **experience-design** — Feedback is one vertex of the Experience Triangle
-- **encounter-design** — How feel changes with spatial context and enemy behavior
-- **player-ux** — Perception constraints determine what feedback players can actually detect
-- **motivation-design** — Feedback as reward signal; feel drives intrinsic satisfaction
-- **game-perf** — Juice effects (particles, shakes) must respect per-frame performance budgets
-- **playtest-design** — "Does this feel good?" requires observation, not self-report
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **player-ux** — Perception limits decide what feedback can register at all
+- **game-design** — Satisfaction and Clarity in the 5-Component Filter
+- **game-perf** — Juice costs frames; the budget is real

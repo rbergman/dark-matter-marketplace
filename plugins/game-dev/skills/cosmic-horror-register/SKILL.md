@@ -8,6 +8,13 @@ description: "Tone, diction, and sensory palette for cosmic-horror game narrativ
 **Purpose:** Supply the tonal layer for cosmic-horror game narrative — what the
 prose sounds like, what it may name, and what it must refuse to explain.
 
+**Sources:** The tradition is Lovecraft, Blackwood (*The Willows*, 1907), M. R.
+James, and their modern successors — see Slot 6 for the reading list, which is
+the citation. The technique claims below are derived from close reading of the
+*Arkham Horror LCG: Edge of the Earth* campaign guide (FFG, 2022), measured
+alongside **game-narrative-craft**'s corpora; they are observations of practice,
+not sourced findings. The trap-word budget is posture B under the Numbers Policy.
+
 **This skill is tone only.** Passage length, choice construction, branching,
 the information-state ledger, and the AI-tell blacklist all live in
 **game-narrative-craft**. Read that first; this is the coat of paint, and a
@@ -266,7 +273,8 @@ everything above is one filling of them.
    converts a vibe into a check.
 
 Ground a new register in at least two sources of opposite temperament, the way
-**game-narrative-craft** does — see its `references/source-analysis.md`. One
+**game-narrative-craft** does — see
+`${CLAUDE_PLUGIN_ROOT}/skills/game-narrative-craft/references/source-analysis.md`. One
 source produces a house style and mislabels it as a genre.
 
 ---
@@ -278,3 +286,14 @@ source produces a house style and mislabels it as a genre.
 - **narrative-design** — quest architecture and branch budget.
 - **game-vision** — whether cosmic horror is the right register for the game
   at all, which is a question this skill does not ask.
+
+---
+
+## Cross-References
+
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-narrative-craft** — Structure; read it first, this assumes it
+- **narrative-design** — Quest architecture and branch budget

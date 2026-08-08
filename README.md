@@ -41,6 +41,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
 | dm-team | Agent Teams patterns | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
+| dm-pixi | PixiJS browser games | `dm-pixi:pixi-vector-arcade` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
 | dm-work | Workflow tools | `dm-work:browser-qa` |
 
@@ -54,7 +55,8 @@ Commands use `/dm-work:command` format (e.g., `/dm-work:merge`).
 dark-matter-marketplace/
 ├── plugins/           # Installable Claude Code plugins
 │   ├── architecture/  # dm-arch: SOLID, data-oriented patterns
-│   ├── game-dev/      # dm-game: design methodology, perf optimization
+│   ├── game-dev/      # dm-game: design methodology, narrative craft, sim-first, perf
+│   ├── pixi-arcade/   # dm-pixi: PixiJS 8 browser-game bootstrapping
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
 │   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
 │   └── workflow/      # dm-work: review, merge, devloop, alignment
@@ -105,88 +107,61 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Comprehensive game development skills across 21 domains: vision, systems architecture, mechanics evaluation, balance, economy, motivation, encounters, narrative design and prose craft, tonal registers, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, performance optimization, and project bootstrapping.
+Game development skills across 26 domains. Every skill names its sources — and
+says explicitly where it has none. All numeric values declare a posture under
+the plugin-wide **Numbers Policy** (`skills/game-design/references/numbers-policy.md`):
+source-backed, starting-value-with-test-plan, or measured-here-with-sample-and-date.
+
+Routing lives in one place: `skills/game-design/references/routing-map.md`. Each
+skill carries at most three tight links; everything else routes through the map.
 
 **Upstream (vision → structure):**
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-game:game-vision` | Skill | Vision Stack: core fantasy, experience pillars, core loop crystallization, MVG definition |
-| `dm-game:systems-design` | Skill | System interaction matrices, emergence analysis, coupling evaluation, possibility space, cursed problems |
+| `dm-game:systems-design` | Skill | System interaction matrices, emergence analysis, coupling, possibility space, cursed problems (Jaffe, GDC 2019) |
+| `dm-game:north-star-check` | Skill | 60-second glance and full audit of the build against the written brief |
 
 **Design systems (structural architecture):**
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-game:economy-design` | Skill | Resource flow architecture, currency design, sink/source modeling, inflation, LiveOps economy |
-| `dm-game:encounter-design` | Skill | Spatial design, enemy behavior patterns, combat spaces, environmental flow, world structure |
-| `dm-game:motivation-design` | Skill | Reward psychology, SDT, reinforcement schedules, social motivation, ethical guardrails |
-| `dm-game:narrative-design` | Skill | Quest structure, branching narrative, environmental storytelling, dialogue, narrative pacing |
-| `dm-game:game-narrative-craft` | Skill | Passage-level prose craft: compression rule, information-state ledger, word-count bands, choice-as-dialogue, failure-as-different-content, AI tells |
-| `dm-game:cosmic-horror-register` | Skill | Tone and diction for cosmic horror, plus the six-slot template for building any tonal register |
-| `dm-game:multiplayer-design` | Skill | Competitive balance, co-op, social systems, matchmaking, anti-toxicity, async multiplayer |
-| `dm-game:audio-design` | Skill | Audio stack architecture, adaptive music, spatial audio, sound as feedback system |
-| `dm-game:accessibility-design` | Skill | Four pillars (visual, auditory, motor, cognitive), implementation tiers, colorblind design |
-| `dm-game:data-driven-design` | Skill | Telemetry, funnel analysis, A/B testing, cohort analysis, metrics frameworks |
+| `dm-game:economy-design` | Skill | Resource flow graphs, currency architecture, sink quality, inflation/deflation |
+| `dm-game:incremental-design` | Skill | Idle/incremental math: cost curves, the wall, prestige layers, offline progress |
+| `dm-game:encounter-design` | Skill | Space/adversaries/resources, translated across genres; telegraph floors; Hayashida's four beats |
+| `dm-game:motivation-design` | Skill | SDT, reinforcement schedules, pity systems, loss aversion, ethical guardrails |
+| `dm-game:narrative-design` | Skill | Quest structure, branching architecture, narrative as system |
+| `dm-game:game-narrative-craft` | Skill | Passage-level prose: the compression rule, information-state ledger, word-count bands, AI tells |
+| `dm-game:cosmic-horror-register` | Skill | Tone and diction for cosmic horror, plus the six-slot template for any register |
+| `dm-game:generated-content-quality` | Skill | Saturation ledgers, quotas, underused-cell seeding — stopping content corpora from converging |
+| `dm-game:simulation-first-design` | Skill | Self-playing and AI-vs-AI games: determinism, spectator readability, bot policy as instrument |
+| `dm-game:async-and-social` | Skill | Ghosts, leaderboards, offline vulnerability, anti-snowball — all at a population of one |
+| `dm-game:audio-design` | Skill | Audio as information system, adaptive music, spatial audio, the mute test |
+| `dm-game:accessibility-design` | Skill | Four pillars, two shippable tiers, colourblind and input accessibility |
+| `dm-game:data-driven-design` | Skill | Telemetry, funnels, cohorts, and the pitfalls (Goodhart, Simpson, survivorship) |
 
 **Evaluation & tuning (mechanics → feel):**
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-game:game-design` | Skill | 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) for evaluating mechanics |
-| `dm-game:game-balance` | Skill | Cost curves, transitive/intransitive systems, economy balance, dominant strategy detection |
-| `dm-game:experience-design` | Skill | Engagement loops, experience triangle, emotion layering, pacing, "why isn't this fun?" diagnostic |
-| `dm-game:player-ux` | Skill | Cognitive load (perception/attention/memory), Gestalt UI principles, onboarding, accessibility |
-| `dm-game:progression-systems` | Skill | Power curves, flow channel, XP math, difficulty sandwich, unlock pacing, adaptive difficulty |
-| `dm-game:game-feel` | Skill | Juice checklists, feedback layers, perception-action cycle, timing reference, feel diagnostics |
-| `dm-game:playtest-design` | Skill | Question generation, observation protocols, metrics tracking, confirmation bias avoidance |
+| `dm-game:game-design` | Skill | The hub. 5-Component Filter, Numbers Policy, debugging protocol, routing map |
+| `dm-game:mechanic-ablation` | Skill | Four-stage proof that a mechanic affects outcomes at all |
+| `dm-game:game-balance` | Skill | Cost curves, transitive/intransitive systems, dominant strategy detection |
+| `dm-game:experience-design` | Skill | Engagement loops, the experience triangle, pacing, the dissonance test |
+| `dm-game:player-ux` | Skill | Perception/attention/memory (Hodent), Gestalt UI, onboarding, developer blindness |
+| `dm-game:progression-systems` | Skill | Power curves, flow channel, XP math, difficulty sandwich, unlock pacing |
+| `dm-game:game-feel` | Skill | Juice checklists, feedback layers, timing reference, feel diagnostics (Swink, Nijman) |
+| `dm-game:playtest-design` | Skill | Question generation, observation protocols, confirmation-bias avoidance |
+| `dm-game:moment-capture` | Skill | Capture felt reactions to play verbatim, at the time |
+| `dm-game:game-perf` | Skill | Zero-allocation hot paths, pooling, deferred destruction, viewport culling |
 
-**Implementation:**
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `dm-game:game-perf` | Skill | Zero-allocation patterns for JS/TS game loops and hot paths |
-| `dm-game:pixi-vector-arcade` | Skill | Bootstrap PixiJS 8 games with retro vector aesthetics, ECS-lite, pooling, spatial hashing |
-
-### dm-lang (language-pro/)
-
-Language-specific expertise with strict, opinionated standards.
+### dm-pixi (pixi-arcade/)
 
 | Component | Type | Purpose |
 |-----------|------|---------|
-| `dm-lang:go-pro` | Skill | Idiomatic Go: error handling, concurrency, slog, generics, table-driven tests |
-| `dm-lang:python-pro` | Skill | Modern Python: uv, ruff, pyright, type safety, clean module design |
-| `dm-lang:rust-pro` | Skill | "Boring Rust" philosophy: clone freely, max-strict validated lints, `#[expect]` discipline |
-| `dm-lang:typescript-pro` | Skill | Strict TypeScript: zero-any tolerance, no-unsafe-*, floating promise prevention |
-| `dm-lang:just-pro` | Skill | `just` command runner patterns for single projects and monorepos |
+| `dm-pixi:pixi-vector-arcade` | Skill | PixiJS 8 bootstrapping: scaffolding, ECS-lite, fixed timestep, spatial hashing, vector/neon visual system |
 
-### dm-team (teams/)
-
-Agent Teams patterns for multi-agent coordination, deliberation, and collaborative workflows. Built on Anthropic's [Agent Teams](https://code.claude.com/docs/en/agent-teams) feature.
-
-**Experimental** — Agent Teams is in preview and disabled by default. Enable it:
-
-```json
-// ~/.claude/settings.json
-{
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
-}
-```
-
-**When to use dm-team vs dm-work:** dm-work uses `Task()` subagents — fire-and-forget workers that report back to the orchestrator. dm-team uses Agent Teams — persistent teammates with their own context windows that message each other directly, self-claim tasks, and collaborate. Use dm-work for focused result-only delegation. Use dm-team when agents need to discuss, challenge each other, or coordinate. See the "Teams vs Subagents vs Direct" table inside `dm-team:lead` for the decision framework.
-
-| Component | Type | Purpose |
-|-----------|------|---------|
-| `dm-team:lead` | Skill | Team lead protocol — delegation, teammate spawning, model selection, common team shapes, beads integration |
-| `dm-team:teammate` | Skill | Teammate protocol — file ownership, self-claiming, inter-agent communication |
-| `dm-team:council` | Skill | Multi-perspective deliberation (LLM Council pattern) for decisions and trade-offs |
-| `dm-team:review` | Skill | Collaborative code review where reviewers discuss and challenge findings |
-| `/dm-team:council` | Command | Spawn a deliberation council for a decision or topic |
-| `/dm-team:review` | Command | Collaborative team code review |
-
----
 
 ## References
 

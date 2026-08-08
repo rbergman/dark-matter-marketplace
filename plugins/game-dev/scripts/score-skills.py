@@ -17,6 +17,11 @@ WHAT THIS CANNOT SEE  (state this whenever quoting the numbers)
     - Whether a "test" is genuinely falsifiable. Checklist boxes inflate `tests`,
       which is why the column is reported but never used as a gate on its own.
     - Prose thresholds written out in words ("three to five") score zero.
+    - `cites` matches author-year and italic-title shapes. ORGANISATIONAL sources
+      (WCAG, the Game Accessibility Guidelines, AbleGamers, Failbetter) score
+      zero despite being perfectly good citations. Use the `srcblk` column, not
+      `cites`, to ask "is this skill grounded at all?" — do not rewrite a real
+      citation to satisfy this regex.
 A skill that scores well here is not verified. It is merely checkable.
 """
 
@@ -73,6 +78,7 @@ def score(path: Path) -> dict:
         "tests": len(TEST.findall(body)),
         "xref": section_lines(body, r"cross[- ]reference|related skills"),
         "activate": section_lines(body, r"when to (activate|use)"),
+        "srcblk": int("**Sources:**" in body),
     }
 
 
@@ -85,7 +91,7 @@ def main() -> int:
         print(json.dumps(rows, indent=2))
         return 0
 
-    cols = ["words", "cites", "specs", "tests", "xref", "activate"]
+    cols = ["words", "srcblk", "cites", "specs", "tests", "xref", "activate"]
     print(f"{'skill':28}" + "".join(f"{c:>9}" for c in cols))
     print("-" * (28 + 9 * len(cols)))
     for r in rows:
@@ -93,7 +99,10 @@ def main() -> int:
     print("-" * (28 + 9 * len(cols)))
     tot = {c: sum(r[c] for r in rows) for c in cols}
     print(f"{f'TOTAL ({len(rows)} skills)':28}" + "".join(f"{tot[c]:>9}" for c in cols))
-    print(f"\nskills with 0 citations: {sum(1 for r in rows if not r['cites'])}")
+    print(f"\nskills with NO sources block: {sum(1 for r in rows if not r['srcblk'])}")
+    print(f"skills with 0 regex-matched citations: "
+          f"{sum(1 for r in rows if not r['cites'])} (see blind spots — organisational "
+          f"sources score zero)")
     print(f"skills with 0 specs:     {sum(1 for r in rows if not r['specs'])}")
     print("\nBlind spots: counts shapes, not truth. A wrong number and a right")
     print("number score alike; checklist boxes inflate `tests`.")

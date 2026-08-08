@@ -430,11 +430,10 @@ Observe (data) → Hypothesize (design) → Test (A/B or playtest) → Measure (
 
 ## Cross-References
 
-| Skill | Relationship |
-|---|---|
-| **playtest-design** | Structured qualitative observation — use before and alongside quantitative telemetry |
-| **game-balance** | Pick rates, win rates, and match duration metrics feed directly into balance tuning |
-| **economy-design** | Economy metrics (velocity, Gini, inflation) are a core domain of data-driven analysis |
-| **progression-systems** | Funnel analysis is the primary tool for diagnosing progression bottlenecks |
-| **motivation-design** | Retention metrics measure whether motivational structures are working |
-| **multiplayer-design** | Matchmaking quality, queue times, and fairness metrics require dedicated telemetry |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **playtest-design** — Qualitative counterpart; run both or misread both
+- **mechanic-ablation** — When telemetry says a mechanic is ignored
+- **economy-design** — The metrics an economy needs on a dashboard

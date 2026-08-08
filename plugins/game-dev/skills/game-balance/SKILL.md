@@ -173,11 +173,10 @@ When balance needs adjustment mid-development:
 
 ## Cross-References
 
-- **game-design** — 5-Component Framework for evaluating if balance changes serve the player experience
-- **economy-design** — Deep economy architecture (sink/source modeling, currency design, inflation). This skill covers balance *within* economies; economy-design covers designing economies *from scratch*
-- **systems-design** — Balance changes in one system ripple through connected systems
-- **progression-systems** — Power curves interact directly with balance; changes in one affect the other
-- **motivation-design** — Reward psychology that drives player perception of "fairness"
-- **experience-design** — Balance exists to serve engagement, not mathematical purity
-- **encounter-design** — Enemy balance and encounter composition
-- **playtest-design** — Methods for gathering the data that informs balance decisions
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **economy-design** — Designing an economy rather than tuning inside one
+- **simulation-first-design** — Searching the balance space with bots instead of playtests
+- **progression-systems** — Power curves, which must agree with cost curves

@@ -335,12 +335,10 @@ Use this when designing a new economy or auditing an existing one.
 
 ## Cross-References
 
-| Area | Skill | When to Go There |
-|------|-------|-------------------|
-| Balancing within an economy | **game-balance** | Tuning specific prices, cost curves, dominant strategy detection — operates on an economy this skill designed |
-| Economy as a system | **systems-design** | Evaluating how the economy interacts with other game systems — economy is typically a foundational system |
-| Reward psychology | **motivation-design** | Understanding why players engage with economic systems — reinforcement schedules, intrinsic vs. extrinsic motivation |
-| Progression pacing | **progression-systems** | Aligning economy pacing with power curves and unlock schedules — the two systems must be synchronized |
-| Core loop engagement | **experience-design** | Ensuring economic decisions contribute to the engagement loop, not just numerical accumulation |
-| Playtest validation | **playtest-design** | Testing whether the economy produces the intended player experience — metrics to track, questions to ask |
-| Player cognitive load | **player-ux** | When currency count or economic complexity exceeds player attention budget |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-balance** — Tuning within an economy that already exists
+- **incremental-design** — Economies where accumulation is the whole loop
+- **simulation-first-design** — Model the economy before implementing it

@@ -353,14 +353,10 @@ Run before shipping or at milestone reviews.
 
 ## Cross-References
 
-- **game-narrative-craft** — The layer below this one: sentence- and passage-level prose craft. Word-count bands, the compression rule, the information-state ledger, choice-as-dialogue, failure-as-different-content, AI tells. Use it for any drafted or reviewed prose; use this skill for the architecture that prose fills.
-- **cosmic-horror-register** — Tone and diction for cosmic horror, and the six-slot template for building other registers
-- **experience-design** — Experience Triangle (Fiction vertex), narrative integration modes (scripted/environmental/emergent), the dissonance test
-- **encounter-design** — Environmental storytelling in spatial context, spatial narrative
-- **motivation-design** — Narrative as intrinsic motivation driver (immersion profile), story as autonomy/relatedness support
-- **systems-design** — Narrative as system participant in the interaction matrix; quest systems interacting with other game systems
-- **economy-design** — Quest reward flow, preventing reward bypass inflation
-- **progression-systems** — Quest-driven progression gating, XP flow through narrative milestones
-- **game-vision** — Core fantasy and experience pillars that narrative must serve
-- **game-design** — 5-Component Filter applied to narrative mechanics (clarity of choices, motivation through story)
-- **player-ux** — Cognitive load of narrative content, readability of dialogue, onboarding through story
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-narrative-craft** — The layer below: passage- and sentence-level prose craft
+- **cosmic-horror-register** — Tone and diction; the six-slot register template
+- **experience-design** — Narrative integration modes and the dissonance test

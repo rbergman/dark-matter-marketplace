@@ -165,33 +165,12 @@ When proposing or critiquing a feature:
 
 ## Related Skills
 
-**Upstream** — before evaluating individual mechanics:
+This skill is the hub. The full index of which skill answers which question —
+by question, by stage, and the layer pairs where two skills cover the same
+ground at different altitudes — lives in `references/routing-map.md`.
 
-| Area | Skill | When to Use |
-|------|-------|-------------|
-| Concept & vision | **game-vision** | Pillars, target experience, core loop crystallization, MVG |
-| System architecture | **systems-design** | System interactions, emergence analysis, possibility space |
-
-**Downstream** — after the 5-Component Filter identifies a weakness:
-
-| Area | Skill | When to Use |
-|------|-------|-------------|
-| Balance & economy | **game-balance** | Cost curves, dominant strategies, economy sinks/sources |
-| Economy architecture | **economy-design** | Currency design, sink/source modeling, inflation, LiveOps |
-| Engagement & pacing | **experience-design** | Core loops, emotion layering, "why isn't this fun?" |
-| Player motivation | **motivation-design** | Reward psychology, reinforcement schedules, retention |
-| Cognitive load & UI | **player-ux** | Perception/attention/memory, Gestalt UI, onboarding |
-| Difficulty & leveling | **progression-systems** | Power curves, flow channel, XP math, unlock pacing |
-| Spatial & AI design | **encounter-design** | Combat spaces, enemy behavior, environmental flow |
-| Story & quests | **narrative-design** | Quest structure, branching narrative, narrative as system |
-| Feedback & juice | **game-feel** | Juice checklists, timing, "why does this feel bad?" |
-| Audio systems | **audio-design** | Sound as information system, adaptive music, spatial audio |
-| Multiplayer | **multiplayer-design** | Competitive balance, co-op, social systems, matchmaking |
-| Accessibility | **accessibility-design** | Four pillars (visual, auditory, motor, cognitive), implementation tiers |
-| Analytics | **data-driven-design** | Telemetry, funnels, A/B testing, metrics frameworks |
-| Testing & validation | **playtest-design** | Question generation, observation protocols, metrics |
-| Per-frame performance | **game-perf** | Zero-allocation patterns for hot paths |
-| Project bootstrapping | **pixi-vector-arcade** | PixiJS 8 setup with vector aesthetics |
+Read it once; it is the only place the routing is written down, so adding a
+skill touches one file rather than twenty.
 
 ## Reference Files
 

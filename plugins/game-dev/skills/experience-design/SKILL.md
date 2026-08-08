@@ -196,13 +196,10 @@ Three approaches to narrative, each with different design implications:
 
 ## Cross-References
 
-- **game-vision** — Upstream: defining experience pillars and target experience before designing loops
-- **systems-design** — How system interactions create the emergent experiences loops generate
-- **game-design** — 5-Component Framework for evaluating individual mechanics within loops
-- **motivation-design** — The psychology behind why engagement loops sustain (or fail to sustain) attention
-- **narrative-design** — Narrative integration modes in depth; story as system participant
-- **game-feel** — Feedback vertex of the Experience Triangle in detail
-- **player-ux** — Cognitive load management that underpins pacing
-- **progression-systems** — Session and meta loop pacing through difficulty and rewards
-- **encounter-design** — Spatial pacing and encounter rhythm within sessions
-- **playtest-design** — Testing whether the experience matches your intent
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-vision** — Pillars and target experience upstream of any loop
+- **game-feel** — The Feedback vertex of the triangle, in detail
+- **player-ux** — Cognitive load, which is what pacing manages

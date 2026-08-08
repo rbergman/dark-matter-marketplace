@@ -283,12 +283,10 @@ If the player understood exactly how the system works — every drop rate, every
 
 ## Cross-References
 
-- **progression-systems** — The math underneath motivation; power curves, XP formulas, and flow channel targeting that implement the psychology described here
-- **experience-design** — Engagement loops and pacing at the macro level; motivation design explains *why* those loops work
-- **game-balance** — Cost curves and economy tuning that make reward schedules feel fair
-- **game-feel** — Feedback quality that makes competence legible; juice that makes rewards feel rewarding
-- **player-ux** — Cognitive load constraints on how many motivational systems players can track simultaneously
-- **playtest-design** — Testing whether motivational systems produce intended behavior and emotions
-- **game-design** — 5-Component Filter's Motivation component; this skill provides the deep framework behind that quick check
-- **economy-design** — Sink/source balance that sustains long-term reward value; currency systems that connect to motivation
-- **narrative-design** — Story motivation (what happens next?) layered with mechanical motivation (what do I earn next?)
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **progression-systems** — The math underneath the psychology
+- **incremental-design** — A genre built almost entirely on these mechanisms
+- **economy-design** — Reward magnitude and sink quality

@@ -5,6 +5,13 @@ description: "Per-frame performance and GC-pressure optimization for JS/TS game 
 
 # Game Performance Optimization
 
+**Sources:** These are standard JavaScript engine behaviours (generational GC,
+hidden-class stability) rather than game-specific findings — see V8's public
+documentation on allocation and garbage collection. Spatial hashing is textbook
+broad-phase collision detection. No figures here are benchmarks; measure your own
+hot path with a profiler before optimising it, per the Numbers Policy in
+**game-design**.
+
 This skill provides patterns for writing allocation-free, GC-friendly code in game loops and hot paths. Apply these patterns proactively when working on any code that executes per-frame.
 
 ## Anti-Patterns and Fixes
@@ -300,8 +307,9 @@ Before committing changes to per-frame code:
 
 ## Cross-References
 
-- **encounter-design** — Performance budgets constrain encounter density and enemy counts
-- **systems-design** — Performance is a system constraint that limits system interaction complexity
-- **game-feel** — Juice effects (particles, shakes) must respect per-frame budgets
-- **game-design** — Performance constraints should be stated as assumptions in feature proposals
-- **pixi-vector-arcade** — Implementation patterns that respect these constraints
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-feel** — Frame budget is a design constraint, not just engineering
+- **simulation-first-design** — Headless sims trade rendering for runs per second

@@ -172,11 +172,10 @@ Total complexity budget
 
 ## Cross-References
 
-- **game-design** — 5-Component Framework (Clarity component maps directly to UX)
-- **experience-design** — Pacing as cognitive load management over time
-- **encounter-design** — Spatial UX: environmental flow, landmark navigation, spatial readability
-- **narrative-design** — Dialogue and quest UX; cutscene pacing; information delivery
-- **motivation-design** — How UX friction affects player motivation and retention
-- **game-feel** — Feedback design that respects perception constraints
-- **playtest-design** — Testing UX with real players, structured observation
-- **progression-systems** — Onboarding as the first phase of the progression curve
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **accessibility-design** — Where cognitive load becomes an access question
+- **game-feel** — Feedback design that respects perception limits
+- **playtest-design** — Observation protocols — self-report will not find these

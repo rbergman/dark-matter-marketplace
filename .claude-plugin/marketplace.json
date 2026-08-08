@@ -24,7 +24,7 @@
     },
     {
       "name": "dm-game",
-      "description": "Comprehensive game development skills: vision, systems, mechanics evaluation, balance, economy, motivation, encounters, narrative design, short-form narrative prose craft, tonal registers, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, per-frame performance, and PixiJS 8 bootstrapping",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "description": "Game development skills grounded in named sources: vision, systems architecture, mechanics evaluation and ablation, balance, economy, incremental/idle math, motivation, encounters, narrative design and short-form prose craft, tonal registers, generated-content quality, simulation-first and self-playing games, async/social, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, and per-frame performance",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/game-dev",
       "category": "development"
     },

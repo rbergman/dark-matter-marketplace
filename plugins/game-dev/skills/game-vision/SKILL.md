@@ -306,18 +306,10 @@ in a world where [fiction/setting premise].
 
 ## Cross-References
 
-| Skill | When to Go There |
-|-------|-------------------|
-| **game-design** | After vision is set, use the 5-Component Filter to evaluate individual mechanics |
-| **experience-design** | Flesh out the engagement loop, pacing, and emotion layering implied by your pillars |
-| **systems-design** | Detailed system interaction architecture once you've derived systems from pillars |
-| **game-balance** | When systems need numeric values — cost curves, stat spreads, economy tuning |
-| **game-feel** | When building the MVG — minimum viable juice to make the prototype testable |
-| **player-ux** | Cognitive load and onboarding design once the core loop is crystallized |
-| **progression-systems** | Power curves, difficulty ramps, and unlock pacing after the core loop validates |
-| **playtest-design** | Designing observation protocols for MVG testing |
-| **motivation-design** | Reward psychology and intrinsic/extrinsic motivation once systems are derived |
-| **encounter-design** | Spatial and enemy behavior design for content that fills your systems |
-| **economy-design** | Sink/source architecture when your vision includes currency or trade |
-| **narrative-design** | Quest structure and branching when your pillars include narrative elements |
-| **pixi-vector-arcade** | When ready to build — PixiJS 8 project bootstrapping for browser-based games |
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **systems-design** — Derive systems from the pillars this skill produces
+- **game-design** — Evaluate each mechanic once the vision is set
+- **north-star-check** — Check later builds against the vision written here
