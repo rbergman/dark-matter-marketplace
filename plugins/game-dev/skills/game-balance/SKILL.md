@@ -7,19 +7,7 @@ description: "Numeric balance across game objects with stats — cost curves, tr
 
 **Purpose:** Systematic tools for tuning numeric systems — items, economies, combat, progression — so that player choices remain meaningful and no single strategy dominates.
 
-**Influences:** Frameworks here draw on systematic game balance methodology, iterative design practice, and experience engineering theory.
-
----
-
-## When to Activate
-
-Use this skill when:
-- Designing item/weapon/unit stats and pricing
-- Building or tuning an in-game economy
-- Players report "X is overpowered" or "Y is useless"
-- Adding new content to an existing system (power creep risk)
-- Designing rock-paper-scissors or counter relationships
-- Setting up resource generation/consumption loops
+**Sources:** Cost curves and the transitive/intransitive split follow Ian Schreiber's *Game Balance Concepts* (2010 course) and Schreiber & Romero, *Game Balance* (CRC Press, 2021). "A negative benefit is a cost — keep all numbers positive and add" is a Magic: The Gathering design convention (Richard Garfield / Mark Rosewater). Dominant-strategy remediation and the buff-before-nerf preference follow David Sirlin's writing on competitive balance.
 
 ---
 

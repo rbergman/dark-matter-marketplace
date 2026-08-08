@@ -9,20 +9,7 @@ description: "Spatial design, enemy behavior, encounter composition, and environ
 
 **Core insight:** The same enemies in a different space feel completely different. The same space with different resources creates different strategies. Encounter design is combinatorial — small changes to any axis reshape the entire experience.
 
----
-
-## When to Activate
-
-Use this skill when:
-- Designing combat encounters, arenas, or enemy placement
-- Building enemy AI or defining enemy behavior patterns
-- Planning level layouts, room flow, or world structure
-- Designing boss fights or multi-phase encounters
-- Creating environmental puzzles or hazard-based challenges
-- Encounters feel repetitive, samey, or tactically flat
-- Players report encounters feel unfair or unreadable
-- Deciding how to guide players through space without explicit markers
-- Designing the macro structure of a game world (linear, hub, open)
+**Sources:** The four-beat teaching structure is Koichi Hayashida's, developed on the *Super Mario Galaxy* / *3D World* team. Landmark and wayfinding principles derive from Kevin Lynch, *The Image of the City* (MIT Press, 1960) — legibility, landmarks, paths and nodes are his. Environmental storytelling follows Don Carson, "Environmental Storytelling" (Gamasutra, 2000) and Harvey Smith & Matthias Worch, "What Happened Here?" (GDC 2010). Reaction-time floors derive from standard psychophysics (simple vs. choice reaction time; Hick's law, 1952). Enemy archetype names are common industry vocabulary with no single origin. The Encounter Triangle is this plugin's own framing.
 
 ---
 
@@ -47,6 +34,27 @@ Adversaries ———————— Resources
 | **Space** | Geometry, cover, elevation, sight lines, movement options | Room shape, verticality, choke points, flanking routes, hazards |
 | **Adversaries** | Enemy types, behaviors, group composition, timing | Archetypes, AI complexity, wave structure, spawn placement |
 | **Resources** | Health, ammo, abilities, environmental tools, information | Scarcity, placement, risk/reward of acquisition |
+
+### Translate the triangle before using it
+
+Most of this skill's vocabulary — cover, sight lines, flanking routes — comes
+from third-person action games and reads as inapplicable everywhere else. It
+isn't. **Space is whatever constrains reachability. Resources are whatever the
+player spends and cannot instantly replace.** Translate the three axes into your
+game's terms first, one line each, then use the rest of the skill.
+
+| Genre | Space is… | Adversaries are… | Resources are… |
+|---|---|---|---|
+| **Horde survival** | Density gradients and escape lanes; the safe pocket that keeps shrinking | Spawn composition and pressure rate | Cooldowns, position, the level-up pause |
+| **Isometric ARPG** | Pack spacing and door-to-door pathing | Pack composition, affix rolls | Potions, cooldowns, gear state |
+| **RTS** | Map control, chokes, expansion distance | Enemy composition and timing pushes | Supply, build time, unit count, player attention |
+| **Turn-based / card** | Board state and reachable positions | The threat clock and the enemy's hand | Actions, cards, health spent as currency |
+| **CYOA / narrative** | Which options exist at this node | The pressure the fiction applies | Time, standing, irreversible commitments |
+| **Autonomous sim** | Adjacency in the world graph | Faction posture and escalation state | Whatever the agents spend — see **simulation-first-design** |
+
+**Test:** write your three lines. If the Resources line comes out empty — nothing
+is spent, nothing is scarce — you do not have an encounter, you have an event.
+That is a legitimate thing to have, and nothing below will improve it.
 
 **The combination is the design.** Changing one axis changes the experience:
 
@@ -132,6 +140,48 @@ Players must identify enemy type and predict behavior from visual design alone.
 - [ ] New enemy types are introduced in low-pressure situations before appearing in difficult encounters
 
 **Design rule:** If the player dies to an enemy they couldn't read, that is a design failure, not a skill failure.
+
+### Telegraph windows have a floor
+
+A telegraph the player cannot physically react to is decoration. Human simple
+reaction time to a visual stimulus is roughly **200–250 ms**; a *choice* reaction
+— see the tell, pick between dodge and block — runs **400 ms and up**, and rises
+further with the number of options (Hick's law). Add the animation time of the
+player's own response before the window closes.
+
+| Response required | Practical telegraph floor |
+|---|---|
+| React at all (any input) | ~250 ms |
+| Choose between 2–3 responses | ~450 ms |
+| Choose and reposition | ~600 ms + traversal time |
+
+These are floors, not targets. An attack telegraphed at exactly the floor is
+unblockable in practice, because the player is also tracking other things.
+Sourced for the underlying reaction times only; the per-row totals are working
+values — measure yours with the **Numbers Policy** test-plan format.
+
+**The exception that proves it:** telegraphs *below* the floor are a legitimate
+design choice when the intended counter is prediction rather than reaction —
+learn the pattern, act before the tell. Fighting games and soulslikes do this
+deliberately. It only works if the pattern is learnable and consistent, and if
+the first several encounters are survivable while learning.
+
+### Teach a new element in four beats
+
+Koichi Hayashida's four-step structure, developed on the *Super Mario Galaxy* /
+*3D World* team and widely adopted since, is the most reliable pattern for
+introducing anything new — an enemy, a hazard, a mechanic:
+
+1. **Introduce** — the element alone, in a safe context, where failure costs
+   nothing and the behaviour is fully observable.
+2. **Develop** — the same element under mild pressure, or with one variation.
+3. **Twist** — the element combined with something already known, or inverted.
+4. **Conclude** — a final application that assumes mastery, often at scale.
+
+**Test:** for each enemy or hazard in the game, find its four beats. If an
+element's first appearance is already step 3, players will experience it as
+unfair rather than difficult — and will report it as a difficulty problem, which
+sends you tuning numbers that were never the cause.
 
 ---
 

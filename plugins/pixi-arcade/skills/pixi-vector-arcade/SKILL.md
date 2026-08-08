@@ -9,18 +9,6 @@ description: Bootstrap browser-based games with PixiJS 8 and a modern retro/vect
 
 ---
 
-## When to Use
-
-Activate this skill when:
-- Creating a new browser-based game with arcade/retro aesthetics
-- Prototyping a game idea with solid architecture
-- Building a PixiJS 8 project with proper performance patterns
-- Setting up a TypeScript game project with ECS architecture
-
-**Keywords:** game, arcade, retro, vector, pixijs, pixi, ecs, prototype, browser game, neon, glow
-
----
-
 ## Tech Stack
 
 ### Core Dependencies

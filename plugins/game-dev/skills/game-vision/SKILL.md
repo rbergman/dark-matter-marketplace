@@ -9,19 +9,7 @@ description: "Use when starting a new game project, pivoting a concept, evaluati
 
 **Position in workflow:** This is the UPSTREAM skill. Define vision here first, then fan out to **game-design** (mechanic evaluation), **experience-design** (engagement loops), **systems-design** (system interactions), and others. If you skip this step, downstream skills lack a target to evaluate against.
 
----
-
-## When to Activate
-
-Use this skill when:
-- Starting a new game project from scratch
-- Pivoting or rethinking a game concept that isn't working
-- Evaluating whether an idea is worth building at all
-- Prototyping has gone on too long without a clear hypothesis to test
-- The team (or your own thinking) can't agree on what the game IS
-- Scope keeps expanding and there's no north star for cutting decisions
-- You need to communicate a game concept to collaborators or stakeholders
-- Returning to a shelved concept and need to re-evaluate it
+**Sources:** The pillars/core-loop/MVG stack follows Mark Cerny's "Method" (D.I.C.E. 2002), whose pre-production-to-publishable-first-playable structure this restates, and Jesse Schell, *The Art of Game Design* (3rd ed., 2019) on lenses and the elemental tetrad. Core-fantasy framing follows standard practice with no single origin. The 70-80/20-30 genre conform-subvert ratio is a working heuristic, not a measured figure — it is stated as one below.
 
 ---
 

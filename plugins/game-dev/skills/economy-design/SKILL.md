@@ -9,26 +9,13 @@ description: "Resource flow architecture, currency system design, inflation/defl
 
 **Core philosophy:** An economy is a directed graph. Every resource has sources, sinks, converters, and pools. If you cannot draw the graph, you do not understand the economy. Draw first, implement second.
 
----
-
-## When to Activate
-
-Use this skill when:
-- Designing resource systems, currencies, stores, or crafting costs from scratch
-- Setting reward magnitudes or drop rates
-- Diagnosing inflation (prices spiraling, early items worthless) or deflation (hoarding, new players locked out)
-- Adding monetization layers (premium currency, battle passes, cosmetic stores)
-- Designing LiveOps events that inject or drain resources
-- Veteran players stockpile resources while new players feel unable to participate
-- Using resource scarcity as a difficulty lever instead of stat scaling
-- Planning a crafting system that intersects with the broader economy
-- Building a simulation model to project economic health before implementation
-
-**Relationship to game-balance:** The **game-balance** skill covers balancing *within* an economy — cost curves, dominant strategy detection, tuning existing numbers. This skill covers designing economies *from scratch* — the architecture of flows, the choice of currencies, and the long-term health of the system.
+**Sources:** Faucet/drain (source/sink) modelling is standard MMO economy practice; the most rigorous public account is EVE Online's economics reporting under Eyjólfur Guðmundsson (CCP, 2007–2014). The Gini coefficient is Corrado Gini (1912), used here as a stratification signal, not as a target. Currency-count and lossy-conversion rules are conventions of the practice rather than sourced findings — treat them as heuristics with the tests attached.
 
 ---
 
 ## Core Framework: The Flow Model
+
+**Relationship to game-balance:** The **game-balance** skill covers balancing *within* an economy — cost curves, dominant strategy detection, tuning existing numbers. This skill covers designing economies *from scratch* — the architecture of flows, the choice of currencies, and the long-term health of the system.
 
 Every economy is a directed graph of resources. Before writing any code, draw the graph.
 

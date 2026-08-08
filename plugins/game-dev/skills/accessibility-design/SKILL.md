@@ -9,27 +9,13 @@ description: "Use when designing any player-facing feature, evaluating a game fo
 
 **Standards:** This skill draws on WCAG (Web Content Accessibility Guidelines), the Xbox Accessibility Guidelines (XAG), and the Game Accessibility Guidelines (gameaccessibilityguidelines.com). These represent industry consensus, not aspirational ideals — major platforms now require or incentivize compliance.
 
----
-
-## When to Activate
-
-Use this skill **proactively** — not after someone reports a problem:
-
-- Designing any player-facing feature (UI, controls, feedback, narrative delivery)
-- Evaluating an existing game or prototype for accessibility gaps
-- Responding to player feedback about barriers ("I can't read the text", "I can't tell these apart")
-- Designing difficulty options, assist systems, or adaptive mechanics
-- Implementing subtitles, captions, or audio description systems
-- Designing or reviewing input systems (remapping, sensitivity, alternate schemes)
-- Planning a colorblind mode or high-contrast mode
-- Reviewing a feature that uses color, sound, or timing to convey critical information
-- When the answer to "can a player with [disability] complete this?" is uncertain
-
-**When a player says "I can't play this" — that's a design failure, not a player limitation.**
+**Sources:** The Game Accessibility Guidelines (gameaccessibilityguidelines.com), a collaborative industry/academic/specialist resource, are the practical baseline and the origin of the basic/intermediate/advanced tiering this skill's tiers follow. Contrast ratios are WCAG 2.1 (W3C). Colourblindness prevalence (~8% of men, ~0.5% of women of northern-European descent, so ~4-5% of a general population) is standard clinical epidemiology — the frequently-quoted "10% of players" figure is too high and this skill does not use it. Input and hardware guidance follows the AbleGamers Foundation and Microsoft's Inclusive Design toolkit.
 
 ---
 
 ## Core Principle: Accessibility Is Design
+
+**When a player says "I can't play this" — that's a design failure, not a player limitation.**
 
 Accessibility features aren't accommodations for edge cases. They're design improvements that happen to be essential for some players and beneficial for all.
 

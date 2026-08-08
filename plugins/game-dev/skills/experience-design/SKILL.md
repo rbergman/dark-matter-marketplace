@@ -7,19 +7,7 @@ description: "Engagement loop design, pacing frameworks, the Experience Triangle
 
 **Purpose:** Tools for designing, diagnosing, and improving the player *experience* — not the feature set. Games are systems that generate experiences; this skill helps you build better generators.
 
-**Influences:** Frameworks here draw on experience engineering theory, cognitive engagement research, and systematic game balance methodology.
-
----
-
-## When to Activate
-
-Use this skill when:
-- Designing or evaluating a core gameplay loop
-- Something "works" mechanically but doesn't feel engaging
-- Planning the emotional arc of a level, session, or campaign
-- Evaluating whether a mechanic creates meaningful choices
-- A feature is technically complete but players aren't having fun
-- Deciding what to cut vs. what to keep
+**Sources:** The Experience Triangle restates the MDA framework (Hunicke, LeBlanc & Zubek, "MDA: A Formal Approach to Game Design and Game Research," AAAI 2004) with Feedback substituted for MDA's Aesthetics. Meaningful-choice criteria follow Sid Meier's "a series of interesting decisions." The dissonance test is the ludonarrative-dissonance argument (Clint Hocking, 2007). Pacing and cognitive-load claims draw on Celia Hodent, *The Gamer's Brain* (2017).
 
 ---
 

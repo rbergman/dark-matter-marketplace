@@ -9,7 +9,7 @@ description: The mechanic-level evaluation toolkit — apply the 5-Component Fra
 
 **Core principle:** Mechanics are code. Gameplay is the player's *experience* of that code. The goal is not to implement features, but to implement **Relevance**.
 
-**Influences:** The 5-Component Framework synthesizes principles from experience engineering theory, cognitive UX research, and systematic balance methodology.
+**Sources:** The 5-Component Filter is this plugin's own synthesis and has no external citation — treat it as a working framework, not received wisdom. Its inputs: Clarity and Satisfaction draw on Celia Hodent, *The Gamer's Brain* (2017); Response draws on Steve Swink, *Game Feel* (Morgan Kaufmann, 2008); Fit draws on the MDA framework (Hunicke, LeBlanc & Zubek, 2004).
 
 ---
 
@@ -41,20 +41,24 @@ For detailed evaluation rubrics, consult `references/5-component-rubric.md`.
 4. Complete the State Machine Checklist if the feature involves player state changes
 5. Check the Numbers Policy before proposing any values
 
-### 2. Numbers Policy (Mandatory)
+### 2. Numbers Policy (Mandatory, plugin-wide)
 
-When proposing ANY numeric value (timing windows, costs, speeds, damage, etc.), choose ONE:
+Every numeric value — timing window, cost, drop rate, growth exponent, threshold —
+must declare one of three postures:
 
-**Option A — Source-backed:**
-- Cite a verifiable reference (GDC talk, postmortem, published analysis)
-- Example: "Coyote time of 80-150ms (Source: Celeste postmortem, GDC 2018)"
+| | Posture | Requires |
+|---|---|---|
+| **A** | Source-backed | A checkable citation: book, GDC talk, published postmortem, paper |
+| **B** | Starting value | An explicit label, a test, a pass/fail metric, and the direction to move on failure |
+| **C** | Measured on this game | The sample size and the date it was measured |
 
-**Option B — Starting value with test plan:**
-- Label explicitly as "Starting value"
-- Include: micro test plan, pass/fail metric, adjustment direction if it fails
-- Example: "Starting value: 120ms. Test: Can players make intended jumps 9/10 times? If fail rate >20%, increase by 30ms increments."
+**Forbidden:** "industry standard," "common practice," "most games," or any
+number with no posture at all. An unlabelled number reads as sourced whether it
+is or not — that is the failure mode, not the guess itself.
 
-**Never** claim "industry standard" or "common practice" without a source.
+**This binds every skill in dm-game, not just this one.** Full contract,
+worked examples, and the assumption-labelling format:
+`references/numbers-policy.md`.
 
 ### 3. Assumption Labeling
 

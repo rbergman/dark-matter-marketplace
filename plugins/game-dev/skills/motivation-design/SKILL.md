@@ -7,21 +7,7 @@ description: "Player motivation psychology, reward scheduling, intrinsic vs. ext
 
 **Purpose:** Tools for understanding and designing around *why players play*. Progression-systems handles the math of growth curves. This skill handles the psychology underneath — what makes players choose to come back, what makes them stop, and where the ethical lines are.
 
-**Influences:** Frameworks here draw on Self-Determination Theory (autonomy, competence, relatedness), operant conditioning research (reinforcement schedules), prospect theory (loss aversion, endowment), and the Zeigarnik effect (incomplete task tension). Player motivation profiles adapted from modern survey-based taxonomies that extend the classic explorer/achiever/socializer/killer model.
-
----
-
-## When to Activate
-
-Use this skill when:
-- Designing reward systems, loot tables, or achievement structures
-- Players aren't returning between sessions (retention failure)
-- Designing social features (guilds, leaderboards, co-op, competition)
-- Evaluating whether retention mechanics cross ethical lines
-- Players say "I don't know why I'd keep playing" or "there's nothing to do"
-- Choosing between intrinsic and extrinsic reward strategies
-- Designing daily login rewards, battle passes, or seasonal content
-- Diagnosing why engagement drops after the first few hours
+**Sources:** Self-Determination Theory is Deci & Ryan (1985, 2000); its application to games follows Ryan, Rigby & Przybylski, "The Motivational Pull of Video Games" (*Motivation and Emotion*, 2006). Reinforcement schedules are Skinner's operant conditioning (1957). Loss aversion at roughly 2x is Kahneman & Tversky's prospect theory (1979). The Zeigarnik effect is Bluma Zeigarnik (1927). The overjustification effect is Lepper, Greene & Nisbett (1973). The six motivation profiles are Quantic Foundry's Gamer Motivation Model (Nick Yee), which extends Bartle's 1996 taxonomy. Pseudo-random distribution as a pity mechanism comes from Warcraft III / Dota 2 (Valve).
 
 ---
 

@@ -14,21 +14,7 @@ description: >
 
 # Data-Driven Design
 
-## When to Activate
-
-Use this skill when:
-
-- Setting up analytics infrastructure or telemetry pipelines
-- Designing event taxonomies and instrumentation schemas
-- Interpreting player behavior data or building hypotheses from metrics
-- Running or evaluating A/B tests
-- Building dashboards for design, executive, or live ops audiences
-- Evaluating feature impact post-launch
-- Making design decisions where quantitative evidence should inform the choice
-- Diagnosing retention drops, progression bottlenecks, or economy imbalances
-- Transitioning from playtest-phase observation to live data collection
-
----
+**Sources:** Goodhart's Law is Charles Goodhart (1975), in the form popularised by Marilyn Strathern (1997): "when a measure becomes a target, it ceases to be a good measure." Simpson's paradox is E. H. Simpson (1951). Survivorship bias is Abraham Wald's WWII aircraft-armour analysis. Funnel and cohort methods are standard product analytics, not game-specific. Metric thresholds in this skill are working values — replace them with figures measured on your own title.
 
 ## Core Principle: Data-Informed, Not Data-Driven
 

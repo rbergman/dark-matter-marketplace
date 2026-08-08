@@ -7,19 +7,7 @@ description: "Difficulty curves, flow-channel targeting, power-curve math, unloc
 
 **Purpose:** Tools for designing how players grow in power, skill, and access over time. Good progression makes every session feel rewarding. Bad progression creates grind, frustration, or trivialized content.
 
-**Influences:** Frameworks here draw on systematic balance methodology (power curves, pacing math), experience engineering theory (accessibility/depth model), cognitive UX research (flow channel, cognitive pacing), and flow theory from positive psychology.
-
----
-
-## When to Activate
-
-Use this skill when:
-- Designing XP curves, level-up formulas, or unlock schedules
-- Tuning difficulty ramps for a campaign or level sequence
-- Players report the game is "too easy," "too hard," or "grindy"
-- Implementing adaptive difficulty or dynamic scaling
-- Planning content pacing for a long-form game
-- Deciding what to gate behind progression vs. make available from the start
+**Sources:** The flow channel is Mihaly Csikszentmihalyi, *Flow* (1990), as applied to games by Jenova Chen ("Flow in Games," MFA thesis, 2006). Accessibility-and-depth as independent axes follows the standard "low floor, high ceiling" formulation. XP-curve shapes and pacing values here are working heuristics with no external source — apply the Numbers Policy in **game-design** and treat every figure as a starting value with a test plan.
 
 ---
 

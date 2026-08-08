@@ -17,6 +17,12 @@
       "category": "development"
     },
     {
+      "name": "dm-pixi",
+      "description": "PixiJS 8 browser-game bootstrapping: project scaffolding, ECS-lite architecture, fixed-timestep loop, object pooling, spatial hashing, and a modern retro/vector visual system",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
+      "source": "./plugins/pixi-arcade",
+      "category": "development"
+    },
+    {
       "name": "dm-game",
       "description": "Comprehensive game development skills: vision, systems, mechanics evaluation, balance, economy, motivation, encounters, narrative design, short-form narrative prose craft, tonal registers, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, per-frame performance, and PixiJS 8 bootstrapping",      "author": {"name": "Dark Matter", "email": "dark-matter@example.com"},
       "source": "./plugins/game-dev",

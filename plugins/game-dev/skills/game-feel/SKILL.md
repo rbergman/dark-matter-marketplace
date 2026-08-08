@@ -7,19 +7,7 @@ description: "Juice, feedback layering, screen shake/particles/sound timing, the
 
 **Purpose:** Make every player action feel responsive, satisfying, and communicative. Game feel is the difference between "it works" and "it feels great." These are the tools to close that gap.
 
-**Influences:** Frameworks here draw on feedback layering theory, cognitive perception-action cycle research, and game design literature on "juice" and responsive design.
-
----
-
-## When to Activate
-
-Use this skill **proactively** when:
-- Implementing any player action (attack, jump, dash, interact)
-- Adding combat hits, impacts, or collisions
-- Designing collectible/pickup feedback
-- Building UI transitions and state changes
-- Something is mechanically correct but feels "flat" or "floaty"
-- A player or tester says "it feels wrong" but can't articulate why
+**Sources:** Steve Swink, *Game Feel: A Game Designer's Guide to Virtual Sensation* (Morgan Kaufmann, 2008) — the foundational text, and the origin of the term. Juice technique follows Martin Jonasson & Petri Purho, "Juice it or lose it" (Nordic Game Jam 2012) and Jan Willem Nijman, "The Art of Screenshake" (INDIGO 2013). Perception and feedback-legibility claims draw on Celia Hodent, *The Gamer's Brain* (2017). Specific timing values are starting points, not measurements — see the Numbers Policy in **game-design**.
 
 ---
 

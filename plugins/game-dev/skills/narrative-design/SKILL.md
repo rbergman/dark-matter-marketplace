@@ -9,21 +9,7 @@ description: "Quest structure, branching narrative architecture, environmental s
 
 **Position in workflow:** Narrative design interacts with nearly every other system. Use **game-vision** to establish core fantasy and pillars first. Then use this skill to design quests, story structure, and dialogue that serve those pillars. Fan out to **encounter-design** for spatial narrative, **economy-design** for reward flow, and **motivation-design** for retention psychology.
 
----
-
-## When to Activate
-
-Use this skill when:
-- Designing quest systems, quest chains, or quest types
-- Structuring branching dialogue or story paths
-- Narrative feels disconnected from gameplay — players skip cutscenes or ignore lore
-- Story contradicts mechanics (ludonarrative dissonance)
-- Quests feel like checklists rather than journeys
-- Designing environmental storytelling for levels or world areas
-- Players can't explain what they're doing or why in fiction terms
-- NPC dialogue feels flat, repetitive, or inconsequential
-- Planning how narrative should interact with economy, progression, or combat systems
-- Evaluating narrative pacing relative to gameplay intensity
+**Sources:** The branching-architecture taxonomy is a coarser form of Sam Kabo Ashwell's "Standard Patterns in Choice-Based Games" (2015), which remains the best available map of the space — read it before designing any branching structure. The dissonance test is Clint Hocking's ludonarrative-dissonance argument (2007). Quest-as-system-interaction framing follows Jesse Schell, *The Art of Game Design*. Environmental storytelling: see **encounter-design**.
 
 ---
 

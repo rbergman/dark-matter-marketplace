@@ -7,19 +7,7 @@ description: "Cognitive load management for players: perception/attention/memory
 
 **Purpose:** Apply cognitive science to game interface and interaction design. The player's brain has hard constraints — limited attention, lossy perception, fragile memory. Design with those constraints, not against them.
 
-**Influences:** Frameworks here draw on neuroscience-grounded game UX research, with supporting concepts from experience engineering theory (elegance, attention budgets) and established perceptual psychology (Gestalt principles, cognitive load theory).
-
----
-
-## When to Activate
-
-Use this skill when:
-- Designing or reviewing HUD/UI layouts
-- Writing tutorials or onboarding sequences
-- Players report confusion, frustration, or "I didn't see that"
-- Evaluating accessibility (colorblind, motor, cognitive)
-- Debugging situations where players blame themselves for bad UI
-- Any time the challenge should be the *game*, not the *interface*
+**Sources:** This skill is substantially Celia Hodent, *The Gamer's Brain: How Neuroscience and UX Can Impact Video Game Design* (CRC Press, 2017) — the three cognitive pillars, the green-ball anti-pattern, usability-versus-engageability, and developer blindness are all hers. Working memory at ~4 chunks is Cowan (2001), which revised Miller's 1956 "7±2." Gestalt grouping principles are Wertheimer (1923). The 4.5:1 contrast minimum is WCAG 2.1 AA.
 
 ---
 

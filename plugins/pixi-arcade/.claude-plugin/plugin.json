@@ -1,0 +1,6 @@
+{
+  "name": "dm-pixi",
+  "version": "0.1.0",
+  "description": "PixiJS 8 browser-game bootstrapping: project scaffolding, ECS-lite architecture, fixed-timestep loop, object pooling, spatial hashing, and a modern retro/vector visual system",
+  "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
+}

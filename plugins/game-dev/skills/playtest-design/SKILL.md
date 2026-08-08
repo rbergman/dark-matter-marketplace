@@ -7,18 +7,7 @@ description: "Question generation for playtests, what to observe vs. ask, metric
 
 **Purpose:** Get useful signal from playtests. Most playtest sessions are wasted — observers confirm what they already believe, ask leading questions, and draw conclusions from noise. This skill provides structured methods to avoid those traps.
 
-**Influences:** Frameworks here draw on cognitive UX research methodology, metrics-driven iterative design practice, and experience engineering theory (emergent behavior observation, planning under uncertainty).
-
----
-
-## When to Activate
-
-Use this skill when:
-- Planning a playtest session (what to test, who to recruit, what to measure)
-- Designing post-playtest surveys or interview questions
-- Setting up analytics/metrics for ongoing data collection
-- Interpreting playtest results and deciding what to change
-- Resolving team disagreements about what the data shows
+**Sources:** Observation-over-self-report and the developer-blindness counter-measures follow Celia Hodent, *The Gamer's Brain* (2017). Confirmation-bias protocol draws on standard experimental-design practice. Small-sample usability guidance derives from Nielsen & Landauer (1993), whose "five users find ~85% of usability problems" applies to *usability* testing specifically and does **not** transfer to balance or preference questions — a distinction this skill is careful about below.
 
 ---
 

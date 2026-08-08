@@ -7,17 +7,6 @@ description: "Per-frame performance and GC-pressure optimization for JS/TS game 
 
 This skill provides patterns for writing allocation-free, GC-friendly code in game loops and hot paths. Apply these patterns proactively when working on any code that executes per-frame.
 
-## When to Activate
-
-Trigger this skill when editing:
-- Game loops, update functions, tick handlers
-- Render/draw functions
-- Physics update code
-- AI/behavior update code
-- Collision detection
-- Particle systems
-- Any function called 60+ times per second
-
 ## Anti-Patterns and Fixes
 
 ### 1. Spread Operator Copies
@@ -243,6 +232,41 @@ class Pool<T> {
   }
 }
 ```
+
+### Deferred Destruction
+Removing from a collection while iterating it is the most common source of
+skipped-entity bugs, and the naive fix — copying the collection every frame — is
+an allocation in the hot path. Mark, then sweep once.
+
+```typescript
+// BAD - mutates during iteration; silently skips the following element
+for (const e of world.asteroids) {
+  if (e.dead) world.asteroids.delete(e);
+}
+
+// GOOD - mark during systems, sweep once after all of them have run
+world.destroy(e);   // sets a flag, pushes to a reused pending array
+// ...all systems run...
+world.flush();      // single pass; clears pending without reallocating
+```
+
+### Viewport Culling
+When the world is larger than the screen, per-entity render work for off-screen
+entities is pure waste. Set `visible = false` rather than skipping the update —
+most renderers then discard the object before it reaches the GPU.
+
+```typescript
+function inViewport(x: number, y: number, r: number, vp: Rectangle): boolean {
+  return x + r > vp.x && x - r < vp.x + vp.width &&
+         y + r > vp.y && y - r < vp.y + vp.height;
+}
+```
+
+- Include the entity radius in the bounds test, or sprites pop at the edge.
+- For wraparound worlds, test every wrapped position, not just the canonical one.
+- **Cull rendering, not simulation.** An entity culled out of the sim behaves
+  differently depending on where the camera is, which reads as a bug and is
+  nearly impossible to reproduce deliberately.
 
 ## Performance as Design Constraint
 

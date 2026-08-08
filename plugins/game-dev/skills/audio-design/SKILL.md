@@ -24,19 +24,7 @@ play, how they relate to gameplay state, and how they serve the player's underst
 of the game world. Production concerns (recording, mastering, compression formats) are
 out of scope.
 
----
-
-## When to Activate
-
-- Designing sound effects for player actions, enemies, or environment
-- Building adaptive music systems that respond to gameplay
-- Planning spatial audio for directional awareness and immersion
-- Creating ambient soundscapes that establish atmosphere
-- Diagnosing why audio feels disconnected from gameplay
-- Noticing that players routinely play on mute
-- Adding audio accessibility features
-- Evaluating audio feedback coverage across game systems
-- Balancing the audio mix and priority system
+**Sources:** Karen Collins, *Game Sound: An Introduction to the History, Theory, and Practice of Video Game Music and Sound Design* (MIT Press, 2008) is the foundational academic text. Adaptive-music technique — vertical layering and horizontal re-sequencing — is standard interactive-audio vocabulary predating any single source. Audio-as-information-system framing follows Rob Bridgett's work on game audio direction. Polyphony and ducking figures are platform-dependent working values, not sourced benchmarks.
 
 ---
 

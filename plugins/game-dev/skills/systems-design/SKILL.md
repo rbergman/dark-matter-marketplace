@@ -9,19 +9,7 @@ description: "System interaction architecture, emergence analysis, coupling eval
 
 **Core philosophy:** Games are not built from features. They are built from interacting systems. Depth comes from how systems interact, not how complex they are alone. A game with four tightly interacting systems is deeper than a game with twelve isolated ones.
 
----
-
-## When to Activate
-
-Use this skill when:
-- Designing the system architecture of a new game
-- Adding a new system to an existing game and need to evaluate fit
-- A game has many features but feels shallow — "lots to do, nothing matters"
-- Evaluating whether systems are producing emergent depth or just mechanical complexity
-- Deciding which systems to build, cut, or defer
-- Diagnosing dominant strategies that collapse possibility space
-- Planning system build order for a prototype or MVP
-- Reviewing whether a game's systems serve its experience pillars
+**Sources:** Cursed Problems is Alex Jaffe, "Cursed Problems in Game Design" (GDC 2019) — the term, the framing, and the resolution rule are his. Systems-over-features thinking follows Doug Church, "Formal Abstract Design Tools" (1999) and Will Wright's writing on simulation-driven design. Possibility space follows Jesse Schell, *The Art of Game Design* (3rd ed., 2019). The interaction matrix and its health indicators are this plugin's own construction — no external source; treat the thresholds as working values.
 
 ---
 
