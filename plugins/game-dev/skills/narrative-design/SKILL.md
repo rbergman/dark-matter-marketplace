@@ -276,9 +276,14 @@ Intensity
 
 ### Core Principles
 
-**Brevity.** Every line must earn its space. If it can be cut without losing meaning, cut it. Dialogue that respects the player's time earns their attention for the moments that matter.
+> **Prose craft lives in game-narrative-craft.** This section covers dialogue as
+> a *design* concern — who speaks, with what agency, at what system cost. For
+> how to write the line (word-count bands, the compression rule, the
+> say-this-shit test, the information-state ledger, AI tells), use
+> **game-narrative-craft**. Do not evaluate drafted prose against this section;
+> it carries no falsifiable tests and was never meant to.
 
-**Character voice.** Distinct characters should sound different even without name labels. Vocabulary, sentence length, rhythm, formality, and what they choose NOT to say all contribute.
+**Character voice.** Distinct characters should sound different even without name labels. Vocabulary, sentence length, rhythm, formality, and what they choose NOT to say all contribute. Capture this per character in the voice sheet described in **game-narrative-craft** before drafting dialogue.
 
 **Subtext over text.** Characters who say exactly what they mean are flat. Characters who say one thing while meaning another are interesting. Let the player read between the lines.
 
@@ -362,6 +367,8 @@ Run before shipping or at milestone reviews.
 
 ## Cross-References
 
+- **game-narrative-craft** — The layer below this one: sentence- and passage-level prose craft. Word-count bands, the compression rule, the information-state ledger, choice-as-dialogue, failure-as-different-content, AI tells. Use it for any drafted or reviewed prose; use this skill for the architecture that prose fills.
+- **cosmic-horror-register** — Tone and diction for cosmic horror, and the six-slot template for building other registers
 - **experience-design** — Experience Triangle (Fiction vertex), narrative integration modes (scripted/environmental/emergent), the dissonance test
 - **encounter-design** — Environmental storytelling in spatial context, spatial narrative
 - **motivation-design** — Narrative as intrinsic motivation driver (immersion profile), story as autonomy/relatedness support

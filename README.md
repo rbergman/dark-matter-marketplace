@@ -105,7 +105,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Comprehensive game development skills across 19 domains: vision, systems architecture, mechanics evaluation, balance, economy, motivation, encounters, narrative, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, performance optimization, and project bootstrapping.
+Comprehensive game development skills across 21 domains: vision, systems architecture, mechanics evaluation, balance, economy, motivation, encounters, narrative design and prose craft, tonal registers, multiplayer, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, performance optimization, and project bootstrapping.
 
 **Upstream (vision → structure):**
 
@@ -122,6 +122,8 @@ Comprehensive game development skills across 19 domains: vision, systems archite
 | `dm-game:encounter-design` | Skill | Spatial design, enemy behavior patterns, combat spaces, environmental flow, world structure |
 | `dm-game:motivation-design` | Skill | Reward psychology, SDT, reinforcement schedules, social motivation, ethical guardrails |
 | `dm-game:narrative-design` | Skill | Quest structure, branching narrative, environmental storytelling, dialogue, narrative pacing |
+| `dm-game:game-narrative-craft` | Skill | Passage-level prose craft: compression rule, information-state ledger, word-count bands, choice-as-dialogue, failure-as-different-content, AI tells |
+| `dm-game:cosmic-horror-register` | Skill | Tone and diction for cosmic horror, plus the six-slot template for building any tonal register |
 | `dm-game:multiplayer-design` | Skill | Competitive balance, co-op, social systems, matchmaking, anti-toxicity, async multiplayer |
 | `dm-game:audio-design` | Skill | Audio stack architecture, adaptive music, spatial audio, sound as feedback system |
 | `dm-game:accessibility-design` | Skill | Four pillars (visual, auditory, motor, cognitive), implementation tiers, colorblind design |
