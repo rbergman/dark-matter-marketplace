@@ -1,6 +1,6 @@
 {
   "name": "dm-game",
-  "version": "2.0.0",
-  "description": "Game development skills grounded in named sources: vision, systems architecture, mechanics evaluation and ablation, balance, economy, incremental/idle math, motivation, encounters, narrative design and short-form prose craft, tonal registers, generated-content quality, simulation-first and self-playing games, async/social, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, and per-frame performance",
+  "version": "2.1.0",
+  "description": "Game development skills grounded in named sources: vision, systems architecture, mechanics evaluation and ablation, balance, economy, incremental/idle math, motivation, encounters, narrative design and short-form prose craft, tonal registers (cosmic horror, deadpan institutional), generated-content quality, simulation-first and self-playing games, async/social, accessibility, audio, data-driven design, experience design, player UX, progression, game feel, playtest methodology, and per-frame performance",
   "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
 }

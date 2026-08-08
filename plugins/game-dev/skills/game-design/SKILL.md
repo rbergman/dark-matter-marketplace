@@ -1,6 +1,6 @@
 ---
 name: game-design
-description: The mechanic-level evaluation toolkit — apply the 5-Component Framework (Clarity, Motivation, Response, Satisfaction, Fit) to any individual mechanic. Use when designing or evaluating a single mechanic, reviewing whether a feature pulls its weight, debugging why a specific action feels off, comparing alternative implementations of the same mechanic, or doing a first-pass critique on a player-facing feature. For session-level pacing or emotional arcs see experience-design; for moment-to-moment juice see game-feel; for system-of-systems interactions see systems-design. This skill is the per-mechanic lens.
+description: "The hub and first pass on any single mechanic: the 5-Component Filter (Clarity, Motivation, Response, Satisfaction, Fit), the plugin-wide Numbers Policy, the state-machine checklist, and a symptom-to-skill debugging table. Use when designing or critiquing one player-facing feature, comparing two implementations of the same mechanic, proposing any numeric value, or when told something 'feels wrong' and you need to find which layer is at fault before tuning anything. Also holds the routing map for every other dm-game skill — start here when unsure which skill applies."
 ---
 
 # Game Design Framework

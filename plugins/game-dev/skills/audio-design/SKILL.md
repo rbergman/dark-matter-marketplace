@@ -1,15 +1,6 @@
 ---
 name: audio-design
-description: >
-  Use when designing how audio communicates game state, creates emotion, and serves as a
-  feedback system. Activate for sound effect design, adaptive music systems, spatial audio,
-  ambient soundscapes, audio priority and ducking, emotional audio design, and audio
-  accessibility. Also activate when audio feels disconnected from gameplay, when players
-  routinely play on mute (a design failure signal), when evaluating whether the audio stack
-  has appropriate layering and variation, or when planning how music responds to gameplay
-  context. This skill treats audio as a design system — not audio engineering or production,
-  but the intentional design of what players hear, when, and why. Covers the full audio
-  stack from music and ambience through sound effects, UI audio, and voice.
+description: "Use when designing how audio communicates game state, creates emotion, and serves as a feedback system. Activate for sound effect design, adaptive music systems, spatial audio, ambient soundscapes, audio priority and ducking, emotional audio design, and audio accessibility. Also activate when audio feels disconnected from gameplay, when players routinely play on mute (a design failure signal), when evaluating whether the audio stack has appropriate layering and variation, or when planning how music responds to gameplay context. This skill treats audio as a design system — not audio engineering or production, but the intentional design of what players hear, when, and why. Covers the full audio stack from music and ambience through sound effects, UI audio, and voice."
 ---
 
 # Audio Design

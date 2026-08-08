@@ -28,7 +28,8 @@ touches one file instead of twenty.
 | How do I lay out this fight, level, or world? | **encounter-design** |
 | How is the story structured as a system? | **narrative-design** |
 | How do I write the actual passage? | **game-narrative-craft** |
-| What should the prose sound like? | **cosmic-horror-register** (and its register template) |
+| What should the prose sound like? | **cosmic-horror-register** (and its six-slot register template) |
+| The joke is the institution, not the monster | **deadpan-institutional-register** |
 | The generated content all feels the same | **generated-content-quality** |
 | The game plays itself / I'm balancing with a bot | **simulation-first-design** |
 | Leaderboards, ghosts, or social features without real-time multiplayer | **async-and-social** |
@@ -66,7 +67,7 @@ deliberate. Going to the wrong one wastes a pass.
 | Higher | Lower | The seam |
 |---|---|---|
 | narrative-design | game-narrative-craft | Architecture and branch budget vs. the sentence and the passage |
-| game-narrative-craft | *register skills* | Genre-neutral structure vs. tone and diction |
+| game-narrative-craft | *register skills* | Genre-neutral structure vs. tone and diction (cosmic-horror, deadpan-institutional) |
 | progression-systems | motivation-design | The math of growth vs. the psychology of why it works |
 | game-balance | economy-design | Tuning within an economy vs. designing one from scratch |
 | economy-design | incremental-design | General resource flow vs. the case where the flow is the game |

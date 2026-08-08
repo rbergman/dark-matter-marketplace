@@ -1,6 +1,6 @@
 ---
 name: mechanic-ablation
-description: Determine whether a game mechanic, displayed value, or currency actually affects outcomes, via a four-stage ablation: exercise, sensitivity, ablate, verdict. Use when asked whether a mechanic matters or earns its place, when a change produces no measurable effect on the balance board or sim, when considering cutting a system, or as a routine pass before a milestone. Requires a headless sim of the real loop, seeded determinism, and a bot/policy set. Guards against the common wrong conclusion that an unchanged metric proves a mechanic is inert.
+description: "Determine whether a game mechanic, displayed value, or currency actually affects outcomes, via a four-stage ablation: exercise, sensitivity, ablate, verdict. Use when asked whether a mechanic matters or earns its place, when a change produces no measurable effect on the balance board or sim, when considering cutting a system, or as a routine pass before a milestone. Requires a headless sim of the real loop, seeded determinism, and a bot/policy set. Guards against the common wrong conclusion that an unchanged metric proves a mechanic is inert. Requires a deterministic headless sim and a diverse bot set — for building that instrument use simulation-first-design; this skill is the procedure you run on it."
 ---
 
 # mechanic-ablation

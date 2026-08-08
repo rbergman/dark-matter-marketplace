@@ -1,6 +1,6 @@
 ---
 name: playtest-design
-description: "Question generation for playtests, what to observe vs. ask, metrics to track, and how to interpret playtest data without confirmation bias. Use when planning a playtest session, designing a feedback survey, setting up analytics, or when you have playtest data and need to make decisions from it."
+description: "Designing and reading playtests: what to observe versus what to ask, question generation, metrics to track, sample sizes, confirmation-bias protocol, and solo-developer validation when you have no testers. Use when planning a playtest or usability session, writing a feedback survey, deciding what to watch for, or when you have playtest data and need to decide what it means. Reach for this when a tester says 'it was fine' and you learn nothing, when you catch yourself explaining the game to the person playing it, or when you need to know whether five testers is enough. Observation-first: self-report is the least reliable data a playtest produces. For capturing one felt reaction verbatim as it happens use moment-capture; for post-ship quantitative measurement use data-driven-design."
 ---
 
 # Playtest Design

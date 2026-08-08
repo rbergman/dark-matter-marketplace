@@ -1,6 +1,6 @@
 ---
 name: north-star-check
-description: Check the build against the project's written north star, pillars, or design brief. Two tiers: a 60-second GLANCE at the start of any session touching game systems, and a full AUDIT at milestone boundaries, before multi-session tuning or optimization passes, or on demand. Use when starting game-systems work, before a tuning pass, at a milestone, or when asked whether the game has drifted from its intent. Catches drift that agents reliably miss by not re-reading the document.
+description: "Check the build against the project's written north star, pillars, or design brief. Two tiers: a 60-second GLANCE at the start of any session touching game systems, and a full AUDIT at milestone boundaries, before multi-session tuning or optimization passes, or on demand. Use when starting game-systems work, before a tuning pass, at a milestone, or when asked whether the game has drifted from its intent. Catches drift that agents reliably miss by not re-reading the document."
 ---
 
 # north-star-check

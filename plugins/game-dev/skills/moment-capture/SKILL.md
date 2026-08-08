@@ -1,6 +1,6 @@
 ---
 name: moment-capture
-description: Capture the user's felt reactions to play verbatim into an append-only docs/moments.md. Use whenever the user reports an aesthetic, emotional, or semantic reaction to playing the game - 'feels chunky', 'that's satisfying', 'this doesn't read right', 'attack timing is unclear'. Positive reactions matter as much as negative ones. Does not apply to bug reports, feature requests, or performance complaints, which belong in the tracker.
+description: "Capture the player's felt reactions to play verbatim into an append-only docs/moments.md, at the time they happen. Use whenever someone reports an aesthetic, emotional, or semantic reaction to playing — 'feels chunky', 'that's satisfying', 'this doesn't read right', 'I stopped watching', 'attack timing is unclear'. Positive reactions matter as much as negative ones. Felt reactions decay fast and get rationalised on recall, so the verbatim record beats a reconstruction. Not for bug reports, feature requests, or performance complaints — those belong in the tracker. For designing a structured session around these reactions use playtest-design."
 ---
 
 # moment-capture

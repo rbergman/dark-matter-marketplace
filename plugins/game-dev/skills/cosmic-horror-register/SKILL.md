@@ -246,7 +246,9 @@ Run *after* the **game-narrative-craft** checklist, not instead of it.
 ## Register template
 
 To build another register — folk horror, noir, comic fantasy, hopepunk,
-techno-thriller — fill the same six slots. The slots are the reusable part;
+techno-thriller — fill the same six slots. **deadpan-institutional-register** is
+the worked second instance: it shares nothing with this one but structure, which
+is the evidence that the slots are the reusable part. The slots are the reusable part;
 everything above is one filling of them.
 
 | slot | question it answers | what a filled slot looks like |

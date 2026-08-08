@@ -150,11 +150,66 @@ where all the structural dimensions differ and the item is still a repeat.
 
 ---
 
+## The referent ledger — the same instrument, run backwards
+
+The saturation ledger catches **convergence**: too many items sharing a shape.
+Its mirror image catches **unmanaged divergence**: too many words for one thing.
+
+Both are corpus-level defects invisible to per-item review, and the second is
+more common in games than the first — because every individual synonym is good
+writing. Register rewards variety; comprehension punishes it.
+
+### The failure
+
+A logging game's teaching channel refers to the resource the player carries as
+**wood**, **timber**, **tonnage**, **load**, **haul**, and *"the load you
+logged"*. Its delivery point is **the truck** and **the landing**. Its shop is an
+**outpost**, a **camp**, a **company outpost**, a **counter**, and a **site**.
+
+Every one of those is a defensible choice in isolation, and a per-line review
+passes all of them. Together they mean a player, seven seconds after the last
+notice, resolving a new noun for a thing they already had a name for — while
+something is chasing them.
+
+### The ledger
+
+One row per game noun. One column: every word the corpus uses for it, and where.
+
+| Referent | Words used | Where | Canon |
+|---|---|---|---|
+| the resource carried | wood, timber, tonnage, load, haul | notices, shop, ticker | **wood** |
+| the delivery point | truck, landing | notices, shop | **truck** |
+| purchasing power | allowance | shop, notices | **allowance** |
+| a purchasable upgrade | rank, line, shelf item | notices, shop | **rank** |
+| the secondary shop | outpost, camp, counter, site | notices, shop | **outpost** |
+
+**The rule: one canonical word per referent in any channel that teaches. The
+synonyms are not deleted — they are reassigned to the flavour channel**, where
+variety is the point and comprehension is not load-bearing. This is how you keep
+the register without paying for it in confusion.
+
+**Test:** build the table. Any referent with more than one word in a teaching
+channel is a bug, and the count is the severity. This takes fifteen minutes on a
+corpus of fifty lines and I have never run it without finding something.
+
+### Where the line falls
+
+Not every synonym is a defect. The question is whether the reader must *resolve*
+the word to act.
+
+- **Flavour, ambient, prose** — vary freely. A ticker line calling wood "tonnage"
+  is characterisation of the company that logs it.
+- **Anything the player must act on** — UI labels, tips, objectives, tutorial
+  copy, error states — one word, always the same one.
+- **Proper nouns are exempt but expensive.** A named thing can have one name and
+  one epithet; a third is a second thing.
+
 ## Where this sits relative to per-item quality
 
 Both are required and they catch different things. Run them in this order:
 
 1. **Ledger + quotas** — before generating. Decides *what* the batch contains.
+   Run the referent ledger here too, once, and fix the canon before drafting.
 2. **Underused-cell seeding** — during. Decides where each item starts.
 3. **Per-item quality review** — after. Voice, correctness, does it work.
 4. **Near-duplicate review** — after. Is it actually new.
@@ -179,17 +234,6 @@ and nobody notices until the corpus ships.
 
 ---
 
-## Cross-references
-
-- **game-narrative-craft** — passage-level prose craft for narrative content;
-  its naming and entropy guidance is the per-item version of this skill's
-  corpus-level method
-- **playtest-design** — "samey" is a report players give; this skill is how you
-  turn that report into a countable finding
-- **data-driven-design** — if the corpus is large enough to instrument, engagement
-  variance per item is the quantitative version of the same question
-
----
 
 ## Cross-References
 

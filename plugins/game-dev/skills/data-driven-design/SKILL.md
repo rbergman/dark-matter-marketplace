@@ -1,15 +1,6 @@
 ---
 name: data-driven-design
-description: >
-  Use when setting up game analytics, designing telemetry events, interpreting player behavior
-  data, running A/B tests, building dashboards, or making design decisions informed by metrics.
-  Activate for any work involving retention analysis, funnel optimization, cohort comparison,
-  economy health monitoring, or live ops data pipelines. Covers the full data lifecycle from
-  instrumentation through interpretation. Essential for live-service games but valuable for
-  any game that ships updates. Bridges structured playtesting (qualitative observation) with
-  ongoing quantitative measurement. Emphasizes data-informed design over purely data-driven
-  optimization — metrics reveal what is happening, but design judgment determines why and
-  what to do about it.
+description: "Telemetry and analytics for games: event taxonomy and schema, engagement/progression/economy/balance/UX metrics, funnel analysis, A/B testing and when not to, cohort analysis, dashboard design, and the interpretation traps — Goodhart's Law, Simpson's paradox, survivorship bias, over-optimisation. Use when instrumenting a game, deciding what to measure, reading a retention or funnel drop, comparing cohorts, or when a metric moved and you need to know whether it means anything. Data-informed, not data-driven: numbers say what happened, not why. For pre-ship qualitative evidence use playtest-design."
 ---
 
 # Data-Driven Design

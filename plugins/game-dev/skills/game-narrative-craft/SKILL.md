@@ -89,6 +89,81 @@ for two moments that should be one, not an automatic cut.
 
 ---
 
+## Teaching copy is a third slot with its own rules
+
+A tip, a tutorial notice, a HUD hint — a line under about twenty words whose job
+is to make a mechanic usable **right now** — is neither a vignette nor a branch
+label, and most of this skill does not apply to it. The compression rule and the
+rendered-detail floor are about scenes. Teaching copy is not a scene. It is an
+instruction competing with a threat for the player's attention.
+
+Six rules, all checkable.
+
+**1. One concept per line.** If the line teaches two things, the player retains
+the first and the second is spent. Split it or drop one.
+
+**2. No forward references.** A line that names something the player has not met
+is a riddle, and a riddle in the teaching channel is worse than silence — it
+consumes the slot and teaches nothing. Ominous forward references are excellent
+and belong in the flavour channel, where a high miss rate costs nothing.
+
+**3. Canonical referents only.** One word per game noun, every time. See the
+referent ledger in **generated-content-quality**; this is where its findings land.
+
+**4. No metaphor above the player's current model.** *"Light is ground you do not
+have to fight for"* requires the player to already hold *darkness is contested
+space*. If the game has not taught that, the sentence is decoration wearing an
+instruction's clothes.
+
+**5. Do not negate a misconception the player may not have.** *"Gear comes out of
+your allowance, not out of the load you logged"* is answering an unasked
+question, and it introduces the wrong answer in the same breath as the right one.
+
+**6. Actionable within ten seconds, using only what is on screen.** This is the
+test:
+
+> **Test:** could the player act on this line in the next ten seconds, with only
+> what is currently visible? If not, it is flavour. Move it to the flavour
+> channel and free the slot.
+
+### The dependency order check
+
+The failure this catches is mechanical, invisible to per-line review, and I have
+now found it in two separate games on the first pass.
+
+Build a two-column table: every teaching line, the concepts it **introduces**, and
+the concepts it **uses**. Sort by fire order. **Any line that uses a concept a
+later line introduces is a bug.**
+
+Worked example. A logging game fires `haul` first —
+
+> WOOD IN YOUR ARMS IS NOT WOOD ON THE TRUCK. ONLY THE TRUCK **COUNTS**.
+
+— and `quota` second, which is the line that introduces the idea of counting
+toward anything. For the length of one notice the player holds a scoring rule for
+a score that does not exist yet. Neither line is wrong; the order is.
+
+The same bug appears in prose. A dungeon crawler says *"**THE COURT** EXPECTED
+SOMEONE"* on floor three and *"THE PROCESSION ENDS AT **A COURT**"* on floor four
+— definite article before the referent exists. **Grep your corpus for `THE
+<NOUN>` and check each first occurrence against the fire order.**
+
+### Density and pressure
+
+Teaching lands or fails on when it arrives, not only on what it says.
+
+- **Under threat, teaching is not received.** A line that fires during combat is
+  competing with survival and will lose. Either fire it before the threat or
+  accept that it is flavour.
+- **Count the lines per location and per minute.** Three panels for one building,
+  seven seconds apart, is not three lessons — it is one lesson and two
+  interruptions.
+- **Measure hit rates, and read the zeroes both ways.** A line that never fires
+  may have a broken trigger *or* may be describing a state the game never
+  produces. Those need opposite fixes, and the counter cannot tell them apart.
+
+---
+
 ## The information-state ledger
 
 **The crux of AI-written game narrative.** The model holds the whole design

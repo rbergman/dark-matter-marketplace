@@ -107,7 +107,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Game development skills across 26 domains. Every skill names its sources — and
+Game development skills across 27 domains. Every skill names its sources — and
 says explicitly where it has none. All numeric values declare a posture under
 the plugin-wide **Numbers Policy** (`skills/game-design/references/numbers-policy.md`):
 source-backed, starting-value-with-test-plan, or measured-here-with-sample-and-date.
@@ -134,6 +134,7 @@ skill carries at most three tight links; everything else routes through the map.
 | `dm-game:narrative-design` | Skill | Quest structure, branching architecture, narrative as system |
 | `dm-game:game-narrative-craft` | Skill | Passage-level prose: the compression rule, information-state ledger, word-count bands, AI tells |
 | `dm-game:cosmic-horror-register` | Skill | Tone and diction for cosmic horror, plus the six-slot template for any register |
+| `dm-game:deadpan-institutional-register` | Skill | Corporate/bureaucratic horror-comedy; worked second instance of the register template |
 | `dm-game:generated-content-quality` | Skill | Saturation ledgers, quotas, underused-cell seeding — stopping content corpora from converging |
 | `dm-game:simulation-first-design` | Skill | Self-playing and AI-vs-AI games: determinism, spectator readability, bot policy as instrument |
 | `dm-game:async-and-social` | Skill | Ghosts, leaderboards, offline vulnerability, anti-snowball — all at a population of one |

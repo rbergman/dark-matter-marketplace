@@ -1,6 +1,6 @@
 ---
 name: systems-design
-description: "System interaction architecture, emergence analysis, coupling evaluation, and possibility space design. Use when designing a new game's system architecture, adding a system to an existing game, evaluating system health, diagnosing 'why doesn't this feel deep?', or when a game has many features but no emergent depth. The central structural skill — bridges individual mechanic evaluation (game-design) with architectural questions about how systems interact to create depth."
+description: "Structural architecture of game systems: the interaction matrix, coupling analysis, emergence, possibility space, cursed problems, and build order. Use when choosing which systems a game needs, evaluating whether to add or cut one, planning build sequence, or when a game has many features and still feels shallow — 'there's a lot to do but it all feels the same'. Also for diagnosing dominant strategies that collapse the possibility space, and for naming a design tension that cannot be engineered away. This is the between-systems altitude: for one mechanic's quality use game-design, for whether a mechanic affects outcomes at all use mechanic-ablation."
 ---
 
 # Systems Design

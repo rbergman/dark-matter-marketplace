@@ -1,6 +1,6 @@
 ---
 name: economy-design
-description: "Resource flow architecture, currency system design, inflation/deflation diagnosis, sink/source balancing, crafting economies, LiveOps event budgeting, and economy simulation modeling. Use when designing resource systems from scratch, adding currencies or stores, setting crafting costs or reward magnitudes, diagnosing inflation or wealth stratification, planning monetization, designing LiveOps events, or when veteran players stockpile while new players feel locked out. Goes deeper than game-balance's economy health check — this is the architectural skill for building and sustaining entire economic systems."
+description: "Designing a resource economy from scratch: the source/sink/converter flow graph, currency architecture, sink quality, inflation and deflation, feedback loops, scarcity as a difficulty lever, and simulating it in a spreadsheet before writing code. Use when designing currencies, stores, crafting costs or drop rates, when prices spiral or players hoard, when veterans break the economy for newcomers, or when deciding how many currencies a game needs. Positive feedback for skill, negative feedback for time. For tuning numbers inside an economy that already works use game-balance; where accumulation is the entire loop use incremental-design."
 ---
 
 # Economy Design

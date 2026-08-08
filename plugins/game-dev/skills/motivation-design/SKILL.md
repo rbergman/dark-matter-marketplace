@@ -1,6 +1,6 @@
 ---
 name: motivation-design
-description: "Player motivation psychology, reward scheduling, intrinsic vs. extrinsic drives, Self-Determination Theory, loss aversion, collection drives, social motivation, and ethical guardrails. Use when designing reward systems, diagnosing why players aren't returning, building achievement or social features, evaluating retention mechanics, or when players say 'I don't know why I'd keep playing.' Bridges the gap between progression math (see progression-systems) and the psychology of why players stay."
+description: "Why players return, and where the ethical lines are: Self-Determination Theory, the six motivation profiles, reinforcement schedules, pity and bad-luck protection, intrinsic versus extrinsic reward and the overjustification effect, loss aversion, collection drives, social motivation, and dark-pattern guardrails. Use when designing rewards, loot tables, achievements, daily systems or social features, when retention drops after the first hours, or when players say 'there's nothing to work toward', 'I have to play every day or fall behind', or 'the rewards feel pointless'. For the underlying curve math use progression-systems."
 ---
 
 # Motivation Design

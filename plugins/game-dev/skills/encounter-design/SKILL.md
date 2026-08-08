@@ -1,6 +1,6 @@
 ---
 name: encounter-design
-description: "Spatial design, enemy behavior, encounter composition, and environmental flow. Use when designing combat encounters, enemy AI, level layouts, boss fights, environmental puzzles, placing enemies or items in space, designing world structure, or when encounters feel repetitive, unfair, or tactically flat. Covers the Encounter Triangle (space, adversaries, resources), combat space vocabulary, enemy archetypes, AI behavior patterns, encounter pacing, environmental guidance, world structure, and environmental storytelling."
+description: "Encounters as the intersection of space, adversaries and resources — across genres, not just action games. Covers the translation table for horde survival, ARPG, RTS, card, CYOA and autonomous sims; space vocabulary, enemy archetypes and composition, AI architecture choice, telegraph timing floors, the four-beat structure for introducing anything new, wave pacing, boss phases, environmental flow and landmarks. Use when laying out a fight, level, arena or world, placing enemies, designing a boss, or when encounters feel repetitive, tactically flat, unreadable or unfair. Reach for this on 'every fight is the same' or 'I died and don't know why'."
 ---
 
 # Encounter Design
