@@ -24,7 +24,7 @@ Target file: $ARGUMENTS (or `./AGENTS.md` if no arg)
 Identify:
 
 - **Missing concepts** — sections/content in the reference that don't exist here at all (Gall's Law framing, SWE Practices, pause-for-review cadence, etc.)
-- **Stale or outdated wording** — places where this repo's wording predates current guidance (e.g. old beads sync model, references to deleted commands like `/rotate` or `/compress`, "Use PROACTIVELY" patterns, Opus 4.6 references)
+- **Stale or outdated wording** — places where this repo's wording predates current guidance (e.g. old beads sync model, references to deleted commands like `/rotate`, `/compress`, `/breakdown`, `/devloop` or `/advice`, "Use PROACTIVELY" patterns, Opus 4.x references)
 - **Conflicts** — places where this repo's content disagrees with the reference. These need a *judgment call*, not a silent overwrite. Flag them.
 - **Project-specific content to preserve** — Settled Decisions, project description, domain-specific conventions, language/framework specifics, anything referencing this repo's actual code. The reference template won't know about these.
 

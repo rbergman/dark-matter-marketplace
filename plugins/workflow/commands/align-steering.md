@@ -1,11 +1,11 @@
 ---
-description: Review and align steering files (CLAUDE.md, AGENTS.md) with Claude Opus 4.7 prompting best practices
+description: Review and align steering files (CLAUDE.md, AGENTS.md) with Claude Opus 5 prompting best practices
 argument-hint: "[file paths]"
 ---
 
 # Align Steering Files
 
-Review steering files and skill definitions for alignment with Claude Opus 4.7 prompting best practices, then apply fixes.
+Review steering files and skill definitions for alignment with Claude Opus 5 prompting best practices, then apply fixes.
 
 ## Arguments
 
@@ -21,7 +21,7 @@ Apply each check to every steering file. For each issue found, edit the file dir
 
 ### 1. Soften aggressive triggers
 
-Opus 4.7 follows instructions more literally than 4.6 and earlier. Aggressive language that compensated for undertriggering now causes overtriggering.
+Opus 5 follows instructions literally. Aggressive language written to compensate for older models undertriggering now causes overtriggering.
 
 | Find | Replace with |
 |------|-------------|
@@ -44,7 +44,7 @@ For each constraint that lacks motivation, add a brief reason. If the reason is 
 
 ### 3. Remove anti-laziness prompting
 
-Opus 4.7 is proactive by default and tends to spawn fewer subagents than 4.6 unless asked. Instructions that pushed older models to be thorough will cause over-exploration; conversely, instructions discouraging delegation may now over-restrict.
+Opus 5 is proactive by default and delegates conservatively unless asked. Instructions written to push older models toward thoroughness now cause over-exploration; instructions discouraging delegation now over-restrict.
 
 Remove or soften:
 - "If in doubt, use [tool]" — causes overtriggering
@@ -55,7 +55,7 @@ Remove or soften:
 
 ### 4. Remove redundancy with native behavior
 
-Opus 4.7 does these natively. Instructions about them add context cost without benefit:
+Opus 5 does these natively. Instructions about them add context cost without benefit:
 
 - Parallel tool calls (native — remove unless tuning aggression level)
 - Response-length calibration (native — remove "be concise" / "be thorough" boilerplate; tune effort level instead)

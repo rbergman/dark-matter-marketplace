@@ -51,7 +51,7 @@ Cross-reference with the merge commit message or branch name to identify which b
 Run `/dm-work:review` on the merge diff with narrowed scope:
 
 ```
-/dm-work:review --commits <merge-range> --min-severity <level> --only <reviewers> --skip-beads --no-interactive --format json
+/dm-work:review --commits <merge-range> --effort medium --min-severity <level> --skip-beads --format json
 ```
 
 **Scoping rules** (don't re-review what was reviewed pre-merge):

@@ -1,6 +1,9 @@
 {
   "name": "dm-team",
-  "version": "0.8.0",
-  "description": "Agent Teams patterns: lead/teammate roles, council deliberation, and collaborative review. Experimental — requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS.",
-  "author": {"name": "Dark Matter", "email": "dark-matter@example.com"}
+  "version": "1.0.0",
+  "description": "Agent Teams roles: lead coordination and teammate protocol. Experimental — requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1.",
+  "author": {
+    "name": "Dark Matter",
+    "email": "dark-matter@example.com"
+  }
 }

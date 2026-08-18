@@ -39,7 +39,7 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | Plugin | Prefix | Example |
 |--------|--------|---------|
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
-| dm-team | Agent Teams patterns | `dm-team:lead` |
+| dm-team | Agent Teams roles (opt-in) | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-pixi | PixiJS browser games | `dm-pixi:pixi-vector-arcade` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
@@ -58,12 +58,11 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, narrative craft, sim-first, perf
 │   ├── pixi-arcade/   # dm-pixi: PixiJS 8 browser-game bootstrapping
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
-│   ├── teams/         # dm-team: Agent Teams orchestration and collaboration
-│   └── workflow/      # dm-work: review, merge, devloop, alignment
+│   ├── teams/         # dm-team: lead + teammate roles for Agent Teams sessions
+│   └── workflow/      # dm-work: review, council, merge, alignment, ELI5 output style
 ├── references/        # Non-installable reference materials
 │   ├── official-plugins.md  # Official Anthropic plugins guide
-│   ├── lang-skill-adaptation.md  # Adapting skills + DX testing
-│   └── testing-agent-teams.md  # Testing guide for dm-team plugin
+│   └── lang-skill-adaptation.md  # Adapting skills + DX testing
 └── README.md
 ```
 
@@ -96,14 +95,17 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
 | `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |
-| `/dm-work:review` | Command | Parallel arch/code/security/design review with adversarial spec verification — local (beads) or PR (GH comments) |
+| `/dm-work:review` | Command | Wraps native `/code-review` with beads creation, severity filtering, and a review-tag checkpoint |
 | `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
-| `/dm-work:advice` | Command | Generate a second-opinion brief for an external agent with no prior context |
-| `/dm-work:align-steering` | Command | Modernize CLAUDE.md / AGENTS.md / SKILL.md against Claude Opus 4.7 prompting guidance |
+| `/dm-work:council` | Command | Convene 3-5 opposed perspectives on a decision, cross-examine, synthesize with dissent recorded |
+| `dm-work:council` | Skill | The deliberation protocol — runs on subagents by default, on teammates when Agent Teams is enabled |
+| `dm-work:eli5` | Output style | "Talk to me like I'm 5" — small words, short paragraphs, 2 options max ([source](https://x.com/lydiahallie/status/2080378470111256907)) |
+| `/dm-work:align-steering` | Command | Modernize CLAUDE.md / AGENTS.md / SKILL.md against Claude Opus 5 prompting guidance |
 | `/dm-work:align-agents` | Command | Align a repo's AGENTS.md with the dm-work reference template — diff/merge, never replace |
-| `/dm-work:devloop` | Command | Iterate a queue (beads / IDs / markdown checklist) with full DoD per item — designed to wrap inside `/loop` for unattended progress |
 
-> Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Document compression and verbosity tuning use the model's native calibration plus `effort` levels.
+> Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Set `autoCompactWindow` (100k–1M tokens) to make auto-compaction fire with headroom instead of at the context cliff, and `/compact <focus>` to steer what survives.
+
+> **Removed August 2026:** `/dm-work:advice`, `/dm-work:devloop` and `/dm-work:beads-migrate`. Native `/goal`, `/loop` and the Disciplined Development Loop in global steering cover what devloop did; beads-migrate was interim and its repos are migrated. Recover from git history if needed.
 
 ### dm-game (game-dev/)
 
@@ -173,7 +175,6 @@ Non-installable materials for reference and sharing.
 | `CLAUDE.md` | Global instructions — personality, prime directive, quality gates, disciplined development loop, beads guidance |
 | `official-plugins.md` | Guide to official Anthropic plugins (code-simplifier, feature-dev, etc.) |
 | `lang-skill-adaptation.md` | Workflow for adapting skills to new languages and DX testing them |
-| `testing-agent-teams.md` | Testing guide for the dm-team plugin |
 
 ---
 
@@ -202,7 +203,7 @@ Core ideas (see `~/.claude/CLAUDE.md` for the full Disciplined Development Loop)
 
 1. **Gall's Law** — Always grow complexity from a simple system that already works. Minimal slices first; speculative architecture last.
 2. **Quality gates are sacred** — Pre-existing failures are still our problem. "Already broken" is not an excuse.
-3. **Delegate when useful** — Spawn `Task()` subagents for parallel work or fresh context; Agent Teams (`dm-team`) for collaboration that needs cross-examination. Otherwise work directly — 1M context handles most tasks.
+3. **Delegate when useful** — Spawn subagents for parallel work or fresh context. With Agent Teams enabled, a *named* subagent launches as a teammate that can talk to its peers — worth it only when cross-examination is the point (`dm-team`). Otherwise work directly; 1M context handles most tasks.
 4. **External state via beads** — `bd` survives session boundaries; conversation context doesn't.
 5. **Review is non-negotiable** — Any substantive implementation gets an independent review pass before close; the implementer owns the fixes.
 

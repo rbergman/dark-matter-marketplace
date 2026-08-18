@@ -63,9 +63,9 @@ All substantive implementation work — yours or a subagent's — gets an indepe
 
 Choose the review mechanism by scope:
 
-- `/dm-work:review` for parallel arch/code/security/design reviewers on a meaningful diff
+- `/code-review` (native) for a meaningful diff — `low`/`medium` effort for high-confidence findings, `high`+ when you want breadth over precision
+- `/dm-work:review` when the findings should land in beads and the review point should be checkpointed for next time
 - A scope-bound subagent review ("read ONLY the diff and the OWN files") for narrower changes, optionally paired with a Codex second-opinion for cross-model coverage
-- For loop-driven queue work, `/dm-work:devloop --review-mode diff|full` runs the review as part of each item's Definition of Done
 
 The goal is to catch drift, accumulated debt, and integration gaps before they compound. Trivial fixes (typo, comment-only) skip review; anything changing runtime behavior, contracts, or shipped surfaces does not.
 
@@ -112,7 +112,7 @@ Follow the **Disciplined Development Loop** from your global AGENTS.md / CLAUDE.
 
 Delegate to subagents via `Task()` when work is parallelizable, benefits from a fresh context window, or naturally splits along file-ownership lines. Otherwise work directly. Don't perform skill-activation rituals at session start — invoke skills only when they match the task at hand.
 
-For Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), see `dm-team:lead` and `dm-team:teammate`. Teams fit when agents need to discuss, challenge, or coordinate across turns; subagents fit fire-and-forget delegation.
+Agent Teams are off by default. When enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), any subagent you give a `name` launches as a teammate instead — see `dm-team:lead` and `dm-team:teammate`. Teams fit when agents need to discuss, challenge, or coordinate across turns; subagents fit fire-and-forget delegation.
 
 ### Worktrees
 
@@ -170,4 +170,4 @@ For personal prefs that should work across worktrees, use imports: `@~/.claude/m
 
 ## Skills & Tools
 
-You have MCPs, skills, and bash tools. Use them. Ensure subagents and teammates know about relevant skills when delegating.
+You have MCPs, skills, and bash tools. Use them. Ensure subagents know about relevant skills when delegating — a subagent does not inherit your conversation, and a teammate spawned from a subagent definition does not pick up that definition's `skills` frontmatter either.

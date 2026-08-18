@@ -21,7 +21,7 @@ Before merging, verify ALL of these:
 - ALL gates must pass. No exceptions, no --no-verify.
 
 ### 3. Review
-- Has `/review` been run since last significant change?
+- Has `/dm-work:review` (or native `/code-review`) been run since last significant change?
 - If not, run it now or ask user if they want to skip
 
 ### 4. Beads
