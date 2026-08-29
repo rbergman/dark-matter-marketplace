@@ -33,7 +33,7 @@ If no runtime testing is possible, the evaluator's value over intent review is m
 
 ```
 Task(subagent_type="general-purpose", model="opus", description="Evaluate against acceptance criteria", prompt="
-# Use model="haiku" for code-only evaluation with simple criteria (no browser-qa)
+# Evaluation is judgment — opus is the floor; never delegate grading to sonnet/haiku
 ROLE: Evaluator. You judge work against acceptance criteria. You do NOT implement or fix.
 
 BEAD: <id>
@@ -125,8 +125,8 @@ The orchestrator processes evaluator output:
 
 - Evaluator adds ~1-2 minutes per invocation (code-only) or ~2-4 minutes (with browser-qa)
 - Skip aggressively when not needed (see skip conditions above)
-- Use haiku model for code-only evaluation if criteria are simple
-- Use opus for browser-qa evaluation (needs to drive CDT tools effectively)
+- Opus is the model floor for evaluation — grading is judgment, not grunt work; manage cost by skipping unneeded evaluations, not by downgrading the judge
+- A contested verdict (implementer disputes a FAIL) is a good moment for a Codex second opinion, if installed — cross-model disagreement is signal; absence is noted, not blocking
 
 ## Platform-Specific Verification
 
@@ -135,7 +135,7 @@ Not all projects use browser-qa. The evaluator should adapt:
 | Project type | Verification method | Evaluator behavior |
 |-------------|--------------------|--------------------|
 | **Standard web app** | browser-qa (CDT MCP) | Full runtime evaluation |
-| **WebGL / Canvas game** | Manual screenshots + human verification | Mark runtime criteria UNTESTABLE; take screenshots if CDT available for visual reference, but can't assert on canvas content |
+| **WebGL / Canvas game** | Deterministic state dumps, seed replays, screenshot diffs | Verify runtime criteria via the project's observability surface: a `just state-dump`-style recipe, seeded/replayable runs, console-exposed game state (`evaluate_script`), screenshot comparison for visual criteria. Only mark UNTESTABLE when the project exposes none of these — and then recommend adding them: a game repo SHOULD expose deterministic state dumps and seeded runs, because agent-verifiable games are the ones agents can actually build (feel remains the operator's — grade mechanics, not fun) |
 | **Native iOS/Android** | Maestro or platform-specific tools | Mark runtime criteria UNTESTABLE unless project has automated UI test tooling wired |
 | **CLI tool** | Bash execution + output assertion | Code-only evaluation; test commands via bash, not browser |
 | **API / backend** | curl / httpie + response assertion | Code-only for endpoints; evaluate_script or direct API calls |

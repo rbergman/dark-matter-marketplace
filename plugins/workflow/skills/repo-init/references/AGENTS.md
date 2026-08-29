@@ -65,7 +65,9 @@ Choose the review mechanism by scope:
 
 - `/code-review` (native) for a meaningful diff — `low`/`medium` effort for high-confidence findings, `high`+ when you want breadth over precision
 - `/dm-work:review` when the findings should land in beads and the review point should be checkpointed for next time
-- A scope-bound subagent review ("read ONLY the diff and the OWN files") for narrower changes, optionally paired with a Codex second-opinion for cross-model coverage
+- A scope-bound subagent review ("read ONLY the diff and the OWN files") for narrower changes
+
+**Cross-model leg (recommended, optional):** when a second reviewer is warranted, Codex is the recommended instrument — different weights fail differently, and it runs on a separate subscription quota. Detect with `command -v codex`. Absent → proceed single-model and note it once in the review report ("cross-model review unavailable: codex not installed"); never block on its absence. Install via the `openai-codex` marketplace; `/codex:setup` configures it.
 
 The goal is to catch drift, accumulated debt, and integration gaps before they compound. Trivial fixes (typo, comment-only) skip review; anything changing runtime behavior, contracts, or shipped surfaces does not.
 
@@ -92,7 +94,7 @@ bd config set beads.role maintainer   # or "contributor" for outside contributor
 Repo-wide conventions worth stating once (not covered by injections):
 
 - **Bead-first workflow:** when ad hoc work appears (bug, feature, task) without an existing bead, create one before implementing. Every code change should trace back to a bead.
-- **Bead detail discipline:** every bead has an imperative title, a description that lets a cold session start work, explicit dependencies, and a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc and call out architectural decisions.
+- **Bead detail discipline:** every bead has an imperative title, a description that lets a cold session start work, explicit dependencies, and a complexity estimate (xs/s/m/l/xl). M+ beads link to a plan doc, call out architectural decisions, state acceptance criteria (split runtime vs code-verifiable — evaluator-ready), and name a verification plan (which gates, which external signal proves it). **The plan doc is the spec** — shape it with `dm-work:spec-shaping` (interview to the goal, explicit decision checkpoint) rather than improvising structure.
 - **Beads baseline: 1.0.4+.** Pin via `brew upgrade beads` etc. 1.0.4 removes the embedded-mode flock (concurrent bd processes are now safe), adds `bd -C <path>` for cross-cwd invocations, and hardens hook auto-import after pull/checkout. `bd init --force` is deprecated in 1.0.4 — use `--reinit-local` (and `--discard-remote` if you mean it).
 - **Sync model:** beads has two operating modes per upstream's [`SYNC_CONCEPTS.md`](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md). Both can be active across repos you work in — check per-repo before assuming a mode.
   - **Canonical (`refs/dolt/data` sync).** Dolt state lives in the `refs/dolt/data` git ref namespace on the same git remote as the code — invisible to branch trees, never appears in PR diffs. `.beads/issues.jsonl` is a **passive export** (viewer / interchange / backup), gitignored when this mode is active. Sync: `bd dolt push` (after meaningful bead work) and `bd dolt pull` (after `git pull` or as needed). `sync.remote` is set in `.beads/config.yaml`. Fresh clones onboard via `bd bootstrap`, which auto-detects `refs/dolt/data` on origin and hydrates Dolt directly. **`bd dolt push` is load-bearing under this mode — it's the sync, not a no-op.**
@@ -110,6 +112,8 @@ Repo-wide conventions worth stating once (not covered by injections):
 
 Follow the **Disciplined Development Loop** from your global AGENTS.md / CLAUDE.md: intake → orient → plan → implement → validate → gate → review → maintain context → re-align → handoff. Each substantial change moves through those steps; trivial fixes skip the heavyweight ones but keep their intent.
 
+**Spec-first for M+ or fuzzy work.** Before implementing, the goal, key decisions, acceptance criteria, and verification plan live in a durable spec (the bead's plan doc — see `dm-work:spec-shaping`), and any multi-step build states its verification plan before code is written: which gates run, which external signal proves the behavior (browser-qa, state dump, seed replay, API response), and whether the evaluator runs. XS/S well-understood work is exempt — a good bead description is its spec; don't ceremonialize small work.
+
 Delegate to subagents via `Task()` when work is parallelizable, benefits from a fresh context window, or naturally splits along file-ownership lines. Otherwise work directly. Don't perform skill-activation rituals at session start — invoke skills only when they match the task at hand.
 
 Agent Teams are off by default. When enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), any subagent you give a `name` launches as a teammate instead — see `dm-team:lead` and `dm-team:teammate`. Teams fit when agents need to discuss, challenge, or coordinate across turns; subagents fit fire-and-forget delegation.
@@ -117,6 +121,35 @@ Agent Teams are off by default. When enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TE
 ### Worktrees
 
 When creating worktrees for isolated feature work, always place them under `.worktrees/` in the repo root. Ensure `.worktrees/` is in `.gitignore` before creating. Use `bd worktree create <name>` for beads-integrated workflow (auto-claims a bead, links the worktree, and tracks merge readiness), or `git worktree add` for raw git.
+
+### Operator alignment
+
+This workflow aligns the operator as much as the agent — apply it in both directions, gently:
+
+- **Brain dumps are welcome.** A multi-thread message is intake, not a violation. Capture every distinct thread, list them back, propose a priority and a scope for this turn, and park the rest as beads — say where each thread went. No thread silently dropped.
+- **Gentle nudges when practice slips.** If a request skips a step this file establishes (spec for M+ fuzzy work, review before merge, verification plan before a multi-step build), give one brief plain-language reminder naming the step and offering the aligned path. One or two sentences, not a lecture. If the operator says proceed anyway, proceed without re-arguing.
+
+### Guardrail tiers
+
+Bucket agent-relevant actions into three tiers, and be honest about which tier each item is actually in:
+
+- **always-do** — autopilot, no ask: orientation, gates before commit, bead tracking, targeted validation.
+- **ask-first** — human checkpoint: merges, pushes to shared branches, destructive or irreversible operations, schema/contract changes, anything the operator scoped as theirs.
+- **never-do** — enforced by **hooks**, not prose. A prose "never" in this file is a request the model can drift past; a PreToolUse hook is a rule. **A never-do without an enforcing hook is an ask-first — either wire the hook or reclassify it honestly.** dm-work ships a `--no-verify` commit block; add a path-protection PreToolUse hook for repo-specific protected paths (see `dm-work:repo-init`).
+
+List this repo's never-do items here, each with the hook that enforces it:
+
+<!-- | Never-do | Enforcing hook | -->
+
+### Model routing
+
+Route by what the task *authors*, not by what's cheapest:
+
+- **Authoring floor: Opus 5+ (Claude) / GPT-5.6 Sol+ (Codex).** Anything that authors substance — code, specs, plans, reviews, designs, debugging, architecture — runs at or above this floor. No exceptions for "simple" code.
+- **Sub-floor models (Sonnet, Haiku, and peers) are for well-understood grunt work only, used sparingly**: code/file exploration and search fan-out, research retrieval and summarization, data extraction/filtering, well-understood mechanical tool use. Never authoring, planning, spec'ing, or reviewing.
+- **Fable-class** for long-horizon autonomous ownership, fuzzy/creative implementation ("make it feel right"), and multi-hour runs in a worktree.
+- **Codex lane** (ChatGPT subscription — a separate quota from Claude): recommended cross-model critic, and an implementation lane for well-specified bounded slices when Claude quota is the constraint. Absent → note it once, proceed single-model, never block.
+- Orchestrate and review in the interactive session; implement via subagents at the floor; judge via `dm-work:evaluator`.
 
 ---
 
@@ -165,6 +198,21 @@ Items marked SETTLED should not be revisited unless the user explicitly asks.
 For personal prefs that should work across worktrees, use imports: `@~/.claude/my-project-instructions.md` in your `CLAUDE.local.md`.
 
 **Deduplication:** Cross-repo policies (universal preferences, personal style) belong in `~/.claude/CLAUDE.md` or `~/.claude/rules/`. Per-repo AGENTS.md should focus on project-specific content. **For shared repos**, keep concise versions of foundational sections (especially Gall's Law / Prime Directive, Quality Gates) — other contributors won't share your global config, and the repo file should stand on its own. **For solo repos**, dedup against global is fine; let the global file be the source of truth.
+
+---
+
+## Knowledge Architecture
+
+Where compiled knowledge lives in this repo — so agents know where to look and where to deposit synthesis, instead of leaving discoveries in chat logs:
+
+| Store | Holds | Propagates? |
+|-------|-------|-------------|
+| `docs/` + bead-linked plan docs (specs) | Durable design intent, decisions, acceptance criteria | Yes (git) |
+| `AGENTS.md` + `.claude/rules/` | Team-shared working rules | Yes (git) |
+| timbers | Commit-level reasoning ledger | Yes (git) |
+| `bd remember` | Per-clone factual learnings (library gotchas, env quirks) | **No — per-clone only** |
+
+**Graduation path:** a lesson that recurs graduates upward — `bd remember` → this AGENTS.md → (when it proves cross-project) a dm-* skill or `~/.claude/rules/`. `/session-retro` harvests; periodic `align-agents` sweeps should ask "which of this repo's local rules have earned cross-project status?" Knowledge that only exists where it was learned is knowledge the next session rediscovers from scratch.
 
 ---
 

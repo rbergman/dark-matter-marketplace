@@ -92,6 +92,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
+| `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
+| `/dm-work:spec` | Command | Run the spec-shaping protocol on a work item or bead |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
 | `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |

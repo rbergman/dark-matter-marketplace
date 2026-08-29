@@ -46,6 +46,16 @@ Invoke native `/code-review` against the resolved target at `--effort` (default 
 
 For an automated caller, `low` or `medium` is right — `high` and above deliberately surface uncertain findings, which is noise when nothing downstream reads carefully.
 
+### Cross-model leg (recommended, optional)
+
+When the diff is foundational (architecture, security, money, concurrency, a spec later work builds on) or a second opinion is otherwise warranted, add a Codex pass — different weights fail differently, and it runs on a separate quota:
+
+```bash
+command -v codex && codex review --uncommitted   # or point it at the resolved range
+```
+
+Merge its findings into step 3 like any other finding source. **If `codex` is not installed:** proceed single-model and add one line to the report — "cross-model review unavailable: codex not installed" — never block, never nag beyond that line. Install via the `openai-codex` marketplace; `/codex:setup` configures it.
+
 ## 3. Filter
 
 Apply `--min-severity`. Drop any finding with no concrete failure mode regardless of its claimed severity — a finding that can't state what breaks is speculation, and leaving it in the report as a silent caveat is worse than dropping it.

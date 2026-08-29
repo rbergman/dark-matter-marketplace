@@ -565,6 +565,40 @@ Skip if the user only has one GitHub identity.
 
 ---
 
+## Step 8.8: Guardrail Hooks (Optional)
+
+The AGENTS.md template's **Guardrail tiers** section says: a never-do without an enforcing hook is an ask-first. dm-work already ships the `--no-verify` commit block globally. Offer repo-specific never-do enforcement:
+
+1. Ask whether the repo has **protected paths** — directories or files agents must never edit (generated code, vendored trees, signed configs, `important/` data).
+2. If yes, add a PreToolUse path-protection hook to the repo's `.claude/settings.json`. **The `file_path` the hook receives is absolute** — match the protected directory as a path segment, never with a `^`-anchored relative pattern (that silently matches nothing):
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if jq -r '.tool_input.file_path // empty' | grep -qE '/(<protected-dir>|<other-path>)/'; then echo 'Protected path — never-do tier. See AGENTS.md Guardrail tiers.' >&2; exit 2; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+3. **Test the hook before trusting it**: attempt one edit to a protected file and confirm it is actually blocked. A guardrail that has never fired is an assumption, not a rule.
+4. Record each protected path in the AGENTS.md **Guardrail tiers** never-do table with its enforcing hook, so prose and enforcement stay in sync.
+5. For game repos, also suggest an observability recipe (`just state-dump` or equivalent seeded/deterministic dump) — it's what makes runtime acceptance criteria evaluator-verifiable instead of UNTESTABLE (see **dm-work:evaluator**).
+
+Skip if the repo has no paths worth hard protection — don't scaffold speculative guardrails.
+
+---
+
 ## Step 9: Next Steps
 
 Point user to language-specific setup:

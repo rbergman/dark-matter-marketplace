@@ -1,6 +1,6 @@
 {
   "name": "dm-work",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Workflow tools: council deliberation, review wrapping native /code-review with beads, evaluator-judge protocol, browser QA, repo init, mise/output-compression tooling, and an ELI5 output style",
   "author": {
     "name": "Dark Matter",

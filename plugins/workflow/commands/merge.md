@@ -23,6 +23,7 @@ Before merging, verify ALL of these:
 ### 3. Review
 - Has `/dm-work:review` (or native `/code-review`) been run since last significant change?
 - If not, run it now or ask user if they want to skip
+- For foundational diffs (architecture, security, money, concurrency), a Codex cross-model pass is recommended if `codex` is installed. Absent → note "cross-model review unavailable: codex not installed" in the pre-flight summary and proceed — not blocking
 
 ### 4. Beads
 - Check for open beads on this branch: `bd list --status=in_progress`

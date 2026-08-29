@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # PreToolUse hook: Run a lightweight sanity review on staged changes before commit.
 # Intercepts git commit commands. Uses Codex CLI (cross-model, reads AGENTS.md natively)
-# or claude -p with Sonnet (reads CLAUDE.md/AGENTS.md as system context) as reviewer.
+# or claude -p with Opus (reads CLAUDE.md/AGENTS.md as system context) as reviewer.
+# Opus is the model floor for review work — never a sub-Opus model.
 #
 # Configuration (env vars):
-#   DM_SANITY_REVIEWER=codex|sonnet|off   (default: auto-detect)
+#   DM_SANITY_REVIEWER=codex|claude|off   (default: auto-detect; "sonnet" accepted as legacy alias for claude)
 #   DM_SKIP_SANITY=1                       (skip this commit — set by orchestrator for already-reviewed work)
 #   DM_SANITY_MAX_LOC=500                  (skip if diff exceeds this LOC — use /review instead)
 #
@@ -30,6 +31,13 @@ fi
 
 # Only intercept git commit commands
 if ! echo "$COMMAND" | grep -qE '^\s*git\s+commit\b'; then
+  exit 0
+fi
+
+# --no-verify commits are block-no-verify.sh's job (hooks in a matcher group run
+# in parallel) — don't spend a model call reviewing a commit that's being blocked
+if echo "$COMMAND" | grep -qE '\--no-verify' \
+   || echo "$COMMAND" | grep -qE 'git\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*(\s|$)'; then
   exit 0
 fi
 
@@ -67,7 +75,7 @@ fi
 MAX_LOC=${DM_SANITY_MAX_LOC:-500}
 LOC=$(git diff --cached --stat | tail -1 | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' || echo "0")
 if [ "$LOC" -gt "$MAX_LOC" ]; then
-  echo '{"decision":"allow","reason":"Sanity review skipped: diff exceeds '"$MAX_LOC"' LOC. Consider running /dm-work:review for a full review."}'
+  jq -n --arg m "Sanity review skipped: diff exceeds ${MAX_LOC} LOC. Consider running /dm-work:review for a full review." '{systemMessage: $m}'
   exit 0
 fi
 
@@ -88,11 +96,18 @@ fi
 # --- Select reviewer ---
 REVIEWER=${DM_SANITY_REVIEWER:-auto}
 
+# Legacy alias
+if [ "$REVIEWER" = "sonnet" ]; then
+  REVIEWER="claude"
+fi
+
+FALLBACK_NOTE=""
 if [ "$REVIEWER" = "auto" ]; then
   if command -v codex &>/dev/null; then
     REVIEWER="codex"
   else
-    REVIEWER="sonnet"
+    REVIEWER="claude"
+    FALLBACK_NOTE="[cross-model review unavailable: codex not installed — claude reviewing] "
   fi
 fi
 
@@ -101,8 +116,8 @@ DIFF=$(git diff --cached 2>/dev/null || true)
 REVIEW_OUTPUT=""
 REVIEW_STATUS=0
 
-# Sonnet prompt — references CLAUDE.md/AGENTS.md which claude -p loads automatically
-SONNET_PROMPT="You are a sanity reviewer. The project's CLAUDE.md (loaded as system context) contains coding standards and conventions — apply them.
+# Claude prompt — references CLAUDE.md/AGENTS.md which claude -p loads automatically
+CLAUDE_PROMPT="You are a sanity reviewer. The project's CLAUDE.md (loaded as system context) contains coding standards and conventions — apply them.
 
 Review the staged diff below for OBVIOUS issues only:
 - Bugs and logic errors
@@ -121,22 +136,26 @@ case "$REVIEWER" in
   codex)
     # Codex CLI review — reads AGENTS.md natively, cross-model sanity check
     REVIEW_OUTPUT=$(timeout 60 codex review --uncommitted 2>&1) || REVIEW_STATUS=$?
-    # If Codex fails (not installed, usage exhausted, timeout), fall back to sonnet
+    # If Codex fails (usage exhausted, timeout), fall back to claude — noted, not silent
     if [ $REVIEW_STATUS -ne 0 ] || [ -z "$REVIEW_OUTPUT" ]; then
       if command -v claude &>/dev/null; then
-        REVIEWER="sonnet"
-        REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-sonnet-4-6 "$SONNET_PROMPT" 2>&1) || REVIEW_STATUS=$?
+        REVIEWER="claude"
+        FALLBACK_NOTE="[cross-model review unavailable: codex failed — claude fallback] "
+        REVIEW_STATUS=0
+        REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-opus-5 "$CLAUDE_PROMPT" 2>&1) || REVIEW_STATUS=$?
       else
-        # No reviewer available — allow commit
+        # No reviewer available — allow commit, but say so
+        jq -n '{systemMessage: "Sanity review skipped: no reviewer available (neither codex nor claude CLI on PATH)."}'
         exit 0
       fi
     fi
     ;;
-  sonnet)
+  claude)
     if ! command -v claude &>/dev/null; then
+      jq -n '{systemMessage: "Sanity review skipped: claude CLI not on PATH."}'
       exit 0
     fi
-    REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-sonnet-4-6 "$SONNET_PROMPT" 2>&1) || REVIEW_STATUS=$?
+    REVIEW_OUTPUT=$(timeout 60 claude -p --model claude-opus-5 "$CLAUDE_PROMPT" 2>&1) || REVIEW_STATUS=$?
     ;;
   *)
     exit 0
@@ -161,12 +180,23 @@ fi
 # Increment circuit breaker
 echo $((COUNT + 1)) > "$COUNTER_FILE"
 
+FINDINGS=$(echo "$REVIEW_OUTPUT" | head -20)
+
 if [ "$ADVISORY_MODE" = "true" ]; then
-  # Advisory only — warn but don't block
-  echo '{"decision":"allow","reason":"⚠️ Sanity review (advisory, circuit breaker active):\n'"$(echo "$REVIEW_OUTPUT" | head -20 | sed 's/"/\\"/g' | tr '\n' ' ')"'\n\nCircuit breaker: 2+ review rounds. Findings are advisory. Set DM_SKIP_SANITY=1 or run /dm-work:review for a full review."}'
+  # Advisory only — warn but don't block (jq handles all string escaping)
+  jq -n --arg m "⚠️ ${FALLBACK_NOTE}Sanity review (advisory, circuit breaker active):
+${FINDINGS}
+
+Circuit breaker: 2+ review rounds. Findings are advisory. Set DM_SKIP_SANITY=1 or run /dm-work:review for a full review." '{systemMessage: $m}'
   exit 0
 fi
 
-# Block with findings — agent reads these and decides
-echo '{"decision":"block","reason":"🔍 Sanity review found concerns:\n\n'"$(echo "$REVIEW_OUTPUT" | head -20 | sed 's/"/\\"/g' | tr '\n' ' ')"'\n\nTo proceed: fix the issues and commit again, OR set DM_SKIP_SANITY=1 if you disagree with the findings."}'
+# Block with findings — stderr + exit 2 is the documented block channel and reaches the model
+{
+  echo "🔍 ${FALLBACK_NOTE}Sanity review found concerns:"
+  echo
+  echo "$FINDINGS"
+  echo
+  echo "To proceed: fix the issues and commit again, OR set DM_SKIP_SANITY=1 if you disagree with the findings."
+} >&2
 exit 2
