@@ -69,6 +69,10 @@ Is the feedback close enough in time to the action?
 
 **Rule:** Immediate visual feedback within 1-2 frames (16-33ms), even if the full animation plays out over longer. The *onset* must be instant.
 
+**Act on press.** Fixed controls, verb keys and world clicks do the thing on the press event; release only modifies or ends what the press started, and the modification must be compatible with the original action (reload / hurried reload / careful reload — never a different verb). Even a ballistic tap has tens of ms between press and release; act-on-release adds that to every interaction and lets focus leave the hit box between the two events. Source: John Carmack, 7 May 2024, reporting a Meta user study on the VR keyboard — fewer typos, expressed preference, "crisper". Exceptions are FORM, not friction: drag surfaces (scrolling views, drag-and-drop, long-press menus) where a press must be provisional. A control that acts on release needs its reason written next to it.
+
+Timeliness has two layers, and a game can pass one and fail the other. The **input layer** is the press initiating the action the same frame. The **feedback layer** is something on screen acknowledging the press within 1-2 frames even when the payload is deliberately late. A wind-up is fine when the wind-up *is* the acknowledgement; a ranged cast whose only feedback is the projectile has none until the projectile.
+
 ---
 
 ## The Juice Checklist
@@ -132,6 +136,8 @@ When something feels wrong, diagnose systematically:
 - Compare against the threshold table above
 - Check if input buffering is working (player presses attack during recovery — does it queue?)
 - Check cancel windows (can the player interrupt one action with another when expected?)
+- Which layer is the lag in? Trace the press event: does it initiate the action the same frame (input layer), and does anything on screen acknowledge it within 1-2 frames (feedback layer)? A ranged attack loosed at a melee swing's impact frame has correct input and no acknowledgement for 300+ ms.
+- Is anything acting on release? `grep` for pointerup / keyup / mouseup handlers that *start* an action rather than modify or end one.
 
 ### Step 3: Check Proportionality
 
@@ -176,6 +182,7 @@ All values below are **starting points** — tune through playtesting per the Nu
 | Collect | Instant | 200-400ms fade | On contact | Magnet + pop + counter pulse |
 | Damage taken | 1 frame flash | 200-500ms | On contact | Screen edge vignette, sound, shake |
 | Death | 3-5 frame slow | 500ms-2s | Dramatic sting | Time slow, camera pull, fade |
+| Ranged attack / cast | 1-2 frames (acknowledge the press) | 150-400ms to release | On release | The projectile is the payload, not the acknowledgement; something must move on the press |
 
 ---
 
@@ -187,6 +194,8 @@ All values below are **starting points** — tune through playtesting per the Nu
 - **Feedback without meaning** — visual noise that doesn't communicate game state
 - **Animation priority over responsiveness** — finishing a pretty animation at the cost of input responsiveness
 - **Same sound on repeat** — rapid repeated actions need pitch/timing variation or they become grating
+- **Act on release** — doing the thing when the button comes up instead of when it goes down. See Gate 3.
+- **Confirm instead of undo** — a modal "are you sure" or an act-on-release safety net where a reversible action would do. Carmack: "Just do it, but allow it to be un-done."
 
 ---
 

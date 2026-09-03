@@ -43,6 +43,8 @@ The brain doesn't passively receive information — it actively constructs a mod
 - [ ] Is critical info visible in peripheral vision? (Health bars, ammo counts)
 - [ ] Does the design work at target viewing distance? (TV from couch vs. phone vs. monitor)
 
+**Control affordance: highlight on pointer-enter, act on press.** That is the two-stage commit act-on-release is usually defended as providing, without the release delay (see **game-feel**, Gate 3). Not available on touch, where the finger occludes the control; there, the drag-off cancel is the only two-stage option and act-on-release is the honest default for touch-only surfaces.
+
 ### Pillar 2: Attention
 
 Attention is a finite resource. The brain consumes ~20% of body energy at ~2% of body weight. Every UI element, tutorial popup, and status indicator competes for this budget.

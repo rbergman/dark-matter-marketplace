@@ -106,7 +106,7 @@ When told "it feels wrong/boring/clunky," diagnose in order:
 |---------|-------------|----------------------|-----------|
 | "I didn't know that would happen" | Clarity | Add telegraph, audio cue, UI indicator | **player-ux** |
 | "I don't care" | Motivation | Connect to progression, increase stakes | **experience-design** |
-| "It feels laggy" | Response | Add buffering, allow cancels, reduce lockouts | **game-feel** |
+| "It feels laggy" | Response | First find the layer: input acts on release, or the press is unacknowledged until the payload lands. Then buffering, cancels, lockouts | **game-feel** |
 | "It feels weak" | Satisfaction | Add feedback channels (minimum 2) | **game-feel** |
 | "It doesn't fit" | Fit | Adjust timing, weight, audio texture | **game-feel** |
 | "It's not balanced" | Balance | Check cost curves, dominant strategies | **game-balance** |
