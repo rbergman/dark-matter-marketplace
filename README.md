@@ -93,6 +93,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
 | `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
+| `dm-work:workflow-commands` | Skill | Expose the same DM command instructions in Codex and other hosts without Claude slash commands |
 | `/dm-work:spec` | Command | Run the spec-shaping protocol on a work item or bead |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
@@ -193,9 +194,11 @@ codex plugin add dm-work@dark-matter-marketplace
 
 Repeat the last command for the desired `dm-*` plugins. Claude uses the commands
 below, then `claude plugin update <plugin>@dark-matter-marketplace --scope user`
-for an existing user install. Start a new session after updating. Codex imports
-supported skills/commands/hooks; Claude-specific tools still require their host
-or an explicitly described fallback.
+for an existing user install. Start a new session after updating. Codex discovers
+the plugin's skills; use `dm-work:workflow-commands` for named command workflows
+such as align-steering or review. Claude-specific tools still require their host
+or an explicitly described fallback; installed files alone do not prove every
+hook or native command is supported.
 
 Workflow changes are checked against `tests/workflow-cases.md` and the mocked
 commit-hook tests (`bash tests/test-sanity-review.sh`). The mocks verify command
