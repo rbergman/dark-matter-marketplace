@@ -1,6 +1,7 @@
 ---
 name: spec-shaping
-description: Shape a durable spec before implementation — interview the operator to the goal, draft the spec as a repo artifact, checkpoint key decisions explicitly, then slice into bounded beads. Use when starting any M+ piece of work, when a request is fuzzy at any size ("make it feel better", "add reporting"), when the user asks for a spec / plan doc / design doc, before a long autonomous implementation run, or before delegating implementation to subagents or Codex. Do NOT use for XS/S well-understood work — a bead description suffices there, and forcing the protocol onto small work is waterfall ceremony. The spec is what makes implementers interchangeable: any model, any session, any harness can pick up a bounded slice and be judged against the same criteria.
+description: >-
+  Shape a durable spec before implementation — interview the operator to the goal, draft the spec as a repo artifact, checkpoint key decisions explicitly, then slice into bounded beads. Use when starting any M+ piece of work, when a request is fuzzy at any size ("make it feel better", "add reporting"), when the user asks for a spec / plan doc / design doc, before a long autonomous implementation run, or before delegating implementation to subagents or Codex. Do NOT use for XS/S well-understood work — a bead description suffices there, and forcing the protocol onto small work is waterfall ceremony. The spec is what makes implementers interchangeable: any model, any session, any harness can pick up a bounded slice and be judged against the same criteria.
 ---
 
 # Spec Shaping
@@ -87,17 +88,22 @@ Template — include only sections that carry content, never pad:
 
 ### 3. Decision checkpoint
 
-Before any implementation: present the Key decisions table, PROPOSED rows
-flagged, in **one message**. Every assumption an agent makes is a drift
-opportunity; this is where assumptions become decisions. The operator confirms
-or corrects; PROPOSED flips to decided. Do not start building with PROPOSED
-rows open on anything architectural.
+The lead (Astra/Fable under the operator's routing policy) owns task definition,
+architecture, acceptance criteria, and verification design. Present unsettled
+decisions with their concrete consequences. Honor decisions and authority already
+given; do not ask for the same approval again. Resolve routine reversible details
+from the code and context. Checkpoint materially different product/architectural
+choices with the operator before dependent implementation, continuing independent
+work where useful. Understanding cannot be outsourced: explain consequential
+tradeoffs clearly enough that the operator can judge the decision.
 
 ### 4. Slice into beads
 
 Each slice = one bead. The bead carries its acceptance criteria and links the
 spec. Implementers (subagent, Codex, fresh session) receive the spec excerpt +
-criteria — bounded context, not conversation history.
+criteria — bounded context, not conversation history. Sol/Opus can implement a
+settled slice; smaller models gather evidence. Return consequential ambiguity to
+the lead instead of silently changing the contract.
 
 ## After the spec
 

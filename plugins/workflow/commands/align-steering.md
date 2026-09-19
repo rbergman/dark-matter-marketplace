@@ -1,127 +1,37 @@
 ---
-description: Review and align steering files (CLAUDE.md, AGENTS.md) with Claude Opus 5 prompting best practices
-argument-hint: "[file paths]"
+description: Align steering with the selected model's current official guidance while preserving task boundaries, authorization, and verification requirements
+argument-hint: "[file paths] [target model, if different from the current model]"
 ---
 
 # Align Steering Files
 
-Review steering files and skill definitions for alignment with Claude Opus 5 prompting best practices, then apply fixes.
+Review the requested CLAUDE.md, AGENTS.md, rules, or skills and apply focused fixes. If no files are given, inspect the current repository's steering first; expand only to referenced guidance that affects it.
 
-## Arguments
+## Establish the target and evidence
 
-If file paths are provided, review those files. Otherwise, find and review the standard steering artifacts:
-- `CLAUDE.md` (project root)
-- `AGENTS.md` (project root)
-- `.claude/CLAUDE.md` (if present)
-- `SKILL.md` files (if reviewing a plugin)
+Use the user's named model, otherwise the current session's actual model. Do not silently substitute another model or equate effort labels across vendors. For files shared by multiple models, preserve a common behavioral contract and add only necessary model-specific guidance.
 
-## Checklist
+Fetch the selected model's current official prompting guide before making model-specific changes. Starting points:
 
-Apply each check to every steering file. For each issue found, edit the file directly.
+- Astra: https://developers.openai.com/api/docs/guides/latest-model
+- Fable 5.1: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1
 
-### 1. Soften aggressive triggers
+Check that the fetched page covers the exact target. If the target or documentation cannot be established, report that gap and limit edits to demonstrable internal contradictions, stale paths, or duplication. Do not infer unsupported capabilities or remove instructions on the assumption that they are native behavior.
 
-Opus 5 follows instructions literally. Aggressive language written to compensate for older models undertriggering now causes overtriggering.
+## Edit the behavior, not just the wording
 
-| Find | Replace with |
-|------|-------------|
-| `CRITICAL`, `CRITICAL:`, `**CRITICAL**` | Remove or state plainly |
-| `MUST`, `ALWAYS`, `NEVER` (in caps) | Lowercase equivalents with motivation |
-| `BLOCKING REQUIREMENT` | Remove — just state the requirement |
-| `MANDATORY`, `NON-NEGOTIABLE` | "Required" or just state it |
-| `DO NOT` / `NEVER` without motivation | Add why: "Do not X because Y" |
+1. Identify the concrete behavior each rule protects. Preserve security boundaries, user-owned taste decisions, acceptance criteria, and required checks. Keep already-authorized actions authorized; request approval only when authority is missing or the action materially changes.
+2. Resolve contradictions in scope, permission, testing, and completion rules. Distinguish failures introduced by the change from pre-existing blockers and unrelated findings. A failing required gate remains unresolved; it does not authorize unrelated remediation or a clean-completion claim.
+3. Make autonomy specific: finish the authorized task, infer routine reversible choices from context, and ask only about material ambiguity. Keep user-facing progress during long work and batch independent tools when supported. Do not remove these instructions merely because an earlier model did them by default.
+4. Route by responsibility. Astra/Fable retain planning, architecture, UI/creative design, acceptance criteria, verification design, difficult diagnosis, and cohesion. Sol/Opus can implement a bounded contract; smaller workers gather evidence. Preserve the operator's model policy and actual harness capabilities. Use compact handoffs when they move meaningful work; neither require delegation for every step nor ban it globally.
+5. Keep meaningful verification and one independent review where required. Reuse evidence for unchanged bytes; review changed seams and unresolved risks. Do not manufacture new tests or repeated gate runs solely to satisfy a ritual.
+6. Keep instructions short enough to navigate, but do not delete useful guidance merely to lower word count. Narrow skill triggers, consolidate duplicated rules, and load detailed references when relevant. There is no target word count for skill descriptions.
+7. Preserve constraints, rejected approaches, exact references, current status, and next actions in durable handoffs. API-specific cache/thinking behavior belongs in harness code only when that harness implements it; do not promise cache hits through prose.
 
-**Key principle:** Where you would have said "CRITICAL: You MUST do X", say "Do X" or "Do X because Y". Claude follows either, but the aggressive version causes overtriggering on edge cases.
+For Astra, check explicit delegation triggers, skill-priority conflicts, unnecessary pauses, and over-broad verification. For Fable 5.1, check progress updates, independent tool batching, targeted edits, completion of the whole request, scope control, and continuation details. Verify these against the fetched guide; this list is a starting point, not an immutable model fact.
 
-### 2. Add motivation to constraints
+## Validate and hand off
 
-Instructions with "why" are followed more precisely than bare commands. Claude generalizes from explanations.
+Read the final instructions as a single policy. Walk through: an already-authorized publish, a pre-existing failing gate, a small bounded fix, an ambiguous architectural choice, missing required runtime evidence, and an unknown model. Explain any changed behavior and unresolved conflict. Foundational steering gets the operator's required independent review against exact bytes.
 
-**Before:** `NEVER use ellipses`
-**After:** `Avoid ellipses — they render poorly in text-to-speech output.`
-
-For each constraint that lacks motivation, add a brief reason. If the reason is obvious, the constraint can stay bare.
-
-### 3. Remove anti-laziness prompting
-
-Opus 5 is proactive by default and delegates conservatively unless asked. Instructions written to push older models toward thoroughness now cause over-exploration; instructions discouraging delegation now over-restrict.
-
-Remove or soften:
-- "If in doubt, use [tool]" — causes overtriggering
-- "Default to using [tool]" — replace with "Use [tool] when..."
-- "Be thorough" / "Be comprehensive" — remove unless you genuinely want exhaustive output
-- "Make sure to check..." / "Don't forget to..." — remove if it describes default behavior
-- Anti-laziness affirmation checklists ("I will not skip steps...")
-
-### 4. Remove redundancy with native behavior
-
-Opus 5 does these natively. Instructions about them add context cost without benefit:
-
-- Parallel tool calls (native — remove unless tuning aggression level)
-- Response-length calibration (native — remove "be concise" / "be thorough" boilerplate; tune effort level instead)
-- Reading files before editing (native — remove)
-- Using available tools (native — remove "Use your tools" type instructions)
-- User-facing progress updates during long agentic traces (native — remove "summarize after every N tool calls")
-
-### 5. Tell what to do, not what not to do
-
-Negative instructions are harder to follow precisely. Reframe as positive guidance.
-
-**Before:** "Do not use markdown in your response"
-**After:** "Write in flowing prose paragraphs."
-
-**Before:** "Do not create unnecessary files"
-**After:** "Prefer editing existing files over creating new ones."
-
-### 6. Check overeagerness prevention
-
-Ensure the file includes minimal-change principles if the project does implementation work. If missing, consider adding:
-
-```
-Keep changes minimal and focused. Only modify what was requested or is clearly necessary. Don't add features, refactor surrounding code, or introduce abstractions beyond what the task requires.
-```
-
-Skip this if the file is purely informational (project structure docs, etc.).
-
-### 7. Check autonomy/safety balance
-
-If the file governs agent behavior, ensure it distinguishes:
-- **Local, reversible actions** (editing files, running tests) — proceed freely
-- **Shared/destructive actions** (pushing, deleting branches, posting comments) — confirm first
-
-If this distinction is missing and the project has agents doing implementation work, add it.
-
-### 8. Match style to desired output
-
-If the steering file uses heavy markdown formatting (bold everywhere, tables for simple lists, nested bullet points), the agent's output will mirror that style. Simplify the file's own formatting to match the communication style you want.
-
-### 9. Skill descriptions: imperative and trigger-forward
-
-When reviewing SKILL.md frontmatter descriptions:
-
-- Use imperative form: "Use when..." not "This skill should be used when..." or "This skill provides..."
-- List adjacent trigger contexts explicitly, including edge cases where the user doesn't name the skill directly
-- Focus on what the user is trying to do, not what the skill implements internally
-- Target 100-200 words — descriptions compete with other skills for attention in the available_skills list
-- Make descriptions distinctive and immediately recognizable
-
-**Before:** "This skill provides patterns for setting up just in projects."
-**After:** "Patterns for setting up just (command runner). Use when creating build systems, setting up new repos, or when the user asks about justfile configuration."
-
-Note: drop "PROACTIVELY" wording. Imperative "Use when..." is sufficient and avoids the directive framing that read as instructing the model rather than describing triggers.
-
-### 10. Explain reasoning behind constraints
-
-Reinforces check 2 for skill body content specifically. If a skill includes rules or constraints, each should explain why. LLMs follow reasoning-backed instructions more precisely than bare commands — they can generalize from explanations to handle edge cases the rule didn't anticipate.
-
-**Before:** "Lower layers MUST NOT import from higher layers"
-**After:** "Lower layers never import from higher layers — this preserves dependency direction and enables independent testing"
-
-If you find ALWAYS/NEVER/MUST in skill content, reframe as: state the constraint in lowercase + explain the consequence of violating it.
-
-## Output
-
-After applying all edits, summarize:
-- Number of issues found and fixed per category
-- Any items you chose not to change and why
-- Remaining concerns that need human judgment
+Report changed files, the official sources consulted, preserved constraints, and checks performed. Do not expand this into a wholesale rewrite unless the requested outcome needs one.

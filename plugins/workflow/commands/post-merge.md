@@ -27,7 +27,13 @@ $ARGUMENTS
 ```bash
 # Auto-detect: find the most recent merge commit
 MERGE_COMMIT=$(git log --merges -1 --format="%H")
-MERGE_BASE=$(git merge-base HEAD~1 HEAD)
+if [ -z "$MERGE_COMMIT" ]; then
+  echo "No merge detected; supply an explicit range."
+  exit 0
+fi
+# After confirming a merge exists, compare its first parent with that merge.
+# Do not use today's HEAD if work has continued since the merge.
+MERGE_BASE=$(git rev-parse "${MERGE_COMMIT}^1")
 
 # Or use explicit range
 # --commits HEAD~5..HEAD
@@ -57,7 +63,7 @@ Run `/dm-work:review` on the merge diff with narrowed scope:
 **Scoping rules** (don't re-review what was reviewed pre-merge):
 - Use `--min-severity medium` by default (skip low-severity noise)
 - Focus on net-new concerns: integration issues, merge artifacts, missed conflicts
-- If a pre-merge review tag exists for the branch, the review command will auto-detect and focus on changes since the last review
+- Explicit ranges take precedence over review tags. Pass the merge's first-parent base and exact merge target; include prior review evidence so the reviewer can focus on integration changes and unresolved seams without pretending a tag changed the requested range.
 
 ### Step 4: Run Evaluator on Closed Beads
 
@@ -65,24 +71,25 @@ For each closed bead that has acceptance criteria:
 
 1. Check if CDT MCP is connected and app is running
 2. If yes: run evaluator with browser-qa against each criterion
-3. If no: run code-only evaluation (or skip if all criteria are runtime-dependent)
+3. If no: use other available runtime instruments (CLI, API, replay, native tooling). Mark unsupported required criteria UNTESTABLE and the overall result BLOCKED.
 
 ```
 Task(... evaluator prompt from dm-work:evaluator ...
   BEAD: <closed-bead-id>
   ACCEPTANCE CRITERIA: <from bead --design>
-  CODE DIFF: <merge diff relevant to this bead>
+  TARGET: <exact merge commit, base, relevant files, runtime build provenance>
 )
 ```
 
 **Skip evaluator** if:
 - `--skip-eval` flag provided
 - No closed beads found with acceptance criteria
-- All criteria are UNTESTABLE (no CDT, no code-verifiable criteria)
+
+Skipping invocation is not acceptance. Report which criteria remain unverified, including when `--skip-eval` is supplied. Missing required evidence is a tracked verification gap, even though the merge already happened; never retroactively label it verified.
 
 ### Step 5: File Findings as Beads
 
-For review findings and evaluator failures, create beads:
+For review findings, evaluator failures, and BLOCKED required criteria, create or update linked beads (reuse existing findings rather than duplicating them):
 
 ```bash
 # Review finding → bug bead

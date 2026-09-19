@@ -1,157 +1,65 @@
 ---
 name: evaluator
-description: Grade implementation work against bead acceptance criteria using a separate judge agent. Use after subagent work passes mechanical gates, as a pre-merge check, or on-demand to evaluate existing features. The evaluator is NOT the orchestrator and NOT the implementer — it only judges. Integrates with browser-qa for runtime verification when CDT MCP is available.
+description: Evaluate implementation against agreed acceptance criteria using an independent judge and exact code or runtime evidence. Use before acceptance or merge when behavioral evidence is needed, after bounded implementation, or on demand. Missing evidence remains unresolved.
 ---
 
 # Evaluator Protocol
 
-Separate the agent doing work from the agent judging it. This is more tractable than making one agent self-critical.
+The evaluator judges; the implementer fixes. Use Astra/Fable for verification adequacy, ambiguous criteria, design, and consequential risks. Sol/Opus may check a fully specified implementation contract. Smaller workers may collect evidence but do not decide acceptance. Respect the operator's model policy and available harness; do not silently downgrade or switch providers.
 
-## When to Invoke
+## When to invoke
 
-The orchestrator calls the evaluator in these situations:
+Use after mechanical gates when required acceptance criteria still need independent behavioral evidence, or on demand. Reuse valid evidence for unchanged code instead of launching a duplicate evaluation. A missing bead does not erase acceptance criteria supplied in a prompt or spec.
 
-1. **Post-subagent, pre-merge** — after implementation passes mechanical gates AND either:
-   - Browser-qa is available (CDT MCP connected + app running) — runtime evaluation
-   - Acceptance criteria require runtime testing ("user can...", "page shows...", "form validates...")
-2. **On-demand** — `evaluate <bead-id>` to test an existing feature against its criteria
-3. **Post-merge** — `/dm-work:post-merge` runs evaluator against closed beads
+If no criteria exist, return BLOCKED with the missing contract. If all required criteria already have adequate independent evidence for the exact target, report that evidence and omit a redundant run. Missing runtime access is not a skip condition for required runtime criteria.
 
-**Skip evaluator when:**
-- XS/S tasks without acceptance criteria
-- Intent review returned COVERAGE: full, DRIFT: none, GAPS: none AND no browser-qa available
-- Bead has no acceptance criteria (report to orchestrator, don't run empty evaluation)
-- Task has no bead (ad-hoc work)
+## Give the judge a bounded brief
 
-The intent review and evaluator have complementary scope:
-- **Intent review** checks CODE COVERAGE — does the diff contain the right changes?
-- **Evaluator** checks BEHAVIORAL CORRECTNESS — does the running app satisfy each criterion?
+Use the harness's actual fresh-context agent tool. Include:
 
-If no runtime testing is possible, the evaluator's value over intent review is minimal. Skip it.
+- The agreed acceptance criteria and their source; criteria are required unless explicitly designated optional by that source.
+- Repository, base and reviewed commit/tree IDs, or an immutable snapshot with file hashes for uncommitted/non-repository work. Include changed files and directly relevant context; a summary is navigation, not evidence.
+- Runtime target and its relationship to the reviewed code: build/commit, URL or executable, fixture/seed, and reproduction commands. Unknown runtime provenance leaves affected criteria UNTESTABLE.
+- Checks already run, their results, and known limitations. The judge inspects artifacts and reports missing access rather than falling back to the author's assurances.
 
-## Evaluator Agent Template
+The judge does not modify code, criteria, tracker state, or merge anything. It returns material ambiguity to the lead. The lead resolves it with the operator when the agreed outcome would change.
 
-```
-Task(subagent_type="general-purpose", model="opus", description="Evaluate against acceptance criteria", prompt="
-# Evaluation is judgment — opus is the floor; never delegate grading to sonnet/haiku
-ROLE: Evaluator. You judge work against acceptance criteria. You do NOT implement or fix.
+## Judge each criterion
 
-BEAD: <id>
-ACCEPTANCE CRITERIA (from bead --design field):
-<numbered list of criteria>
+Choose evidence that can observe the claimed behavior. A function's existence does not prove it works; a test-pass criterion requires the actual test result, not just reading test source. Browser interaction, CLI execution, API calls, state dumps, seeded replays, and visual inspection are all runtime evidence. Use browser-qa only when appropriate and available; a missing browser connector does not prevent CLI or API verification.
 
-CODE DIFF:
-<git diff output or summary of changes>
+Results:
 
-EVALUATION PROCESS:
+- PASS: direct evidence satisfies the criterion; cite artifact or command and observed result.
+- FAIL: observed behavior contradicts the criterion; give the reproduction and failure.
+- UNTESTABLE: evidence, access, provenance, or interpretation is insufficient; say what would resolve it. Ambiguous criteria are UNTESTABLE, not guessed PASS/FAIL.
+- WAIVED: an explicitly optional criterion was waived by the operator; record who authorized it and why. Waived is not passed. Changing a required criterion needs an explicit contract revision first.
 
-1. Classify each criterion:
-   - RUNTIME: requires browser interaction to verify ("user can...", "page shows...", "form validates...")
-   - CODE: verifiable from code inspection ("function exists", "type is correct", "test passes")
+Overall result, in precedence order:
 
-2. If browser-qa available (CDT MCP connected, app running at <url>):
-   - Activate dm-work:browser-qa
-   - For each RUNTIME criterion: navigate, interact, assert
-   - For each CODE criterion: inspect the diff
+1. FAIL if any unwaived criterion fails.
+2. BLOCKED if any required criterion is UNTESTABLE, the contract is absent, or a required criterion lacks a result.
+3. PASS only when every required criterion passes and every optional criterion passes or has an explicit waiver. An unresolved optional criterion remains BLOCKED until resolved or waived.
 
-3. If browser-qa NOT available:
-   - For each CODE criterion: inspect the diff
-   - For each RUNTIME criterion: mark UNTESTABLE with reason
-   - If ALL criteria are UNTESTABLE: return early with overall: SKIP
+Never use SKIP to imply acceptance. Required criteria that cannot be tested prevent verified acceptance even if all available checks passed.
 
-4. Grade each criterion: PASS / FAIL / UNTESTABLE
-   - PASS: criterion is satisfied (code or runtime evidence)
-   - FAIL: criterion is not satisfied (describe what's wrong)
-   - UNTESTABLE: cannot verify without runtime / missing prerequisite
+Return JSON with `target`, `criteria_results` (criterion ID/text, required, result, evidence, limitation, and waiver authority if applicable), `overall`, and a short `summary`. A criterion may have evidence from multiple instruments; name what those instruments cannot establish.
 
-SKILLS: dm-work:browser-qa (if CDT MCP available)
+## Act on the result
 
-OUTPUT FORMAT (JSON to stdout):
-{
-  \"bead_id\": \"<id>\",
-  \"criteria_results\": [
-    {
-      \"criterion\": 1,
-      \"text\": \"User can navigate to /settings\",
-      \"type\": \"RUNTIME\",
-      \"result\": \"PASS\",
-      \"detail\": \"Navigated to /settings, page loads with profile form visible\"
-    },
-    {
-      \"criterion\": 2,
-      \"text\": \"Email validates client-side\",
-      \"type\": \"RUNTIME\",
-      \"result\": \"FAIL\",
-      \"detail\": \"Entered invalid email 'notanemail', no validation error shown\"
-    }
-  ],
-  \"overall\": \"FAIL\",
-  \"pass_count\": 1,
-  \"fail_count\": 1,
-  \"untestable_count\": 0,
-  \"summary\": \"1/2 criteria pass. Email validation missing on client side.\"
-}
+- PASS: acceptance evidence is complete; merge still requires the repository's gates, review, and existing authorization.
+- BLOCKED: recover the missing evidence or clarify the contract. Report the unresolved criterion; do not merge or close as verified acceptance. If discovered post-merge, record the gap and track remediation without retroactively claiming verification.
+- FAIL: the implementer fixes in-scope defects, then the judge checks the changed behavior and affected seams. A large failure count is a reason for the lead to reassess the approach, not proof that the spec is wrong.
 
-RULES:
-- Judge ONLY against the listed acceptance criteria. Do not invent requirements.
-- PASS means the criterion is satisfied, not that the code is perfect.
-- Report what you observed, not what you assumed.
-- If a criterion is ambiguous, grade it and note the ambiguity in detail.
-- Do NOT modify code, commit, or close beads.
-")
-```
+Never rewrite acceptance criteria to make a failed implementation pass. Proposed contract revisions include their reason and impact, and follow the operator's decision authority. After repeated failure on the same criterion, the lead re-examines the hypothesis or verification method instead of repeating the same loop. Ask the operator only when a material decision or unavailable input remains.
 
-## Handling Evaluator Results
+## Platform evidence
 
-The orchestrator processes evaluator output:
+For web UI, use interaction and visual evidence. For canvas/native games, use the available runtime, deterministic state, replay, and rendered output; a state dump cannot establish visual clarity or fun. For CLI/backend work, execute commands or requests. For native apps, use platform tooling or recorded operator verification. Mark any unsupported claim UNTESTABLE and identify the missing instrument.
 
-**overall: PASS** → proceed to merge
-**overall: SKIP** → all criteria untestable, proceed (evaluator adds no value here)
-**overall: FAIL** →
-1. Check fail count vs total:
-   - 1-2 failures: send FAIL details back to original subagent for targeted fix
-   - >50% failures: likely a spec problem — escalate to user, don't iterate
-2. Check if failures are criteria bugs (criterion is impossible/ambiguous):
-   - If so, update the bead criteria, don't blame the implementation
-3. Create beads for persistent failures:
-   ```bash
-   bd create --title="Eval: <failed criterion>" --type=bug --priority=2
-   bd dep add <new-bead> discovered-from:<parent-bead>
-   ```
+Feel and fiction belong to the operator. Mechanical success is not a substitute for a felt acceptance criterion.
 
-**Circuit breaker:** If evaluator fails twice on the same criterion after rework, escalate to user. Don't loop.
+## Related skills
 
-## Cost and Timing
-
-- Evaluator adds ~1-2 minutes per invocation (code-only) or ~2-4 minutes (with browser-qa)
-- Skip aggressively when not needed (see skip conditions above)
-- Opus is the model floor for evaluation — grading is judgment, not grunt work; manage cost by skipping unneeded evaluations, not by downgrading the judge
-- A contested verdict (implementer disputes a FAIL) is a good moment for a Codex second opinion, if installed — cross-model disagreement is signal; absence is noted, not blocking
-
-## Platform-Specific Verification
-
-Not all projects use browser-qa. The evaluator should adapt:
-
-| Project type | Verification method | Evaluator behavior |
-|-------------|--------------------|--------------------|
-| **Standard web app** | browser-qa (CDT MCP) | Full runtime evaluation |
-| **WebGL / Canvas game** | Deterministic state dumps, seed replays, screenshot diffs | Verify runtime criteria via the project's observability surface: a `just state-dump`-style recipe, seeded/replayable runs, console-exposed game state (`evaluate_script`), screenshot comparison for visual criteria. Only mark UNTESTABLE when the project exposes none of these — and then recommend adding them: a game repo SHOULD expose deterministic state dumps and seeded runs, because agent-verifiable games are the ones agents can actually build (feel remains the operator's — grade mechanics, not fun) |
-| **Native iOS/Android** | Maestro or platform-specific tools | Mark runtime criteria UNTESTABLE unless project has automated UI test tooling wired |
-| **CLI tool** | Bash execution + output assertion | Code-only evaluation; test commands via bash, not browser |
-| **API / backend** | curl / httpie + response assertion | Code-only for endpoints; evaluate_script or direct API calls |
-
-When runtime verification isn't possible, the evaluator should:
-1. Grade all code-verifiable criteria normally
-2. Mark platform-specific criteria as UNTESTABLE with the reason and recommended verification method
-3. Include a note: "Manual verification recommended for: [list criteria]"
-
-## Integration Points
-
-| Component | How evaluator connects |
-|-----------|----------------------|
-| **Orchestrator** | Calls evaluator as Step 1.5 in post-subagent verification |
-| **Browser-qa** | Evaluator activates browser-qa skill for standard web apps |
-| **Beads** | Reads acceptance criteria from bead; files new beads for failures |
-| **Sprint contracts** | Acceptance criteria in bead ARE the sprint contract |
-| **Post-merge review** | Post-merge command uses evaluator for closed beads |
-| **Intent review** | Complementary: intent checks code coverage, evaluator checks behavior |
+- **spec-shaping** — establishes the agreed contract and verification plan.
+- **browser-qa** — gathers web runtime evidence.

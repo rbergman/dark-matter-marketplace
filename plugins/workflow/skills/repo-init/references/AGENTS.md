@@ -32,7 +32,7 @@ This applies to features, refactors, infrastructure, and the codebase as a whole
 
 ### Quality gates per commit
 
-If pre-commit hooks already run lint/typecheck/test, trust them and don't re-run manually. If hooks are missing, partial, or skipped (e.g. WIP commits behind a flag), run `just check` (or the project's equivalent) yourself before committing. **Pre-existing failures are still our problem** — "already broken" is not an excuse, and is usually our prior miss.
+If pre-commit hooks run the required checks for the exact changed state, reuse their results. Otherwise run the missing checks. Fix failures introduced by this change and in-scope defects. Establish and track pre-existing failures; a required failing gate prevents a clean-completion claim but does not authorize unrelated remediation. Ask for a scope decision only when necessary remediation is not already authorized. Record any permitted operator-approved exception as an exception, never a pass.
 
 When file/function/complexity limits trigger, **extract logical sections into well-named companion files** rather than compressing code to fit. Don't combine statements onto one line, strip comments, or shorten names to satisfy a metric.
 
@@ -65,7 +65,7 @@ Choose the review mechanism by scope:
 
 - `/code-review` (native) for a meaningful diff — `low`/`medium` effort for high-confidence findings, `high`+ when you want breadth over precision
 - `/dm-work:review` when the findings should land in beads and the review point should be checkpointed for next time
-- A scope-bound subagent review ("read ONLY the diff and the OWN files") for narrower changes
+- One fresh-context subagent for narrower changes, reading the diff and directly relevant callers/contracts. Pin the reviewed commit/tree or immutable snapshot, including new files; fail explicitly if those bytes cannot be read. Re-review remediation and affected seams, not unchanged scope.
 
 **Cross-model leg (recommended, optional):** when a second reviewer is warranted, Codex is the recommended instrument — different weights fail differently, and it runs on a separate subscription quota. Detect with `command -v codex`. Absent → proceed single-model and note it once in the review report ("cross-model review unavailable: codex not installed"); never block on its absence. Install via the `openai-codex` marketplace; `/codex:setup` configures it.
 
@@ -134,7 +134,7 @@ This workflow aligns the operator as much as the agent — apply it in both dire
 Bucket agent-relevant actions into three tiers, and be honest about which tier each item is actually in:
 
 - **always-do** — autopilot, no ask: orientation, gates before commit, bead tracking, targeted validation.
-- **ask-first** — human checkpoint: merges, pushes to shared branches, destructive or irreversible operations, schema/contract changes, anything the operator scoped as theirs.
+- **ask-first when not already authorized** — human checkpoint: merges, pushes to shared branches, destructive or irreversible operations, material schema/contract choices, and anything the operator scoped as theirs. Honor existing authorization for the same concrete action; it does not extend to a materially different target or effect.
 - **never-do** — enforced by **hooks**, not prose. A prose "never" in this file is a request the model can drift past; a PreToolUse hook is a rule. **A never-do without an enforcing hook is an ask-first — either wire the hook or reclassify it honestly.** dm-work ships a `--no-verify` commit block; add a path-protection PreToolUse hook for repo-specific protected paths (see `dm-work:repo-init`).
 
 List this repo's never-do items here, each with the hook that enforces it:
@@ -143,13 +143,13 @@ List this repo's never-do items here, each with the hook that enforces it:
 
 ### Model routing
 
-Route by what the task *authors*, not by what's cheapest:
+Honor the operator's current model policy and available harness. With Astra/Fable as lead:
 
-- **Authoring floor: Opus 5+ (Claude) / GPT-5.6 Sol+ (Codex).** Anything that authors substance — code, specs, plans, reviews, designs, debugging, architecture — runs at or above this floor. No exceptions for "simple" code.
-- **Sub-floor models (Sonnet, Haiku, and peers) are for well-understood grunt work only, used sparingly**: code/file exploration and search fan-out, research retrieval and summarization, data extraction/filtering, well-understood mechanical tool use. Never authoring, planning, spec'ing, or reviewing.
-- **Fable-class** for long-horizon autonomous ownership, fuzzy/creative implementation ("make it feel right"), and multi-hour runs in a worktree.
-- **Codex lane** (ChatGPT subscription — a separate quota from Claude): recommended cross-model critic, and an implementation lane for well-specified bounded slices when Claude quota is the constraint. Absent → note it once, proceed single-model, never block.
-- Orchestrate and review in the interactive session; implement via subagents at the floor; judge via `dm-work:evaluator`.
+- **Lead judgment:** planning, task definition, architecture (full-stack and game engine), UI/creative design, acceptance criteria/DoD, verification design, research synthesis, difficult diagnosis, and cohesion stay with Astra/Fable. The lead can implement directly when judgment or valuable context makes that efficient.
+- **Bounded implementation:** Sol Medium in Codex or Opus in Claude implements settled contracts and tests. Give compact briefs with scope, invariants, decisions, and checks; return consequential ambiguity to the lead. Reuse workers for coherent follow-ups; do not recursively delegate by default.
+- **Evidence gathering:** Terra/Luna in Codex or Sonnet/Haiku in Claude may search, inventory, extract, or run mechanical tools. They do not own design, creative conclusions, or review acceptance.
+- **Independent review:** Astra/Fable assesses architecture, consequential security/state risks, design, and verification adequacy; Sol/Opus may review bounded implementation correctness.
+- Delegate when a meaningful execution loop can be moved with less handoff/review/repair work than staying local. Avoid full-history forks that inherit the costly model. Use actual tool model-selection semantics, not assumed cache hits or cross-provider equivalence. Do not silently switch providers or the selected lead.
 
 ---
 
@@ -166,7 +166,7 @@ Before starting any work, run the **Orient** step from the Disciplined Developme
 1. **Branch:** `git branch --show-current` — confirm you're on the expected branch
 2. **Worktree:** `git worktree list` — are you in a worktree or the main repo?
 3. **Working tree state:** `git status` — clean? any leftover state from a prior session?
-4. **Confirm with user:** "I'm on branch X in [worktree/main]. Is this where you want me working?"
+4. **Resolve the target:** compare the branch/worktree with the request and existing work. Proceed when they agree; ask only if a real conflict or missing target cannot be resolved from context.
 5. **Check beads:** `bd ready` — what work is available?
 6. **Read project context:** `AGENTS.md` (or `CLAUDE.md` if that's the project's convention)
 

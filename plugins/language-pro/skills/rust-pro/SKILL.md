@@ -1,6 +1,7 @@
 ---
 name: rust-pro
-description: "Boring Rust" — clone freely, simple control flow, max-strictness lints with mechanical enforcement, ownership-honest code that compiles and reads cleanly. Use when implementing, debugging, refactoring, or reviewing Rust code; resolving borrow checker errors; tuning Cargo lints; choosing between Arc/Rc/Box; designing trait boundaries; or evaluating whether a clone is the right call. Applies to any Rust work unless a more specific role overrides.
+description: >-
+  "Boring Rust" — clone freely, simple control flow, max-strictness lints with mechanical enforcement, ownership-honest code that compiles and reads cleanly. Use when implementing, debugging, refactoring, or reviewing Rust code; resolving borrow checker errors; tuning Cargo lints; choosing between Arc/Rc/Box; designing trait boundaries; or evaluating whether a clone is the right call. Applies to any Rust work unless a more specific role overrides.
 ---
 
 # Rust Pro

@@ -102,7 +102,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `/dm-work:council` | Command | Convene 3-5 opposed perspectives on a decision, cross-examine, synthesize with dissent recorded |
 | `dm-work:council` | Skill | The deliberation protocol — runs on subagents by default, on teammates when Agent Teams is enabled |
 | `dm-work:eli5` | Output style | "Talk to me like I'm 5" — small words, short paragraphs, 2 options max ([source](https://x.com/lydiahallie/status/2080378470111256907)) |
-| `/dm-work:align-steering` | Command | Modernize CLAUDE.md / AGENTS.md / SKILL.md against Claude Opus 5 prompting guidance |
+| `/dm-work:align-steering` | Command | Align steering against the selected model's current official guidance, including Astra and Fable 5.1 |
 | `/dm-work:align-agents` | Command | Align a repo's AGENTS.md with the dm-work reference template — diff/merge, never replace |
 
 > Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Set `autoCompactWindow` (100k–1M tokens) to make auto-compaction fire with headroom instead of at the context cliff, and `/compact <focus>` to steer what survives.
@@ -182,6 +182,25 @@ Non-installable materials for reference and sharing.
 
 ## Installation
 
+Codex also reads this marketplace's Claude-format plugins. After publishing a
+plugin version, install or refresh it with the host's plugin manager:
+
+```bash
+codex plugin marketplace add git@github.com:rbergman/dark-matter-marketplace.git
+codex plugin marketplace upgrade dark-matter-marketplace
+codex plugin add dm-work@dark-matter-marketplace
+```
+
+Repeat the last command for the desired `dm-*` plugins. Claude uses the commands
+below, then `claude plugin update <plugin>@dark-matter-marketplace --scope user`
+for an existing user install. Start a new session after updating. Codex imports
+supported skills/commands/hooks; Claude-specific tools still require their host
+or an explicitly described fallback.
+
+Workflow changes are checked against `tests/workflow-cases.md` and the mocked
+commit-hook tests (`bash tests/test-sanity-review.sh`). The mocks verify command
+and evidence handling, not live model quality or quota savings.
+
 ```bash
 # Add the marketplace
 claude plugin marketplace add rbergman/dark-matter-marketplace
@@ -204,7 +223,7 @@ claude plugin install dm-work@dark-matter-marketplace
 Core ideas (see `~/.claude/CLAUDE.md` for the full Disciplined Development Loop):
 
 1. **Gall's Law** — Always grow complexity from a simple system that already works. Minimal slices first; speculative architecture last.
-2. **Quality gates are sacred** — Pre-existing failures are still our problem. "Already broken" is not an excuse.
+2. **Quality gates remain explicit** — Fix introduced and in-scope failures. Track pre-existing blockers without silently expanding scope or calling a failing gate passed.
 3. **Delegate when useful** — Spawn subagents for parallel work or fresh context. With Agent Teams enabled, a *named* subagent launches as a teammate that can talk to its peers — worth it only when cross-examination is the point (`dm-team`). Otherwise work directly; 1M context handles most tasks.
 4. **External state via beads** — `bd` survives session boundaries; conversation context doesn't.
 5. **Review is non-negotiable** — Any substantive implementation gets an independent review pass before close; the implementer owns the fixes.

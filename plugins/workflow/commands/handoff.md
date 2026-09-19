@@ -25,4 +25,5 @@ Constraints:
 - Be specific. File paths, bead IDs, function names, exact commands — not vague descriptions.
 - Don't summarize the conversation. Capture *state and intent*, not history.
 - If something is in beads already (`bd show <id>`), reference it rather than restating it.
+- Preserve the operator's constraints, explicit authorizations, rejected approaches and reasons, exact references, unresolved acceptance evidence, and next action. Do not downgrade a missing check into completed work during summarization.
 - Aim for tight prose. Bullets and short paragraphs over walls of text.

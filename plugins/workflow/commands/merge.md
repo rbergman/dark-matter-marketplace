@@ -14,7 +14,7 @@ Before merging, verify ALL of these:
 ### 1. Branch Verification
 - Confirm current branch: `git branch --show-current`
 - Confirm target branch (usually main): ask user if unclear
-- Confirm with user: "Merging [source] into [target]. Proceed?"
+- Establish whether the user already authorized this source/target merge. Ask once only if that authority is missing or the target materially changes.
 
 ### 2. Quality Gates
 - Run `just check` or `npm run check` (project-appropriate gate)
@@ -22,7 +22,7 @@ Before merging, verify ALL of these:
 
 ### 3. Review
 - Has `/dm-work:review` (or native `/code-review`) been run since last significant change?
-- If not, run it now or ask user if they want to skip
+- If not, run the required review against the exact merge candidate. Missing runtime acceptance evidence remains unresolved under the evaluator protocol.
 - For foundational diffs (architecture, security, money, concurrency), a Codex cross-model pass is recommended if `codex` is installed. Absent → note "cross-model review unavailable: codex not installed" in the pre-flight summary and proceed — not blocking
 
 ### 4. Beads
@@ -32,7 +32,7 @@ Before merging, verify ALL of these:
 
 ### 5. User Approval
 - Present summary: branch, passing gates, review status, bead status
-- **Wait for explicit user approval before executing merge**
+- Execute only with explicit user authorization for this merge; an earlier authorization for the same action counts. Do not ask for approval twice.
 
 ## Lint-Staged & Merge Commits
 
@@ -60,8 +60,7 @@ git merge <source> --no-ff
 
 ## Post-Merge
 
-- Run quality gates again on the merged result
-- If conflicts arose and were resolved, run gates again
+- Run required gates on the merged result once; repeat only after further changes, failures, or unresolved risks.
 - **Clean up worktree and branch** (mandatory for worktree-based work):
   ```bash
   # Remove the worktree

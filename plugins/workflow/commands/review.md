@@ -35,14 +35,16 @@ Priority order:
    TAG="review/${BRANCH}/latest"
    git rev-parse "$TAG" >/dev/null 2>&1 && RANGE="${TAG}..HEAD"
    ```
-   If the tag is already at HEAD, report "No changes since last review at `<sha>`" and stop. Reviewing nothing wastes a run.
-4. **No tag** → merge-base with the default branch, or `HEAD~5..HEAD` if there's no meaningful base.
+   The tag covers committed bytes only. In default local mode, also inspect staged, unstaged, and untracked files (`git status --porcelain`); include their intended changes in an immutable snapshot. Stop for a tag at HEAD only when those scopes are also empty.
+4. **No tag** → merge-base with the repository's actual default branch, plus staged, unstaged, and untracked changes in default local mode. If there is no meaningful base, establish the intended baseline from repository history or the request; do not invent a `HEAD~5` range.
 
-Report the resolved scope before reviewing: commits, files, LOC.
+Explicit PR or commit-range requests retain their requested scope; report unrelated local changes without including them silently. For default local review, an empty committed range is not an empty review when local changes exist.
+
+Resolve the base and target to immutable IDs before reviewing. For uncommitted work, snapshot the intended staged/unstaged/untracked files and record hashes; distinguish that target from a commit range. Report the resolved scope before reviewing. Never substitute the ambient checkout for the selected target.
 
 ## 2. Review
 
-Invoke native `/code-review` against the resolved target at `--effort` (default `medium`). It reports findings with file, line, severity, summary and failure scenario.
+Invoke native `/code-review` against the resolved target at `--effort` (default `medium`) when available. Otherwise use one harness-native fresh-context reviewer. It reports findings with file, line, severity, summary and failure scenario. Apply the operator's model policy: Astra/Fable for architecture, design, consequential security/state risks, and verification adequacy; Sol/Opus for bounded implementation correctness. A model-floor rule does not override this responsibility split.
 
 For an automated caller, `low` or `medium` is right — `high` and above deliberately surface uncertain findings, which is noise when nothing downstream reads carefully.
 
@@ -50,9 +52,7 @@ For an automated caller, `low` or `medium` is right — `high` and above deliber
 
 When the diff is foundational (architecture, security, money, concurrency, a spec later work builds on) or a second opinion is otherwise warranted, add a Codex pass — different weights fail differently, and it runs on a separate quota:
 
-```bash
-command -v codex && codex review --uncommitted   # or point it at the resolved range
-```
+Give the second reviewer the same base and target IDs or snapshot hashes, original acceptance criteria, and prior findings. Require commit/tree-addressed reads (`git show <target>:<path>`) or the immutable snapshot. Fail explicitly if those bytes cannot be read. Do not substitute `codex review --uncommitted` for a resolved commit range; check the installed CLI's supported target options before invoking it.
 
 Merge its findings into step 3 like any other finding source. **If `codex` is not installed:** proceed single-model and add one line to the report — "cross-model review unavailable: codex not installed" — never block, never nag beyond that line. Install via the `openai-codex` marketplace; `/codex:setup` configures it.
 
@@ -62,7 +62,7 @@ Apply `--min-severity`. Drop any finding with no concrete failure mode regardles
 
 ## 4. Act — fix or track, never ignore
 
-LLM execution is cheap. Pre-LLM, "everything → bead → defer" was rational; now it leaves easy wins on the floor. **Every surviving finding gets one of two outcomes in this session: fixed, or tracked.** "Non-blocking" means "not required for this commit to be correct," not "safe to ignore."
+Fix in-scope findings and track concrete out-of-scope findings. Required failing gates remain blockers; their existence does not authorize unrelated changes. Re-review remediation and affected seams, not unchanged scope.
 
 Unless `--skip-beads`, file the tracked ones:
 
@@ -94,11 +94,7 @@ Verdicts: ✅ PASS · ⚠️ ISSUES FOUND · 🚨 CRITICAL ISSUES
 
 ## 6. Checkpoint
 
-```bash
-git tag -f "review/$(git branch --show-current)/latest" HEAD
-```
-
-The next `/review` starts from here. Skip in PR mode.
+Checkpoint the exact reviewed target commit only after required review findings are resolved and changed seams reviewed. Do not advance the checkpoint to a newer HEAD, an unreviewed fix, or an unresolved target. For snapshots, record reviewed hashes instead of a commit tag. The next run starts from the last successfully reviewed bytes. Skip local tags in PR mode.
 
 ## Related
 
