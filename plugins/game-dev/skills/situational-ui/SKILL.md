@@ -187,8 +187,9 @@ redshifted's `?capture=`, serves the team without a player-facing UI.
   2. keeps the sim frozen with photo mode's own flag
   3. clears the `'screen'` unlock reason, so pointer lock can serve mouse-look
 
-  Esc or B, routed through game-shell's router as photo mode's Back, returns to
-  pause. Camera input goes through input-bindings' actions, so remaps apply.
+  Esc or B returns to pause through game-shell's optional `modeBack` hook, which the
+  router consults while the stack is empty. Photo mode never adds its own Esc
+  listener. Camera input goes through input-bindings' actions, so remaps apply.
 - **Filename** includes the game and a timestamp. Offer the download; never upload.
 
 **Checklist:**

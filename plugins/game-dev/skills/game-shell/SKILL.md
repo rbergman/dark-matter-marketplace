@@ -205,7 +205,7 @@ Every source calls the latch; none of them opens pause itself:
 | Clock overload | Accumulated sim debt past a threshold | Corpus value: free-horses pauses on debt over 250 ms with "The game fell behind and paused" (`game-clock.ts`). B for yours. Test: throttle the CPU 6× in DevTools; the game pauses rather than running in slow motion. Drop the debt rather than replay it. |
 | Lost pointer lock | Reported by **pointer-lock** | The lock module reports; it doesn't pause |
 | Lost controller | `gamepaddisconnected` while the pad was the last-used device | XR-115: the player must be able to continue, or be prompted. The pause screen says "Reconnect the controller or press a key". |
-| Fullscreen exited | `fullscreenchange` while in play | In fullscreen, Chrome consumes the first Esc to leave fullscreen, in browser-process handling; whether the page also gets the keydown is unprobed. Pausing here keeps one Esc meaning "stop". The game's own fullscreen toggle calls `noteOwnFullscreenExit()` first, so pressing it doesn't pause. |
+| Fullscreen exited | `fullscreenchange` while in play | In fullscreen, Chrome consumes the first Esc to leave fullscreen, in browser-process handling; whether the page also gets the keydown is unprobed. Pausing here keeps one Esc meaning "stop". The game's own fullscreen toggle goes through `exitOwnFullscreen()`, so pressing it doesn't pause. If the exit fails, the flag clears. |
 
 Turn-based games have nothing to protect, and live-orders sims where pause is a
 toggle (volatile-state-redux) are exempt. They still want the hidden-tab catch-up

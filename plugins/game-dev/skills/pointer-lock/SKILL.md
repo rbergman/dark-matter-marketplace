@@ -1,6 +1,6 @@
 ---
 name: pointer-lock
-description: "Pointer lock in a browser game: deriving whether the mouse should be captured every frame from named unlock reasons (a menu, a map, a debug pane, a player preference), requesting it only from a user gesture, Chrome's 1250 ms refusal after the player escapes a lock, retrying while the click's activation is still live, reporting a lost lock to the pause latch, giving back a lock granted too late, falling back when raw input is unsupported, locking before fullscreen, virtual cursors, a fallback look mode when lock is denied, and where the reticle should read from. Use when adding mouse-look or mouse aiming, when menus open over a locked pointer, or when players report 'the mouse won't recapture after the menu', 'clicking does nothing for a second', 'I pressed Esc and the game kept running', 'the cursor is stuck in the window', or 'the reticle jitters'. game-shell owns pausing; this skill owns the lock."
+description: "Pointer lock in a browser game: deriving whether the mouse should be captured every frame from named unlock reasons (a menu, a map, a debug pane, a player preference), requesting it from a user gesture or right after the game's own release, Chrome's 1250 ms refusal after the player escapes a lock, retrying while the click's activation is still live, reporting a lost lock to the pause latch, giving back a lock granted too late, falling back when raw input is unsupported, locking before fullscreen, virtual cursors, a fallback look mode when lock is denied, and where the reticle should read from. Use when adding mouse-look or mouse aiming, when menus open over a locked pointer, or when players report 'the mouse won't recapture after the menu', 'clicking does nothing for a second', 'I pressed Esc and the game kept running', 'the cursor is stuck in the window', or 'the reticle jitters'. game-shell owns pausing; this skill owns the lock."
 ---
 
 # Pointer Lock
@@ -68,8 +68,9 @@ The tests were mutation-checked on the in-flight guard.
 - **Esc always releases.** The browser guarantees this. The game treats it as
   "stop": it pauses, and the real cursor appears over the pause menu.
 - **Every menu releases the lock,** and the cursor is free to use it.
-- **After a menu the game opened** (P, Start, a map key, the latch for blur), the
-  game released the lock itself. Resuming by any means, Esc included, recaptures
+- **After a menu the game opened** (P, Start, a map key), the game released the
+  lock itself. Blur doesn't count: the browser takes the lock away, so that resume
+  needs a click. Resuming by any means, Esc included, recaptures
   at once.
 - **After the player escaped the lock,** recapture needs a gesture:
   - Clicking Resume, or pressing Enter or Space on it, works (after Chrome's
@@ -122,7 +123,7 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
   call makes the request inside the activation.
 - **One request in flight at a time.** A Resume click can reach the module twice in
   one dispatch: once by clearing the `'screen'` reason, once by `onGesture()`.
-  Raw-input fallback (rule 6) is triggered by `NotSupportedError` only.
+  Raw-input fallback follows rule 6.
 - **The request can still fail.** The likely case: the click came within Chrome's
   1250 ms of the player escaping. **Retry while `navigator.userActivation.isActive`
   is true.**
@@ -146,8 +147,10 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
   leaving, or the OS taking the pointer.
 - **Report it** with `shell.requestAutoPause('lockLost')` once the lock had been
   held for a grace period. A loss *inside* the grace doesn't pause, but it isn't
-  ignored either: it schedules a retry, or shows "Click to aim". Otherwise a quick
-  Esc leaves the game running with a free cursor. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
+  ignored either: it shows "Click to aim".
+  - It never auto-retries. A live activation would re-grab the mouse about 1.3 s
+    after a quick, deliberate Esc.
+  - Ignoring it would leave the game running with a free cursor. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
   acquire-then-immediately-lose on resume doesn't open a stray pause. If it does,
   lengthen the grace.
 - **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
@@ -164,9 +167,13 @@ with `!wanted`, call `exitPointerLock()` at once (Downwash).
 ### 6. Raw input, fullscreen, touch
 
 - **Request `{ unadjustedMovement: true }` first.** It turns off OS mouse
-  acceleration. On any rejection other than `NotAllowedError`, retry without it.
-  Redshifted falls back only on `NotSupportedError`; Downwash falls back on
-  anything but `NotAllowedError`, which is safer across engines. Some older engines
+  acceleration.
+  - On `NotSupportedError`, drop it for the session.
+  - On any other rejection except `NotAllowedError`, retry once without it, for that
+    request only. That is Downwash's per-request fallback. An engine that rejects
+    the option with an odd error still locks, and a transient error doesn't cost
+    raw input for good.
+  - Redshifted falls back only on `NotSupportedError`. Some older engines
   throw synchronously, so wrap the request in an `async` function.
 - **Lock, then fullscreen,** in the same handler. Fullscreen consumes the
   activation.
@@ -238,7 +245,8 @@ Each line names what the check cannot see.
       *Blind to: browsers other than the one tested. Run once in Firefox and
       Safari by hand.*
 - [ ] **Open Options from a key during play:** the lock releases, the release isn't
-      reported as a loss, and on close plus a click it relocks instantly.
+      reported as a loss, and on close it relocks with no click (programmatic-exit
+      exemption).
 - [ ] **Alt-tab while locked:** the game pauses, and the lock isn't restored on
       return until the player clicks. *Blind to: OS-specific focus behaviour.*
 - [ ] **Deny lock** (option off, or an iframe without `allow-pointer-lock`): the

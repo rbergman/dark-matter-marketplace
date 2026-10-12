@@ -155,6 +155,8 @@ Binding key K to action A, where B already holds K:
 - **Browser and OS keys the page can't or shouldn't take:**
   - F5, F11, F12
   - Ctrl/Cmd combinations
+
+  Refuse them with the reason shown.
 - **Tab is not reserved.** Menus own input while they're open, so Tab is free for
   play. Keep HUD buttons out of the tab order with `tabindex="-1"` (menu-navigation
   rule 5).
@@ -165,9 +167,9 @@ Binding key K to action A, where B already holds K:
 - **Pad Start:** it toggles pause and cancels a pad capture.
 - **The `pause` action can't take a key menus need** (Enter, Space, Tab, the
   arrows). Pause works from inside menus, so binding it there would break every
-  menu. `rebind` refuses those keys for `pause`, with the reason shown.
-
-  Refuse them with the reason shown.
+  menu. `rebind` refuses those keys for `pause`, with the reason shown. A swap that
+  would push `pause` onto one gives it a spare instead, and the loader treats a
+  saved menu key for `pause` as unbound-to-default.
 - **Debug keys** used in development builds, such as Backquote (abduction-run).
 
 ### 6. Loading a save merges, never replaces
@@ -231,7 +233,7 @@ Binding key K to action A, where B already holds K:
 
 ### 9. Sensitivity
 
-Mouse-look and stick-aim sensitivity is one multiplier per device, stored in the
+Mouse-look and stick-aim sensitivity is a multiplier (split per device if the game needs it), stored in the
 settings record (`input.sensitivity`). XAG 107 asks for at least ±50%. The virtual
 cursor and camera read it live (see **pointer-lock**).
 

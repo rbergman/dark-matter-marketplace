@@ -1,6 +1,6 @@
-// pointer-lock reference sketch: want derived every frame from named reasons, requests only from
-// activation and retried while that activation lasts, our own releases never reported as losses,
-// late grants given back. Strict TS, no dependencies. Adapt; don't import.
+// pointer-lock reference sketch: want derived every frame from named reasons; one request when want
+// returns (exempt after our own release), then retries only while a click's activation lasts; our own
+// releases never reported as losses; late grants given back. Strict TS, no dependencies. Adapt; don't import.
 
 export type UnlockReason = 'screen' | 'map' | 'debug' | 'preview' | 'userPref';
 
@@ -31,8 +31,14 @@ export class PointerLock {
 
   constructor(private readonly target: HTMLElement) {
     this.supported = 'pointerLockElement' in document && typeof target.requestPointerLock === 'function';
-    document.addEventListener('pointerlockchange', () => this.handleChange());
-    document.addEventListener('pointerlockerror', () => this.scheduleRetry());
+    document.addEventListener('pointerlockchange', () => {
+      this.pending = false; // some engines settle via events only; never leave a request stuck in flight
+      this.handleChange();
+    });
+    document.addEventListener('pointerlockerror', () => {
+      this.pending = false;
+      this.scheduleRetry();
+    });
     target.addEventListener('click', (e) => {
       if (e instanceof PointerEvent && e.pointerType === 'touch') return; // never lock for touch
       this.onGesture();
@@ -79,23 +85,28 @@ export class PointerLock {
     else if (!this.isLocked) this.attempt();
   }
 
-  private attempt(): void {
+  /**
+   * Raw input: NotSupportedError drops it for the session. Any other non-NotAllowed error retries
+   * once without it, for that request only (Downwash's per-request fallback), so an engine that
+   * rejects the option with an odd error still locks, and a transient error doesn't cost raw input.
+   */
+  private attempt(raw = this.raw): void {
     if (this.pending || this.isLocked) return;
     this.cancelRetry();
     this.pending = true;
-    void this.request().then(
+    void this.request(raw).then(
       () => {
         this.pending = false;
       },
       (err: unknown) => {
         this.pending = false;
         const name = err instanceof DOMException ? err.name : '';
-        if (name === 'NotSupportedError' && this.raw) {
-          this.raw = false; // raw input unsupported here: plain requests from now on
-          this.attempt();
+        if (raw && name === 'NotSupportedError') this.raw = false;
+        if (raw && name !== 'NotAllowedError') {
+          this.attempt(false);
           return;
         }
-        this.scheduleRetry(); // NotAllowedError (cooldown, no activation) or a transient error
+        this.scheduleRetry(); // NotAllowedError (cooldown, no activation) or a plain request failing
       },
     );
   }
@@ -118,9 +129,9 @@ export class PointerLock {
     this.retryTimer = null;
   }
 
-  private async request(): Promise<void> {
+  private async request(raw: boolean): Promise<void> {
     // async wrapper: some older engines throw synchronously instead of rejecting
-    await (this.raw ? this.target.requestPointerLock({ unadjustedMovement: true }) : this.target.requestPointerLock());
+    await (raw ? this.target.requestPointerLock({ unadjustedMovement: true }) : this.target.requestPointerLock());
   }
 
   private handleChange(): void {
@@ -134,9 +145,10 @@ export class PointerLock {
     if (was !== this.isLocked) this.onChange(this.isLocked);
     if (was && !this.isLocked && this.wanted) {
       // A loss right after acquiring is the acquire-then-lose race: don't pause for it, but never
-      // leave the game running with a free cursor either; try again or ask for a click.
+      // leave the game running with a free cursor either. Ask for a click; don't auto-retry: that
+      // would re-grab the mouse ~1.3 s after a quick deliberate Esc, reversing the player's choice.
       if (performance.now() - this.acquiredAt >= GRACE_MS) this.onLost();
-      else this.scheduleRetry();
+      else this.onNeedsClick();
     }
   }
 }

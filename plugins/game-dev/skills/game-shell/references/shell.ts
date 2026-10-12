@@ -33,6 +33,11 @@ export interface ShellHooks {
   /** Called on every push/pop: apply the pause duck, freeze view FX, etc. */
   onStackChange(state: { open: number; simPaused: boolean; topId: string | null }): void;
   onResume(): void;
+  /**
+   * A non-dialog mode (photo mode) handles Esc/B while the stack is empty: return true when it did.
+   * Optional; without it, Esc/B in play open pause as usual.
+   */
+  modeBack?(): boolean;
   /** Automation runs (?bot, ?perf) must not pause on an operator's alt-tab. */
   automation: boolean;
 }
@@ -203,9 +208,13 @@ export class Shell {
     this.removeAt(this.stack.length - 1, true);
   }
 
-  /** Call just before the game's own document.exitFullscreen(), so its fullscreenchange doesn't pause. */
-  noteOwnFullscreenExit(): void {
+  /** The game's own fullscreen toggle: exits without its fullscreenchange pausing the run. */
+  exitOwnFullscreen(): void {
+    if (document.fullscreenElement === null) return; // nothing to exit: never leave the flag set
     this.ownFullscreenExit = true;
+    void document.exitFullscreen().catch(() => {
+      this.ownFullscreenExit = false; // the exit failed: the next real exit must still pause
+    });
   }
 
   closeAll(): void {
@@ -266,7 +275,11 @@ export class Shell {
         if (top === undefined || this.isFresh(at, b)) this.togglePause(at, [PAD_START]);
         continue;
       }
-      if (top === undefined || !this.isFresh(at, b)) continue;
+      if (top === undefined) {
+        if (b === PAD_B) this.hooks.modeBack?.();
+        continue;
+      }
+      if (!this.isFresh(at, b)) continue;
       if (b === PAD_B && top.dismissable) this.back();
       // A activates the focused control on its press edge (pointer-cancellation rules are about
       // pointers, not pads), here where the fresh-press guard lives. menu-navigation moves focus.
@@ -334,6 +347,7 @@ export class Shell {
       msSinceTopOpened: top === undefined ? Infinity : e.timeStamp - top.openedAt,
       topDismissable: top?.dismissable ?? true,
     });
+    if (d === 'openPause' && this.hooks.modeBack?.() === true) return; // a mode (photo) took Back
     if (d === 'openPause' && this.pauseDialog !== null) this.open(this.pauseDialog, {}, e.timeStamp);
     else if (d === 'back') this.back();
   }

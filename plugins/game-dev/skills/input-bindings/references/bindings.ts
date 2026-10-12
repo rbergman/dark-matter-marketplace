@@ -78,6 +78,10 @@ function spareFor(map: KeyMap, ctx: Context, except: Action): string | null {
 
 // ---- Remapping: swap, notice, undo ---------------------------------------------------------
 
+/** Pause works from inside menus too, so it may not take a key menus need. */
+const MENU_CODES: ReadonlySet<string> = new Set(['Enter', 'NumpadEnter', 'Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+
+
 export type RebindResult =
   | { ok: false; reason: string }
   | { ok: true; map: KeyMap; undo: KeyMap; notice: string | null };
@@ -87,9 +91,6 @@ export type RebindResult =
  * takes this slot's old key (D4: swap, never silently unbind) and the notice names both.
  * `label` turns a code into what the player sees (layout-aware); pass the real one from the UI.
  */
-/** Pause works from inside menus too, so it may not take a key menus need. */
-const MENU_CODES: ReadonlySet<string> = new Set(['Enter', 'NumpadEnter', 'Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
-
 export function rebind(
   map: KeyMap,
   action: Action,
@@ -108,8 +109,10 @@ export function rebind(
   if (clash !== null) {
     let swapped = withSlot(map[clash.action], clash.slot, old);
     let given = old;
+    // Pause displaced onto a menu key would break every menu: it takes a spare instead.
+    const pauseOnMenuKey = clash.action === 'pause' && old !== null && MENU_CODES.has(old);
     // Never leave the displaced action with no key at all: give it a spare and say which.
-    if (swapped[0] === null && swapped[1] === null) {
+    if (pauseOnMenuKey || (swapped[0] === null && swapped[1] === null)) {
       given = spareFor({ ...map, [action]: withSlot(map[action], slot, code) }, ACTIONS[action].context, clash.action);
       swapped = withSlot(swapped, clash.slot, given);
     }
@@ -169,7 +172,11 @@ export function mergeSaved(saved: unknown): KeyMap {
       continue;
     }
     const pick = (v: unknown, d: string | null): string | null =>
-      v === null ? null : typeof v === 'string' && v.length > 0 && !RESERVED.has(v) ? v : d;
+      v === null
+        ? null
+        : typeof v === 'string' && v.length > 0 && !RESERVED.has(v) && !(a === 'pause' && MENU_CODES.has(v))
+          ? v
+          : d;
     out[a] = [pick(s[0], DEFAULTS[a][0]), pick(s[1], DEFAULTS[a][1])];
   }
   // Duplicates among SAVED actions within a context: the later action's slot falls back to empty.
