@@ -43,7 +43,7 @@ The brain doesn't passively receive information — it actively constructs a mod
 - [ ] Is critical info visible in peripheral vision? (Health bars, ammo counts)
 - [ ] Does the design work at target viewing distance? (TV from couch vs. phone vs. monitor)
 
-**Control affordance: highlight on pointer-enter, act on press.** That is the two-stage commit act-on-release is usually defended as providing, without the release delay (see **game-feel**, Gate 3). Not available on touch, where the finger occludes the control; there, the drag-off cancel is the only two-stage option and act-on-release is the honest default for touch-only surfaces.
+**Control affordance: highlight on pointer-enter, act on press.** That is the two-stage commit act-on-release is usually defended as providing, without the release delay (see **game-feel**, Gate 3). Not available on touch, where the finger occludes the control; there, the drag-off cancel is the only two-stage option and act-on-release is the honest default for touch-only surfaces. **Scope:** this applies to game-world controls. DOM menu buttons keep the browser's native activation, and pad buttons act on their press edge; see the scope note under Act on press in **game-feel**.
 
 ### Pillar 2: Attention
 

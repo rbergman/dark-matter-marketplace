@@ -107,14 +107,12 @@ export function sanitise(raw: Raw): Settings {
 
 export interface Loaded {
   settings: Settings;
-  /** False for a record written by a newer build: use it, but don't write until the player changes something. */
+  /** False for a record written by a newer build: use it in memory, never write over it. */
   writable: boolean;
-  /** The newer build's raw record, so a later write keeps the fields this build doesn't know. */
-  future: Raw | null;
 }
 
 export function load(text: string | null): Loaded {
-  const fresh = (): Loaded => ({ settings: structuredClone(DEFAULTS), writable: true, future: null });
+  const fresh = (): Loaded => ({ settings: structuredClone(DEFAULTS), writable: true });
   if (text === null) return fresh();
   let raw: unknown;
   try {
@@ -124,8 +122,8 @@ export function load(text: string | null): Loaded {
   }
   if (!isRec(raw)) return fresh();
   const v = typeof raw['version'] === 'number' ? raw['version'] : 1;
-  if (v > VERSION) return { settings: sanitise(raw), writable: false, future: raw };
-  return { settings: sanitise(migrate(raw)), writable: true, future: null };
+  if (v > VERSION) return { settings: sanitise(raw), writable: false };
+  return { settings: sanitise(migrate(raw)), writable: true };
 }
 
 export class SettingsStore {
@@ -148,25 +146,19 @@ export class SettingsStore {
     const l = load(text);
     this.settings = l.settings;
     this.writable = l.writable;
-    this.future = l.future;
+    if (!l.writable) this.onUnsaved(); // "Settings from a newer version: changes apply for this session only."
   }
-
-  private readonly future: Raw | null;
 
   /** The one write path. Systems read `settings`; nothing else writes storage. */
   update(change: (s: Settings) => void): void {
     change(this.settings);
     this.settings = sanitise(this.settings as unknown as Raw);
-    this.writable = true; // the player changed something: this build now owns the record
-    this.flush();
+    this.flush(); // a newer build's record is never overwritten: any merge corrupts one side
   }
 
   private flush(): void {
     if (!this.writable) return;
-    // Over a newer build's record, keep its version and unknown fields; overwrite only what we own.
-    const text = JSON.stringify(
-      this.future === null ? this.settings : { ...this.future, ...this.settings, version: this.future['version'] },
-    );
+    const text = JSON.stringify(this.settings);
     if (text === this.last) return; // de-duplicate writes (Downwash)
     try {
       this.storage?.setItem(this.key, text);

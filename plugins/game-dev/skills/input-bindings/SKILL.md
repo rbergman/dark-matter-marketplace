@@ -122,8 +122,11 @@ keyboard router**. That is the single capture-phase `keydown` on `window`, and
   listeners also ignore keys while `shell.ownsInput`.
 - Logarithmic captures in the capture phase so the bound key doesn't also fire its
   action.
-- **Esc cancels.** It is the one key capture can't bind; see game-shell rule 2.
-- **The pad path checks capture first too** (game-shell's `pad()`).
+- **Esc cancels, and so does pad Start.** game-shell's router calls
+  `cancelCapture()` for those, and hands every other key or button to capture.
+  They are the only inputs capture can't bind.
+- **The pad path checks capture first too** (game-shell's `pad()`). The A press
+  that started a pad capture was consumed in that frame and can't bind itself.
 - **Start capture from `click`, not `pointerdown`.** Otherwise the press that opened
   the slot is captured as a mouse binding.
 - **Ignore `e.repeat`.** Holding a key as capture starts must not bind it by
@@ -155,6 +158,10 @@ Binding key K to action A, where B already holds K:
 - **Tab is not reserved.** Menus own input while they're open, so Tab is free for
   play. Keep HUD buttons out of the tab order with `tabindex="-1"` (menu-navigation
   rule 5).
+- **The gameplay key handler calls `preventDefault()` on every bound key while the
+  stack is empty.** Otherwise Tab's default moves focus out of the page, which
+  blurs the window and pauses the game. Space would scroll; arrows would scroll
+  too.
 - **Pad Start:** it toggles pause and cancels a pad capture.
 
   Refuse them with the reason shown.

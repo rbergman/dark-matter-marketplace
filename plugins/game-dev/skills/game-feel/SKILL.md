@@ -71,6 +71,22 @@ Is the feedback close enough in time to the action?
 
 **Act on press.** Fixed controls, verb keys and world clicks do the thing on the press event; release only modifies or ends what the press started, and the modification must be compatible with the original action (reload / hurried reload / careful reload — never a different verb). Even a ballistic tap has tens of ms between press and release; act-on-release adds that to every interaction and lets focus leave the hit box between the two events. Source: John Carmack, 7 May 2024, reporting a Meta user study on the VR keyboard — fewer typos, expressed preference, "crisper". Exceptions are FORM, not friction: drag surfaces (scrolling views, drag-and-drop, long-press menus) where a press must be provisional. A control that acts on release needs its reason written next to it.
 
+**Scope: game-world verbs** (decided 2026-10-11, D3 in the game-ui-patterns spec).
+- **DOM menu controls keep native activation:** `click`, the browser's Enter on
+  keydown and Space on keyup.
+  - XAG 107 asks pointer activation to complete on the up event, with a way to
+    cancel.
+  - WCAG 2.5.2 allows down-event completion only where it is *essential*. Undo
+    qualifies only an up-event completion.
+  - Highlight on pointer-enter still gives the two-stage feel.
+- **Pad buttons act on their press edge.** Pointer-cancellation rules are about
+  pointers.
+- **Destructive menu items with no undo** (Restart, Quit, New Run over a save) take
+  a second activation. That is the stated exception to "confirm instead of undo"
+  below, which applies only where undo exists.
+
+See **game-shell** and **menu-navigation**.
+
 Timeliness has two layers, and a game can pass one and fail the other. The **input layer** is the press initiating the action the same frame. The **feedback layer** is something on screen acknowledging the press within 1-2 frames even when the payload is deliberately late. A wind-up is fine when the wind-up *is* the acknowledgement; a ranged cast whose only feedback is the projectile has none until the projectile.
 
 ---
@@ -183,6 +199,63 @@ All values below are **starting points** — tune through playtesting per the Nu
 | Damage taken | 1 frame flash | 200-500ms | On contact | Screen edge vignette, sound, shake |
 | Death | 3-5 frame slow | 500ms-2s | Dramatic sting | Time slow, camera pull, fade |
 | Ranged attack / cast | 1-2 frames (acknowledge the press) | 150-400ms to release | On release | The projectile is the payload, not the acknowledgement; something must move on the press |
+
+---
+
+## Shake and Flash Budgets
+
+The juice checklist sizes individual effects. This section keeps them from
+compounding into a screen that is unreadable, irreproducible or unsafe. The FX
+gate that scales them is **settings-and-persistence**'s.
+
+### One trauma accumulator per camera
+
+- **Every source calls one `addTrauma(amount)`.** It clamps the *total* to 1.
+  - Capping at each write site isn't a budget: timberwolf writes `Math.min(8, …)`
+    in several places.
+  - Summing per-hit impulses beats the per-hit cap under burst damage
+    (abduction-run, read from code).
+- **Choose the combine rule on purpose:**
+  - **Capped sum:** busy fights feel busy. Downwash uses `MAX_TRAUMA = 1`.
+  - **Max:** gravelight's `max(shake, hit | kill)`. One heavy hit isn't diluted.
+  - **Latest qualifying event wins:** volatile-state-redux. Never stacks.
+- **Offset = `maxOffset × trauma² × noise(t)`.**
+  - The squared trauma makes small hits subtle and big ones violent.
+  - The trauma-with-decay model is credited to Squirrel Eiserloh's GDC 2016 talk
+    "Juicing Your Cameras With Math" via Bevy's example. The slides weren't read,
+    so treat the exponent as a choice.
+  - `maxOffset` uses the checklist's 2–15 px range.
+- **Decay per second, not per frame.** Logarithmic multiplies by `0.001 ** dt`.
+  *Starting value:* full trauma gone in about 1 s (posture B). Test: does a heavy
+  hit still read as heavy, without shake still running when the next hit lands?
+  - Gravelight decays ×0.86 *per tick*. That is fine in a fixed-step sim, wrong
+    in a variable-rate render loop.
+- **Seeded noise, never `Math.random`.** Gravelight's shake is deterministic from
+  the tick, so capture frames are byte-stable. Timberwolf and abduction-run jitter
+  with `Math.random`, and a seed can't replay them.
+- **The settings gate scales the offset at render,** and trauma keeps decaying while
+  scaled to 0. Toggling mid-shake then leaves no stuck offset (logarithmic).
+- **Rate-limit hit-stop.** Downwash allows one every 0.35 s (posture C). Stacked
+  hit-stops read as the game freezing.
+
+### Flash
+
+- **Hard limits, setting or not:** no more than 3 flashes in any 1 s.
+  - WCAG 2.2 SC 2.3.1 (Level A) defines a general flash as a 10% luminance change
+    with the darker state below 0.8.
+  - Red flashes (saturated red) are stricter.
+  - Area: XAG 118 says about 20% of the screen; WCAG and GAG say about 25%. **Use
+    20%.**
+  - Eliminate triggers rather than rely on a warning screen (XAG 118).
+  - Don't label a setting "epilepsy safe" (GAG); name it by what it does.
+- **With reduce-flash on:**
+  - full-screen flashes become an edge vignette or a border pulse
+  - effect alpha is capped (volatile-state-redux uses 0.45, posture C)
+  - white-outs become a dim
+- **Low-health vignettes are steady, or pulse well under 3 Hz.** With reduced
+  motion, they hold steady.
+- **The hit flash on a target** (the checklist's 1–2 frame white flash) is small
+  enough to stay. It is information, not decoration.
 
 ---
 

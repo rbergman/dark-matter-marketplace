@@ -139,7 +139,8 @@ All directional input goes through `move(direction)`: arrows, Tab, D-pad, stick.
   focus restore, `showModal()`'s autofocus and a Tab all move it, and no stale
   highlight is left behind.
 - **Hover doesn't take focus from a text field** (initials entry) or from a live
-  remap capture.
+  remap capture. The Controls screen sets `data-capturing` on itself while a
+  capture is live.
   - The browser's focus-visible heuristic follows the *keyboard*.
   - A focus moved by pad code after a mouse click may not show a ring.
   - ASSUMPTION: Chrome hides the ring for script focus after pointer
@@ -164,10 +165,15 @@ Tab and Space belong to the game. Menus are where Tab navigates.
 
 - **Poll once per rendered frame,** with edges (pressed this frame, not last). Never
   poll inside the sim tick: Downwash's pad couldn't unpause until polling moved.
-- **D-pad = arrows. A = activate** (`el.click()` on the focused element) on its
-  **press edge**. The pointer-cancellation rules (XAG 107, WCAG 2.5.2) are about
-  pointers, not pads, and game-shell's fresh-press guard masks an A held when the
-  screen opened. **B and Start go to game-shell.**
+- **D-pad = arrows** (this skill). **A, B and Start go to game-shell's `pad()`**,
+  where the fresh-press guard lives.
+  - A clicks the focused control on its press edge. The pointer-cancellation
+    rules (XAG 107, WCAG 2.5.2) are about pointers, not pads.
+  - Every button held when a screen opens is masked until it is released, so the
+    A fired mid-fight can't pick a draft card.
+- **Frame order:** game-shell's `pad()` first, then this skill's D-pad and stick
+  handling, then gameplay. A press consumed by the shell, such as the A that starts
+  a remap capture, is never seen again in the same frame.
 - **The left stick navigates past a threshold, then repeats while held.**
   *Starting values:* threshold 0.5, first repeat after 400 ms, then every 100 ms.
   Test: can a player stop on the item they meant 9 times in 10 in a 12-item list?

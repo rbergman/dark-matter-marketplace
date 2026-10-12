@@ -4,7 +4,7 @@
 
 // ---- The action map ------------------------------------------------------------------------
 
-export type Action = 'up' | 'down' | 'left' | 'right' | 'fire' | 'jump' | 'sprint';
+export type Action = 'up' | 'down' | 'left' | 'right' | 'fire' | 'jump' | 'sprint' | 'pause';
 export type Context = 'play' | 'menu';
 
 export interface ActionDef {
@@ -20,6 +20,8 @@ export const ACTIONS: Readonly<Record<Action, ActionDef>> = {
   fire: { kind: 'hold', context: 'play' },
   jump: { kind: 'press', context: 'play' },
   sprint: { kind: 'hold', context: 'play' },
+  /** game-shell's isPauseKey() reads this; Esc always pauses as well and can't be bound. */
+  pause: { kind: 'press', context: 'play' },
 };
 
 /** Two keyboard slots per action, by KeyboardEvent.code. null = empty slot. */
@@ -34,6 +36,7 @@ export const DEFAULTS: KeyMap = {
   fire: ['Space', null],
   jump: ['KeyE', null],
   sprint: ['ShiftLeft', null],
+  pause: ['KeyP', null],
 };
 
 /**
@@ -47,7 +50,7 @@ export const RESERVED: ReadonlyMap<string, string> = new Map([
   ['F12', 'F12 opens developer tools'],
 ]);
 
-/** Pad Start is reserved: it toggles pause (game-shell) and cancels a pad capture. */
+/** Pad Start is reserved: game-shell toggles pause with it and cancels a pad capture on it; never offer it to rebind. */
 export const PAD_RESERVED: ReadonlySet<number> = new Set([9]);
 
 /** Free keys for an action that an old save predates (timberwolf's idea, by code). */

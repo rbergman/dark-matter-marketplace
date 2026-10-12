@@ -124,9 +124,11 @@ The shell installs **one** `keydown` listener on `window` in the **capture
 phase**. It is the router for shell keys, and it decides in this order:
 
 ```
-remap capture active?            → hand the key to capture; preventDefault + stopImmediatePropagation
+remap capture active?            → preventDefault + stopImmediatePropagation; Esc cancels it,
+                                   any other key goes to capture
+target is a text field?          → skip the next two rows (P types "p", Space types spaces)
 repeated Enter/Space in a screen → preventDefault (a held Enter must not re-activate a button)
-P (or another pause key)?        → toggle pause
+the bound pause key (default P)? → toggle pause
 Esc → preventDefault, then escDecision():
   e.repeat?                      → ignore
   stack empty, in play?          → open pause
@@ -149,9 +151,12 @@ hook? **Verified in Chrome 152:**
   entirely, and the shell decides.
 
 Each dialog still listens for:
-- `cancel`: prevent it if cancelable, then route to `back()`. This covers close
-  requests that arrive with no keydown, such as an Android back gesture.
-- `close`: resync the stack if the browser closed a dialog anyway.
+- `cancel`: prevent it if cancelable, then route to `back()` if the screen is
+  dismissable. This covers close requests that arrive with no keydown, such as an
+  Android back gesture.
+- `close`: resync the stack if the browser closed a dialog anyway. A
+  non-dismissable screen (death) is shown again, because it holds the only way
+  forward.
 
 **Nothing else in the game may listen for Esc:**
 - no gameplay "pause" binding
@@ -163,8 +168,17 @@ listener registration order. Input-bindings reserves Esc so it can't be remapped
 onto an action.
 
 **Pad parity:** B calls the same `back()`, and Start calls the same toggle as P.
-The pad path checks remap capture first, exactly as the keyboard path does.
-Otherwise B closes Options while the player is binding B. Poll the pad **every
+- **A activates the focused control on its press edge,** inside the shell's
+  `pad()`, where the fresh-press guard lives.
+- **The pad path checks remap capture first,** exactly as the keyboard path does.
+  Start cancels a capture; every other button binds. Otherwise B closes Options
+  while the player is binding B.
+- **Every pad button down when any screen opens is masked** until it is released.
+- **Call `shell.pad()` first each frame,** before menu-navigation's D-pad handling
+  and before gameplay. A press the shell consumed is never seen again that frame.
+
+**P is input-bindings' remappable `pause` action.** `isPauseKey` reads that
+binding, so binding Fire to P swaps like any other conflict. Poll the pad **every
 rendered frame**, never inside the sim tick: a paused sim never ticks, so a pad
 polled there can never unpause.
 
@@ -290,9 +304,11 @@ Each line names what the check cannot see.
 - [ ] **Unit:** the shell's key decision is a pure function of `(stack, key, repeat,
       msSinceOpen, capturing)`, tested per branch. Mutation-check: delete the
       `repeat` guard and a test must fail. *Blind to: browser event order.*
-- [ ] **Unit:** auto-pause latch. Each source calls it, it is a no-op with the stack
-      open, and nothing resumes. *Blind to: whether the browser actually fires the
-      event.*
+- [ ] **Unit:** auto-pause latch. Each source calls it, it is a no-op while the sim
+      is paused, it opens over a live side panel, and nothing resumes. *Blind to:
+      whether the browser actually fires the event.*
+- [ ] **Type "p" in the initials or feedback field:** it types, and pause doesn't
+      toggle.
 - [ ] **Real browser, real keys** (CDP `press_key`, not `dispatchEvent`):
       - open Pause → Options, press Esc ×2, spaced beyond the grace; the stack pops
         one level per press and play resumes. A third Esc opens pause again.

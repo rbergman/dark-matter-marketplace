@@ -171,11 +171,13 @@ interface FxGate { reduceMotion: boolean; reduceFlash: boolean; shakeScale: numb
    The binding map goes through input-bindings' `mergeSaved`. Downwash and
    volatile-state-redux both do this well.
 4. **A version from the future** (the player downgraded, or another tab runs a
-   newer build): sanitise what you can, use it in memory, and **don't write**
-   until the player changes something.
-   - When you do write, write over the newer record: its version, its unknown
-     fields, and your known fields.
-   - Writing a fresh record destroys fields the newer build owns.
+   newer build): sanitise what you can, use it in memory, and **never write over
+   it**. Tell the player once: "Settings from a newer version: changes apply for
+   this session only."
+   - Every merge corrupts one side. Writing your own version wipes the newer
+     build's fields. Keeping the future version mislabels your old-format values,
+     so the newer build skips the migrations they need. Both were found in review.
+   - Not writing is the only safe option.
 5. **Legacy keys from a rename:**
    1. read them once
    2. write the new record

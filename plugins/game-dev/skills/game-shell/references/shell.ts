@@ -19,11 +19,12 @@ export interface PadEdges {
 export interface ShellHooks {
   /** True while a run is live (not title, not game over). */
   inPlay(): boolean;
-  /** Remap capture (input-bindings) gets every key and pad edge first. */
+  /** Remap capture (input-bindings) gets every key and pad edge first; Esc and pad Start cancel it. */
   capturing(): boolean;
   captureKey(e: KeyboardEvent): void;
   capturePad(edges: PadEdges): void;
-  /** Extra pause keys from the binding map (e.g. KeyP). Esc is always one. */
+  cancelCapture(): void;
+  /** True when `code` is bound to input-bindings' remappable `pause` action (default KeyP). Esc always pauses too. */
   isPauseKey(code: string): boolean;
   /** Drop held gameplay input so nothing ghost-holds after a screen closes. */
   clearHeldInput(): void;
@@ -79,14 +80,24 @@ export function escDecision(s: {
 }
 
 // W3C Gamepad "standard" mapping indices.
+const PAD_A = 0;
 const PAD_B = 1;
 const PAD_START = 9;
+
+/** Text fields keep their keys: P types a "p", a held Space types spaces. */
+function isEditable(t: EventTarget | null): boolean {
+  if (t instanceof HTMLTextAreaElement) return true;
+  if (t instanceof HTMLElement && t.isContentEditable) return true;
+  return t instanceof HTMLInputElement && !['button', 'checkbox', 'radio', 'range', 'submit', 'reset'].includes(t.type);
+}
 
 export class Shell {
   private readonly stack: Screen[] = [];
   private readonly hooks: ShellHooks;
   private armed: HTMLButtonElement | null = null;
   private lastPointerDown = -Infinity;
+  /** Pad buttons currently down (from pad() edges): masked on every screen open. */
+  private readonly padDown = new Set<number>();
   /** Set once at boot: the dialog Esc, Start, P and the latch open. */
   pauseDialog: HTMLDialogElement | null = null;
 
@@ -125,12 +136,16 @@ export class Shell {
     // Close requests that arrive without a keydown (Android back): route to back().
     el.addEventListener('cancel', (e) => {
       if (e.cancelable) e.preventDefault();
-      if (this.top()?.el === el) this.back();
+      const top = this.top();
+      if (top?.el === el && top.dismissable) this.back();
     });
-    // If the browser closed it anyway (non-cancelable cancel), resync instead of drifting.
+    // If the browser closed it anyway (non-cancelable cancel), resync instead of drifting;
+    // a non-dismissable screen (death) is shown again, since it holds the only way forward.
     el.addEventListener('close', () => {
       const i = this.stack.findIndex((s) => s.el === el);
-      if (i !== -1) this.removeAt(i, false);
+      if (i === -1) return;
+      if (this.stack[i]?.dismissable === false) el.showModal();
+      else this.removeAt(i, false);
     });
     // The fresh-press guard for native activation: a click from a press that began before the
     // screen opened, or inside its read-hold, never reaches the button.
@@ -160,7 +175,7 @@ export class Shell {
       dismissable: opts.dismissable ?? true,
       opener: document.activeElement,
       openedAt: at,
-      heldPad: new Set(opts.heldPad ?? []),
+      heldPad: new Set([...this.padDown, ...(opts.heldPad ?? [])]),
       readHoldMs: opts.readHoldMs ?? 0,
     });
     el.showModal();
@@ -210,10 +225,17 @@ export class Shell {
     return at - top.openedAt >= top.readHoldMs;
   }
 
-  /** Pad edges from this rendered frame. Release unmasks a button held at open. */
+  /**
+   * Pad edges from this rendered frame. Call FIRST each frame, before menu-navigation's D-pad
+   * handling and before gameplay reads the pad. Release unmasks a button held at open.
+   */
   pad(edges: PadEdges, at = performance.now()): void {
+    for (const b of edges.pressed) this.padDown.add(b);
+    for (const b of edges.released) this.padDown.delete(b);
     if (this.hooks.capturing()) {
-      this.hooks.capturePad(edges); // capture first, exactly as the keyboard path does
+      // Capture first, exactly as the keyboard path does. Start cancels; everything else binds.
+      if (edges.pressed.includes(PAD_START)) this.hooks.cancelCapture();
+      else this.hooks.capturePad(edges);
       return;
     }
     const top = this.top();
@@ -225,8 +247,12 @@ export class Shell {
       }
       if (top === undefined || !this.isFresh(at, b)) continue;
       if (b === PAD_B && top.dismissable) this.back();
-      // A (0) activates the focused control on its press edge: pointer-cancellation rules are
-      // about pointers, not pads. menu-navigation's move() handles the D-pad.
+      // A activates the focused control on its press edge (pointer-cancellation rules are about
+      // pointers, not pads), here where the fresh-press guard lives. menu-navigation moves focus.
+      if (b === PAD_A) {
+        const f = document.activeElement;
+        if (f instanceof HTMLElement && top.el.contains(f)) f.click();
+      }
     }
   }
 
@@ -251,20 +277,25 @@ export class Shell {
 
   private onKeyDown(e: KeyboardEvent): void {
     if (this.hooks.capturing()) {
-      // Capture owns the keyboard: no gameplay or menu listener may see this key.
+      // Capture owns the keyboard: no gameplay or menu listener may see this key. Esc cancels.
       e.preventDefault();
       e.stopImmediatePropagation();
-      this.hooks.captureKey(e);
+      if (e.code === 'Escape') this.hooks.cancelCapture();
+      else if (!e.repeat) this.hooks.captureKey(e);
       return;
     }
+    const editable = isEditable(e.target);
     // A held Enter/Space must not re-activate (and so arm-then-confirm) a focused button.
     // preventDefault on the keydown blocks Enter activation (verified Chrome 152).
-    if (this.ownsInput && e.repeat && (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space')) {
+    if (
+      this.ownsInput && e.repeat && !editable &&
+      (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space')
+    ) {
       e.preventDefault();
       return;
     }
     if (e.code !== 'Escape') {
-      if (this.hooks.isPauseKey(e.code) && !e.repeat) {
+      if (!editable && this.hooks.isPauseKey(e.code) && !e.repeat) {
         e.preventDefault();
         this.togglePause(e.timeStamp);
       }

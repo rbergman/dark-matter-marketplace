@@ -105,9 +105,11 @@ export function wireHighlight(screen: HTMLElement): void {
 export function wireHover(screen: HTMLElement): void {
   screen.addEventListener('pointerover', (e) => {
     if (document.pointerLockElement !== null) return;
-    // Don't steal focus from a text field (initials entry) or a live remap capture.
+    // Don't steal focus from a text field (initials entry) or a live remap capture. The Controls
+    // screen sets data-capturing on itself while input-bindings' capture is live.
     const a = document.activeElement;
-    if (a instanceof HTMLTextAreaElement || (a instanceof HTMLInputElement && a.type !== 'range')) return;
+    const textLike = a instanceof HTMLInputElement && ['text', 'search', 'email', 'url', 'tel', 'password', 'number'].includes(a.type);
+    if (a instanceof HTMLTextAreaElement || textLike) return;
     if (screen.dataset['capturing'] !== undefined) return;
     const target = e.target instanceof Element ? e.target.closest<HTMLElement>(FOCUSABLE) : null;
     if (target !== null && screen.contains(target)) setHighlight(screen, target);
