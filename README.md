@@ -112,7 +112,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Game development skills across 27 domains. Every skill names its sources — and
+Game development skills across 37 domains. Every skill names its sources — and
 says explicitly where it has none. All numeric values declare a posture under
 the plugin-wide **Numbers Policy** (`skills/game-design/references/numbers-policy.md`):
 source-backed, starting-value-with-test-plan, or measured-here-with-sample-and-date.
@@ -161,6 +161,21 @@ skill carries at most three tight links; everything else routes through the map.
 | `dm-game:playtest-design` | Skill | Question generation, observation protocols, confirmation-bias avoidance |
 | `dm-game:moment-capture` | Skill | Capture felt reactions to play verbatim, at the time |
 | `dm-game:game-perf` | Skill | Zero-allocation hot paths, pooling, deferred destruction, viewport culling |
+
+**UI shell & HUD (browser games):**
+
+| Component | Type | Purpose |
+|-----------|------|---------|
+| `dm-game:game-ui-patterns` | Skill | The guide: shell contract, three-tier decision table, which idiom to follow, build order |
+| `dm-game:game-shell` | Skill | Modal stack, the single Esc/Start/P owner, pause menu, auto-pause latch, fresh-press guards, run flow |
+| `dm-game:menu-navigation` | Skill | Keyboard/pad/mouse focus: restore to opener, wrap rules (XAG 112), one highlight, stick repeat |
+| `dm-game:input-bindings` | Skill | Action map on `code`, remap with swap+undo, merge-on-load, gamepad edges, generated prompts |
+| `dm-game:settings-and-persistence` | Skill | Audio buses, motion/flash/shake gate reaching the canvas, versioned record with migration ladder |
+| `dm-game:pointer-lock` | Skill | Want from unlock reasons, activation-gated retries, Chrome's 1250 ms cooldown, lost lock → pause |
+| `dm-game:hud-readouts` | Skill | Layer choice, interpolated world markers, edge arrows, minimap, score readouts, tiered toast queue |
+| `dm-game:progression-legibility` | Skill | Stacking rules per stat, effective-number cards, visible caps, threat curves from a felt target |
+| `dm-game:game-verification` | Skill | Instrument table with blind spots, determinism, mutation checks, perf percentiles, CDP UI walks |
+| `dm-game:situational-ui` | Skill | Radial menus, inventory grids, dialogue boxes, photo mode — and when not to build them |
 
 ### dm-pixi (pixi-arcade/)
 

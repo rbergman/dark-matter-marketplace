@@ -23,6 +23,8 @@ Everything else in a game's UI hangs off this.
 - **Player-facing requirements:**
   - XAG 107: UI fully operable by keyboard alone.
   - XAG 112: a persistent way back from every screen.
+  - XAG 115 (Error messages and destructive actions): a second step before an
+    action that loses progress.
   - Microsoft's public Xbox console certification requirements:
     - XR-115: the player can continue after a controller drops, or is prompted
     - test case 001-02: resume after suspend without losing progress
