@@ -138,9 +138,10 @@ during action, which must be read while the game runs, is **in-play-comms**'s.
 
 - **Teach only what play won't teach.** Andersen et al. (CHI 2012, 45,000+ players)
   found that tutorials raised play time by up to 29% and progress by up to 75% in
-  Foldit, the most complex of three games, and had a negligible effect in the two
-  simpler ones, which the authors describe as learnable through experimentation. In one of those, Hello Worlds, fewer players came back
-  with context-sensitive tutorials than with none (17.96% vs 21.60%, Table 3). In Foldit, in-context instructions beat an up-front manual
+  Foldit, the most complex of three games, and had a negligible effect on play in
+  the two simpler ones, which the authors describe as learnable through
+  experimentation. In one of them, Hello Worlds, context-sensitive tutorials even
+  lowered the return rate (17.96% against 21.60% with none, Table 3). In Foldit, in-context instructions beat an up-front manual
   (play time +16%, progress +40%). List the rules a player can't discover by
   experimenting; cut hints for genre idioms.
 - **Trigger, not timeline.** A hint shows while its trigger condition holds (near a

@@ -133,7 +133,7 @@ Each line is checkable, and carries why it is Tier 1.
       multiplayer. Essential for parents, interruptions, and anxiety.
 - [ ] **Clear objective/waypoint system**, toggleable off for players who prefer
       to navigate unaided.
-- [ ] **Tutorials are clear, and dismissible or timed** long enough, with the duration adjustable up to at least 10× (XAG 116 allows either).
+- [ ] **Tutorials are clear, and either dismissible or timed long enough** with the duration adjustable up to at least 10× (XAG 116 allows either).
 
 ### Tier 2 — Should-Have (first major update)
 

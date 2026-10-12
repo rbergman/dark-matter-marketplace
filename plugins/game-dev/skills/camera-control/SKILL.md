@@ -276,9 +276,10 @@ The options tab, with rows from redshifted's camera tab (corpus) and the gaps no
     closer and play easier, so difficulty depends on the device. That's a problem
     for shared leaderboards and PvP, beyond the `hw: 0` clamp; split boards by
     device class, or accept it.
-  - **Design ranges for the smallest supported screen:** shorter guns, smaller HUD
-    margins on phones, or a larger minimum window. Fair fire and framing then hold
-    unchanged.
+  - **Design ranges for the smallest supported screen.** In the example, holding
+    0.62 on a 393 px-high screen allows a range of about 277 with no margins, and
+    far less with rule 5's. In practice this means much shorter guns, or no
+    landscape-phone support. Fair fire and framing then hold unchanged.
   - **Not an option:** a fixed "canonical" view for the sim rule that the phone
     doesn't actually show. Ships in the unshown part would count as seen, which
     breaks fair fire (**encounter-design**). Framing the phone to that view is the
