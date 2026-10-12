@@ -112,7 +112,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 ### dm-game (game-dev/)
 
-Game development skills across 39 domains. Every skill names its sources — and
+Game development skills across 40 domains. Every skill names its sources — and
 says explicitly where it has none. All numeric values declare a posture under
 the plugin-wide **Numbers Policy** (`skills/game-design/references/numbers-policy.md`):
 source-backed, starting-value-with-test-plan, or measured-here-with-sample-and-date.
@@ -170,6 +170,7 @@ skill carries at most three tight links; everything else routes through the map.
 | `dm-game:game-shell` | Skill | Modal stack, the single Esc/Start/P owner, pause menu, auto-pause latch, fresh-press guards, run flow |
 | `dm-game:menu-navigation` | Skill | Keyboard/pad/mouse focus: restore to opener, wrap rules (XAG 112), one highlight, stick repeat |
 | `dm-game:input-bindings` | Skill | Action map on `code`, remap with swap+undo, merge-on-load, gamepad edges, generated prompts |
+| `dm-game:touch-controls` | Skill | Switch on first touch, per-pointer sticks released on cancel/hide, page-still CSS, touch fire schemes, rotate card, iPhone gaps |
 | `dm-game:settings-and-persistence` | Skill | Audio buses, motion/flash/shake gate reaching the canvas, versioned record with migration ladder |
 | `dm-game:pointer-lock` | Skill | Want from unlock reasons, activation-gated retries, Chrome's 1250 ms cooldown, lost lock → pause |
 | `dm-game:hud-readouts` | Skill | Layer choice, interpolated world markers, edge arrows, minimap, score readouts, tiered toast queue |

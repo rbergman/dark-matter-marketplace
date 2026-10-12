@@ -7,7 +7,8 @@ description: "The input layer of a browser game: an action map on KeyboardEvent.
 
 **Purpose:** Every action is remappable, prompts always show the binding that
 actually works, the game reads the pad as reliably as the keyboard, and an update
-that adds an action never breaks a player's saved controls.
+that adds an action never breaks a player's saved controls. Touch is a third
+device for the same actions; its sticks and failures are **touch-controls**'.
 
 **Sources:**
 - **Xbox Accessibility Guidelines, XAG 107 (Input):**

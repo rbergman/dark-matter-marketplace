@@ -41,6 +41,7 @@ touches one file instead of twenty.
 | Pause menu, Esc/Start/B, modal stack, auto-pause, title and game-over flow | **game-shell** |
 | Focus, keyboard-only and pad-only menu navigation | **menu-navigation** |
 | Key remapping, gamepad input, button prompts | **input-bindings** |
+| Virtual sticks, touch fire, phone and tablet play | **touch-controls** |
 | Options screen, audio sliders, a11y toggles, saving settings | **settings-and-persistence** |
 | Pointer lock, virtual cursor, reticle | **pointer-lock** |
 | Compass, edge arrows, minimap, toasts, score readouts | **hud-readouts** |
@@ -70,7 +71,7 @@ data-driven-design, accessibility-design
 register skills
 
 **Shell and HUD** — game-ui-patterns → game-shell → menu-navigation,
-input-bindings, settings-and-persistence → pointer-lock, hud-readouts,
+input-bindings, settings-and-persistence → pointer-lock, touch-controls, hud-readouts,
 progression-legibility, camera-control → situational-ui, in-play-comms;
 game-verification throughout
 
@@ -97,6 +98,7 @@ deliberate. Going to the wrong one wastes a pass.
 | progression-systems | progression-legibility | The curve's math vs. whether the player can read it off the screen |
 | simulation-first-design | game-verification | The sim as a design instrument vs. the full verification kit and its blind spots |
 | game-shell | menu-navigation | Which screen owns input vs. how focus moves inside it |
+| input-bindings | touch-controls | Actions, keys and pads vs. the third device and its glass-specific failures |
 | hud-readouts | in-play-comms | Fire-and-forget toasts vs. lines that must be read during action and stay true |
 | game-feel | camera-control | Punch, shake and the trauma budget vs. where the camera points and how it gets there |
 | encounter-design | camera-control | The fair-fire rule vs. the framing that makes it playable |

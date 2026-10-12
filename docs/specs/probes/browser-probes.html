@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game UI browser probes</title>
+<style>
+  :root { --bg: #f6f5f2; --fg: #1d1d1b; --muted: #6b6a66; --line: #d8d6d0; --ok: #1f7a3a; --bad: #b3261e; --accent: #2457c5; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #161615; --fg: #eceae5; --muted: #a09e98; --line: #34332f; --ok: #5cc27a; --bad: #f08a80; --accent: #8fb0ff; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.lede { color: var(--muted); margin: 0 0 20px; }
+  section { border-top: 1px solid var(--line); padding: 16px 0; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
+  ol { margin: 6px 0 10px; padding-left: 20px; }
+  button { font: inherit; padding: 8px 14px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--fg); cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #pad { height: 120px; border: 1px dashed var(--line); border-radius: 6px; display: grid; place-items: center; color: var(--muted); margin: 8px 0; user-select: none; }
+  pre { background: color-mix(in srgb, var(--fg) 6%, transparent); padding: 12px; border-radius: 6px; white-space: pre-wrap; font-size: 13px; min-height: 80px; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Game UI browser probes</h1>
+  <p class="lede">Five checks the dm-game skills make about pointer lock, Esc and held keys. Run each in order, then press <b>Copy results</b> and paste them back. About two minutes per browser.</p>
+
+  <section>
+    <h2>1 · Relock after Esc (cooldown)</h2>
+    <ol><li>Click the box to lock the pointer.</li><li>Press <b>Esc</b> to release it.</li><li>Click <b>Resume</b> immediately, then click it again about 2 s later.</li></ol>
+    <div id="pad">click to lock</div>
+    <button id="resume">Resume</button>
+  </section>
+
+  <section>
+    <h2>2 · Programmatic exit, then relock without a click</h2>
+    <ol><li>Click <b>Start</b>. It locks the pointer, then the page releases it after 1 s (like a game opening its menu).</li><li>Don't click anything. 2 s later the page asks for the lock again from a timer, with no gesture.</li></ol>
+    <button id="prog">Start</button>
+  </section>
+
+  <section>
+    <h2>3 · Does the page see the Esc that exits lock or fullscreen?</h2>
+    <ol><li>Click <b>Fullscreen</b>, then press <b>Esc</b> once.</li><li>Lock the pointer (box above), then press <b>Esc</b> once.</li></ol>
+    <button id="fs">Fullscreen</button>
+  </section>
+
+  <section>
+    <h2>4 · Held Enter on a focused button</h2>
+    <ol><li>Tab to (or click) <b>Hold Enter here</b>, then hold <b>Enter</b> for about 2 s and release.</li><li>Do the same with <b>Space</b>.</li></ol>
+    <button id="hold">Hold Enter here</button>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <button id="copy">Copy results</button>
+    <pre id="log"></pre>
+  </section>
+</main>
+<script>
+const logEl = document.getElementById('log');
+const t0 = performance.now();
+const lines = [];
+function log(msg, cls) {
+  const line = `${((performance.now() - t0) / 1000).toFixed(2)}s  ${msg}`;
+  lines.push(line);
+  const span = document.createElement('span');
+  if (cls) span.className = cls;
+  span.textContent = line + '\n';
+  logEl.append(span);
+}
+log(`UA: ${navigator.userAgent}`);
+log(`userActivation API: ${'userActivation' in navigator}`);
+
+const pad = document.getElementById('pad');
+let lockedAt = 0, unlockedAt = 0;
+function request(src) {
+  const at = performance.now();
+  const sinceUnlock = unlockedAt ? Math.round(at - unlockedAt) : null;
+  const active = navigator.userActivation ? navigator.userActivation.isActive : 'n/a';
+  try {
+    const r = pad.requestPointerLock();
+    if (r && typeof r.then === 'function') {
+      r.then(() => log(`[${src}] request resolved (${sinceUnlock ?? '-'} ms after unlock, activation ${active})`, 'ok'),
+             (e) => log(`[${src}] request rejected: ${e && e.name} (${sinceUnlock ?? '-'} ms after unlock, activation ${active})`, 'bad'));
+    } else log(`[${src}] request returned no promise (${sinceUnlock ?? '-'} ms after unlock, activation ${active})`);
+  } catch (e) { log(`[${src}] request threw: ${e && e.name}`, 'bad'); }
+}
+document.addEventListener('pointerlockchange', () => {
+  if (document.pointerLockElement === pad) { lockedAt = performance.now(); log('pointer LOCKED', 'ok'); pad.textContent = 'locked: press Esc'; }
+  else { unlockedAt = performance.now(); log(`pointer unlocked (held ${Math.round(unlockedAt - lockedAt)} ms)`); pad.textContent = 'click to lock'; }
+});
+document.addEventListener('pointerlockerror', () => log('pointerlockerror event', 'bad'));
+pad.addEventListener('click', () => request('box click'));
+document.getElementById('resume').addEventListener('click', () => request('Resume click'));
+
+document.getElementById('prog').addEventListener('click', () => {
+  request('Start click');
+  setTimeout(() => { log('page calls exitPointerLock() (menu opens)'); document.exitPointerLock(); }, 1000);
+  setTimeout(() => request('timer, no gesture, after programmatic exit'), 3000);
+});
+
+document.getElementById('fs').addEventListener('click', () => {
+  const p = document.documentElement.requestFullscreen?.() ?? document.documentElement.webkitRequestFullscreen?.();
+  if (p && p.catch) p.catch((e) => log(`fullscreen rejected: ${e && e.name}`, 'bad'));
+});
+document.addEventListener('fullscreenchange', () => log(`fullscreen ${document.fullscreenElement ? 'ENTERED' : 'exited'}`));
+document.addEventListener('webkitfullscreenchange', () => log(`webkit fullscreen ${document.webkitFullscreenElement ? 'ENTERED' : 'exited'}`));
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') log(`keydown Escape seen by page (locked=${document.pointerLockElement === pad}, fullscreen=${!!(document.fullscreenElement || document.webkitFullscreenElement)}, repeat=${e.repeat})`);
+}, { capture: true });
+
+const hold = document.getElementById('hold');
+let clicks = 0, downs = 0, repeats = 0, key = '';
+hold.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  if (!e.repeat) { clicks = 0; downs = 0; repeats = 0; key = e.key === ' ' ? 'Space' : 'Enter'; }
+  downs++; if (e.repeat) repeats++;
+});
+hold.addEventListener('click', () => clicks++);
+hold.addEventListener('keyup', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  setTimeout(() => log(`held ${key}: ${downs} keydowns (${repeats} repeats), ${clicks} clicks`, clicks > 1 ? 'bad' : 'ok'), 0);
+});
+
+document.getElementById('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(lines.join('\n')); log('results copied'); }
+  catch { log('clipboard blocked: select the log text and copy it by hand'); }
+});
+</script>
+</body>
+</html>

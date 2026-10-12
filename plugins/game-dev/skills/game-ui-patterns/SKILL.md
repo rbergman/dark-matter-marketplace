@@ -89,6 +89,7 @@ Any line above that fails is a ship blocker for a real-time game. See
 | Score and combo readouts | There is a score | — | **hud-readouts** |
 | Damage feedback and shake budgets | The player can be hurt | — | **game-feel** |
 | Follow camera, zoom, combat framing, camera options | The world is bigger than the screen | A fixed single-screen arena | **camera-control** |
+| Touch controls (sticks, touch fire, rotate card) | The game should play on a phone or tablet | Desktop-only by design, said on the title | **touch-controls** |
 | Upgrade / draft card picker | Mid-run choices between numbers | The choice is spatial or narrative | **progression-legibility** |
 
 ### Tier 3 — situational
