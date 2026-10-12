@@ -129,6 +129,28 @@ Phase 4: Release (full game)
 - [ ] Can experienced players skip/accelerate the tutorial?
 - [ ] Are controls taught through muscle memory, not reading?
 
+### Contextual Hints (Implementation)
+
+Teach a verb where and when it's needed, then get out of the way. This is
+timberwolf's task prompts and learned counters (2026-09/10): its operator found
+prompts that "never go away even after you have done it".
+
+- **Trigger, not timeline.** A hint shows while its trigger condition holds (near a
+  fire, carrying wood), and clears the first time the player does the thing.
+- **Shown where the player is looking,** as a keycap plus a few words. The keycap
+  is built from the **live binding** at draw time, so a remap shows (see
+  **input-bindings** rule 8). Never hard-code "[E]".
+- **Learned, then gone.** Count successful uses per hint; stop showing after N.
+  Timberwolf uses 6 for feeding and 3 for dropping (posture C there; B elsewhere).
+  Test: does the hint vanish before the player stops needing it?
+  - Readouts such as a price or a stack size aren't lessons, and never fade.
+- **Per player, not per save.** Store learned counts per browser: it is the player
+  who learned it. Options has a "reset tips" control.
+- **Budget.** At most 2 hints on screen. Hide teaching hints in danger, except
+  panic verbs (heal, flee), which are needed most then.
+- **UI only.** Hints read game state and never write it, and never draw from the
+  sim's RNG, so seeds, replays and bots are unaffected.
+
 ---
 
 ## Developer Blindness

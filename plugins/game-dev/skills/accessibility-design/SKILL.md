@@ -158,6 +158,26 @@ Each line is checkable, and carries why it is Tier 1.
 | Cognitive | Adaptive difficulty (invisible) | See **progression-systems** for implementation patterns |
 | All | Comprehensive accessibility menu with previews | Let players see the effect of each option before committing |
 
+### Presets: Bundles Over Toggles
+
+Once a game has more access settings than fit one screen, offer **presets** as a
+starting point: Vision, Hearing, Motor, Reduced Motion. The Last of Us Part II
+ships hearing, vision and motor presets, each still adjustable (Naughty Dog's
+accessibility announcement; Can I Play That coverage).
+
+- A preset **sets** individual toggles. It is not a mode. Editing any toggle
+  afterwards shows the preset as "Custom".
+  - This is the opposite of the "single Accessibility Mode toggle" anti-pattern
+    below: the player can always see and change what the preset did.
+- **Offer the presets at first launch,** before any gameplay. XAG 112 asks that
+  first launch offer accessibility settings, or that the defaults already meet the
+  guidelines.
+- **Name presets by need, not diagnosis.** "Reduced motion", not "Vestibular
+  disorder". GAG warns against labels like "epilepsy safe" for the same reason:
+  name the setting by what it does.
+- Wiring each toggle into the game is **settings-and-persistence**'s job; this
+  section decides which bundles exist.
+
 ---
 
 ## Colorblind Design
