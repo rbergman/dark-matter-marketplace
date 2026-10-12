@@ -188,7 +188,7 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 - **Hold time.** *Starting value:* 2 s plus 60 ms per character (posture B). Test: a
   first-time player reads every lesson toast without pausing. If they miss lines,
   lengthen the hold.
-  - The hold is scaled by a setting up to at least 10× (or off), or dismissed by an
+  - The hold is scaled by a setting up to at least 10×, or dismissed by an
     input (XAG 116).
   - It runs on the pausable view clock (rule 4).
 - **Accessibility:** a `role="status"` region (`aria-live="polite"`) for the toast

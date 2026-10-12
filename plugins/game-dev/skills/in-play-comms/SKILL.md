@@ -37,10 +37,11 @@ If a line doesn't need all three "yes"es, use the neighbour. It is less machiner
   or is dismissed or advanced on input. **XAG 104:** subtitle presentation.
   ice-pirates has no reading-time setting; the sketch adds one, marked ADDED.
 - **What to teach:** Andersen et al., "The Impact of Tutorials on Games of Varying
-  Complexity" (CHI 2012, 45,000+ players; abstract and introduction read). Tutorials
-  raised play time by up to 29% and progress by up to 75% in Foldit, the complex,
-  unfamiliar game, and had a negligible effect in the two games built on familiar
-  mechanics. In Foldit, in-context instructions beat an up-front manual (play time +16%,
+  Complexity" (CHI 2012, 45,000+ players; pp. 1, 7–8 read). Tutorials
+  raised play time by up to 29% and progress by up to 75% in Foldit, the most
+  complex of three games, and had a negligible effect in the two simpler ones,
+  which the authors describe as learnable through experimentation. In one of those, Hello Worlds, fewer players came back
+  with context-sensitive tutorials than with none (17.96% vs 21.60%, Table 3). In Foldit, in-context instructions beat an up-front manual (play time +16%,
   progress +40%).
 - **Hard Deck** (its teaching spec session, 2026-10-12): Bob's choices of "repeat
   until acted on" with a Replay tips option, and no dismiss input by default. These
@@ -185,12 +186,22 @@ Corpus values. Then:
   withdrawn once it has had `MIN_SHOWN` and its key is gone, so a lesson about a
   0.35–0.85 s gun charge (Hard Deck) would retire unread. For an event shorter
   than `MIN_SHOWN` plus the reading time, either:
-  - make the line urgent and unkeyed, as ice-pirates' telegraph lesson is
-    (`telegraphHint`: pri 2, `live: () => true`, so it cuts in while the glow shows
-    and is never withdrawn), or
-  - key it to the enclosing situation ("a gun has you in range").
+  - **key it to the enclosing situation** ("a gun has you in range") at coaching
+    priority. Prefer this one.
+  - **make it urgent, with a key that stays live,** as ice-pirates' telegraph
+    lesson is. `telegraphHint` is pri 2, and its `live: () => true` keeps its key in
+    `liveKeys()`, so it cuts in while the glow shows and is never withdrawn. The
+    costs: urgent skips the engagement gate and the 60% overlap, a fourth card
+    retires the oldest unread, and it wears the alarm styling and `assertive`
+    announcement. ice-pirates gets away with it because barks are spaced 6 s apart
+    (`barkIn`). Use it for one or two lessons, and space urgent lines.
+- **Fire it once.** `push()` only dedupes while a line is queued or showing, so a
+  trigger that pushes on every gun glow repeats the lesson all run. The caller keeps
+  a per-run fired flag (ice-pirates' `st.flags`).
 - **Teach only what play won't teach.** In Andersen et al.'s study, tutorials paid
-  off only in the complex, unfamiliar game, and in-context help beat a manual. Cut
+  off only in Foldit, the most complex game, and in-context help beat a manual only
+  there. The authors' conclusion is that tutorials may not be justified for games
+  that can be learned through experimentation. Cut
   lessons for familiar idioms (WASD, click to shoot). Keep the rules a player can't
   discover by experimenting, and say them on their event. **player-ux** decides the
   list.
@@ -211,8 +222,8 @@ Corpus values. Then:
 
 Hard Deck's design (Bob's choice, 2026-10-12; posture B until playtested):
 
-- **Each lesson fires once per run on its trigger, until the player performs the
-  action it teaches.** Then a persisted learned-flag (in the settings or profile
+- **Each lesson fires once per run on its trigger (a per-run fired flag, rule 6),
+  until the player performs the action it teaches.** Then a persisted learned-flag (in the settings or profile
   record, **settings-and-persistence**) retires it for good.
 - **A lesson with nothing to act on** (an informational rank-up) is show-once.
 - **"Replay tips"** in options clears the learned flags.

@@ -268,14 +268,21 @@ The options tab, with rows from redshifted's camera tab (corpus) and the gaps no
   velocity, so pulses silently do nothing (inferred from the code, untested).
 - **Phones break the floor rule.** Sizing the floor from the longest gun on the
   smallest window can be unreadable on a landscape phone. Hard Deck (via its
-  session): a 720 px flak gun on an 852×393 screen needs ~0.27 zoom to fit, against
-  a readability floor of 0.62. The two ways out both have a cost:
+  session) has a 720 px flak gun and a readability floor of 0.62. On an 852×393
+  screen, fitting it vertically needs 196.5 / 720 ≈ 0.27 ignoring HUD margins; with
+  rule 5's margins it is (196.5 − 150) / (720 + 40) ≈ 0.06. Either way it's far
+  below readable. The ways out:
   - **Feed the device's real view to the fair-fire rule.** Phones then engage
     closer and play easier, so difficulty depends on the device. That's a problem
-    for shared leaderboards and PvP, beyond the `hw: 0` clamp.
-  - **Use a canonical view for the sim rule**, the same world size on every device,
-    and frame to it. Phone players then see threats smaller, or behind edge arrows
-    (**hud-readouts**).
+    for shared leaderboards and PvP, beyond the `hw: 0` clamp; split boards by
+    device class, or accept it.
+  - **Design ranges for the smallest supported screen:** shorter guns, smaller HUD
+    margins on phones, or a larger minimum window. Fair fire and framing then hold
+    unchanged.
+  - **Not an option:** a fixed "canonical" view for the sim rule that the phone
+    doesn't actually show. Ships in the unshown part would count as seen, which
+    breaks fair fire (**encounter-design**). Framing the phone to that view is the
+    unreadable zoom again.
 
   Pick one per game and write the choice down.
 - **Fit against a moving centre.** Fit uses the target centre, not the current

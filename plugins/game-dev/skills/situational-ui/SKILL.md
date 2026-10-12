@@ -137,7 +137,7 @@ anything without shape.
 - a **skip** that asks once, because a skipped scene can't be undone
 
 - **Player-paced by default** (GAG Basic). Auto-advance is an option whose timing is
-  adjustable up to at least 10× (or off), or dismissed on input (XAG 116).
+  adjustable up to at least 10×, or dismissed on input (XAG 116).
   - *Starting hold for auto-advance:* 2 s plus 60 ms per character, the same as
     toasts (posture B).
   - Test: a first-time player reads every line.
