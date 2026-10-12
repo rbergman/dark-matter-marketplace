@@ -1,6 +1,6 @@
 ---
 name: in-play-comms
-description: "A voice that talks to the player during action (crew radio, a co-pilot, a coach, an operator) and must be read while the game keeps running: lines keyed to a situation and withdrawn the moment it stops being true, lessons versus moments, a reading-time floor whose clock slows while the player is busy, entry gates by priority with caps so nothing starves, a short stack of cards, teaching on the event instead of the clock, teaching overlays drawn from the rules, and a line budget measured with a scripted pilot. Use when building or reviewing in-play tutorial lines, crew chatter, mission radio or contextual coaching, and when players say 'it told me to run after the enemy was dead', 'the tip vanished before I read it', 'I was busy and missed it', 'it talked over itself', 'the story never got told', or 'the tip was gone before I'd read it'. For fire-and-forget toasts see hud-readouts; for player-paced dialogue the game waits on, see situational-ui."
+description: "A voice that talks to the player during action (crew radio, a co-pilot, a coach, an operator) and must be read while the game keeps running: lines keyed to a situation and withdrawn the moment it stops being true, lessons versus moments, a reading-time floor whose clock slows while the player is busy, entry gates by priority with caps so nothing starves, a short stack of cards, teaching on the event instead of the clock, teaching overlays drawn from the rules, and a line budget measured with a scripted pilot. Use when building or reviewing in-play tutorial lines, crew chatter, mission radio or contextual coaching, and when players say 'it told me to run after the enemy was dead', 'the tip vanished before I read it', 'I was busy and missed it', 'it talked over itself', 'the story never got told', or 'I couldn't dismiss it'. For fire-and-forget toasts see hud-readouts; for player-paced dialogue the game waits on, see situational-ui."
 ---
 
 # In-Play Comms
@@ -101,10 +101,12 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
   it. No → it's a lesson.
 - **A lesson card is not a persistent hint.** It retires after its reading time
   like any card. player-ux's "learned, then gone" governs hints that stay up while
-  their trigger holds; it can also drop a queued lesson the player has already shown
-  they know. ice-pirates shows the steering lesson even to a player who steered
-  early. Whether one early press counts as learned is a design call; decide it per
-  lesson and write it down.
+  their trigger holds. To skip a *queued* lesson the player has already shown they
+  know, call `drop(text)` (ADDED in the sketch; pending lines only). **Never key a
+  lesson to "not learned yet":** a key also withdraws the card on screen, which
+  brings back the unread steering lesson above. ice-pirates shows the steering
+  lesson even to a player who steered early. Whether one early press counts as
+  learned is a design call; decide it per lesson and write it down.
 
 ### 3. Reading time is a floor, and the clock bends to the player
 
@@ -118,10 +120,12 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
 - **The clock is `dt`, and `dt` is 0 while paused** (game-shell's view clock).
 - **The player's setting multiplies `need`:** 1–10×, or "until dismissed" with a
   dismiss input (XAG 116; ADDED in the sketch). Under "until dismissed":
-  - every non-urgent line waits for the dismiss, even past its cap, so rule 4's
-    "nothing starves" holds only for finite settings
-  - a keyed moment that goes stale while waiting is dropped unseen, as it would be
-    at any speed
+  - while *any* card is on screen, every non-urgent line waits, even past its cap,
+    so rule 4's "nothing starves" holds only for finite settings
+  - each card takes its own dismiss, newest first: if an urgent line cut in over a
+    lesson, the first dismiss retires the urgent card
+  - keyed cards are still withdrawn when their situation ends (after `MIN_SHOWN`),
+    on screen or queued, exactly as at any speed
   - `dismiss()` reports through the same `CommsChange` as `update()`, so the view
     retires the card the same way
 - **Test:** a first-time player under fire reads every lesson. *Blind to:* reading

@@ -87,10 +87,11 @@ framing, heading mode, `view()` and the conversions, and the aim lead.
   frame is not: it follows twice as tightly at 120 Hz as at 60.
 - **Tune in halflife,** but know which one. For damp, it's the time to close half
   the gap: rate `r` has halflife `ln 2 / r`, so ice-pirates' 4/s is ~0.17 s. For
-  redshifted's spring, `halflife` is the decay constant's (`y = 2 ln 2 / h`). From
-  rest the spring closes only ~40% of the gap in one `h` and reaches half at ~1.2 h,
-  so its 0.25 s default takes ~0.3 s to close half (redshifted's own test shows the
-  40%). Swapping damp for a spring "at the same halflife" gives a camera ~20% looser.
+  redshifted's spring, `halflife` is a parameter (`y = 2 ln 2 / h`), not the time to
+  close half the gap. From rest the spring closes ~40% of the gap in one `h` and
+  half at ~1.2 h, so its 0.25 s default takes ~0.3 s to close half (arithmetic on
+  the formula). Swapping damp for a spring "at the same halflife" gives a camera ~20%
+  looser.
 - **Zoom eases slower than position:** ice-pirates 1.6/s against 4/s; redshifted a
   0.4 s against 0.25 s spring halflife. Zoom changes are the most disorienting
   motion.
@@ -195,17 +196,21 @@ it in ice-pirates.
   and `toWorld` **excludes** it, so shake never moves the aim point (redshifted's
   `screenToWorld`, deliberately). Kicks are velocity impulses into the spring, not
   target moves.
-- **Which HUD takes the shake** (hud-readouts rule 2): a marker drawn *on* a world
-  object takes it, or it slides off its shaking target. Screen-pinned HUD (edge
-  arrows, the compass, panels) never does. The sketch's `toScreen(p)` is unshaken,
+- **Which HUD takes the shake:** a marker drawn *on* a world object takes it, or it
+  slides off its shaking target, and panels never do (both hud-readouts rule 2).
+  Edge arrows and the compass are pinned to the screen edge, so this skill treats
+  them as panels; that call is this skill's (posture B), and hud-readouts' own
+  example helper does shake them. The sketch's `toScreen(p)` is unshaken,
   and `toScreen(p, true)` is for on-object markers. Redshifted's `worldToHudScreen`
   shakes everything, including its edge arrows.
 - **Shake sizing, the trauma accumulator, noise and the settings gate** are
   **game-feel**'s ("Shake and Flash Budgets"). Redshifted caps the offset at 15 px
   and decays trauma 1.8/s linearly; ice-pirates caps it at 14 px with damp 9/s
   (corpus values).
-- **`toScreen` and `toWorld` are the only conversions.** Every HUD element, culling
-  pass and aim calculation calls them.
+- **Every conversion derives from one `x, y, zoom, angle`.** HUD elements and aim
+  call `toScreen` and `toWorld`; fair fire calls `inView`; culling uses `bounds()`.
+  No HUD element does its own maths: the checklist's `inView`-agrees-with-`toScreen`
+  test catches drift.
   - **Redshifted's objective markers** do their own on-screen test with no zoom term
     (`objective-markers.ts`), unlike its edge arrows. That is a likely bug, inferred
     from reading the code.
@@ -233,7 +238,9 @@ The options tab, with rows from redshifted's camera tab (corpus) and the gaps no
 
 ### 9. Time: the camera runs on the game's clock
 
-- **Paused: give follow, zoom and the aim lead `dt = 0`.** Redshifted does. ice-pirates
+- **Paused: give follow, zoom, shake and the aim lead `dt = 0`.** Shake then freezes
+  mid-offset behind the pause menu, still, because the sketch's noise clock advances
+  by `shakeDt` too (redshifted's `shakeTime` does the same). Redshifted does all this. ice-pirates
   freezes only the aim lead and passes the real `dt` to `follow`; with the sim
   frozen the target is still, so the camera just finishes settling and shake keeps
   decaying. That's harmless there, but it's the gap a moving target would expose.

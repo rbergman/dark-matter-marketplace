@@ -67,6 +67,7 @@ export class Camera {
   private trauma = 0;
   private sx = 0;
   private sy = 0;
+  private shakeTime = 0;
 
   constructor(private readonly settings: () => CameraSettings) {}
 
@@ -89,9 +90,10 @@ export class Camera {
 
   /**
    * `dt` is 0 while paused or in hit-stop; the caller decides. `shakeDt` lets trauma keep decaying
-   * through a hit-stop (redshifted passes the un-hit-stopped dt). `noise` in -1..1, seeded (game-feel).
+   * through a hit-stop (redshifted passes the un-hit-stopped dt); paused, both are 0 and the shake
+   * holds still. `noise(channel, t)` in -1..1, seeded (game-feel); `t` is the shake clock, not wall time.
    */
-  follow(t: CameraTarget, dt: number, noise: (ch: number) => number, shakeDt = dt): void {
+  follow(t: CameraTarget, dt: number, noise: (ch: number, t: number) => number, shakeDt = dt): void {
     const s = this.settings();
     [this.x, this.vx] = spring(this.x, this.vx, t.x, s.halflife, dt);
     [this.y, this.vy] = spring(this.y, this.vy, t.y, s.halflife, dt);
@@ -108,8 +110,9 @@ export class Camera {
     } else this.angle = 0;
     this.trauma = Math.max(0, this.trauma - shakeDt); // ~1 s from full; see game-feel's budgets
     const amp = 15 * this.trauma * this.trauma * s.shake;
-    this.sx = amp * noise(0);
-    this.sy = amp * noise(1);
+    this.shakeTime += shakeDt;
+    this.sx = amp * noise(0, this.shakeTime);
+    this.sy = amp * noise(1, this.shakeTime);
   }
 
   /** Largest zoom keeping `p` on screen around `c`, clear of the HUD; never below the floor. */

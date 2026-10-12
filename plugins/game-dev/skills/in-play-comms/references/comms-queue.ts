@@ -86,6 +86,12 @@ export class CommsQueue {
     return out;
   }
 
+  /** ADDED: skip a queued line by text (a lesson the player has shown they know). Never touches the screen. */
+  drop(text: string): void {
+    const i = this.pending.findIndex((p) => p.text === text);
+    if (i >= 0) this.pending.splice(i, 1);
+  }
+
   /** Death, restart, quit: drop everything. */
   clear(): CommsCard[] {
     const gone = [...this.cards];
