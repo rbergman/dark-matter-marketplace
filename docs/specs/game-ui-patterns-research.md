@@ -334,8 +334,9 @@ summary was seen. UNSOURCED means a convention with no source found.
     than 3 per second, over roughly 20% of the screen.
   - Red flash: R/(R+G+B) ≥ 0.8.
   - Points to the Harding FPA test.
-- **Title list for the D5 audit** (v3.2, from the version-history page; 113 is
-  merged into 112):
+- **Title list for the D5 audit** (v3.2, from the version-history page, re-fetched
+  2026-10-12). 113 is **not** merged: only two of its guidelines moved into 112 in
+  v2.0.
   - 101 Text display
   - 102 Contrast
   - 103 Additional channels for visual and audio cues
@@ -348,13 +349,20 @@ summary was seen. UNSOURCED means a convention with no source found.
   - 110 Haptic feedback
   - 111 Audio descriptions
   - 112 UI navigation
+  - 113 UI focus handling
+  - 114 UI context
   - 115 Error messages and destructive actions
   - 116 Time limits
   - 117 Visual distractions and motion settings
   - 118 Photosensitivity
+  - 119 Speech-to-text / text-to-speech chat
+  - 120 Communication experiences
+  - 121 Accessible feature documentation
+  - 122 Accessible customer support
+  - 123 Mental health best practices
 
-  114 and 119+ are not confirmed. Review 1 implies 121 covers communication
-  alternatives; fetch these during D5.
+  There is nothing above 123. Review 1's suggestion of 121 for chat alternatives
+  was wrong: chat is 119 and 120.
 
 **Game Accessibility Guidelines** (gameaccessibilityguidelines.com/full-list):
 - **Basic:**

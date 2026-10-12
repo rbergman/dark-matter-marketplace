@@ -44,13 +44,13 @@ Players who are blind, have low vision, are colorblind, or are photosensitive.
 
 | Barrier | Solution | Standard |
 |---------|----------|----------|
-| Color-only information | Add shape, pattern, text, or position as redundant channel | WCAG 1.4.1, XAG 106 |
-| Small text | Scalable text, minimum 28px at 1080p for body text | XAG 102 |
+| Color-only information | Add shape, pattern, text, or position as redundant channel | WCAG 1.4.1, XAG 103 |
+| Small text | Scalable text: minimum 26px at 1080p on console, 18px on PC; this skill recommends 28px as the TV-distance default (posture B) | XAG 101 |
 | Low contrast | 4.5:1 ratio for text, 3:1 for large UI elements | WCAG 1.4.3 (AA) |
 | No screen reader support | Semantic UI structure, text alternatives for images | WCAG 1.1.1 |
-| Fixed UI scale | Independent UI scaling separate from resolution | XAG 102 |
-| Photosensitive content | No flashing above 3Hz, option to disable screen effects | WCAG 2.3.1 |
-| Motion-intensive effects | Motion reduction toggle (camera shake, screen bob, parallax) | WCAG 2.3.3 |
+| Fixed UI scale | Independent UI scaling separate from resolution, up to 200% | XAG 101 |
+| Photosensitive content | No more than 3 flashes per second, option to disable screen effects | WCAG 2.3.1, XAG 118 |
+| Motion-intensive effects | Motion reduction toggle (camera shake, screen bob, parallax) | WCAG 2.3.3, XAG 117 |
 
 ### Pillar 2: Auditory
 
@@ -58,12 +58,12 @@ Players who are deaf, hard of hearing, or playing without sound.
 
 | Barrier | Solution | Standard |
 |---------|----------|----------|
-| Audio-only critical info | Visual equivalent for every audio cue (directional indicators, alerts) | XAG 107 |
-| No subtitles | Subtitle system with speaker identification | XAG 107 |
+| Audio-only critical info | Visual equivalent for every audio cue (directional indicators, alerts) | XAG 103 |
+| No subtitles | Subtitle system with speaker identification | XAG 104 |
 | No captions | Descriptive captions for non-speech sounds [explosion nearby] | GAG intermediate |
-| Mixed audio levels | Independent volume sliders per channel (music, SFX, voice, ambient) | XAG 107 |
+| Mixed audio levels | Independent volume sliders per channel (music, SFX, voice, ambient) | XAG 105 |
 | Directional audio cues | Visual directional indicators (damage direction, footstep radar) | GAG advanced |
-| Voice chat dependency | Text chat alternative, ping systems, visual callouts | XAG 107 |
+| Voice chat dependency | Text chat alternative, ping systems, visual callouts | XAG 119, XAG 120 |
 
 ### Pillar 3: Motor
 
@@ -71,12 +71,12 @@ Players with limited mobility, dexterity, or stamina — including temporary con
 
 | Barrier | Solution | Standard |
 |---------|----------|----------|
-| Hardcoded controls | Full remapping for ALL inputs, no exceptions | XAG 104 |
-| Hold-to-activate only | Toggle/hold option for every sustained input (sprint, aim, crouch) | XAG 104 |
+| Hardcoded controls | Full remapping for ALL inputs, no exceptions | XAG 107 |
+| Hold-to-activate only | Toggle/hold option for every sustained input (sprint, aim, crouch) | XAG 107 |
 | Rapid button mashing | Alternative input (hold, auto-complete, reduced threshold) | GAG intermediate |
-| Precision timing | Adjustable timing windows, generous input buffers | XAG 109 |
+| Precision timing | Adjustable timing windows, generous input buffers | XAG 108 |
 | Complex simultaneous inputs | Simplification options, sequential alternatives | GAG advanced |
-| Fixed sensitivity | Adjustable dead zones, sensitivity curves, acceleration | XAG 104 |
+| Fixed sensitivity | Adjustable dead zones, sensitivity curves, acceleration | XAG 107 |
 | No one-handed play | Alternative control schemes, copilot mode | GAG advanced |
 
 ### Pillar 4: Cognitive
@@ -85,13 +85,13 @@ Players with cognitive disabilities, learning differences, ADHD, anxiety — or 
 
 | Barrier | Solution | Standard |
 |---------|----------|----------|
-| Single difficulty preset | Multiple options, ideally granular per-parameter | XAG 109 |
-| Unforgiving timing | Pauseable gameplay, adjustable game speed | XAG 109 |
-| Unclear objectives | Objective markers, quest logs, waypoint systems | GAG basic |
+| Single difficulty preset | Multiple options, ideally granular per-parameter | XAG 108 |
+| Unforgiving timing | Pauseable gameplay, adjustable game speed | XAG 108 |
+| Unclear objectives | Objective markers, quest logs, waypoint systems | GAG basic, XAG 109 |
 | No save flexibility | Save anywhere, generous autosave | GAG basic |
 | Unreplayable tutorials | Tutorial replay from menu, contextual hints | GAG basic |
 | Information overload | Adjustable HUD density, progressive disclosure | See **player-ux** |
-| Distressing content | Content warnings, option to skip/reduce intensity | GAG intermediate |
+| Distressing content | Content warnings, option to skip/reduce intensity | GAG intermediate, XAG 123 |
 | Complex navigation | Minimap, breadcrumbs, "return to path" button | GAG intermediate |
 
 Cognitive accessibility has the broadest overlap with general UX quality — this is where accessibility and **player-ux** (cognitive load management) directly converge.
@@ -110,8 +110,10 @@ Each line is checkable, and carries why it is Tier 1.
       redundant channel (shape, icon, text, position). ~8% of men and ~0.5% of
       women of northern-European descent have a colour-vision deficiency; free if
       designed in, expensive to retrofit.
-- [ ] **Text scales to at least 28px at 1080p** — body text, UI labels, item
-      descriptions. *Starting value; test at your actual target viewing distance.*
+- [ ] **Text meets XAG 101's minimum** (26px at 1080p on console, 18px on PC)
+      **and scales to 200%.** This applies to body text, UI labels and item
+      descriptions. The default this skill recommends is 28px for TV distance: a
+      *starting value*, to test at your actual viewing distance.
 - [ ] **Contrast meets WCAG AA** — 4.5:1 for text, 3:1 for UI components.
 - [ ] **Motion reduction option** for camera shake, screen effects, parallax.
       Roughly 35% of US adults over 40 have experienced vestibular dysfunction
