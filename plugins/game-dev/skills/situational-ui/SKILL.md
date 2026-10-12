@@ -106,8 +106,9 @@ anything without shape.
     its "shape decides" rule
   - a centred inventory pauses
   - a live panel never takes gameplay input (game-shell rule 1)
-  - Esc with an item carried cancels the carry first (gravelight's bag-before-menu
-    order)
+  - Esc or B with an item carried cancels the carry first (gravelight's
+    bag-before-menu order). Do it through game-shell's `consumeBack` on the
+    inventory screen, never with a separate Esc listener.
 - **The tooltip** shows effective numbers, before → after, against what's equipped
   (progression-legibility rule 2).
 
@@ -181,9 +182,13 @@ redshifted's `?capture=`, serves the team without a player-facing UI.
   context has `preserveDrawingBuffer: true`, or the capture runs in the same frame
   right after a render. Render once with the HUD hidden, call `toBlob` in the same
   task, then restore.
-- **Camera input** goes through input-bindings' actions, not raw keys, so remaps
-  apply. Pointer lock may be wanted here for mouse-look: it's an unlock reason
-  being cleared (pointer-lock rule 1).
+- **Photo mode is a mode, not a shell dialog.** Choosing it from pause:
+  1. closes the pause screen
+  2. keeps the sim frozen with photo mode's own flag
+  3. clears the `'screen'` unlock reason, so pointer lock can serve mouse-look
+
+  Esc or B, routed through game-shell's router as photo mode's Back, returns to
+  pause. Camera input goes through input-bindings' actions, so remaps apply.
 - **Filename** includes the game and a timestamp. Offer the download; never upload.
 
 **Checklist:**

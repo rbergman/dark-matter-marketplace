@@ -14,7 +14,8 @@ export interface Settings {
   fx: { motion: Tri; flash: Tri; shake: number | null };
   display: { uiScale: number }; // 1 = 100%; XAG 101 asks for up to 2
   /** keys/pad are sanitised by input-bindings' mergeSaved() in the game's glue, not here. */
-  input: { keys: unknown; pad: unknown; toggles: Record<string, boolean>; deadzone: number };
+  /** sensitivity: mouse/stick multiplier (XAG 107 asks ±50% at least); captureMouse: pointer-lock's userPref reason. */
+  input: { keys: unknown; pad: unknown; toggles: Record<string, boolean>; deadzone: number; sensitivity: number; captureMouse: boolean };
 }
 
 /**
@@ -30,7 +31,7 @@ export const DEFAULTS: Settings = {
   },
   fx: { motion: 'system', flash: 'system', shake: null },
   display: { uiScale: 1 },
-  input: { keys: null, pad: null, toggles: {}, deadzone: 0.18 },
+  input: { keys: null, pad: null, toggles: {}, deadzone: 0.18, sensitivity: 1, captureMouse: true },
 };
 
 // ---- Migrations: only for renames and changed units/meanings -------------------------------
@@ -99,6 +100,8 @@ export function sanitise(raw: Raw): Settings {
       pad: inp['pad'] ?? null,
       toggles,
       deadzone: num(inp['deadzone'], d.input.deadzone, 0, 0.5), // 0-50%: accessibility-design's dead-zone range
+      sensitivity: num(inp['sensitivity'], d.input.sensitivity, 0.25, 4), // covers XAG 107's ±50% with room; posture B
+      captureMouse: bool(inp['captureMouse'], d.input.captureMouse),
     },
   };
 }
@@ -135,7 +138,8 @@ export class SettingsStore {
   constructor(
     private readonly key: string,
     private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null,
-    private readonly onUnsaved: () => void,
+    /** 'newer': record from a newer build (session-only changes); 'storage': storage unavailable. Different messages. */
+    private readonly onUnsaved: (reason: 'newer' | 'storage') => void,
   ) {
     let text: string | null = null;
     try {
@@ -146,7 +150,7 @@ export class SettingsStore {
     const l = load(text);
     this.settings = l.settings;
     this.writable = l.writable;
-    if (!l.writable) this.onUnsaved(); // "Settings from a newer version: changes apply for this session only."
+    if (!l.writable) this.onUnsaved('newer'); // "Settings from a newer version: changes apply for this session only."
   }
 
   /** The one write path. Systems read `settings`; nothing else writes storage. */
@@ -166,7 +170,7 @@ export class SettingsStore {
     } catch {
       if (!this.warned) {
         this.warned = true;
-        this.onUnsaved(); // "Settings won't be saved in this browser mode."
+        this.onUnsaved('storage'); // "Settings won't be saved in this browser mode."
       }
     }
   }

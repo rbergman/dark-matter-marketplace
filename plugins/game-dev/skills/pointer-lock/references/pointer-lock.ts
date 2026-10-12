@@ -25,6 +25,7 @@ export class PointerLock {
   private isLocked = false;
   private acquiredAt = 0;
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
+  private pending = false; // one request in flight at a time (a Resume click can trigger two paths)
   private raw = true; // try unadjustedMovement until an engine rejects it
   private readonly supported: boolean;
 
@@ -69,30 +70,32 @@ export class PointerLock {
     this.wanted = want; // set BEFORE exiting, so our own release is never reported as a loss
     if (!want) {
       this.cancelRetry();
-      if (this.isLocked) document.exitPointerLock(); // programmatic exit: next request is exempt
+      // Programmatic exit: per the Pointer Lock spec the next request is exempt from the
+      // activation requirement, so a menu the game opened can relock on resume without a click.
+      if (this.isLocked) document.exitPointerLock();
     }
-    // want became true without a gesture (e.g. a menu closed by Esc): we can only try if
-    // activation is still live; otherwise ask for a click.
-    else if (!this.isLocked) this.attemptOrAsk();
-  }
-
-  private attemptOrAsk(): void {
-    if (activationLive()) this.attempt();
-    else this.onNeedsClick();
+    // Always try once: after a programmatic exit this succeeds without a gesture. If it is refused,
+    // the retry logic decides between waiting out a cooldown and asking for a click.
+    else if (!this.isLocked) this.attempt();
   }
 
   private attempt(): void {
+    if (this.pending || this.isLocked) return;
     this.cancelRetry();
+    this.pending = true;
     void this.request().then(
-      () => undefined,
+      () => {
+        this.pending = false;
+      },
       (err: unknown) => {
+        this.pending = false;
         const name = err instanceof DOMException ? err.name : '';
-        if (name !== 'NotAllowedError' && this.raw) {
+        if (name === 'NotSupportedError' && this.raw) {
           this.raw = false; // raw input unsupported here: plain requests from now on
           this.attempt();
           return;
         }
-        this.scheduleRetry(); // NotAllowedError: cooldown or no activation
+        this.scheduleRetry(); // NotAllowedError (cooldown, no activation) or a transient error
       },
     );
   }
@@ -106,7 +109,7 @@ export class PointerLock {
     }
     this.retryTimer = setTimeout(() => {
       this.retryTimer = null;
-      if (this.wanted && !this.isLocked) this.attemptOrAsk();
+      if (this.wanted && !this.isLocked) this.attempt();
     }, RETRY_MS);
   }
 
@@ -129,7 +132,12 @@ export class PointerLock {
       if (!this.wanted) document.exitPointerLock(); // a late grant nobody wants: give it back
     }
     if (was !== this.isLocked) this.onChange(this.isLocked);
-    if (was && !this.isLocked && this.wanted && performance.now() - this.acquiredAt >= GRACE_MS) this.onLost();
+    if (was && !this.isLocked && this.wanted) {
+      // A loss right after acquiring is the acquire-then-lose race: don't pause for it, but never
+      // leave the game running with a free cursor either; try again or ask for a click.
+      if (performance.now() - this.acquiredAt >= GRACE_MS) this.onLost();
+      else this.scheduleRetry();
+    }
   }
 }
 

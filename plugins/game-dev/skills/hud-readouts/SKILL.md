@@ -75,7 +75,7 @@ toast queue.
 
 | Layer | Use for | Cost |
 |---|---|---|
-| **DOM overlay** | Text readouts, panels, toasts, anything a screen reader or `aria-live` should hear | Layout per write: write only on change (rule 3) |
+| **DOM overlay** | Text readouts, panels, toasts, anything a screen reader or `aria-live` should hear | Layout per write: write only on change (rule 3). Give the overlay `pointer-events: none` and opt interactive controls back in, or clicks never reach the canvas, and pointer-lock's gesture handler never runs |
 | **Canvas** (the renderer's own UI layer) | Many items, or per-frame motion: edge arrows, world markers, minimap blips, damage numbers | No accessibility tree: mirror critical facts into DOM text, as volatile-state-redux does |
 | **Diegetic** (in the fiction: a dashboard dial, a light on the ship) | Non-urgent state, when immersion is a declared pillar | Easy to miss. Pair it with a non-diegetic fallback the player can switch on |
 
@@ -124,9 +124,12 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 ### 5. Off-screen edge arrows
 
 - **Off-screen test:** project the target. It is "on screen" only inside the
-  viewport *minus the HUD insets*, plus a margin.
+  viewport *minus the HUD insets*.
   - Timberwolf excludes the HUD dock with `hudInset`.
-  - Downwash uses a 40 px margin (corpus value, `compass.ts`).
+  - A margin past the **viewport** edges stops arrows flickering there. Downwash
+    uses 40 px outside the viewport (corpus value, `compass.ts`).
+  - **Never put the margin on an inset edge,** or a target just under the dock gets
+    a marker drawn beneath it.
   - On screen, draw a marker on the target. Off screen, draw an arrow.
 - **Placement:** cast a ray from the screen centre (or the player) towards the
   target, and put the arrow where it meets the inset rectangle. Point it along the

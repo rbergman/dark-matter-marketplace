@@ -39,6 +39,8 @@ export interface ShellHooks {
 
 interface Screen {
   el: HTMLDialogElement;
+  /** Called on Esc/B before popping; return true when the screen handled it (an inventory cancelling a carry). */
+  consumeBack: (() => boolean) | null;
   pausesSim: boolean;
   /** False for screens Esc/B must not close (death screen: it has its own Restart/Title). */
   dismissable: boolean;
@@ -52,6 +54,8 @@ interface Screen {
 }
 
 export interface OpenOptions {
+  /** The screen's own first use of Back (cancel a carry, close a sub-panel). The ONLY per-screen Esc hook. */
+  consumeBack?: () => boolean;
   pausesSim?: boolean;
   dismissable?: boolean;
   readHoldMs?: number;
@@ -60,7 +64,7 @@ export interface OpenOptions {
 
 /** Corpus value: logarithmic's 250 ms resume grace (player.ts); posture B here. Test: lose lock with Esc and pause stays
  * open; if a stray Esc still closes it, lengthen in 50 ms steps. */
-export const ESC_GRACE_MS = 300;
+export const ESC_GRACE_MS = 250;
 
 export type EscDecision = 'capture' | 'ignore' | 'openPause' | 'back' | 'blocked';
 
@@ -85,6 +89,9 @@ const PAD_A = 0;
 const PAD_B = 1;
 const PAD_START = 9;
 
+/** Keys menus need: a pause binding never fires on these while a screen is open. */
+const MENU_KEYS = new Set(['Enter', 'NumpadEnter', 'Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+
 /** Text fields keep their keys: P types a "p", a held Space types spaces. */
 function isEditable(t: EventTarget | null): boolean {
   if (t instanceof HTMLTextAreaElement) return true;
@@ -99,6 +106,7 @@ export class Shell {
   private lastPointerDown = -Infinity;
   /** Pad buttons currently down (from pad() edges): masked on every screen open. */
   private readonly padDown = new Set<number>();
+  private ownFullscreenExit = false;
   /** Set once at boot: the dialog Esc, Start, P and the latch open. */
   pauseDialog: HTMLDialogElement | null = null;
 
@@ -117,7 +125,9 @@ export class Shell {
       this.requestAutoPause('blur');
     });
     document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement === null) this.requestAutoPause('fullscreenExit');
+      if (document.fullscreenElement !== null) return;
+      if (this.ownFullscreenExit) this.ownFullscreenExit = false; // the game's own toggle: not a "stop"
+      else this.requestAutoPause('fullscreenExit');
     });
     window.addEventListener('gamepaddisconnected', () => {
       if (this.hooks.lastDeviceIsPad()) this.requestAutoPause('padLost');
@@ -172,6 +182,7 @@ export class Shell {
     this.hooks.clearHeldInput();
     this.stack.push({
       el,
+      consumeBack: opts.consumeBack ?? null,
       pausesSim: opts.pausesSim ?? true,
       dismissable: opts.dismissable ?? true,
       opener: document.activeElement,
@@ -184,9 +195,17 @@ export class Shell {
     this.changed();
   }
 
-  /** Pop one level. Popping the pause screen resumes play. */
+  /** Pop one level, unless the top screen consumes Back itself. Popping the pause screen resumes play. */
   back(): void {
-    if (this.stack.length > 0) this.removeAt(this.stack.length - 1, true);
+    const top = this.top();
+    if (top === undefined) return;
+    if (top.consumeBack?.() === true) return;
+    this.removeAt(this.stack.length - 1, true);
+  }
+
+  /** Call just before the game's own document.exitFullscreen(), so its fullscreenchange doesn't pause. */
+  noteOwnFullscreenExit(): void {
+    this.ownFullscreenExit = true;
   }
 
   closeAll(): void {
@@ -233,14 +252,15 @@ export class Shell {
   pad(edges: PadEdges, at = performance.now()): void {
     for (const b of edges.pressed) this.padDown.add(b);
     for (const b of edges.released) this.padDown.delete(b);
+    const top = this.top();
+    // Releases unmask held-at-open buttons even during a capture, so no press is eaten later.
+    if (top !== undefined) for (const b of edges.released) top.heldPad.delete(b);
     if (this.hooks.capturing()) {
       // Capture first, exactly as the keyboard path does. Start cancels; everything else binds.
       if (edges.pressed.includes(PAD_START)) this.hooks.cancelCapture();
       else this.hooks.capturePad(edges);
       return;
     }
-    const top = this.top();
-    if (top !== undefined) for (const b of edges.released) top.heldPad.delete(b);
     for (const b of edges.pressed) {
       if (b === PAD_START) {
         if (top === undefined || this.isFresh(at, b)) this.togglePause(at, [PAD_START]);
@@ -296,7 +316,9 @@ export class Shell {
       return;
     }
     if (e.code !== 'Escape') {
-      if (!editable && this.hooks.isPauseKey(e.code) && !e.repeat) {
+      // A pause binding never steals a key menus need while a screen is open.
+      const menuKey = this.ownsInput && MENU_KEYS.has(e.code);
+      if (!editable && !menuKey && this.hooks.isPauseKey(e.code) && !e.repeat) {
         e.preventDefault();
         this.togglePause(e.timeStamp);
       }

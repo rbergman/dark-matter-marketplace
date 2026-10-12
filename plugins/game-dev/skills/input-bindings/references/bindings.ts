@@ -87,6 +87,9 @@ export type RebindResult =
  * takes this slot's old key (D4: swap, never silently unbind) and the notice names both.
  * `label` turns a code into what the player sees (layout-aware); pass the real one from the UI.
  */
+/** Pause works from inside menus too, so it may not take a key menus need. */
+const MENU_CODES: ReadonlySet<string> = new Set(['Enter', 'NumpadEnter', 'Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+
 export function rebind(
   map: KeyMap,
   action: Action,
@@ -96,6 +99,7 @@ export function rebind(
 ): RebindResult {
   const reason = RESERVED.get(code);
   if (reason !== undefined) return { ok: false, reason };
+  if (action === 'pause' && MENU_CODES.has(code)) return { ok: false, reason: `${label(code)} is needed in menus` };
   const old = map[action][slot];
   if (old === code) return { ok: true, map, undo: map, notice: null };
   const next: Record<Action, Slots> = { ...map };

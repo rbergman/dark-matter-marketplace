@@ -163,6 +163,9 @@ Binding key K to action A, where B already holds K:
   blurs the window and pauses the game. Space would scroll; arrows would scroll
   too.
 - **Pad Start:** it toggles pause and cancels a pad capture.
+- **The `pause` action can't take a key menus need** (Enter, Space, Tab, the
+  arrows). Pause works from inside menus, so binding it there would break every
+  menu. `rebind` refuses those keys for `pause`, with the reason shown.
 
   Refuse them with the reason shown.
 - **Debug keys** used in development builds, such as Backquote (abduction-run).
@@ -226,7 +229,13 @@ Binding key K to action A, where B already holds K:
 - **Glyph family** (Xbox ABXY versus PlayStation shapes) can't be read reliably
   from `pad.id`. Default to one family and offer a setting.
 
-### 9. Hold or toggle
+### 9. Sensitivity
+
+Mouse-look and stick-aim sensitivity is one multiplier per device, stored in the
+settings record (`input.sensitivity`). XAG 107 asks for at least ±50%. The virtual
+cursor and camera read it live (see **pointer-lock**).
+
+### 10. Hold or toggle
 
 Every `hold` action offers Toggle (accessibility-design Tier 1; XAG 107 says avoid
 long holds). In toggle mode, a press flips the state. Clear toggled state wherever

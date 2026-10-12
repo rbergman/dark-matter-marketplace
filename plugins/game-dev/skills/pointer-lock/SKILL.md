@@ -35,7 +35,17 @@ running with an invisible cursor.
   notice) are corpus values (Numbers Policy): posture A for the game that ships
   them, B for yours.
 
-Typed sketch: `references/pointer-lock.ts`.
+Typed sketch: `references/pointer-lock.ts`. Its state machine was tested
+against a stubbed DOM covering:
+- relock after a programmatic exit
+- one request in flight
+- asking for a click when there is no activation
+- retrying while activation lasts
+- the raw-input fallback only on `NotSupportedError`
+- grace versus lost
+- giving back a late grant
+
+The tests were mutation-checked on the in-flight guard.
 
 ---
 
@@ -58,9 +68,16 @@ Typed sketch: `references/pointer-lock.ts`.
 - **Esc always releases.** The browser guarantees this. The game treats it as
   "stop": it pauses, and the real cursor appears over the pause menu.
 - **Every menu releases the lock,** and the cursor is free to use it.
-- **Resuming by clicking Resume, or pressing Enter or Space on it, recaptures at
-  once.** Resuming with Esc, B or Start can't, because those aren't user
-  activation, so the HUD says **"Click to aim"** until the next click.
+- **After a menu the game opened** (P, Start, a map key, the latch for blur), the
+  game released the lock itself. Resuming by any means, Esc included, recaptures
+  at once.
+- **After the player escaped the lock,** recapture needs a gesture:
+  - Clicking Resume, or pressing Enter or Space on it, works (after Chrome's
+    cooldown).
+  - Resuming with Esc, B or Start can't, because those aren't user activation. The
+    HUD says **"Click to aim"** until the next click.
+  - That distinction comes from the Pointer Lock spec's exemption for programmatic
+    exits, and isn't probed here (posture B).
 - **If lock is unavailable or refused,** the game still plays in a fallback look
   mode and says so once.
 - **Options has a "Capture mouse" toggle.** Abduction-run defaults it off in
@@ -93,11 +110,19 @@ Then the `pointerlockchange` that follows is known to be ours and is never repor
 as a loss (Downwash, redshifted `0db70d39`). A programmatic exit also exempts the
 next request from the post-Esc rule, so menus opened by the game relock instantly.
 
-### 3. Request only from activation, and retry while it lasts
+### 3. Try once, then retry only while activation lasts
 
+- **When `want` becomes true, request once, whatever the context.**
+  - After the game's own `exitPointerLock()`, the spec exempts the next request
+    from needing activation, so a menu the game opened relocks on resume with no
+    click.
+  - Only when that try is refused does activation matter.
 - **Every gesture handler that should recapture calls `onGesture()`
   synchronously:** a canvas click, a Resume click, Enter or Space on Resume. That
   call makes the request inside the activation.
+- **One request in flight at a time.** A Resume click can reach the module twice in
+  one dispatch: once by clearing the `'screen'` reason, once by `onGesture()`.
+  Raw-input fallback (rule 6) is triggered by `NotSupportedError` only.
 - **The request can still fail.** The likely case: the click came within Chrome's
   1250 ms of the player escaping. **Retry while `navigator.userActivation.isActive`
   is true.**
@@ -107,8 +132,8 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
   - **Not observed:** a relock succeeding after the cooldown. The test browser (an
     embedded Chromium) refuses pointer lock outright, so the checklist's "click
     Resume within 1 s" step still needs a desktop Chrome.
-- **Once activation has expired, stop retrying** and show "Click to aim". A retry
-  without activation can only fail.
+- **Once a request has been refused and activation has expired, stop retrying** and
+  show "Click to aim". A further retry without activation can only fail.
 - **Corpus alternatives:** Downwash and redshifted retry blindly every 500 ms.
   Logarithmic backs off from 0.35 s to 3 s. Both work because a click resets them;
   the activation check says *why* they work, and stops the pointless attempts.
@@ -120,7 +145,9 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
 - **A loss** is a `pointerlockchange` to unlocked while `wanted`: Esc, focus
   leaving, or the OS taking the pointer.
 - **Report it** with `shell.requestAutoPause('lockLost')` once the lock had been
-  held for a grace period. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
+  held for a grace period. A loss *inside* the grace doesn't pause, but it isn't
+  ignored either: it schedules a retry, or shows "Click to aim". Otherwise a quick
+  Esc leaves the game running with a free cursor. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
   acquire-then-immediately-lose on resume doesn't open a stray pause. If it does,
   lengthen the grace.
 - **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
@@ -204,7 +231,9 @@ Each line names what the check cannot see.
       - click to lock, press Esc: pause opens once, and the cursor is visible
       - click Resume within 1 s: lock returns once the cooldown passes, without a
         second click
-      - resume with Esc: "Click to aim" shows, and a click relocks
+      - after escaping the lock, resume with Esc: "Click to aim" shows, and a click
+        relocks
+      - open pause with P, then resume with Esc: the lock returns with no click
 
       *Blind to: browsers other than the one tested. Run once in Firefox and
       Safari by hand.*

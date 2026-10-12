@@ -46,8 +46,9 @@ export interface Rect {
 
 /**
  * Where a target at screen point (tx, ty) gets drawn. `safe` is the viewport minus HUD insets
- * (timberwolf's hudInset). `margin` widens "on screen" so arrows don't flicker at the edge
- * (Downwash: 40 px, a corpus value). `behind` is true when a 3-D projection had w < 0.
+ * (timberwolf's hudInset). `margin` widens "on screen" past the VIEWPORT edges only, so arrows
+ * don't flicker there (Downwash: 40 px outside the viewport, a corpus value); it never widens an
+ * inset edge, so a target under the HUD dock always gets an arrow. `behind`: 3-D projection had w < 0.
  */
 export function placeIndicator(
   tx: number,
@@ -55,6 +56,7 @@ export function placeIndicator(
   safe: Rect,
   margin: number,
   behind = false,
+  viewport: Rect = safe,
 ): { onScreen: true; x: number; y: number } | { onScreen: false; x: number; y: number; angle: number } {
   const cx = (safe.left + safe.right) / 2;
   const cy = (safe.top + safe.bottom) / 2;
@@ -64,10 +66,12 @@ export function placeIndicator(
     dx = -dx; // a point behind the camera projects mirrored: flip before placing
     dy = -dy;
   }
+  // Expand a side by the margin only where the safe rect touches the viewport edge (no inset there).
+  const m = (side: keyof Rect): number => (safe[side] === viewport[side] ? margin : 0);
   const inside =
     !behind &&
-    tx >= safe.left - margin && tx <= safe.right + margin &&
-    ty >= safe.top - margin && ty <= safe.bottom + margin;
+    tx >= safe.left - m('left') && tx <= safe.right + m('right') &&
+    ty >= safe.top - m('top') && ty <= safe.bottom + m('bottom');
   if (inside) return { onScreen: true, x: tx, y: ty };
   if (dx === 0 && dy === 0) dy = 1;
   // Scale the ray from centre to just touch the safe rectangle.

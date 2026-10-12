@@ -101,6 +101,10 @@ interface Screen { el: HTMLDialogElement; pausesSim: boolean; dismissable: boole
                    opener: Element | null; openedAt: number; heldPad: Set<number>; readHoldMs: number }
 ```
 
+- **A screen's own first use of Back** (an inventory cancelling a carry, a
+  sub-panel closing) goes through `consumeBack` on that screen's entry. The shell
+  calls it before popping, for Esc and B alike. That is the only per-screen Back
+  hook, and the reason no screen ever needs its own Esc listener.
 - **Every push and pop calls one `onStackChange` hook.** That hook applies the pause
   duck, lifts it in Options, freezes view FX, and is where pointer-lock reads "a
   screen is open" as an unlock reason.
@@ -201,7 +205,7 @@ Every source calls the latch; none of them opens pause itself:
 | Clock overload | Accumulated sim debt past a threshold | Corpus value: free-horses pauses on debt over 250 ms with "The game fell behind and paused" (`game-clock.ts`). B for yours. Test: throttle the CPU 6× in DevTools; the game pauses rather than running in slow motion. Drop the debt rather than replay it. |
 | Lost pointer lock | Reported by **pointer-lock** | The lock module reports; it doesn't pause |
 | Lost controller | `gamepaddisconnected` while the pad was the last-used device | XR-115: the player must be able to continue, or be prompted. The pause screen says "Reconnect the controller or press a key". |
-| Fullscreen exited | `fullscreenchange` while in play | When fullscreen, the browser spends the first Esc on leaving fullscreen. Per the HTML close-request steps, the page gets no keydown (from the spec, not probed). Pausing here keeps one Esc meaning "stop". |
+| Fullscreen exited | `fullscreenchange` while in play | In fullscreen, Chrome consumes the first Esc to leave fullscreen, in browser-process handling; whether the page also gets the keydown is unprobed. Pausing here keeps one Esc meaning "stop". The game's own fullscreen toggle calls `noteOwnFullscreenExit()` first, so pressing it doesn't pause. |
 
 Turn-based games have nothing to protect, and live-orders sims where pause is a
 toggle (volatile-state-redux) are exempt. They still want the hidden-tab catch-up
