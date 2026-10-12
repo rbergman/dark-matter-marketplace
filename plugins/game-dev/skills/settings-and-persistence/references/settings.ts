@@ -1,0 +1,217 @@
+// settings-and-persistence reference sketch: one versioned record, parse -> migrate -> sanitise,
+// failure-tolerant writes, tri-state reduced motion, an FX gate, and Web Audio buses.
+// Strict TS, no dependencies. Adapt; don't import. load/migrate/sanitise are pure and unit-testable.
+
+export const VERSION = 3;
+
+export type Bus = 'music' | 'sfx' | 'ui';
+export type Tri = 'system' | 'on' | 'off';
+
+export interface Settings {
+  version: number;
+  audio: { master: number; muted: boolean; buses: Record<Bus, { level: number; muted: boolean }> };
+  fx: { motion: Tri; flash: Tri; shake: number }; // shake 0-100 (%)
+  display: { uiScale: number }; // 1 = 100%; XAG 101 asks for up to 2
+  bindings: unknown; // input-bindings' mergeSaved() sanitises this
+}
+
+export const DEFAULTS: Settings = {
+  version: VERSION,
+  audio: {
+    master: 80,
+    muted: false,
+    buses: { music: { level: 70, muted: false }, sfx: { level: 80, muted: false }, ui: { level: 60, muted: false } },
+  },
+  fx: { motion: 'system', flash: 'system', shake: 100 },
+  display: { uiScale: 1 },
+  bindings: null,
+};
+
+// ---- Migrations: only for renames and changed units/meanings -------------------------------
+
+type Raw = Record<string, unknown>;
+
+/** migrations[v] turns a version-v record into version v+1. */
+const MIGRATIONS: Readonly<Record<number, (r: Raw) => Raw>> = {
+  // v1 stored volumes as 0-1 floats under `volume`; v2 stores 0-100 under `audio`.
+  1: (r) => {
+    const v = isRec(r['volume']) ? r['volume'] : {};
+    const pct = (x: unknown): unknown => (typeof x === 'number' ? Math.round(x * 100) : x);
+    return {
+      ...r,
+      version: 2,
+      audio: { master: pct(v['master']), muted: false, buses: { music: { level: pct(v['music']) }, sfx: { level: pct(v['sfx']) } } },
+    };
+  },
+  // v2 stored `reducedMotion: boolean` (the OS value got frozen in); v3 stores a tri-state.
+  // A stored `false` is indistinguishable from "never chose", so map it back to 'system'.
+  2: (r) => {
+    const rm = r['reducedMotion'];
+    return { ...r, version: 3, fx: { ...(isRec(r['fx']) ? r['fx'] : {}), motion: rm === true ? 'on' : 'system' } };
+  },
+};
+
+export function migrate(raw: Raw): Raw {
+  let r = raw;
+  let v = typeof r['version'] === 'number' ? r['version'] : 1;
+  while (v < VERSION) {
+    const step = MIGRATIONS[v];
+    if (step === undefined) return {}; // a gap in the ladder: fall back to defaults, loudly in tests
+    r = step(r);
+    v += 1;
+  }
+  return r;
+}
+
+// ---- Sanitise: field by field, every load, after migrating ---------------------------------
+
+export function sanitise(raw: Raw): Settings {
+  const d = DEFAULTS;
+  const a = rec(raw['audio']);
+  const b = rec(a['buses']);
+  const bus = (k: Bus): { level: number; muted: boolean } => {
+    const x = rec(b[k]);
+    return { level: num(x['level'], d.audio.buses[k].level, 0, 100), muted: bool(x['muted'], d.audio.buses[k].muted) };
+  };
+  const fx = rec(raw['fx']);
+  const disp = rec(raw['display']);
+  return {
+    version: VERSION,
+    audio: { master: num(a['master'], d.audio.master, 0, 100), muted: bool(a['muted'], d.audio.muted), buses: { music: bus('music'), sfx: bus('sfx'), ui: bus('ui') } },
+    fx: { motion: tri(fx['motion']), flash: tri(fx['flash']), shake: num(fx['shake'], d.fx.shake, 0, 100) },
+    display: { uiScale: num(disp['uiScale'], d.display.uiScale, 0.75, 2) },
+    bindings: raw['bindings'] ?? null,
+  };
+}
+
+// ---- Load / save -----------------------------------------------------------------------------
+
+export interface Loaded {
+  settings: Settings;
+  /** False for a record written by a newer build: use it, but don't write until the player changes something. */
+  writable: boolean;
+}
+
+export function load(text: string | null): Loaded {
+  if (text === null) return { settings: structuredClone(DEFAULTS), writable: true };
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return { settings: structuredClone(DEFAULTS), writable: true };
+  }
+  if (!isRec(raw)) return { settings: structuredClone(DEFAULTS), writable: true };
+  const v = typeof raw['version'] === 'number' ? raw['version'] : 1;
+  if (v > VERSION) return { settings: sanitise(raw), writable: false };
+  return { settings: sanitise(migrate(raw)), writable: true };
+}
+
+export class SettingsStore {
+  private last = '';
+  private warned = false;
+  settings: Settings;
+  private writable: boolean;
+
+  constructor(
+    private readonly key: string,
+    private readonly storage: Pick<Storage, 'getItem' | 'setItem'> | null,
+    private readonly onUnsaved: () => void,
+  ) {
+    let text: string | null = null;
+    try {
+      text = storage?.getItem(key) ?? null;
+    } catch {
+      text = null; // storage disabled: run on defaults
+    }
+    const l = load(text);
+    this.settings = l.settings;
+    this.writable = l.writable;
+  }
+
+  /** The one write path. Systems read `settings`; nothing else writes storage. */
+  update(change: (s: Settings) => void): void {
+    change(this.settings);
+    this.settings = sanitise(this.settings as unknown as Raw);
+    this.writable = true; // the player changed something: this build now owns the record
+    this.flush();
+  }
+
+  private flush(): void {
+    if (!this.writable) return;
+    const text = JSON.stringify(this.settings);
+    if (text === this.last) return; // de-duplicate writes (Downwash)
+    try {
+      this.storage?.setItem(this.key, text);
+      this.last = text;
+    } catch {
+      if (!this.warned) {
+        this.warned = true;
+        this.onUnsaved(); // "Settings won't be saved in this browser mode."
+      }
+    }
+  }
+}
+
+// ---- The FX gate: resolved live, read by every effect at emit AND render -------------------
+
+export interface FxGate {
+  reduceMotion: boolean;
+  reduceFlash: boolean;
+  shakeScale: number; // 0-1
+}
+
+export function resolveFx(s: Settings, osReduce: boolean): FxGate {
+  const t = (x: Tri): boolean => (x === 'system' ? osReduce : x === 'on');
+  return { reduceMotion: t(s.fx.motion), reduceFlash: t(s.fx.flash), shakeScale: s.fx.shake / 100 };
+}
+
+/** Keep the gate current when the OS preference changes mid-session. Never store the OS value. */
+export function watchOsMotion(onChange: (reduce: boolean) => void): boolean {
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mq.addEventListener('change', (e) => onChange(e.matches));
+  return mq.matches;
+}
+
+// ---- Audio buses -----------------------------------------------------------------------------
+
+/** Starting value (posture B): gain = (v/100)^2. Test: equal slider steps sound like equal loudness steps. */
+export const curve = (v: number): number => (v / 100) ** 2;
+
+export function makeBuses(ctx: AudioContext): { master: GainNode; bus: Record<Bus, GainNode> } {
+  const master = ctx.createGain();
+  master.connect(ctx.destination);
+  const mk = (): GainNode => {
+    const g = ctx.createGain();
+    g.connect(master);
+    return g;
+  };
+  return { master, bus: { music: mk(), sfx: mk(), ui: mk() } };
+}
+
+/** Apply levels; `duck` is game-shell's pause duck (1 in Options so levels are judged at full scale). */
+export function applyAudio(s: Settings, nodes: ReturnType<typeof makeBuses>, ctx: AudioContext, duck = 1): void {
+  const t = ctx.currentTime;
+  nodes.master.gain.setTargetAtTime(s.audio.muted ? 0 : curve(s.audio.master) * duck, t, 0.02);
+  for (const k of Object.keys(nodes.bus) as Bus[]) {
+    const b = s.audio.buses[k];
+    nodes.bus[k].gain.setTargetAtTime(b.muted ? 0 : curve(b.level), t, 0.02);
+  }
+}
+
+// ---- helpers ---------------------------------------------------------------------------------
+
+function isRec(v: unknown): v is Raw {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+function rec(v: unknown): Raw {
+  return isRec(v) ? v : {};
+}
+function num(v: unknown, d: number, lo: number, hi: number): number {
+  return typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d;
+}
+function bool(v: unknown, d: boolean): boolean {
+  return typeof v === 'boolean' ? v : d;
+}
+function tri(v: unknown): Tri {
+  return v === 'on' || v === 'off' || v === 'system' ? v : 'system';
+}
