@@ -136,6 +136,12 @@ timberwolf's task prompts and learned counters (2026-09/10): its operator found
 prompts that "never go away even after you have done it". A hint spoken by a voice
 during action, which must be read while the game runs, is **in-play-comms**'s.
 
+- **Teach only what play won't teach.** Andersen et al. (CHI 2012, 45,000+ players)
+  found that tutorials raised play time by up to 29% and progress by up to 75% in
+  Foldit, a complex, unfamiliar game, and had a negligible effect in two games built
+  on familiar mechanics. In Foldit, in-context instructions beat an up-front manual
+  (play time +16%, progress +40%). List the rules a player can't discover by
+  experimenting; cut hints for genre idioms.
 - **Trigger, not timeline.** A hint shows while its trigger condition holds (near a
   fire, carrying wood), and clears the first time the player does the thing.
 - **Shown where the player is looking,** as a keycap plus a few words. The keycap

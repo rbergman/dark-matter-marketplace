@@ -266,6 +266,18 @@ The options tab, with rows from redshifted's camera tab (corpus) and the gaps no
 - **Zoom pulses need an integrator.** Redshifted's pulses are velocity into the zoom
   spring; with speed zoom off, zoom is forced to 1 and nothing integrates the
   velocity, so pulses silently do nothing (inferred from the code, untested).
+- **Phones break the floor rule.** Sizing the floor from the longest gun on the
+  smallest window can be unreadable on a landscape phone. Hard Deck (via its
+  session): a 720 px flak gun on an 852×393 screen needs ~0.27 zoom to fit, against
+  a readability floor of 0.62. The two ways out both have a cost:
+  - **Feed the device's real view to the fair-fire rule.** Phones then engage
+    closer and play easier, so difficulty depends on the device. That's a problem
+    for shared leaderboards and PvP, beyond the `hw: 0` clamp.
+  - **Use a canonical view for the sim rule**, the same world size on every device,
+    and frame to it. Phone players then see threats smaller, or behind edge arrows
+    (**hud-readouts**).
+
+  Pick one per game and write the choice down.
 - **Fit against a moving centre.** Fit uses the target centre, not the current
   camera position, so the framing is right once the camera arrives. While moving,
   a point near the margin can briefly be off screen; the 40 px pad covers it.

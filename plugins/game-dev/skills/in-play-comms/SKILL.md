@@ -32,9 +32,19 @@ If a line doesn't need all three "yes"es, use the neighbour. It is less machiner
   12 (Korean) to 22 (Hindi) characters a second, with Slovak at 17. The 15 used here
   is inside that band; the English figure (reported as 20) wasn't confirmed at the
   primary source.
-- **XAG 116:** durations adjustable (up to 10× or off), or dismissed on input.
-  **XAG 104:** subtitle presentation. ice-pirates has no reading-time setting; the
-  sketch adds one, marked ADDED.
+- **XAG 116** (read 2026-10-12): a tutorial window or speaker dialogue has a
+  duration adjustable "up to at least ten times the length of the default limit",
+  or is dismissed or advanced on input. **XAG 104:** subtitle presentation.
+  ice-pirates has no reading-time setting; the sketch adds one, marked ADDED.
+- **What to teach:** Andersen et al., "The Impact of Tutorials on Games of Varying
+  Complexity" (CHI 2012, 45,000+ players; abstract and introduction read). Tutorials
+  raised play time by up to 29% and progress by up to 75% in Foldit, the complex,
+  unfamiliar game, and had a negligible effect in the two games built on familiar
+  mechanics. In Foldit, in-context instructions beat an up-front manual (play time +16%,
+  progress +40%).
+- **Hard Deck** (its teaching spec session, 2026-10-12): Bob's choices of "repeat
+  until acted on" with a Replay tips option, and no dismiss input by default. These
+  are design choices, not yet playtested.
 - **Teach in four beats** (Hayashida) and **telegraph floors** are
   **encounter-design**'s; this skill is the voice that rides on them.
 
@@ -118,8 +128,13 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
 - **The card's clock runs at `1 − 0.35 × engagement`.** A busy player gets up to
   ~1.5× the time.
 - **The clock is `dt`, and `dt` is 0 while paused** (game-shell's view clock).
-- **The player's setting multiplies `need`:** 1–10×, or "until dismissed" with a
-  dismiss input (XAG 116; ADDED in the sketch). Under "until dismissed":
+- **The default needs no input:** the engagement-slowed clock, frozen while
+  paused and behind modal screens such as an upgrade draft (both give `dt = 0`),
+  times the player's reading-time multiplier, 1–10× (XAG 116; ADDED in the sketch).
+  Bob's stated preference for Hard Deck is no dismiss input at all; he found one
+  "too much hassle" (felt, not playtested).
+- **"Until dismissed" is an option, not the default:** XAG 116's alternative to a
+  long duration, for players who want it. It needs a dismiss input. Under it:
   - while *any* card is on screen, every non-urgent line waits, even past its cap,
     so rule 4's "nothing starves" holds only for finite settings
   - each card takes its own dismiss, newest first: if an urgent line cut in over a
@@ -166,8 +181,19 @@ Corpus values. Then:
 - **Prefer one event-triggered line over a scripted sequence** wherever an event
   exists: first damage, first pickup, first time the player is in a weak spot's arc.
   The event *is* the introduce step of encounter-design's four beats.
-- **Fire it once**, and key it to the event's situation, so it's withdrawn if the
-  event ends before the line shows.
+- **Never key a line to the event itself when the event is short.** A keyed card is
+  withdrawn once it has had `MIN_SHOWN` and its key is gone, so a lesson about a
+  0.35–0.85 s gun charge (Hard Deck) would retire unread. For an event shorter
+  than `MIN_SHOWN` plus the reading time, either:
+  - make the line urgent and unkeyed, as ice-pirates' telegraph lesson is
+    (`telegraphHint`: pri 2, `live: () => true`, so it cuts in while the glow shows
+    and is never withdrawn), or
+  - key it to the enclosing situation ("a gun has you in range").
+- **Teach only what play won't teach.** In Andersen et al.'s study, tutorials paid
+  off only in the complex, unfamiliar game, and in-context help beat a manual. Cut
+  lessons for familiar idioms (WASD, click to shoot). Keep the rules a player can't
+  discover by experimenting, and say them on their event. **player-ux** decides the
+  list.
 
 ### 7. Teaching overlays come from the rules
 
@@ -180,6 +206,22 @@ Corpus values. Then:
   pointed dead astern, straight at the towed berg the line said to avoid.
 - **Overlays end with their line or beat.** With many ships, put them behind a held
   key, boldest on the target.
+
+### 8. Lesson persistence: repeat until acted on
+
+Hard Deck's design (Bob's choice, 2026-10-12; posture B until playtested):
+
+- **Each lesson fires once per run on its trigger, until the player performs the
+  action it teaches.** Then a persisted learned-flag (in the settings or profile
+  record, **settings-and-persistence**) retires it for good.
+- **A lesson with nothing to act on** (an informational rank-up) is show-once.
+- **"Replay tips"** in options clears the learned flags.
+- **Acting drops only a queued copy** (`drop(text)`). A card already on screen
+  finishes its reading time, and the lesson is never keyed to "not learned yet"
+  (rule 2).
+- **Define each lesson's acted-on signal up front,** detectable from what the view
+  can see (an input, a sim event), and write it beside the line. A lesson without
+  one either repeats forever or is show-once by accident.
 
 ---
 
@@ -221,8 +263,15 @@ Each line names what the check cannot see.
 - [ ] **Withdrawal walk:** start a fight, end it with a warning on screen; the
       warning goes once it has had `MIN_SHOWN` on the reading clock. That's ~1.2 s
       idle and up to ~1.9 s just after a fight, while engagement is still settling.
-- [ ] **Reading-time setting:** at 3× and "until dismissed", every card stays up
-      accordingly and dismiss works on keyboard and pad.
+- [ ] **Reading-time setting:** at 3× every card stays up 3× as long, and stays
+      frozen behind pause and a draft; under "until dismissed", dismiss works on
+      keyboard and pad.
+- [ ] **Persistence:** each lesson lists its acted-on signal; perform it and the
+      lesson stops on the next run; "Replay tips" brings it back. *Blind to: a player
+      who did the thing by accident and still doesn't know it.*
+- [ ] **Short events:** every event-triggered line about an event shorter than
+      `MIN_SHOWN` plus its reading time is urgent and unkeyed, or keyed to the
+      enclosing situation.
 - [ ] **Screen reader:** cards are announced once each; urgent ones interrupt.
       *Blind to: a real screen-reader user's load during action.*
 - [ ] **Felt:** a first-time player, mid-fight, can say what the last lesson told
