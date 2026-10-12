@@ -102,6 +102,7 @@ Any line above that fails is a ship blocker for a real-time game. See
 | Dialogue box | Spoken or read lines | Ambient barks; use toasts | **situational-ui** |
 | Photo mode | The game is beautiful and players share it | Prototype stage | **situational-ui** |
 | Tutorials and contextual hints | Any mechanic play alone doesn't teach | — | **player-ux** |
+| Hold-to-complete key cap with progress | Any verb completed by holding a key | Tap verbs | **input-bindings** |
 | In-play comms (crew radio, coaching during action) | Lines must be read while the game runs, and must stay true | Fire-and-forget news (toasts) or lines the game can wait on (dialogue) | **in-play-comms** |
 | Accessibility presets | The a11y settings outgrow one screen | A handful of toggles; presets add a layer for nothing | **accessibility-design** |
 

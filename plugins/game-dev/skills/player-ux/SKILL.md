@@ -144,6 +144,17 @@ during action, which must be read while the game runs, is **in-play-comms**'s.
   lowered the return rate (17.96% against 21.60% with none, Table 3). In Foldit, in-context instructions beat an up-front manual
   (play time +16%, progress +40%). List the rules a player can't discover by
   experimenting; cut hints for genre idioms.
+- **Say when, not just what.** A verb that only works in a place gets a zone in the
+  world, and the prompt follows the zone. ice-pirates (2026-10-12, Bob's playtest:
+  the tip "doesn't say to hold it while inside the cyan ring"):
+  - **Outside the zone:** the ring around the target is dimmed, with a keyless
+    prompt: "Get inside the ring round X, then hold G".
+  - **Inside it:** the ring turns cyan and the key-cap prompt appears, with its
+    progress fill (**input-bindings** rule 11).
+  - **The ring shows from ~3× its radius,** so the player can aim for it.
+  - **Spoken coaching uses the same words.**
+
+  Felt verdict pending.
 - **Trigger, not timeline.** A hint shows while its trigger condition holds (near a
   fire, carrying wood), and clears the first time the player does the thing.
 - **Shown where the player is looking,** as a keycap plus a few words. The keycap

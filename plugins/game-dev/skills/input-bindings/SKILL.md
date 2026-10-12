@@ -244,6 +244,37 @@ Every `hold` action offers Toggle (accessibility-design Tier 1; XAG 107 says avo
 long holds). In toggle mode, a press flips the state. Clear toggled state wherever
 held keys are cleared: on game-shell opening a screen, and on window blur.
 
+### 11. Hold-to-complete actions show their progress on the key cap
+
+A verb that completes after a hold (hold G to board, hold T to cut a tow) must say
+how long is left. Bob, ice-pirates playtest 2026-10-12: holding a key "should show
+a progress bar on the key indicator to help inform when it will be done (this is
+a typical game design pattern)". ice-pirates `src/sim/hud-model.ts` and
+`src/ui/hud.ts` (commit `08de850`) do it this way:
+
+- **A prompt is data, not a string:** `{ key, text, hold: 0..1 | null, action }`.
+  `hold` is null for a tap and the progress for a held verb. The key comes from
+  `prompt(action)` (rule 8). ice-pirates still hard-codes "G" and "T", its own
+  noted gap.
+- **Fill the cap only while the key is actually down.** The HUD asks input through
+  an injected `holding(action)` callback, so the model stays pure. A fill shown
+  while the key is up reads as "you're already doing it".
+- **A multi-phase hold is one bar.** ice-pirates' boarding runs 0–50% while the
+  helmsman closes in (from the gap) and 50–100% for the fight on deck, so the bar
+  never resets mid-hold.
+- **A simple hold timer maps directly:** `max(0, held) / needed`. ice-pirates' tow
+  timer goes negative after a release until key-up, so one hold can't trigger
+  twice; clamp it at 0 for the bar.
+- **Quantise the fill** (ice-pirates rounds to 2% steps), and write the DOM only on
+  change (hud-readouts rule 3).
+- **Offer a press-once alternative where the hold is long** (XAG 107, rule 10). A
+  tap starts the action and a second tap cancels it; that mechanism is UNSOURCED,
+  and ice-pirates doesn't offer it yet.
+- **Say *when*, not just *what*,** for a hold with a range: see **player-ux**,
+  Contextual Hints.
+
+Felt verdict pending: Bob hadn't played the build yet when this was written.
+
 ---
 
 ## Edge cases that bite
