@@ -102,11 +102,14 @@ export class PointerLock {
         this.pending = false;
         const name = err instanceof DOMException ? err.name : '';
         if (raw && name === 'NotSupportedError') this.raw = false;
-        if (raw && name !== 'NotAllowedError') {
+        // A refusal (cooldown, no activation) isn't about raw input. Chrome 154 reports its post-Esc
+        // cooldown as SecurityError, not NotAllowedError (probe page, 2026-10-12).
+        const refused = name === 'NotAllowedError' || name === 'SecurityError';
+        if (raw && !refused) {
           this.attempt(false);
           return;
         }
-        this.scheduleRetry(); // NotAllowedError (cooldown, no activation) or a plain request failing
+        this.scheduleRetry(); // a refusal (cooldown, no activation) or a plain request failing
       },
     );
   }

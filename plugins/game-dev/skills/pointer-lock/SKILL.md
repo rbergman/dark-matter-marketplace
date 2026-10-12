@@ -186,8 +186,10 @@ with `!wanted`, call `exitPointerLock()` at once (Hard Deck).
 - **Request `{ unadjustedMovement: true }` first.** It turns off OS mouse
   acceleration.
   - On `NotSupportedError`, drop it for the session.
-  - On any other rejection except `NotAllowedError`, retry once without it, for that
-    request only. That is Hard Deck's per-request fallback. An engine that rejects
+  - On any other rejection except a refusal, retry once without it, for that
+    request only. A refusal is `NotAllowedError`, or `SecurityError`, which is how
+    Chrome 154 reports its post-Esc cooldown (probe page, 2026-10-12: refused at
+    1163 ms, granted at 1328 ms). That is Hard Deck's per-request fallback. An engine that rejects
     the option with an odd error still locks, and a transient error doesn't cost
     raw input for good.
   - Redshifted falls back only on `NotSupportedError`. Some older engines
