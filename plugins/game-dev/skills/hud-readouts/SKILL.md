@@ -197,6 +197,9 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 - **Placement:** at an edge, away from the play-critical centre. A toast that must be
   read in combat goes near the eye-line instead (GAG intermediate), and then it
   belongs in the `now` tier.
+- **Lines that must be read during action and must stay true** (crew radio,
+  coaching) need more than a toast: situation keys, an engagement-bent reading clock
+  and a card stack. See **in-play-comms**.
 
 ---
 

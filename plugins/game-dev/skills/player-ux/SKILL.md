@@ -131,7 +131,9 @@ Phase 4: Release (full game)
 
 ### Contextual Hints (Implementation)
 
-Teach a verb where and when it's needed, then get out of the way. This is
+Teach a verb where and when it's needed, then get out of the way. A hint spoken by
+a voice during action, which must be read while the game runs, is **in-play-comms**'s.
+This is
 timberwolf's task prompts and learned counters (2026-09/10): its operator found
 prompts that "never go away even after you have done it".
 

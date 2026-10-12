@@ -118,7 +118,7 @@ Timeliness has two layers, and a game can pass one and fail the other. The **inp
 - [ ] **Squash and stretch** — character compresses on land, stretches on jump
 - [ ] **Dust/particles** — on landing, on dash, on direction change
 - [ ] **Trail effects** — afterimages, motion blur, speed lines
-- [ ] **Camera lead** — camera slightly ahead of movement direction
+- [ ] **Camera lead** — camera slightly ahead of movement direction (how to build it, and the rest of camera control: **camera-control**)
 - [ ] **Sound** — footsteps with surface-appropriate variation
 
 ### UI Transition Juice

@@ -47,6 +47,8 @@ touches one file instead of twenty.
 | Can the player read the upgrade numbers and the difficulty curve? | **progression-legibility** |
 | How do I verify this — sims, determinism, perf, UI walkthroughs? | **game-verification** |
 | Radial menu, inventory grid, dialogue box, photo mode | **situational-ui** |
+| Crew radio or coaching that must be read during action | **in-play-comms** |
+| Follow camera, zoom, combat framing, rotate-with-ship, camera options | **camera-control** |
 | Setting up a new PixiJS browser game | **dm-pixi:pixi-vector-arcade** |
 
 ---
@@ -69,7 +71,8 @@ register skills
 
 **Shell and HUD** — game-ui-patterns → game-shell → menu-navigation,
 input-bindings, settings-and-persistence → pointer-lock, hud-readouts,
-progression-legibility → situational-ui; game-verification throughout
+progression-legibility, camera-control → situational-ui, in-play-comms;
+game-verification throughout
 
 ---
 
@@ -94,6 +97,9 @@ deliberate. Going to the wrong one wastes a pass.
 | progression-systems | progression-legibility | The curve's math vs. whether the player can read it off the screen |
 | simulation-first-design | game-verification | The sim as a design instrument vs. the full verification kit and its blind spots |
 | game-shell | menu-navigation | Which screen owns input vs. how focus moves inside it |
+| hud-readouts | in-play-comms | Fire-and-forget toasts vs. lines that must be read during action and stay true |
+| game-feel | camera-control | Punch, shake and the trauma budget vs. where the camera points and how it gets there |
+| encounter-design | camera-control | The fair-fire rule vs. the framing that makes it playable |
 
 ---
 

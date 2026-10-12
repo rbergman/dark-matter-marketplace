@@ -567,3 +567,51 @@ choice.
 
 **Not verified:** Ofcom and ITU numbers at source; PlayStation and Nintendo text; a
 Valve source on glyph switching; Eiserloh slide content; Hodent on HUD and toasts.
+
+---
+
+## Addendum 2026-10-12: in-play comms and camera control
+
+Added for beads `d0w` and `dyw`, from two messages the ice-pirates session sent at
+Bob's request, checked against source.
+
+**ice-pirates** (read at `a832c8a`):
+- `src/ui/comms-queue.ts`: `MAX_CARDS` 3, `MIN_SHOWN` 1.2, `BUSY_SLOW` 0.35, `OVERLAP` 0.6, `GATE`
+  {0: calm 0.3/cap 9, 1: 0.65/2.5, 2: 1.01/0}, `readTime = clamp(1 + len/15, 3, 9)`, dedupe by
+  text. Tests: `comms-queue.test.ts`, including the end-to-end opening test.
+- `src/app/engagement.ts`: weights fire 1, grapple 0.9, under fire 0.8, steer 0.45, lever 0.4;
+  rise rate 5, settle 0.5.
+- `index.html:27`: `#hud-comms` with `aria-live="polite"`. No reading-time setting anywhere.
+- `src/view/camera.ts`: position damp 4, zoom damp 1.6, screen factor
+  `clamp(min(w, 1.6h)/1440, 0.6, 1.4)`, wheel `exp(−dy·0.0012)` clamped 0.45–1.8, fit margins
+  120/150 and pad 40, floor 0.4, shake cap 14 with damp 9. `src/app/focus.ts`: 1.6 s velocity
+  lead, aim lead `clamp(0.15·Δ, ±110)` with damp 1.6, zoom 4.6/3.3 trimmed by 15% with speed,
+  berg pull 0.3, threat lean 0.3. `ai-util.ts` `threatsTo`: 1.15 × range.
+  `tuning.ts:102` `fairViewMargin` 0.15. `ai.ts` `sightings` and `seenBy`.
+
+**redshifted / BLUESHIFTED** (`index.html` titles it BLUESHIFTED; a subagent surveyed it and
+the lead spot-checked the starred items):
+- ★ `rendering/camera-math.ts:48-63` `springDamperExact` (cites Holden, "Spring-It-On"),
+  `fastNegExp` approximation.
+- ★ `hud/settings/settings-types.ts:95-144`: halflife 0.02–0.25 from the lag slider, warp ×1.25,
+  zoom-amount → `zoomMin` 1.0..0.6, base zoom piecewise 0.5625/0.75/1.25 ("felt excessive in
+  playtest" comment), defaults.
+- ★ `rendering/camera.ts:290-300`: shortest toroidal delta; look-ahead cancels the spring's lag.
+- Subagent only: dynamic-zoom halflife 0.4; trauma decay 1.8/s linear; offset cap 15 px;
+  `screenToWorld` ignores shake; north-up only (`shakeRotation` computed but unused); no
+  reduced-motion handling; no framing; dt clamped 0.1; follow stops at hp ≤ 0; no respawn snap
+  found; objective markers test on-screen without zoom (possible bug); zoom pulses inert with
+  dynamic zoom off (inferred).
+
+**External:**
+- Keren, "Scroll Back" (Game Developer, 2015), read in full by a subagent: lerp-smoothing and
+  physics-smoothing, projected-focus and target-focus, camera-window, multi-focal camera with
+  position-averaging and zoom-to-fit, cue-focus, and the "Neural Background" point about camera
+  speed and direction. No rotation guidance.
+- Ruskin, GDC 2012: verified to exist (GDC Vault listing, Emily Short's summary). Slides not
+  read.
+- Netflix timed-text guides: adult limits Korean 12, Slovak 17, Hindi 22 cps. English 20 cps
+  reported by third parties only.
+
+**Not verified:** Holden's talk; heading-follow and motion-sickness guidance, so heading-follow
+is labelled UNSOURCED in camera-control.

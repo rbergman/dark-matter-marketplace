@@ -1,6 +1,6 @@
 ---
 name: game-ui-patterns
-description: "The decision guide for a browser game's UI shell and HUD: which patterns every shipped game needs (pause menu, options with remapping and audio sliders, modal stack, keyboard/pad/mouse navigation, versioned settings, audio unlock, title and game-over flow), which are common (pointer lock, objective compass, minimap, toasts, damage feedback, score readouts, upgrade drafts) and which are situational (diegetic HUD, radial menus, inventory, dialogue, hints, photo mode, presets) — and which skill holds the detail for each. Use when starting a new game's shell, adding a menu or HUD element, reviewing a game before it ships, or when a session is about to hand-roll a pause menu, an Esc handler, a settings save or a pointer-lock request from scratch. Reach for this on 'the pause menu has no restart', 'Esc closed two things', 'pointer lock never comes back', 'my settings vanished after the update', or 'reduced motion does nothing'."
+description: "The decision guide for a browser game's UI shell and HUD: which patterns every shipped game needs (pause menu, options with remapping and audio sliders, modal stack, keyboard/pad/mouse navigation, versioned settings, audio unlock, title and game-over flow), which are common (pointer lock, objective compass, minimap, toasts, damage feedback, camera control, score readouts, upgrade drafts) and which are situational (diegetic HUD, radial menus, inventory, dialogue, in-play comms, hints, photo mode, presets) — and which skill holds the detail for each. Use when starting a new game's shell, adding a menu or HUD element, reviewing a game before it ships, or when a session is about to hand-roll a pause menu, an Esc handler, a settings save or a pointer-lock request from scratch. Reach for this on 'the pause menu has no restart', 'Esc closed two things', 'pointer lock never comes back', 'my settings vanished after the update', or 'reduced motion does nothing'."
 ---
 
 # Game UI Patterns
@@ -88,6 +88,7 @@ Any line above that fails is a ship blocker for a real-time game. See
 | Toasts and achievement popups | Events the player should know about but not stop for | The event needs a decision; use a modal | **hud-readouts** |
 | Score and combo readouts | There is a score | — | **hud-readouts** |
 | Damage feedback and shake budgets | The player can be hurt | — | **game-feel** |
+| Follow camera, zoom, combat framing, camera options | The world is bigger than the screen | A fixed single-screen arena | **camera-control** |
 | Upgrade / draft card picker | Mid-run choices between numbers | The choice is spatial or narrative | **progression-legibility** |
 
 ### Tier 3 — situational
@@ -100,6 +101,7 @@ Any line above that fails is a ship blocker for a real-time game. See
 | Dialogue box | Spoken or read lines | Ambient barks; use toasts | **situational-ui** |
 | Photo mode | The game is beautiful and players share it | Prototype stage | **situational-ui** |
 | Tutorials and contextual hints | Any mechanic play alone doesn't teach | — | **player-ux** |
+| In-play comms (crew radio, coaching during action) | Lines must be read while the game runs, and must stay true | Fire-and-forget news (toasts) or lines the game can wait on (dialogue) | **in-play-comms** |
 | Accessibility presets | The a11y settings outgrow one screen | A handful of toggles; presets add a layer for nothing | **accessibility-design** |
 
 ---

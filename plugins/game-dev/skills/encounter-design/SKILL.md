@@ -183,6 +183,29 @@ element's first appearance is already step 3, players will experience it as
 unfair rather than difficult — and will report it as a difficulty problem, which
 sends you tuning numbers that were never the cause.
 
+### Nothing shoots you that you haven't seen
+
+The readability rule above, enforced by the sim instead of by art. From ice-pirates
+(2026-10-12, `src/sim/systems/ai.ts`: `sightings`, `seenBy`); its numbers are corpus
+values, posture B for your game.
+
+- **The player's view travels in their sim input** (`{x, y, hw, hh}` in world units,
+  from the camera's `view()`), so the rule is deterministic and replays exactly.
+- **Sighted:** a ship whose centre has been inside the strict view. Only a sighted
+  ship may open fire on a player-steered ship. Once sighted, it may keep firing from
+  up to 15% beyond the view's edge (`fairViewMargin`); past that margin it's
+  forgotten and must be seen again.
+- **AI against AI is unrestricted.** The rule protects players, not the simulation.
+- **Pair it with combat framing** (**camera-control** rule 5): the camera backs out
+  to keep every threat on screen. Without framing, the rule makes enemies hold fire
+  until point-blank. Without the rule, framing still lets off-screen fire through.
+- **In PvP, the server clamps each client's view to a minimum,** or a client sending
+  `hw: 0` is immune to AI fire.
+- **Test:** a headless run where a hostile approaches from off screen; it doesn't
+  fire until it has been inside the view, and does fire from the margin band
+  afterwards. *Blind to: a threat covered by the HUD; the framing margins handle
+  that.*
+
 ---
 
 ## Behavior Design Patterns
