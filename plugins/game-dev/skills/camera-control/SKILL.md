@@ -26,8 +26,8 @@ done right; **game-feel** owns punch, shake and the trauma budget.
   eyes see and what the inner ear feels causes discomfort, so camera speed and
   direction shouldn't change suddenly. It gives no advice on rotation.
 - **Daniel Holden, "Spring-It-On"**, cited by redshifted's code for the exact
-  critically damped spring. Not read for this skill; the sketch reproduces
-  redshifted's implementation, which its tests cover.
+  critically damped spring. Not read for this skill. The sketch reproduces
+  redshifted's formula with `Math.exp` in place of its `fastNegExp` approximation.
 - **XAG 117** (visual distractions and motion settings): camera motion is a setting.
 - **Heading-follow is UNSOURCED.** Neither corpus game has it; the rules are posture B.
 
@@ -85,11 +85,15 @@ framing, heading mode, `view()` and the conversions, and the aim lead.
 
 - **Both are frame-rate independent** written this way. `x += (goal − x) · 0.1` per
   frame is not: it follows twice as tightly at 120 Hz as at 60.
-- **Tune in halflife,** the time to close half the gap. Damp rate `r` has halflife
-  `ln 2 / r`. ice-pirates' position damp of 4/s is ~0.17 s; redshifted's spring
-  default is 0.25 s (corpus values).
+- **Tune in halflife,** but know which one. For damp, it's the time to close half
+  the gap: rate `r` has halflife `ln 2 / r`, so ice-pirates' 4/s is ~0.17 s. For
+  redshifted's spring, `halflife` is the decay constant's (`y = 2 ln 2 / h`). From
+  rest the spring closes only ~40% of the gap in one `h` and reaches half at ~1.2 h,
+  so its 0.25 s default takes ~0.3 s to close half (redshifted's own test shows the
+  40%). Swapping damp for a spring "at the same halflife" gives a camera ~20% looser.
 - **Zoom eases slower than position:** ice-pirates 1.6/s against 4/s; redshifted a
-  0.4 s halflife against 0.25 s. Zoom changes are the most disorienting motion.
+  0.4 s against 0.25 s spring halflife. Zoom changes are the most disorienting
+  motion.
 - **Keren's warnings:** a lerp can let a fast character reach the screen edge before
   the camera catches up. A spring starts more slowly and can overshoot. Critically
   damped, from rest, it doesn't overshoot a fixed goal; after a kick it can, once.
@@ -173,11 +177,15 @@ it in ice-pirates.
   spinning. If testers report discomfort, slow it down.
 - **The heading goes up:** `angle = −heading − π/2` in y-down screen space.
 - **Every HUD element goes through the camera's `toScreen`**, which now rotates. The
-  compass, edge arrows and markers then rotate correctly without their own maths.
+  compass, edge arrows and markers then rotate correctly without their own maths
+  (rule 7 covers which of them take the shake).
   Anything drawn in screen space with world meaning (a "north" tick, a minimap
   heading) needs rotating too.
-- **Fair fire's view becomes the rotated screen's bounding box** (`view()` in the
-  sketch). It errs toward "seen", which is the safe side.
+- **Fair fire tests points in screen axes.** `view()` carries the angle, and
+  `inView(view, p, grow)` rotates the point before comparing. Never use the axis-
+  aligned box around the rotated screen (`bounds()` in the sketch) for fair fire: it
+  covers off-screen corners, so ships the player never saw would count as seen. The
+  box is for culling only. In a sim, send `angle` in the player's view input.
 - **Framing fits the distance in both screen axes** while rotated, because either
   axis can carry it.
 
@@ -187,6 +195,11 @@ it in ice-pirates.
   and `toWorld` **excludes** it, so shake never moves the aim point (redshifted's
   `screenToWorld`, deliberately). Kicks are velocity impulses into the spring, not
   target moves.
+- **Which HUD takes the shake** (hud-readouts rule 2): a marker drawn *on* a world
+  object takes it, or it slides off its shaking target. Screen-pinned HUD (edge
+  arrows, the compass, panels) never does. The sketch's `toScreen(p)` is unshaken,
+  and `toScreen(p, true)` is for on-object markers. Redshifted's `worldToHudScreen`
+  shakes everything, including its edge arrows.
 - **Shake sizing, the trauma accumulator, noise and the settings gate** are
   **game-feel**'s ("Shake and Flash Budgets"). Redshifted caps the offset at 15 px
   and decays trauma 1.8/s linearly; ice-pirates caps it at 14 px with damp 9/s
@@ -196,8 +209,8 @@ it in ice-pirates.
   - **Redshifted's objective markers** do their own on-screen test with no zoom term
     (`objective-markers.ts`), unlike its edge arrows. That is a likely bug, inferred
     from reading the code.
-- **`view()` returns what's on screen in world units** (`{x, y, hw, hh}`) for fair
-  fire and culling.
+- **`view()` returns what's on screen in world units** (`{x, y, hw, hh, angle}`) for
+  fair fire; `bounds()` returns the axis-aligned box for culling.
 
 ### 8. Camera options
 
@@ -220,10 +233,14 @@ The options tab, with rows from redshifted's camera tab (corpus) and the gaps no
 
 ### 9. Time: the camera runs on the game's clock
 
-- **Paused:** follow and aim lead get `dt = 0` (both games).
-- **Hit-stop:** follow freezes, trauma keeps decaying on real time (redshifted).
-- **Time dilation** (a draft easing time to a freeze): the camera uses the scaled
-  `dt` and slows with it (redshifted).
+- **Paused: give follow, zoom and the aim lead `dt = 0`.** Redshifted does. ice-pirates
+  freezes only the aim lead and passes the real `dt` to `follow`; with the sim
+  frozen the target is still, so the camera just finishes settling and shake keeps
+  decaying. That's harmless there, but it's the gap a moving target would expose.
+- **Hit-stop:** follow freezes, and trauma keeps decaying (redshifted passes the
+  un-hit-stopped `dt` to the shake; the sketch's `shakeDt`).
+- **Time dilation** (a draft easing time to a freeze): follow *and* trauma use the
+  scaled `dt`, so both slow and freeze with it (redshifted).
 - **Clamp `dt`** (redshifted: 0.1 s), so a tab coming back doesn't fling the spring.
 - **Death:** stop following, so the camera isn't dragged by the wreck (redshifted).
 - **New run, respawn, teleport: `snap()`** and zero the velocity. Redshifted has no
@@ -259,11 +276,15 @@ Each line names what the check cannot see.
 - [ ] **Floor:** the longest-range threat at max range, on the smallest window, is
       on screen. *Blind to: ranges added later; re-run when a weapon changes.*
 - [ ] **Frame-rate independence:** 60 frames at 60 Hz and 240 at 240 Hz end at the
-      same position (redshifted tests this).
-- [ ] **Conversions:** `toWorld(toScreen(p)) = p` with zoom and rotation; `toWorld`
-      unchanged by shake.
-- [ ] **Heading mode:** the heading points screen-up; every corner of the screen is
-      inside `view()`; the compass and edge arrows point at their targets.
+      same position. Redshifted's own test is looser (one 0.1 s step against two
+      0.05 s steps, to one decimal), because `fastNegExp` isn't exact; a port that
+      keeps it needs a tolerance.
+- [ ] **Conversions:** `toWorld(toScreen(p)) = p` with zoom, rotation and shake on
+      (unshaken `toScreen`); `toScreen(p, true)` moves with the shake; `toWorld` doesn't.
+- [ ] **Heading mode:** the heading points screen-up; `inView` agrees with
+      `toScreen` for points scattered across the box around the screen (and the box
+      alone would have accepted some off-screen ones); the compass and edge arrows
+      point at their targets.
 - [ ] **Pointer leave:** move the mouse out, back in elsewhere; the view drifts, not
       jumps. With a pad last-used, look-ahead still works with the mouse outside.
 - [ ] **Pause, hit-stop, death, restart:** the camera freezes, freezes, stops, and

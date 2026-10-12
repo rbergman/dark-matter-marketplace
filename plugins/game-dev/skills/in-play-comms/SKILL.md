@@ -1,6 +1,6 @@
 ---
 name: in-play-comms
-description: "A voice that talks to the player during action (crew radio, a co-pilot, a coach, an operator) and must be read while the game keeps running: lines keyed to a situation and withdrawn the moment it stops being true, lessons versus moments, a reading-time floor whose clock slows while the player is busy, entry gates by priority with caps so nothing starves, a short stack of cards, teaching on the event instead of the clock, teaching overlays drawn from the rules, and a line budget measured with a scripted pilot. Use when building or reviewing in-play tutorial lines, crew chatter, mission radio or contextual coaching, and when players say 'it told me to run after the enemy was dead', 'the tip vanished before I read it', 'I was busy and missed it', 'it talked over itself', 'the story never got told', or 'it told me how to steer after I'd already steered'. For fire-and-forget toasts see hud-readouts; for player-paced dialogue the game waits on, see situational-ui."
+description: "A voice that talks to the player during action (crew radio, a co-pilot, a coach, an operator) and must be read while the game keeps running: lines keyed to a situation and withdrawn the moment it stops being true, lessons versus moments, a reading-time floor whose clock slows while the player is busy, entry gates by priority with caps so nothing starves, a short stack of cards, teaching on the event instead of the clock, teaching overlays drawn from the rules, and a line budget measured with a scripted pilot. Use when building or reviewing in-play tutorial lines, crew chatter, mission radio or contextual coaching, and when players say 'it told me to run after the enemy was dead', 'the tip vanished before I read it', 'I was busy and missed it', 'it talked over itself', 'the story never got told', or 'the tip was gone before I'd read it'. For fire-and-forget toasts see hud-readouts; for player-paced dialogue the game waits on, see situational-ui."
 ---
 
 # In-Play Comms
@@ -99,6 +99,12 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
   was withdrawn unread.
 - **Test:** for each line, ask "would this sentence be false in a minute?" Yes → key
   it. No → it's a lesson.
+- **A lesson card is not a persistent hint.** It retires after its reading time
+  like any card. player-ux's "learned, then gone" governs hints that stay up while
+  their trigger holds; it can also drop a queued lesson the player has already shown
+  they know. ice-pirates shows the steering lesson even to a player who steered
+  early. Whether one early press counts as learned is a design call; decide it per
+  lesson and write it down.
 
 ### 3. Reading time is a floor, and the clock bends to the player
 
@@ -111,8 +117,13 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
   ~1.5× the time.
 - **The clock is `dt`, and `dt` is 0 while paused** (game-shell's view clock).
 - **The player's setting multiplies `need`:** 1–10×, or "until dismissed" with a
-  dismiss input (XAG 116; ADDED in the sketch). Under "until dismissed", the next
-  non-urgent line waits for the dismiss.
+  dismiss input (XAG 116; ADDED in the sketch). Under "until dismissed":
+  - every non-urgent line waits for the dismiss, even past its cap, so rule 4's
+    "nothing starves" holds only for finite settings
+  - a keyed moment that goes stale while waiting is dropped unseen, as it would be
+    at any speed
+  - `dismiss()` reports through the same `CommsChange` as `update()`, so the view
+    retires the card the same way
 - **Test:** a first-time player under fire reads every lesson. *Blind to:* reading
   speed in your language and audience; watch a playtest.
 
@@ -156,7 +167,7 @@ Corpus values. Then:
 
 ### 7. Teaching overlays come from the rules
 
-- **The line declares the overlay** (`teach: [{ kind: 'arcs', shipId }]`); the view
+- **The beat declares the overlay** (`teach: [{ kind: 'arcs', shipId }]`); the view
   draws it from the real defs: a weapon's range and arc, the hull's weak-spot
   fraction. An overlay can't drift from the rule it teaches.
 - **Draw only what the line talks about.** Shading every gun turned the screen red;
@@ -204,7 +215,8 @@ Each line names what the check cannot see.
       screen. This test found pitfalls 2 and 3 in ice-pirates. *Blind to: a human
       who plays differently from the pilot, and to reading speed.*
 - [ ] **Withdrawal walk:** start a fight, end it with a warning on screen; the
-      warning goes within ~1.2 s.
+      warning goes once it has had `MIN_SHOWN` on the reading clock. That's ~1.2 s
+      idle and up to ~1.9 s just after a fight, while engagement is still settling.
 - [ ] **Reading-time setting:** at 3× and "until dismissed", every card stays up
       accordingly and dismiss works on keyboard and pad.
 - [ ] **Screen reader:** cards are announced once each; urgent ones interrupt.

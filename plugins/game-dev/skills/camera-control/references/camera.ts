@@ -87,8 +87,11 @@ export class Camera {
     this.trauma = Math.min(1, this.trauma + a);
   }
 
-  /** dt is 0 while paused or in hit-stop; the caller decides. `noise` in -1..1, seeded (game-feel). */
-  follow(t: CameraTarget, dt: number, noise: (ch: number) => number): void {
+  /**
+   * `dt` is 0 while paused or in hit-stop; the caller decides. `shakeDt` lets trauma keep decaying
+   * through a hit-stop (redshifted passes the un-hit-stopped dt). `noise` in -1..1, seeded (game-feel).
+   */
+  follow(t: CameraTarget, dt: number, noise: (ch: number) => number, shakeDt = dt): void {
     const s = this.settings();
     [this.x, this.vx] = spring(this.x, this.vx, t.x, s.halflife, dt);
     [this.y, this.vy] = spring(this.y, this.vy, t.y, s.halflife, dt);
@@ -103,7 +106,7 @@ export class Camera {
       const d = Math.atan2(Math.sin(goal - this.angle), Math.cos(goal - this.angle));
       this.angle += d * damp(2, dt);
     } else this.angle = 0;
-    this.trauma = Math.max(0, this.trauma - dt); // ~1 s from full; see game-feel's budgets
+    this.trauma = Math.max(0, this.trauma - shakeDt); // ~1 s from full; see game-feel's budgets
     const amp = 15 * this.trauma * this.trauma * s.shake;
     this.sx = amp * noise(0);
     this.sy = amp * noise(1);
@@ -122,27 +125,39 @@ export class Camera {
   }
 
   /**
-   * What is on screen, in world units, as an axis-aligned box: the input to fair fire and culling.
-   * With rotation, the box bounds the rotated screen, so it errs toward "seen".
+   * What is on screen, in world units: centre, half extents in SCREEN axes, and the rotation. The input to
+   * fair fire (test points with `inView`, never with a box) and the sim's per-player view.
    */
-  view(): { x: number; y: number; hw: number; hh: number } {
-    const hw = this.w / 2 / this.zoom;
-    const hh = this.h / 2 / this.zoom;
+  view(): View {
+    return { x: this.x, y: this.y, hw: this.w / 2 / this.zoom, hh: this.h / 2 / this.zoom, angle: this.angle };
+  }
+
+  /**
+   * An axis-aligned box around the rotated screen: for CULLING only. It covers off-screen corners, so
+   * using it for fair fire would let ships the player never saw count as seen.
+   */
+  bounds(): { x: number; y: number; hw: number; hh: number } {
+    const { hw, hh } = this.view();
     const c = Math.abs(Math.cos(this.angle));
     const s = Math.abs(Math.sin(this.angle));
     return { x: this.x, y: this.y, hw: hw * c + hh * s, hh: hw * s + hh * c };
   }
 
-  /** World -> screen, shake included: for drawing and the HUD (compass, edge arrows, markers). */
-  toScreen(p: Pt): Pt {
+  /**
+   * World -> screen. Unshaken by default: screen-pinned HUD (edge arrows, compass) never takes the shake.
+   * Pass `shaken` for a marker drawn on a world object, so it moves with the shaken picture.
+   */
+  toScreen(p: Pt, shaken = false): Pt {
     const c = Math.cos(this.angle);
     const s = Math.sin(this.angle);
     const dx = (p.x - this.x) * this.zoom;
     const dy = (p.y - this.y) * this.zoom;
-    return { x: dx * c - dy * s + this.w / 2 + this.sx, y: dx * s + dy * c + this.h / 2 + this.sy };
+    const ox = shaken ? this.sx : 0;
+    const oy = shaken ? this.sy : 0;
+    return { x: dx * c - dy * s + this.w / 2 + ox, y: dx * s + dy * c + this.h / 2 + oy };
   }
 
-  /** Screen -> world, shake EXCLUDED (redshifted): shake must never move the aim point. */
+  /** Screen -> world, shake excluded (redshifted's screenToWorld): shake must never move the aim point. */
   toWorld(p: Pt): Pt {
     const c = Math.cos(this.angle);
     const s = Math.sin(this.angle);
@@ -150,6 +165,21 @@ export class Camera {
     const dy = (p.y - this.h / 2) / this.zoom;
     return { x: this.x + dx * c + dy * s, y: this.y - dx * s + dy * c };
   }
+}
+
+export interface View extends Pt {
+  hw: number;
+  hh: number;
+  angle: number;
+}
+
+/** Is `p` on screen? Rotates into screen axes, so heading mode stays exact. `grow` 1.15 = fair fire's margin. */
+export function inView(v: View, p: Pt, grow = 1): boolean {
+  const c = Math.cos(v.angle);
+  const s = Math.sin(v.angle);
+  const dx = p.x - v.x;
+  const dy = p.y - v.y;
+  return Math.abs(dx * c - dy * s) < v.hw * grow && Math.abs(dx * s + dy * c) < v.hh * grow;
 }
 
 /**

@@ -190,7 +190,9 @@ The readability rule above, enforced by the sim instead of by art. From ice-pira
 values, posture B for your game.
 
 - **The player's view travels in their sim input** (`{x, y, hw, hh}` in world units,
-  from the camera's `view()`), so the rule is deterministic and replays exactly.
+  from the camera's `view()`), so the rule is deterministic and replays exactly. A
+  rotating camera adds `angle`, and the test rotates the point; a box around the
+  rotated screen would count off-screen ships as seen (**camera-control** rule 6).
 - **Sighted:** a ship whose centre has been inside the strict view. Only a sighted
   ship may open fire on a player-steered ship. Once sighted, it may keep firing from
   up to 15% beyond the view's edge (`fairViewMargin`); past that margin it's

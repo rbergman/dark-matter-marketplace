@@ -78,12 +78,12 @@ export class CommsQueue {
     return out;
   }
 
-  /** ADDED: a dismiss input retires the newest card (the "until dismissed" setting needs one). */
-  dismiss(): CommsCard | null {
+  /** ADDED: a dismiss input retires the newest card (the "until dismissed" setting needs one). Same shape as update(). */
+  dismiss(): CommsChange {
+    const out: CommsChange = { admitted: [], retired: [] };
     const c = this.cards[this.cards.length - 1];
-    if (c === undefined) return null;
-    this.cards.pop();
-    return c;
+    if (c !== undefined) this.retire(c, out);
+    return out;
   }
 
   /** Death, restart, quit: drop everything. */
