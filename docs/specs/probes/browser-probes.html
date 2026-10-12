@@ -35,7 +35,7 @@
 
   <section>
     <h2>2 · Programmatic exit, then relock without a click</h2>
-    <ol><li>Click <b>Start</b>. It locks the pointer, then the page releases it after 1 s (like a game opening its menu).</li><li>Don't click anything. 2 s later the page asks for the lock again from a timer, with no gesture.</li></ol>
+    <ol><li>Click <b>Start</b>. It locks the pointer, then the page releases it after 1 s (like a game opening its menu).</li><li>Don't click or press anything. About 7 s after Start (after the click's activation has expired, ~5 s in Chrome) the page asks for the lock again from a timer. The log shows whether activation was still live.</li></ol>
     <button id="prog">Start</button>
   </section>
 
@@ -97,7 +97,7 @@ document.getElementById('resume').addEventListener('click', () => request('Resum
 document.getElementById('prog').addEventListener('click', () => {
   request('Start click');
   setTimeout(() => { log('page calls exitPointerLock() (menu opens)'); document.exitPointerLock(); }, 1000);
-  setTimeout(() => request('timer, no gesture, after programmatic exit'), 3000);
+  setTimeout(() => request('timer, no gesture, after programmatic exit'), 7000);
 });
 
 document.getElementById('fs').addEventListener('click', () => {

@@ -225,7 +225,7 @@ A screen that opens while input is held must not let that input act on it.
 | Keyboard | Ignore `e.repeat` for every shell action. A held key only repeats, and a new press has `repeat === false`. | timberwolf: this alone fixed "it auto started a new game immediately" |
 | Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Hard Deck holds *game-over* pad restart for 400 ms (1500 ms while typing initials) |
 | Mouse | A capture-phase `click` listener on each dialog drops a click whose `pointerdown` happened before `openedAt` | — |
-| Held Enter / Space | The router `preventDefault()`s repeated Enter/Space keydowns while a screen is open. Enter activates a button on keydown, and preventing that keydown blocks it (verified Chrome 152). Without this, a held Enter arms Restart, then confirms it. | — |
+| Held Enter / Space | The router `preventDefault()`s repeated Enter/Space keydowns while a screen is open. Enter activates a button on keydown, and preventing that keydown blocks it (verified Chrome 152). Each *repeated* Enter keydown clicks the focused button again, while a held Space clicks once on release (Playwright Chromium 156: 21 keydowns, 21 clicks; Space 1). Without the guard, a held Enter arms Restart, then confirms it. Firefox and Safari unverified. | — |
 | Anything, on a screen meant to be read | A read-hold after `openedAt`: the same capture-phase `click` listener drops activations inside it | timberwolf: 1100 ms death hold (corpus value) |
 | Esc on a pause the latch just opened | Grace after `openedAt` | logarithmic: 250 ms resume grace (corpus value). Hard Deck's 300 ms is its pointer-lock loss grace, a different guard (see **pointer-lock**). |
 

@@ -17,11 +17,11 @@ a second game.
     `scripts/touch-check.mjs` (CDP multi-touch emulation at four phone and tablet
     sizes). Its real-phone feel test is still open.
   - **redshifted** `touch-adapter.ts`: fixed canvas-drawn sticks and hold buttons on
-    legacy touch events, with 47 tests including "releases touches on cancel (like
+    legacy touch events, with 31 tests including "releases touches on cancel (like
     incoming phone call)".
   - **free-horses**: fixed DOM pedal buttons, swipe-to-look, two-finger pinch zoom.
-  - **wreckline**: fixed sticks with `setPointerCapture`, a "HOLD TO FIRE" aim stick,
-    and separate phone and tablet layouts.
+  - **wreckline**: fixed sticks with `setPointerCapture`, a "HOLD TO FIRE" aim stick
+    that fires past 0.18 deflection, and separate phone and tablet layouts.
 
   Only **sightline** vibrates. Numbers marked *corpus value* are posture A for the
   game that ships them and posture B for yours (Numbers Policy).
@@ -80,8 +80,10 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
 ### 1. Switch on the input, not the device
 
 - **Any `pointerdown` with `pointerType === 'touch'` turns touch play on; a
-  `pointermove` with `pointerType === 'mouse'` turns it off** (Hard Deck). This is
-  **input-bindings**' last-device rule with a third device.
+  `pointermove` with `pointerType === 'mouse'` or any pad input turns it off** (Hard
+  Deck's `padEndsTouch`: otherwise the idle touch aim overwrites the pad's aim on a
+  tablet with a controller). This is **input-bindings**' last-device rule with a
+  third device.
 - **Don't sniff.** redshifted enables its adapter on
   `'ontouchstart' in window || navigator.maxTouchPoints > 0`, so a touch-screen
   laptop gets sticks while it's played with a mouse. `(pointer: coarse)` is fine for
@@ -107,9 +109,12 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
   see the up. redshifted tests the cancel. The sketch adds hide and blur (ADDED).
   Match the `pointerId` on release: wreckline's notes record a fix for releasing
   the wrong stick.
-- **`preventDefault()` on the touch `pointerdown`** over the play surface, so no
-  compatibility mouse events follow. Otherwise one tap is also a left click: a
-  cannon shot, a pointer-lock request (Hard Deck).
+- **`preventDefault()` on the touch `pointerdown`** over the play surface. This
+  suppresses the compatibility `mousedown`/`mouseup`, so a cannon on `mousedown`
+  doesn't also fire (Hard Deck). **It does not suppress `click`:** any `click`
+  handler that fires or requests pointer lock must check `pointerType` itself.
+  Hard Deck's pointer-lock click handler carries exactly that guard (**pointer-lock**
+  says the same).
 - **Never request pointer lock for touch** (wreckline skips it for
   `pointerType === 'touch'`; **pointer-lock** owns the rest).
 
@@ -117,10 +122,10 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
 
 | Property | On | Why |
 |---|---|---|
-| `touch-action: none` | Canvas, play surface, every control | No scroll, pan or double-tap zoom under a thumb (all four touch games) |
+| `touch-action: none` | Canvas, play surface, every control | No scroll, pan or double-tap zoom under a thumb (Hard Deck, free-horses, wreckline; redshifted instead calls `preventDefault` in non-passive touch listeners) |
 | `user-select: none`, `-webkit-touch-callout: none` | Play surface and controls | No text selection or iOS callout on a long press (Hard Deck) |
 | `overscroll-behavior: none` | `html`, `body` | No pull-to-refresh or rubber-band (wreckline) |
-| `viewport-fit=cover` plus `env(safe-area-inset-*)` | Viewport meta; control positions | Use the full screen, keep controls out of the notch and home bar (Hard Deck, free-horses, wreckline) |
+| `viewport-fit=cover` plus `env(safe-area-inset-*)` | Viewport meta; control positions | Use the full screen, keep controls out of the notch and home bar (Hard Deck). Both halves are needed: free-horses uses `env()` without `viewport-fit=cover`, so its insets read zero on iPhone |
 | `touch-action: manipulation` | Menu and tap-only UIs | Kills the double-tap-zoom delay but keeps pinch zoom (timberwolf, royal-inbox) |
 
 - **Don't use `user-scalable=no` on the whole page** (redshifted does).
@@ -143,10 +148,11 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
   Deck's `stickVector`). A dead zone that just clips makes the ship lurch to 12%
   speed the moment it moves.
 - **Corpus values:** radius 60 CSS px with dead zone 0.12 (Hard Deck); radius 75
-  canvas px with dead zone 0.15 (redshifted); 43 px travel with a 0.12 threshold
-  (wreckline).
-- **Aim keeps its last value on release** (Hard Deck), so letting go doesn't snap
-  the turret to zero.
+  canvas px with dead zone 0.15 (redshifted). wreckline's drive stick has 43 px
+  travel and a plain 0.12 gate, which clips rather than rescales.
+- **The consumer keeps the last aim.** A released or resting stick reads zero; the
+  input layer keeps the last non-zero aim, so letting go doesn't snap the turret
+  (Hard Deck's `applyTouch`). Wire the stick straight to the turret and it snaps.
 - **The gamepad's radial, rescaled dead zone** is **input-bindings**' rule 7. A
   touch stick is the same signal from a different source, so share the maths.
 
@@ -157,15 +163,17 @@ Every scheme gives something up:
 
 | Scheme | Corpus or precedent | Cost |
 |---|---|---|
-| **Aim stick fires past a threshold** (below it, aim only) | Hard Deck (`FIRE_AT` 0.5); Feral's shipped "three-stage" stick: faint at rest, a slight push aims, further fires, with a haptic pulse at the switch | Players must find the threshold; the cue that marks it must be felt or seen |
+| **Aim stick fires past a threshold** (below it, aim only) | Hard Deck (`FIRE_AT` 0.5); wreckline (0.18); Feral's shipped "three-stage" stick: faint at rest, a slight push aims, further fires, with a haptic pulse at the switch | Players must find the threshold; the cue that marks it must be felt or seen |
 | **Separate hold-to-fire button** | redshifted, free-horses | Feral rejected it: players had to stop aiming to shoot |
-| **Auto-fire while aiming at a target in range** | Feral tried it; Hard Deck has proposed it for touch, awaiting Bob's decision | Feral's testers kept running out of ammo; it removes the decision to shoot |
+| **Auto-fire while aiming at a target in range** | Feral tried it; Hard Deck has proposed it as the touch default, awaiting Bob's decision | Where ammo is finite, Feral's testers kept running out. Hard Deck's cannon is unlimited, so that cost doesn't apply there. It removes the decision to shoot |
 | **Tap-and-hold on an enemy** | Feral tried it | Comfortable, ammo-safe, but lost the twin-stick feel |
 
-- **Default for a twin-stick game: the threshold stick,** because it's the only
-  scheme that keeps aiming and firing on one thumb without removing the choice to
-  fire. It is posture B: Hard Deck's 0.5 is a first value, and Feral gives no
-  number.
+- **Default for a twin-stick game with finite ammo: the threshold stick.** It's the
+  scheme Feral shipped and two corpus games use. The reason is this skill's
+  (UNSOURCED): it keeps aiming and firing on one thumb without removing the choice
+  to fire. With unlimited ammo, auto-fire is a fair alternative. The values are
+  posture B: Hard Deck's 0.5 is a first value, wreckline uses 0.18, and Feral gives
+  no number.
 - **Mark the threshold.** Feral used a haptic pulse. On iPhone there is no
   vibration (rule 8), so the cue must also be visual: a ring at the threshold, and
   the knob changing colour while it fires.
@@ -244,11 +252,14 @@ Each line names what the check cannot see.
 
 - [ ] **Unit, stick maths:** dead zone zero, no jump just past it, unit at the rim,
       direction kept. *Blind to: feel.*
-- [ ] **Unit, ownership (fake DOM, as the sketch's test):** left and right thumbs
-      claim their sticks; a third finger is ignored; cancel releases only its own
-      stick; hide and blur release all; a mouse move leaves touch mode; a mouse
-      `pointerdown` spawns nothing. Mutation-check each. *Blind to: real event
-      order on devices.*
+- [ ] **Unit, ownership (a fake DOM: Node's `EventTarget` and plain events
+      suffice):** left and right thumbs claim their sticks; a third finger is
+      ignored; cancel releases only its own stick; hide and blur release all; a
+      mouse move and `endTouch()` leave touch mode; a mouse `pointerdown` spawns
+      nothing; after `destroy()` no event moves a stick. Mutation-check each.
+      *Blind to: real event order on devices.*
+- [ ] **Click guard:** a tap on the play surface fires no `click`-bound action and
+      requests no pointer lock.
 - [ ] **CDP multi-touch emulation** at phone and tablet sizes in both orientations
       (Hard Deck's `touch-check.mjs`: 844×390, 390×844, 1180×820, 820×1180). Hard
       Deck states its own blind spots: emulated touch on a desktop GPU, not a phone;

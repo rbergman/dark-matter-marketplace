@@ -1,9 +1,9 @@
 // touch-controls reference sketch: floating twin sticks on pointer events. A thumb landing on the left half
 // spawns the move stick under it, the right half the aim stick; the aim stick fires past FIRE_AT. Each stick
 // owns one pointerId; every way a touch can end releases it. Adapted from Hard Deck src/view/touch.ts
-// (2026-10-12); the release-on-hide rule follows redshifted's touch-adapter test. Strict TS, no deps.
+// (2026-10-12). Release on hide and blur, and destroy(), are ADDED. Strict TS, no deps.
 
-/** Corpus values (Hard Deck); posture B for your game. Tests in SKILL.md rule 4. */
+/** Corpus values (Hard Deck); posture B for your game. Checks: SKILL.md's verification checklist. */
 export const RADIUS = 60; // CSS px of knob travel at full deflection
 export const DEAD = 0.12; // fraction of travel ignored, so a resting thumb doesn't drift
 export const FIRE_AT = 0.5; // aim-stick deflection that also fires
@@ -72,23 +72,29 @@ export class Stick {
 export class TwinStick {
   readonly left = new Stick();
   readonly right = new Stick();
-  /** Touch play is on after any touch, off after a real mouse move (input-bindings' last device). */
+  /**
+   * Touch play is on after any touch, off after a real mouse move. The pad path must clear it too (Hard
+   * Deck's padEndsTouch), or an idle touch aim overwrites the pad's aim: call endTouch() on pad input.
+   */
   usingTouch = false;
+  private readonly ac = new AbortController();
 
   constructor(surface: HTMLElement, win: Window = window, doc: Document = document) {
+    const signal = this.ac.signal;
     win.addEventListener(
       'pointerdown',
       (e) => {
         if (e.pointerType === 'touch') this.usingTouch = true;
       },
-      { capture: true },
+      { capture: true, signal },
     );
     surface.addEventListener('pointerdown', (e) => {
       if (e.pointerType !== 'touch') return;
-      e.preventDefault(); // no compatibility mouse events: a touch must not also read as a click
+      // Suppresses the compatibility mousedown/mouseup only. `click` still fires: click handlers check pointerType.
+      e.preventDefault();
       const stick = e.clientX < win.innerWidth / 2 ? this.left : this.right;
       if (!stick.held) stick.down(e.pointerId, e.clientX, e.clientY); // a second finger on a held half is ignored
-    });
+    }, { signal });
     win.addEventListener('pointermove', (e) => {
       if (e.pointerType === 'mouse') {
         this.usingTouch = false;
@@ -96,24 +102,36 @@ export class TwinStick {
       }
       if (e.pointerId === this.left.id) this.left.move(e.clientX, e.clientY);
       else if (e.pointerId === this.right.id) this.right.move(e.clientX, e.clientY);
-    });
+    }, { signal });
     const release = (e: PointerEvent): void => {
       if (e.pointerId === this.left.id) this.left.up();
       else if (e.pointerId === this.right.id) this.right.up();
     };
-    win.addEventListener('pointerup', release);
-    win.addEventListener('pointercancel', release); // a phone call, a system gesture, a palm
-    // ADDED: a hidden page may never deliver the pointerup; drop every stick so nothing stays held.
+    win.addEventListener('pointerup', release, { signal });
+    win.addEventListener('pointercancel', release, { signal }); // a phone call, a system gesture, a palm
+    // A hidden page may never deliver the pointerup; drop every stick so nothing stays held.
     doc.addEventListener('visibilitychange', () => {
       if (doc.hidden) this.releaseAll();
-    });
-    win.addEventListener('blur', () => this.releaseAll());
+    }, { signal });
+    win.addEventListener('blur', () => this.releaseAll(), { signal });
+  }
+
+  /** A remounting UI (React, a restart) must remove the old listeners, or stale sticks read every touch. */
+  destroy(): void {
+    this.ac.abort();
+    this.releaseAll();
+  }
+
+  endTouch(): void {
+    this.usingTouch = false;
+    this.releaseAll();
   }
 
   get move(): Vec {
     return this.left.v;
   }
 
+  /** Zero when released or resting: the consumer keeps the last non-zero aim, or the turret snaps (Hard Deck). */
   get aim(): Vec {
     return this.right.v;
   }
