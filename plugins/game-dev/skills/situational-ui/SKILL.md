@@ -64,7 +64,8 @@ function sliceAt(x: number, y: number, slices: number, deadzone = 0.5): number {
 - **Slice count.** *Starting value:* at most 8 (posture B). Test: players pick the
   slice they intended 9 times in 10 without looking down. If not, use fewer slices.
 - **Deadzone.** *Starting value:* 0.5 (posture B). The stick must clearly leave
-  centre, or the cancel position is unreachable.
+  centre, or the cancel position is unreachable. Test: release from centre cancels
+  10 times in 10, and a deliberate flick never cancels. Adjust in 0.1 steps.
 - **Keyboard and mouse:**
   - keyboard: number keys select directly
   - mouse: direction from the point where the button went down, not from screen
@@ -135,7 +136,7 @@ anything without shape.
 - a **skip** that asks once, because a skipped scene can't be undone
 
 - **Player-paced by default** (GAG Basic). Auto-advance is an option whose timing is
-  adjustable, or dismissed on input (XAG 116).
+  adjustable up to at least 10× (or off), or dismissed on input (XAG 116).
   - *Starting hold for auto-advance:* 2 s plus 60 ms per character, the same as
     toasts (posture B).
   - Test: a first-time player reads every line.

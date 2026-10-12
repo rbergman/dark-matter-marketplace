@@ -248,8 +248,8 @@ Bugs:
 ## progression-legibility (curves, stacking, draft cards)
 
 - **Draft cards:**
-  - bay-raid `ui.ts:151-224`: keys 1-3, click, pad; a 400 ms pad hold-off after the
-    picker opens.
+  - bay-raid `ui.ts:151-224`: keys 1-3, click, pad, on press edges only. There is no
+    hold-off; the 400 ms hold is the game-over restart.
   - redshifted crate modal: pointer lock released, time-freeze easing rather than a
     hard pause, Esc blocked.
   - royal-inbox: hotkeys 1-3 with a 300 ms `createInputGate` against double-submit.
@@ -278,6 +278,54 @@ Strongest:
 
 Gap: no game has automated keyboard-only, pad-only, pointer-lock or pause-from-every-
 screen tests. free-horses' Options browser check is the nearest.
+
+## Survey details the skills cite
+
+From the survey agents' full reports (2026-10-11), and where marked re-read in
+source (2026-10-12). These fill in what the condensed sections above omit.
+
+**Corrections to the sections above:**
+- Downwash's 400 ms (1500 ms while typing initials) is the **game-over** pad restart
+  hold (`ui.ts` `padRestartReady`, re-read). Its draft relies on pad edges alone,
+  with no hold-off.
+- Downwash's 300 ms is the **pointer-lock loss** grace (`pointer-lock.ts`
+  `LOCK_GRACE_MS`). There is no Esc grace in `app.ts` (re-read).
+- logarithmic's HUD has a **4 Hz throttle** (`hud.ts`, re-read). The 1 Hz is the
+  shop's `innerHTML` re-render.
+
+**Values re-read in source 2026-10-12:**
+- Downwash: compass `MARGIN = 40` (`compass.ts`), `HIT_STOP_GAP = 0.35` (`app.ts`)
+- redshifted: glow on gains of 1000+ (`score-animator.ts`)
+- abduction-run: combo ×1.0 → ×3.0 (`combo.ts`)
+- logarithmic: `RESUME_KEY_GRACE_MS = 250` (`player.ts`); fallback notice at
+  1400 ms (`main.ts`)
+- free-horses: 250 ms overload (`game-clock.ts`); six viewports in
+  `check-options-browser.cjs`
+- gravelight: `PAUSE_DUCK = 0.7` (`frame-loop.ts`)
+- volatile-state-redux: `reducedFlash ? 0.45 : 1` (`combat-effects.ts`)
+- royal-inbox: `createInputGate(cooldownMilliseconds = 300)`
+
+**From the survey reports, not re-read:**
+- **Fades, counts and caps:**
+  - redshifted arrow fades of 0.3 and 0.4 s, and about 20 compass fix commits
+  - timberwolf caps at 5 nearest minor marks, plus learned counts `USES_TO_LEARN`
+    feed 6 and drop 3 (`learned.ts`, seen in source this session)
+- **Storage keys:** timberwolf has six (`tw.keys.v1`, `timberwolf-sound-v1`, tips,
+  tasks, learned, `timberwolf-run-v1`); abduction-run has four.
+- **Missing options:**
+  - gravelight has three sliders and no mute
+  - free-horses has no mute toggle
+- **Gravelight:**
+  - `MAX_CATCHUP_STEPS` (`fixed-step.ts`)
+  - bag-before-menu Esc order (`input.ts:189-198`)
+- **Downwash:**
+  - P opens pause (`app.ts:164-168`)
+  - first review found FX emitting under pause (`docs/reviews/gpt-review-1.md`)
+- **Logarithmic:** swallows Esc in a text field (`player.ts`)
+- **Pointer lock:**
+  - abduction-run's unlock reasons include `characterPreview`
+  - redshifted commit `0db70d39` clears `wantsLock` before exit, and Downwash
+    ported the same model
 
 ---
 

@@ -12,7 +12,8 @@ export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t
 export class ViewClock {
   /** Seconds of unpaused view time. */
   t = 0;
-  /** Starting value (B): clamp a frame's dt at 0.1 s so a returning tab doesn't skip every timer. */
+  /** Starting value (B): clamp a frame's dt at 0.1 s so a returning tab doesn't skip every timer.
+   *  Test: hide the tab for 10 s with a toast showing; on return it has ≤ 0.1 s less left. */
   constructor(private readonly maxDt = 0.1) {}
   /** Call once per rendered frame with real elapsed seconds; returns the dt HUD timers should use. */
   tick(realDt: number, simPaused: boolean): number {
@@ -46,7 +47,7 @@ export interface Rect {
 /**
  * Where a target at screen point (tx, ty) gets drawn. `safe` is the viewport minus HUD insets
  * (timberwolf's hudInset). `margin` widens "on screen" so arrows don't flicker at the edge
- * (Downwash: 40 px, posture C). `behind` is true when a 3-D projection had w < 0.
+ * (Downwash: 40 px, a corpus value). `behind` is true when a 3-D projection had w < 0.
  */
 export function placeIndicator(
   tx: number,
@@ -96,7 +97,7 @@ export interface Toast {
   left?: number;
 }
 
-/** Starting values (B): hold 2 s + 60 ms/char; CHATTER_MAX is posture C in timberwolf (6). */
+/** Starting values (B): hold 2 s + 60 ms/char; CHATTER_MAX is a corpus value (timberwolf, 6). Tests in SKILL.md rule 8. */
 export const CHATTER_MAX = 6;
 export const holdFor = (text: string, scale = 1): number => (2 + 0.06 * text.length) * scale;
 

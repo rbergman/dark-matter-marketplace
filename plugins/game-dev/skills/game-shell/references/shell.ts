@@ -58,7 +58,8 @@ export interface OpenOptions {
   heldPad?: Iterable<number>;
 }
 
-/** Starting value: posture C in Downwash (300 ms), logarithmic (250 ms). Test: lose lock with Esc; pause stays open. */
+/** Corpus value: logarithmic's 250 ms resume grace (player.ts); posture B here. Test: lose lock with Esc and pause stays
+ * open; if a stray Esc still closes it, lengthen in 50 ms steps. */
 export const ESC_GRACE_MS = 300;
 
 export type EscDecision = 'capture' | 'ignore' | 'openPause' | 'back' | 'blocked';

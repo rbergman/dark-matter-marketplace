@@ -59,9 +59,13 @@ boot ──► title ──first gesture──► play ◄──resume── pau
 ## Game over
 
 - **The read-hold.** The screen ignores confirm until it has been readable for a
-  moment. Timberwolf holds 1100 ms; Downwash holds pad restart 400 ms, or 1500 ms
-  while typing initials. Those are posture C; elsewhere they are posture B. Test:
-  can a first-time player say what killed them before the next run starts?
+  moment. These are corpus values (Numbers Policy):
+  - timberwolf holds 1100 ms (`shell-keys.ts`)
+  - Downwash holds pad restart 400 ms, or 1500 ms while typing initials
+    (`ui.ts` `padRestartReady`)
+
+  For your game they are posture B. Test: can a first-time player say what killed
+  them before the next run starts? If not, lengthen the hold.
 - **The key you died holding cannot skip it.** Guard on `e.repeat` and pad buttons
   held at open.
 - **Contents, in priority order:**
@@ -77,7 +81,8 @@ boot ──► title ──first gesture──► play ◄──resume── pau
 
 ## Local high scores
 
-- **A top-10 per mode, with three-letter initials** (Downwash's arcade idiom). If
+- **A top-10 per mode, with three-letter initials.** That is Downwash's choice and an
+  arcade convention, UNSOURCED. If
   the game has loadouts, keep one table per loadout and say which table the player
   is in.
   - Abduction-run falls back to the global best for a loadout with no bucket.

@@ -235,7 +235,7 @@ gate that scales them is **settings-and-persistence**'s.
   with `Math.random`, and a seed can't replay them.
 - **The settings gate scales the offset at render,** and trauma keeps decaying while
   scaled to 0. Toggling mid-shake then leaves no stuck offset (logarithmic).
-- **Rate-limit hit-stop.** Downwash allows one every 0.35 s (posture C). Stacked
+- **Rate-limit hit-stop.** Downwash allows one every 0.35 s (corpus value, `app.ts`). Stacked
   hit-stops read as the game freezing.
 
 ### Flash
@@ -250,7 +250,7 @@ gate that scales them is **settings-and-persistence**'s.
   - Don't label a setting "epilepsy safe" (GAG); name it by what it does.
 - **With reduce-flash on:**
   - full-screen flashes become an edge vignette or a border pulse
-  - effect alpha is capped (volatile-state-redux uses 0.45, posture C)
+  - effect alpha is capped (volatile-state-redux uses 0.45, a corpus value)
   - white-outs become a dim
 - **Low-health vignettes are steady, or pulse well under 3 Hz.** With reduced
   motion, they hold steady.

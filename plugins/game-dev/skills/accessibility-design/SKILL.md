@@ -46,7 +46,7 @@ Players who are blind, have low vision, are colorblind, or are photosensitive.
 |---------|----------|----------|
 | Color-only information | Add shape, pattern, text, or position as redundant channel | WCAG 1.4.1, XAG 103 |
 | Small text | Scalable text: minimum 26px at 1080p on console, 18px on PC; this skill recommends 28px as the TV-distance default (posture B) | XAG 101 |
-| Low contrast | 4.5:1 ratio for text, 3:1 for large UI elements | WCAG 1.4.3 (AA) |
+| Low contrast | 4.5:1 for text, 3:1 for large text (WCAG 1.4.3); 3:1 for UI components (WCAG 1.4.11) | WCAG 1.4.3, 1.4.11 (AA) |
 | No screen reader support | Semantic UI structure, text alternatives for images | WCAG 1.1.1 |
 | Fixed UI scale | Independent UI scaling separate from resolution, up to 200% | XAG 101 |
 | Photosensitive content | No more than 3 flashes per second, option to disable screen effects | WCAG 2.3.1, XAG 118 |
@@ -216,7 +216,7 @@ Common, frequently implemented poorly, and fixable at the design level rather th
 | Body text | 4.5:1 against background | WCAG AA |
 | Large text (24px+ or 18px+ bold) | 3:1 against background | WCAG AA |
 | UI components and graphical objects | 3:1 against adjacent colors | WCAG 1.4.11 |
-| Enhanced (Tier 3 goal) | 7:1 text, 4.5:1 UI | WCAG AAA |
+| Enhanced (Tier 3 goal) | 7:1 normal text, 4.5:1 large text (WCAG 1.4.6, AAA); 7:1 for all elements in a high-contrast mode (XAG 102) | WCAG AAA, XAG 102 |
 
 ### Testing Colorblind Design
 

@@ -204,7 +204,8 @@ Binding key K to action A, where B already holds K:
   rest, raise it.
 - **Triggers are analog buttons (`.value`).** Use press and release thresholds with
   hysteresis. *Starting values:* press at 0.5, release at 0.4 (posture B). Test:
-  half-pulled triggers don't chatter.
+  half-pulled triggers don't chatter. If they do, widen the gap; if a full pull
+  feels late, lower the press threshold.
 - **Pad remapping** captures the next button that goes from up to down in a poll.
   **Start cancels**: it's reserved. Esc on the keyboard cancels too. Every other
   button, B included, binds on its press edge. The prompt says "Press a button…

@@ -45,7 +45,7 @@ failing storage, the motion resolution and the bus gains.
 |---|---|---|
 | Reduced motion reaches CSS, not the canvas shake | timberwolf, gravelight; free-horses particles (read from code, not reproduced) | Setting read in one place; effects built once with the OS value |
 | Settings wiped by an update | Downwash, logarithmic, gravelight (save) | Version mismatch resets instead of migrating |
-| Six keys, versions only in key names | timberwolf, abduction-run, volatile-state-redux | No single record; a "v1" in the key orphans data rather than migrating it |
+| Many keys, versions only in key names | timberwolf (6 keys), abduction-run (4), volatile-state-redux | No single record; a "v1" in the key orphans data rather than migrating it |
 | Two sources of truth for volume | redshifted | Audio modules write their own keys beside the panel's |
 | OS reduced-motion preference frozen at first save | free-horses (read from code, not reproduced), logarithmic | OS default written into storage as if the player chose it |
 | Only master volume, or no mute | gravelight (3 sliders, no mute), free-horses (no mute) | Bus model not exposed |
@@ -91,9 +91,9 @@ failing storage, the motion resolution and the bus gains.
 - **Slider-to-gain curve.** *Starting value:* `gain = (v / 100) ** 2`. Test: do
   equal slider steps sound like equal loudness steps across the range? If the top
   half seems to do nothing, steepen the curve, or switch to a dB mapping
-  (−40 dB to 0).
+  (−40 dB to 0, also posture B, with the same test).
 - **Pause ducks master** (game-shell); Options doesn't, so levels are judged at
-  full scale. Gravelight ducks to 70% on pause only (posture C).
+  full scale. Gravelight ducks to 70% on pause only (corpus value).
 - **Mix design** (what each bus is for, ducking rules, priorities) is
   **audio-design**'s. This skill only wires the controls.
 

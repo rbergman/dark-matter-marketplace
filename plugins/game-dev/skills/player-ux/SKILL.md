@@ -141,7 +141,7 @@ prompts that "never go away even after you have done it".
   is built from the **live binding** at draw time, so a remap shows (see
   **input-bindings** rule 8). Never hard-code "[E]".
 - **Learned, then gone.** Count successful uses per hint; stop showing after N.
-  Timberwolf uses 6 for feeding and 3 for dropping (posture C there; B elsewhere).
+  Timberwolf uses 6 for feeding and 3 for dropping (corpus values; B for yours).
   Test: does the hint vanish before the player stops needing it?
   - Readouts such as a price or a stack size aren't lessons, and never fade.
 - **Per player, not per save.** Store learned counts per browser: it is the player

@@ -198,7 +198,7 @@ Every source calls the latch; none of them opens pause itself:
 |---|---|---|
 | Tab hidden | `visibilitychange` with `document.hidden` | Non-negotiable: hidden tabs stop rAF and throttle timers (MDN) |
 | Window blur | `window` `blur` | UNSOURCED convention, corpus majority. Skip if focus moved into an iframe in the play view. Skip in bot and perf modes (`?bot`, `?perf`), or an operator's alt-tab stalls the measurement. |
-| Clock overload | Accumulated sim debt past a threshold | free-horses: debt over 250 ms pauses with "The game fell behind and paused". Posture C there; B elsewhere. Drop the debt rather than replay it. |
+| Clock overload | Accumulated sim debt past a threshold | Corpus value: free-horses pauses on debt over 250 ms with "The game fell behind and paused" (`game-clock.ts`). B for yours. Test: throttle the CPU 6× in DevTools; the game pauses rather than running in slow motion. Drop the debt rather than replay it. |
 | Lost pointer lock | Reported by **pointer-lock** | The lock module reports; it doesn't pause |
 | Lost controller | `gamepaddisconnected` while the pad was the last-used device | XR-115: the player must be able to continue, or be prompted. The pause screen says "Reconnect the controller or press a key". |
 | Fullscreen exited | `fullscreenchange` while in play | When fullscreen, the browser spends the first Esc on leaving fullscreen. Per the HTML close-request steps, the page gets no keydown (from the spec, not probed). Pausing here keeps one Esc meaning "stop". |
@@ -214,11 +214,11 @@ A screen that opens while input is held must not let that input act on it.
 | Input | Guard | Corpus value |
 |---|---|---|
 | Keyboard | Ignore `e.repeat` for every shell action. A held key only repeats, and a new press has `repeat === false`. | timberwolf: this alone fixed "it auto started a new game immediately" |
-| Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Downwash: 400 ms pad hold-off on the draft (C) |
+| Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Downwash holds *game-over* pad restart for 400 ms (1500 ms while typing initials) |
 | Mouse | A capture-phase `click` listener on each dialog drops a click whose `pointerdown` happened before `openedAt` | — |
 | Held Enter / Space | The router `preventDefault()`s repeated Enter/Space keydowns while a screen is open. Enter activates a button on keydown, and preventing that keydown blocks it (verified Chrome 152). Without this, a held Enter arms Restart, then confirms it. | — |
-| Anything, on a screen meant to be read | A read-hold after `openedAt`: the same capture-phase `click` listener drops activations inside it | timberwolf: 1100 ms death hold (C) |
-| Esc on a pause the latch just opened | Grace after `openedAt` | Downwash 300 ms, logarithmic 250 ms (C) |
+| Anything, on a screen meant to be read | A read-hold after `openedAt`: the same capture-phase `click` listener drops activations inside it | timberwolf: 1100 ms death hold (corpus value) |
+| Esc on a pause the latch just opened | Grace after `openedAt` | logarithmic: 250 ms resume grace (corpus value). Downwash's 300 ms is its pointer-lock loss grace, a different guard (see **pointer-lock**). |
 
 **This is the same guard everywhere**: the death screen, the draft picker, a
 confirm, a pause opened by the latch. Native button activation goes through it too,
@@ -269,7 +269,7 @@ Then:
   is gravelight's suspend-not-abandon model.
 
 **Pause audio:** duck the master bus rather than silencing it (gravelight ducks to
-70%; posture C), and **don't** duck inside Options, so levels can be judged. See
+70%; corpus value, `frame-loop.ts`), and **don't** duck inside Options, so levels can be judged. See
 **settings-and-persistence**.
 
 ---
@@ -287,7 +287,8 @@ Then:
   Opening happens during dispatch, so the new screen's handlers can run on the same
   event. Gate on `openedAt`, set to the event's timestamp (rule 4).
 - **Hotkeys versus focused buttons.** Never block all hotkeys whenever a button
-  has focus: volatile-state-redux did, and after one click every hotkey went dead.
+  has focus. volatile-state-redux's `shortcutBlocked` does that, and reading the
+  code says one click kills every hotkey (not reproduced).
   Let a focused control consume only the keys it uses (Enter, Space, arrows on
   sliders). See **menu-navigation**.
 - **Catch-up after a hidden tab.** Clamp the accumulator, as gravelight does with

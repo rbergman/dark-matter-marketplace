@@ -92,13 +92,13 @@ export function sanitise(raw: Raw): Settings {
       flash: tri(fx['flash']),
       shake: fx['shake'] === null ? null : typeof fx['shake'] === 'number' ? num(fx['shake'], 100, 0, 100) : d.fx.shake,
     },
-    // uiScale floor 0.75: posture B (test: is the smallest setting still legible at the target distance?)
+    // uiScale floor 0.75: posture B. Test: the smallest setting is still legible at the target distance; if not, raise it.
     display: { uiScale: num(disp['uiScale'], d.display.uiScale, 0.75, 2) },
     input: {
       keys: inp['keys'] ?? null,
       pad: inp['pad'] ?? null,
       toggles,
-      deadzone: num(inp['deadzone'], d.input.deadzone, 0, 0.5),
+      deadzone: num(inp['deadzone'], d.input.deadzone, 0, 0.5), // 0-50%: accessibility-design's dead-zone range
     },
   };
 }

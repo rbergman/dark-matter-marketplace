@@ -42,8 +42,8 @@ Typed sketch: `references/nav.ts`.
 | Failure | Seen in | Root cause |
 |---|---|---|
 | Settings screen unreachable by keyboard or pad | redshifted | Canvas-drawn panel with no focusables; a navigation helper existed and was never wired |
-| Every hotkey dead after one click on a HUD button | volatile-state-redux | "Block hotkeys while a button has focus", applied to all keys |
-| Shop loses keyboard focus every second | logarithmic | `innerHTML` re-render at 1 Hz while open |
+| Every hotkey dead after one click on a HUD button | volatile-state-redux (read from code, not reproduced) | "Block hotkeys while a button has focus", applied to all keys |
+| Shop loses keyboard focus every second | logarithmic (read from code, not reproduced) | `innerHTML` re-render at 1 Hz while open |
 | Focus lands on the first item, not where the player came from | Downwash | Pop focuses "first item of the new top" |
 | Gameplay Tab fights menu Tab | free-horses (inference) | Default binding on Tab, with HUD buttons in the tab order |
 | A highlight outlives the cursor | gravelight (fixed) | Hover and keyboard tracked as two highlights |

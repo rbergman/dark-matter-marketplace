@@ -4,7 +4,11 @@
 
 export type UnlockReason = 'screen' | 'map' | 'debug' | 'preview' | 'userPref';
 
-/** Starting values. GRACE: posture C in Downwash (300 ms). RETRY: how often to retry while activation lasts (B). */
+/**
+ * GRACE: corpus value, Downwash LOCK_GRACE_MS (300 ms); B here, test in SKILL.md rule 4.
+ * RETRY: posture B. Test: escape, then click Resume at once; the lock returns within ~150 ms of the 1250 ms
+ * cooldown ending. If retries flood the console, lengthen.
+ */
 const GRACE_MS = 300;
 const RETRY_MS = 150;
 

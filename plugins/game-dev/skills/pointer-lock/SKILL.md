@@ -32,7 +32,8 @@ running with an invisible cursor.
   - named unlock reasons and a virtual cursor: abduction-run
   - lost lock means pause, a backoff, and a fallback look mode: logarithmic
 - **Corpus timings** (500 ms retry, 300 ms grace, 0.35–3 s backoff, 1.4 s fallback
-  notice) are posture C in their games.
+  notice) are corpus values (Numbers Policy): posture A for the game that ships
+  them, B for yours.
 
 Typed sketch: `references/pointer-lock.ts`.
 
@@ -100,7 +101,7 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
 - **The request can still fail.** The likely case: the click came within Chrome's
   1250 ms of the player escaping. **Retry while `navigator.userActivation.isActive`
   is true.**
-  - **Measured** (Chrome 152, 2026-10-12, posture C): the activation from one click
+  - **Measured** (Chrome 152 built-in browser, 2026-10-12, n = 1): the activation from one click
     stayed live for about 5.0 s. The retry loop ran until then, then asked for a
     click. That comfortably outlasts the 1250 ms cooldown.
   - **Not observed:** a relock succeeding after the cooldown. The test browser (an
@@ -119,8 +120,9 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
 - **A loss** is a `pointerlockchange` to unlocked while `wanted`: Esc, focus
   leaving, or the OS taking the pointer.
 - **Report it** with `shell.requestAutoPause('lockLost')` once the lock had been
-  held for a grace period. *Starting value:* 300 ms (Downwash, posture C). Test:
-  acquire-then-immediately-lose on resume doesn't open a stray pause.
+  held for a grace period. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
+  acquire-then-immediately-lose on resume doesn't open a stray pause. If it does,
+  lengthen the grace.
 - **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
   the same intent: a loss means pause, not a silent relock.
 - **Whether the page also sees the Esc keydown** that unlocked is unverified, and
@@ -165,7 +167,7 @@ can't do it):
 - play with the visible cursor
 - look by cursor offset from centre, plus edge-turning
 - tell the player once, after a short delay: logarithmic shows it after 1.4 s
-  (posture C)
+  (corpus value, `main.ts`)
 
 The game must remain playable.
 

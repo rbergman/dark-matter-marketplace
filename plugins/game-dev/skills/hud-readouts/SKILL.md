@@ -29,7 +29,8 @@ that player-ux has already decided the content of.
   - a threat rim instead of a widget: gravelight
 - **UNSOURCED**, chosen by the corpus and named where it applies: north-up maps
   versus rotating radar, and toast placement at the top right. Corpus timings are
-  posture C in their games.
+  corpus values (Numbers Policy): posture A for the game that ships them, B for
+  yours.
 
 Typed sketch: `references/hud.ts`. It covers interpolation, the pausable view
 clock, write-on-change text, edge-arrow placement, shortest-arc easing and the
@@ -46,7 +47,7 @@ toast queue.
 | HUD labels shake with the camera | free-horses' ui-plan warns against it | Screen-space HUD drawn inside the shaken camera container |
 | Arrow shown for a target hidden behind the HUD dock | timberwolf (fixed, `hudInset`) | On-screen test used the full viewport |
 | Toasts pile up and cover play | Downwash (uncapped timeouts), logarithmic (unbounded queue, no dedupe) | No queue, cap or tier |
-| ~20 fix commits in one compass | redshifted | Arrow kinds added one at a time, with no shared placement rule |
+| About 20 fix commits in one compass (survey count) | redshifted | Arrow kinds added one at a time, with no shared placement rule |
 
 ---
 
@@ -100,8 +101,9 @@ legible option for "danger level". Its intensity follows the flash setting (see
   - volatile-state-redux publishes to React at 5 Hz
   - logarithmic's HUD runs at 4 Hz
 
-  Both are posture C. *Starting value elsewhere:* 5–10 Hz. Test: does any value the
-  player acts on lag visibly?
+  Both are corpus values. *Starting value elsewhere:* 5–10 Hz (posture B). Test:
+  does any value the player acts on lag visibly? If so, raise that one readout's
+  rate, not all of them.
 
 ### 3. Write the DOM only on change
 
@@ -124,23 +126,24 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 - **Off-screen test:** project the target. It is "on screen" only inside the
   viewport *minus the HUD insets*, plus a margin.
   - Timberwolf excludes the HUD dock with `hudInset`.
-  - Downwash uses a 40 px margin (posture C).
+  - Downwash uses a 40 px margin (corpus value, `compass.ts`).
   - On screen, draw a marker on the target. Off screen, draw an arrow.
 - **Placement:** cast a ray from the screen centre (or the player) towards the
   target, and put the arrow where it meets the inset rectangle. Point it along the
-  ray. One pure function for every arrow kind: redshifted's twenty compass fixes
-  came from per-kind special cases.
+  ray. Use one pure function for every arrow kind. Redshifted's compass took about
+  20 fix commits as kinds were added one at a time (survey count).
 - **Motion:**
   - Ease the angle along the *shortest arc*, or arrows spin the long way when a
     target crosses behind (Downwash).
   - Fade in and out (redshifted: 0.3 and 0.4 s; Downwash eases alpha), all
-    posture C.
+    corpus values.
 - **Kinds:** a distinct shape per kind as well as colour (timberwolf). Cap the
-  count: timberwolf shows the 5 nearest minor marks (posture C). Urgency (a neglect
+  count: timberwolf shows the 5 nearest minor marks (corpus value). Urgency (a neglect
   pulse, an expiry blink) is a brightness change. With reduced motion it becomes a
   steady colour or outline, not a scale pulse.
 - **Damage direction** uses the same placement towards the attacker, with a shorter
-  life. It is GAG's visual cue for directional audio.
+  life. It is the visual channel for a directional audio cue (XAG 103;
+  accessibility-design's directional-indicator row).
 
 ### 6. Minimap and radar
 
@@ -159,7 +162,7 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 - **A tabular-figure font** (`font-variant-numeric: tabular-nums`), so the number
   doesn't jitter as digits change width.
 - **Pulse on change,** scaled to the gain: redshifted glows on gains of 1000 or
-  more (posture C).
+  more (corpus value, `score-animator.ts`).
   - Replay a CSS animation by toggling the class with a forced reflow, or with the
     Web Animations API. A React key remount also works (abduction-run `c1ef2293`).
   - With reduced motion, use a colour flash rather than a scale pulse.
@@ -175,14 +178,15 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 
   Within a tier, first in, first out. This is timberwolf's `radio-queue.ts`, a
   pure, tested module.
-- **Cap the chatter tier and shed the oldest.** Timberwolf caps it at 6 (posture C).
+- **Cap the chatter tier and shed the oldest.** Timberwolf caps it at 6 (corpus value, `CHATTER_MAX`).
   `now` and `next` are never dropped.
 - **De-duplicate** an identical line already queued or on screen. Logarithmic's
   queue doesn't, so repeats stack.
 - **Hold time.** *Starting value:* 2 s plus 60 ms per character (posture B). Test: a
   first-time player reads every lesson toast without pausing. If they miss lines,
   lengthen the hold.
-  - The hold is scaled by a setting, or dismissed by an input (XAG 116).
+  - The hold is scaled by a setting up to at least 10× (or off), or dismissed by an
+    input (XAG 116).
   - It runs on the pausable view clock (rule 4).
 - **Accessibility:** a `role="status"` region (`aria-live="polite"`) for the toast
   text. Switch to `assertive` only for `now` alerts (timberwolf). Several

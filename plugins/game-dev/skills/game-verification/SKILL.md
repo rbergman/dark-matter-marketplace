@@ -154,7 +154,8 @@ timberwolf keeps them in `docs/ui.md`.
   budget) and fail the run on a breach.
   - *Starting budget:* p99 within one frame at the target refresh (16.7 ms at
     60 Hz), posture B. Test: does a player notice hitches at that budget on the
-    lowest target machine?
+    lowest target machine? If they do, tighten it to p99.9; if no one can see a
+    breach, it's fine to loosen p99.
 - **Name the machine** in the report. The harness can't see any other.
 
 ### 7. Tag every claim

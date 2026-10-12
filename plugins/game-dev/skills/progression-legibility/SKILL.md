@@ -94,7 +94,7 @@ effective values, and solving a growth rate from a target ratio.
 
 ### 3. Score multipliers and combos
 
-- **Cap the multiplier.** Abduction-run caps at ×3.0 (posture C). An uncapped
+- **Cap the multiplier.** Abduction-run caps at ×3.0 (corpus value, `combo.ts`). An uncapped
   combo makes the score a function of one skill, not of play.
   - Soft caps (diminishing approach) keep each step meaningful.
   - Hard caps are easier to read.
@@ -143,7 +143,8 @@ The procedure, all posture B:
    that should be k times harder between x₁ and x₂ has `r = ln(k) / (x₂ − x₁)`.
 4. **Sweep with the bot** across seeds and distances or times, and check the proxy
    holds (**simulation-first-design**). State the bot's blind spot with the number:
-   "within tolerance on 20 seeds, from a bot that never retreats".
+   "within tolerance on 20 seeds, from a bot that never retreats". The seed
+   count is posture B: raise it until the result stops moving between runs.
 5. **Playtest the feel.** Did mission 3 *feel* like a boss fight? Only a person can
    say; record it verbatim (**moment-capture**). If the proxy passes and the feel
    fails, the proxy was wrong. Change the proxy, not the player.
@@ -152,16 +153,17 @@ The procedure, all posture B:
 
 - **Contents, in order:** name; effect as before → after; stacks (n/max); stacking
   note if needed; tags or synergies.
-- **Three choices** is the common shape and enough to need a decision (posture B;
-  test whether players read all three before picking). More choices means more
-  reading.
+- **Three choices** is the common shape and enough to need a decision (posture B).
+  Test: do players read all three before picking? If most pick in under a second,
+  the cards are too samey, so differentiate them. If they stall, there are too many
+  words. More choices means more reading.
 - **Input:**
   - keys 1–3, click, pad direction plus A
   - focus starts on no card, or on the first; never preselect the "best"
   - the **fresh-press guard** belongs to game-shell (rule 4): a fire button held
-    when the draft opens must be released first, so it can't pick a card. Downwash
-    holds the pad off for 400 ms; royal-inbox gates double-submits at 300 ms. Both
-    are posture C.
+    when the draft opens must be released first, so it can't pick a card.
+    Royal-inbox gates double-submits at 300 ms (corpus value, `input-gate.ts`).
+    Downwash's draft relies on pad press *edges* alone.
 - **Pause by shape:** a centred card modal pauses the sim (game-shell rule 1).
   Redshifted eases time to a freeze rather than cutting it; that's a feel choice.
   Either way, the sim isn't running at full speed behind an unread card.

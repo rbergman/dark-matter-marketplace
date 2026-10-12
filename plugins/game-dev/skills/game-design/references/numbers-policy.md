@@ -41,6 +41,16 @@ the sample and the date, because it will go stale.
 > Median vignette length 203 words (n=58, Edge of the Earth campaign guide,
 > measured 2026-08-08).
 
+### Corpus values: A for the game that ships them, B for yours
+
+A value copied from another game is not posture C. C means measured on *the game
+you're tuning*. Label such a value as a **corpus value**: name the game and the
+file (posture A for what that game ships), and treat it as posture B for yours,
+with a test, until you've measured it there.
+
+> Esc grace: corpus value 250 ms (logarithmic `player.ts`). For this game,
+> starting value with a test: lose pointer lock with Esc, and pause must stay open.
+
 ---
 
 ## What is forbidden
