@@ -443,6 +443,26 @@ summary was seen. UNSOURCED means a convention with no source found.
   - Two modals opened with no user activation between them share one close-watcher
     group, so one close request can close both. That comes from the spec summary
     and was not probed.
+- **Held keys and newly focused buttons.** Verified 2026-10-11 in Chrome 152, real
+  CDP keys:
+  - A Space whose keydown opened a modal, with focus moved to a button, delivers
+    its keyup to that button, but **no click fires**. Space activation needs the
+    keydown on the same button.
+  - Enter activates on **keydown**, and `preventDefault()` on that keydown
+    (capture phase) blocks the activation.
+  - Whether a *held* Enter's auto-repeat clicks again was not testable with the
+    tool. The guard (prevent repeated Enter and Space keydowns inside shell
+    screens) is cheap, and verified effective.
+- **game-shell sketch smoke tests** (Chrome 152, real CDP keys, 2026-10-11/12):
+  - **v1:** Pause → Options, then Esc, Esc pops one level per press with focus back
+    to the opener. A rapid double Esc keeps pause open (grace). Restart's second
+    activation arms, then fires.
+  - One unreproduced run left focus on Restart after a confirm. Two exact re-runs
+    restored focus correctly, so no fix was made.
+  - **v2:** P toggles pause, and from Options-over-Pause closes both and resumes.
+    Focus lands on `data-default` on open. `onStackChange` fires on every push and
+    pop. On a non-dismissable death screen with a 1000 ms read-hold: Enter inside
+    the hold is dropped, Esc does nothing, and Enter after the hold activates.
 - **`KeyboardEvent.code`** (MDN):
   - `code` is the physical position; don't derive labels from it.
   - `navigator.keyboard.getLayoutMap()` gives labels (experimental).

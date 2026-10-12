@@ -31,8 +31,9 @@ don't have.
 Ten behaviours a shipped real-time browser game satisfies. Each line names its
 owner, so a failure has an address.
 
-1. **Esc / Start / B opens pause, and backs out one level everywhere else.** One
-   owner handles it, never two. → **game-shell**
+1. **Esc, Start or P opens pause; Esc or B backs out one level; Start and P toggle
+   pause from anywhere in its stack.** One owner handles all of them, never two.
+   → **game-shell**
 2. **Pause has Resume, Options, Restart and Quit.** Restart and Quit take a second
    activation, because neither can be undone. → **game-shell**
 3. **The game pauses itself** when the tab hides, the window blurs, the clock falls

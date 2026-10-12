@@ -23,8 +23,9 @@ Everything else in a game's UI hangs off this.
 - **Player-facing requirements:**
   - XAG 107: UI fully operable by keyboard alone.
   - XAG 112: a persistent way back from every screen.
-  - Xbox requirement XR-115: the player can continue after a controller drops.
-  - 001-02: resume after suspend without losing progress.
+  - Microsoft's public Xbox console certification requirements:
+    - XR-115: the player can continue after a controller drops, or is prompted
+    - test case 001-02: resume after suspend without losing progress
 - **UNSOURCED conventions, followed because players expect them:** Start opens
   pause; B or Esc backs out one level; the game pauses when the window loses focus.
   Console certification texts that might codify them are not public.
@@ -34,8 +35,11 @@ Everything else in a game's UI hangs off this.
   - the fresh-press rules: timberwolf
   - "screen shape decides the pause": gravelight
 
-The full TypeScript is in `references/shell.ts`. It is type-checked in strict mode and smoke-tested in Chrome 152 with real keys: one pop per Esc, focus back to the opener, double-Esc grace, Restart second activation. The title-to-restart flow
-is in `references/run-flow.md`.
+The full TypeScript is in `references/shell.ts`. It is type-checked in strict mode,
+and its pure `escDecision` is branch-tested. The first version was smoke-tested in
+Chrome 152 with real keys: one pop per Esc, focus back to the opener, double-Esc
+grace, and the Restart second activation; the log is in the spec's research digest.
+The title-to-restart flow is in `references/run-flow.md`.
 
 ---
 
@@ -58,10 +62,13 @@ Every corpus game built a shell, and most broke it in one of the same places:
 
 What a player of 2020s games expects without being told:
 
-- **Esc, Start or Menu opens pause during play.** P also works on keyboard (Downwash
-  binds it as a second key).
+- **Esc, Start/Menu or P opens pause during play.** Start and P *toggle*: pressed
+  with pause anywhere on the stack, they close everything down to and including
+  pause, and resume. Downwash binds P as a second key.
 - **Esc or B backs out exactly one level.** Esc on pause means Resume. Every screen
-  has a visible way back as well (XAG 112).
+  has a visible way back as well (XAG 112). A screen with its own exits, such as the
+  death screen's Restart and Title, is marked not dismissable: Esc and B do nothing
+  there.
 - **Pause contents, in this order:** Resume (focused by default), Options, Restart,
   Quit to title. Optional items: Controls, Feedback.
 - **Restart and Quit ask once more.** The button relabels itself ("Restart: are you
@@ -88,8 +95,13 @@ Screens are `<dialog>` elements opened with `showModal()`. Each screen has an en
 on the shell's stack:
 
 ```ts
-interface Screen { el: HTMLDialogElement; pausesSim: boolean; opener: Element | null; openedAt: number }
+interface Screen { el: HTMLDialogElement; pausesSim: boolean; dismissable: boolean;
+                   opener: Element | null; openedAt: number; heldPad: Set<number>; readHoldMs: number }
 ```
+
+- **Every push and pop calls one `onStackChange` hook.** That hook applies the pause
+  duck, lifts it in Options, freezes view FX, and is where pointer-lock reads "a
+  screen is open" as an unlock reason.
 
 - **The top screen owns input.** Gameplay reads input only when the stack is empty.
 - **Opening any screen clears held gameplay input**, so a key held into the menu
@@ -103,19 +115,28 @@ interface Screen { el: HTMLDialogElement; pausesSim: boolean; opener: Element | 
 - **Pausing freezes everything time-based in the view too:** particle emitters, HUD
   timers, popups. Downwash's first review caught FX still emitting under pause.
   Wall-clock idle income is the deliberate exception (logarithmic).
+- **On resume, drop the sim accumulator.** Time spent paused must never be replayed
+  as catch-up ticks.
 
 ### 2. Escape has exactly one handler
 
 The shell installs **one** `keydown` listener on `window` in the **capture
-phase**. It calls `preventDefault()` on every Esc, and decides:
+phase**. It is the router for shell keys, and it decides in this order:
 
 ```
-remap capture active?   → cancel the capture (input-bindings), stop
-e.repeat?               → ignore
-stack empty, in play?   → open pause
-top screen still fresh? → ignore (see rule 4)
-otherwise               → back(): pop one level; popping pause resumes
+remap capture active?            → hand the key to capture; preventDefault + stopImmediatePropagation
+repeated Enter/Space in a screen → preventDefault (a held Enter must not re-activate a button)
+P (or another pause key)?        → toggle pause
+Esc → preventDefault, then escDecision():
+  e.repeat?                      → ignore
+  stack empty, in play?          → open pause
+  top opened < grace ago?        → ignore (rule 4)
+  top not dismissable?           → ignore
+  otherwise                      → back(): pop one level; popping pause resumes
 ```
+
+The Esc decision is a pure function (`escDecision` in the sketch), so every branch
+gets a unit test.
 
 Why `keydown` and not the dialog's `cancel` event, which looks like the obvious
 hook? **Verified in Chrome 152:**
@@ -141,18 +162,21 @@ Redshifted had exactly that copy, masked by guards. Downwash survived only throu
 listener registration order. Input-bindings reserves Esc so it can't be remapped
 onto an action.
 
-**Pad parity:** B calls the same `back()`, and Start calls the same open-pause/back
-path. Poll the pad **every rendered frame**, never inside the sim tick: a paused
-sim never ticks, so a pad polled there can never unpause.
+**Pad parity:** B calls the same `back()`, and Start calls the same toggle as P.
+The pad path checks remap capture first, exactly as the keyboard path does.
+Otherwise B closes Options while the player is binding B. Poll the pad **every
+rendered frame**, never inside the sim tick: a paused sim never ticks, so a pad
+polled there can never unpause.
 
 ### 3. Auto-pause goes through one latch
 
 ```ts
-requestAutoPause(reason: 'hidden' | 'blur' | 'overload' | 'lockLost' | 'padLost')
+requestAutoPause(reason: 'hidden' | 'blur' | 'overload' | 'lockLost' | 'padLost' | 'fullscreenExit')
 ```
 
-The latch is a no-op unless the game is in play with the stack empty. Every source
-calls it; none of them opens pause itself:
+The latch is a no-op unless the game is in play and **the sim is running**. A live
+side panel (`pausesSim: false`) doesn't protect the run, so pause opens over it.
+Every source calls the latch; none of them opens pause itself:
 
 | Source | Event | Notes |
 |---|---|---|
@@ -175,13 +199,19 @@ A screen that opens while input is held must not let that input act on it.
 |---|---|---|
 | Keyboard | Ignore `e.repeat` for every shell action. A held key only repeats, and a new press has `repeat === false`. | timberwolf: this alone fixed "it auto started a new game immediately" |
 | Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Downwash: 400 ms pad hold-off on the draft (C) |
-| Mouse | Ignore a `click` whose `pointerdown` happened before `openedAt` | — |
-| Anything, on a screen meant to be read | A read-hold after `openedAt` before confirm is accepted | timberwolf: 1100 ms death hold (C) |
+| Mouse | A capture-phase `click` listener on each dialog drops a click whose `pointerdown` happened before `openedAt` | — |
+| Held Enter / Space | The router `preventDefault()`s repeated Enter/Space keydowns while a screen is open. Enter activates a button on keydown, and preventing that keydown blocks it (verified Chrome 152). Without this, a held Enter arms Restart, then confirms it. | — |
+| Anything, on a screen meant to be read | A read-hold after `openedAt`: the same capture-phase `click` listener drops activations inside it | timberwolf: 1100 ms death hold (C) |
 | Esc on a pause the latch just opened | Grace after `openedAt` | Downwash 300 ms, logarithmic 250 ms (C) |
 
 **This is the same guard everywhere**: the death screen, the draft picker, a
-confirm, a pause opened by the latch. Use one `isFresh(screen, input)` helper on the
-shell; don't write a bespoke timer per screen.
+confirm, a pause opened by the latch. Native button activation goes through it too,
+via the click listener. Use the shell's one `isFresh` helper and the per-dialog click
+guard; don't write a bespoke timer per screen.
+
+A Space held through a screen opening is safe. Its keyup lands on the newly focused
+button, but no click fires, because Space activation needs the keydown on the same
+button (verified Chrome 152).
 
 ### 5. The first gesture unlocks the platform
 
@@ -201,6 +231,16 @@ Then:
 - **Pad-only start is allowed, but silent.** Gamepad input is not user activation,
   so audio may stay suspended. Start the run anyway and show one line: "Sound
   starts with any key or click."
+  - Decide this synchronously, with `navigator.userActivation.isActive`.
+  - A `resume()` without activation can stay pending forever, so waiting for
+    `statechange` never shows the line.
+- **Re-locking pointer lock after a resume** needs user activation, and so does the
+  first lock request.
+  - A click on Resume, or Enter or Space on it, counts as activation: request the
+    lock inside that handler.
+  - Esc, B and Start don't count. After those, show "Click to aim".
+  - Chrome also refuses a lock request within 1250 ms of the player escaping one.
+  - See **pointer-lock**.
 - **Gamepads aren't listed until a pad gesture.** `navigator.getGamepads()` is
   empty until a button press; that's normal, not an error (W3C Gamepad).
 
@@ -254,8 +294,9 @@ Each line names what the check cannot see.
       open, and nothing resumes. *Blind to: whether the browser actually fires the
       event.*
 - [ ] **Real browser, real keys** (CDP `press_key`, not `dispatchEvent`):
-      - open Pause → Options, press Esc ×3; the stack pops one level per press, and
-        the third press does nothing
+      - open Pause → Options, press Esc ×2, spaced beyond the grace; the stack pops
+        one level per press and play resumes. A third Esc opens pause again.
+      - hold Enter on Restart; it arms once and does not confirm
       - hold a movement key through death; the death screen stays
 
       *Blind to: pads, and anything feel-related.*

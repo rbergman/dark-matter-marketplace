@@ -138,14 +138,15 @@ interface FxGate { reduceMotion: boolean; reduceFlash: boolean; shakeScale: numb
   never chose" into "the player chose this forever". Free-horses and logarithmic
   both freeze the first visit's value.
 - Flash and shake may default from the same OS signal; volatile-state-redux seeds
-  all three from it. Store them as the player's choice only once they touch them.
+  all three from it. Store them as "unset" (`'system'`, or `shake: null`) until the
+  player touches them; only then is the value their choice.
 
 ### 4. One record, versioned in the payload
 
 - **One key per kind of data:** `<game>.settings`, `<game>.scores` and
   `<game>.save` are separate. A save-format bump must never wipe settings;
   logarithmic's `SAVE_VERSION` check rejects the whole record.
-- **Payload:** `{ version: 4, audio: {…}, fx: {…}, bindings: {…}, display: {…} }`.
+- **Payload:** `{ version: 3, audio: {…}, fx: {…}, input: {…}, display: {…} }`.
   The version lives *in* the payload, so old data can be migrated. A version in
   the key name only orphans it.
 - **One store object owns the record.** Every system reads from it and writes
@@ -171,8 +172,10 @@ interface FxGate { reduceMotion: boolean; reduceFlash: boolean; shakeScale: numb
    volatile-state-redux both do this well.
 4. **A version from the future** (the player downgraded, or another tab runs a
    newer build): sanitise what you can, use it in memory, and **don't write**
-   until the player changes something. Otherwise you destroy fields the newer
-   build owns.
+   until the player changes something.
+   - When you do write, write over the newer record: its version, its unknown
+     fields, and your known fields.
+   - Writing a fresh record destroys fields the newer build owns.
 5. **Legacy keys from a rename:**
    1. read them once
    2. write the new record

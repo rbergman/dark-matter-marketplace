@@ -1,22 +1,36 @@
-// game-shell reference sketch: one owner for screens, Escape, auto-pause and fresh presses.
+// game-shell reference sketch: one owner for screens, Escape/Start/P, auto-pause and fresh presses.
 // DOM overlay over a canvas renderer. Strict TS, no dependencies. Adapt; don't import.
 //
 // Wiring this file assumes:
-//   - each screen is a <dialog> in index.html (pause, options, death, ...)
+//   - each screen is a <dialog> in index.html (pause, options, death, ...), its safe default marked
+//     with `data-default`
 //   - gameplay input reads `shell.ownsInput` and ignores keys while it is true
-//   - the sim checks `shell.simPaused` before each fixed tick
+//   - the sim checks `shell.simPaused` before each fixed tick, and drops its accumulator on resume
 //   - the pad is polled once per rendered frame and its edges passed to `shell.pad()`
+//   - pointer-lock derives its want from `!shell.ownsInput` (an open screen is an unlock reason)
 
 export type AutoPauseReason = 'hidden' | 'blur' | 'overload' | 'lockLost' | 'padLost' | 'fullscreenExit';
+
+export interface PadEdges {
+  pressed: readonly number[];
+  released: readonly number[];
+}
 
 export interface ShellHooks {
   /** True while a run is live (not title, not game over). */
   inPlay(): boolean;
-  /** Remap capture (input-bindings) gets Esc first, to cancel itself. */
+  /** Remap capture (input-bindings) gets every key and pad edge first. */
   capturing(): boolean;
-  cancelCapture(): void;
+  captureKey(e: KeyboardEvent): void;
+  capturePad(edges: PadEdges): void;
+  /** Extra pause keys from the binding map (e.g. KeyP). Esc is always one. */
+  isPauseKey(code: string): boolean;
   /** Drop held gameplay input so nothing ghost-holds after a screen closes. */
   clearHeldInput(): void;
+  /** True when the last-used device is a pad (input-bindings' LastDevice). */
+  lastDeviceIsPad(): boolean;
+  /** Called on every push/pop: apply the pause duck, freeze view FX, etc. */
+  onStackChange(state: { open: number; simPaused: boolean; topId: string | null }): void;
   onResume(): void;
   /** Automation runs (?bot, ?perf) must not pause on an operator's alt-tab. */
   automation: boolean;
@@ -25,36 +39,63 @@ export interface ShellHooks {
 interface Screen {
   el: HTMLDialogElement;
   pausesSim: boolean;
+  /** False for screens Esc/B must not close (death screen: it has its own Restart/Title). */
+  dismissable: boolean;
   opener: Element | null;
   /** event.timeStamp / performance.now() of the open, for fresh-press checks. */
   openedAt: number;
   /** Pad buttons held when the screen opened; masked until released. */
   heldPad: Set<number>;
-  /** Minimum ms before confirm is accepted (read-hold); 0 for most screens. */
+  /** Minimum ms before an activation is accepted (read-hold); 0 for most screens. */
   readHoldMs: number;
 }
 
 export interface OpenOptions {
   pausesSim?: boolean;
+  dismissable?: boolean;
   readHoldMs?: number;
   heldPad?: Iterable<number>;
 }
 
-/** Starting value: posture C in Downwash (300 ms), logarithmic (250 ms). Test: lose lock with Esc; pause must stay open. */
-const LATCH_GRACE_MS = 300;
+/** Starting value: posture C in Downwash (300 ms), logarithmic (250 ms). Test: lose lock with Esc; pause stays open. */
+export const ESC_GRACE_MS = 300;
+
+export type EscDecision = 'capture' | 'ignore' | 'openPause' | 'back' | 'blocked';
+
+/** The Esc decision as a pure function, so every branch is unit-testable (and mutation-checkable). */
+export function escDecision(s: {
+  capturing: boolean;
+  repeat: boolean;
+  open: number;
+  inPlay: boolean;
+  msSinceTopOpened: number;
+  topDismissable: boolean;
+}): EscDecision {
+  if (s.capturing) return 'capture';
+  if (s.repeat) return 'ignore';
+  if (s.open === 0) return s.inPlay ? 'openPause' : 'ignore';
+  if (s.msSinceTopOpened < ESC_GRACE_MS) return 'ignore';
+  return s.topDismissable ? 'back' : 'blocked';
+}
+
+// W3C Gamepad "standard" mapping indices.
+const PAD_B = 1;
+const PAD_START = 9;
 
 export class Shell {
   private readonly stack: Screen[] = [];
   private readonly hooks: ShellHooks;
   private armed: HTMLButtonElement | null = null;
-  /** Set once at boot: the dialog the latch, Esc and Start open. */
+  private lastPointerDown = -Infinity;
+  /** Set once at boot: the dialog Esc, Start, P and the latch open. */
   pauseDialog: HTMLDialogElement | null = null;
 
   constructor(hooks: ShellHooks) {
     this.hooks = hooks;
-    // The ONE Escape listener. Capture phase, so it runs before anything else and its
-    // preventDefault() suppresses the browser's dialog close request (verified Chrome 152).
+    // The ONE keyboard router for shell keys. Capture phase on window, so it runs first; its
+    // preventDefault() on Esc suppresses the browser's dialog close request (verified Chrome 152).
     window.addEventListener('keydown', (e) => this.onKeyDown(e), { capture: true });
+    window.addEventListener('pointerdown', (e) => (this.lastPointerDown = e.timeStamp), { capture: true });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.requestAutoPause('hidden');
     });
@@ -66,6 +107,9 @@ export class Shell {
     document.addEventListener('fullscreenchange', () => {
       if (document.fullscreenElement === null) this.requestAutoPause('fullscreenExit');
     });
+    window.addEventListener('gamepaddisconnected', () => {
+      if (this.hooks.lastDeviceIsPad()) this.requestAutoPause('padLost');
+    });
   }
 
   get ownsInput(): boolean {
@@ -76,8 +120,9 @@ export class Shell {
     return this.stack.some((s) => s.pausesSim);
   }
 
-  /** Register a dialog once. `cancel` covers close requests without a keydown (Android back). */
+  /** Register each dialog once. */
   register(el: HTMLDialogElement): void {
+    // Close requests that arrive without a keydown (Android back): route to back().
     el.addEventListener('cancel', (e) => {
       if (e.cancelable) e.preventDefault();
       if (this.top()?.el === el) this.back();
@@ -87,6 +132,22 @@ export class Shell {
       const i = this.stack.findIndex((s) => s.el === el);
       if (i !== -1) this.removeAt(i, false);
     });
+    // The fresh-press guard for native activation: a click from a press that began before the
+    // screen opened, or inside its read-hold, never reaches the button.
+    el.addEventListener(
+      'click',
+      (e) => {
+        const top = this.top();
+        if (top?.el !== el) return;
+        const byPointer = e.detail > 0; // keyboard-synthesised clicks have detail 0
+        const stale = byPointer && this.lastPointerDown < top.openedAt;
+        if (stale || e.timeStamp - top.openedAt < top.readHoldMs) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      },
+      { capture: true },
+    );
   }
 
   open(el: HTMLDialogElement, opts: OpenOptions = {}, at = performance.now()): void {
@@ -96,12 +157,15 @@ export class Shell {
     this.stack.push({
       el,
       pausesSim: opts.pausesSim ?? true,
+      dismissable: opts.dismissable ?? true,
       opener: document.activeElement,
       openedAt: at,
       heldPad: new Set(opts.heldPad ?? []),
       readHoldMs: opts.readHoldMs ?? 0,
     });
     el.showModal();
+    focusDefault(el);
+    this.changed();
   }
 
   /** Pop one level. Popping the pause screen resumes play. */
@@ -113,37 +177,56 @@ export class Shell {
     while (this.stack.length > 0) this.removeAt(this.stack.length - 1, false);
   }
 
-  /** Every pause source calls this; none of them opens pause itself. Never auto-resumes. */
+  /**
+   * Every pause source calls this; none of them opens pause itself. Never auto-resumes.
+   * A live side panel (pausesSim: false) does not protect the run, so pause opens over it.
+   */
   requestAutoPause(reason: AutoPauseReason): void {
     const pause = this.pauseDialog;
-    if (pause === null || !this.hooks.inPlay() || this.stack.length > 0) return;
+    if (pause === null || !this.hooks.inPlay() || this.simPaused) return;
     if (this.hooks.automation && (reason === 'blur' || reason === 'hidden')) return;
     this.open(pause, { pausesSim: true });
   }
 
-  /** True when `input` may act on the top screen: the fresh-press guard, in one place. */
-  isFresh(kind: 'key' | 'pad' | 'pointer', at: number, padButton = -1, repeat = false): boolean {
+  /** Start and P: toggle pause. Opens it in play; with pause on the stack, closes down through it. */
+  togglePause(at = performance.now(), heldPad: Iterable<number> = []): void {
+    const pause = this.pauseDialog;
+    if (pause === null) return;
+    const i = this.stack.findIndex((s) => s.el === pause);
+    if (i === -1) {
+      if (this.hooks.inPlay() && !this.simPaused) this.open(pause, { heldPad }, at);
+      return;
+    }
+    while (this.stack.length > i + 1) this.removeAt(this.stack.length - 1, false);
+    this.back();
+  }
+
+  /** True when an input at `at` may act on the top screen: the fresh-press guard, in one place. */
+  isFresh(at: number, padButton = -1, repeat = false): boolean {
     const top = this.top();
     if (top === undefined) return true;
-    if (repeat) return false; // a held key only repeats; a new press has repeat === false
-    if (at < top.openedAt) return false; // the event that opened the screen, or a press from before it
-    if (kind === 'pad' && top.heldPad.has(padButton)) return false;
+    if (repeat || at < top.openedAt) return false;
+    if (padButton >= 0 && top.heldPad.has(padButton)) return false;
     return at - top.openedAt >= top.readHoldMs;
   }
 
   /** Pad edges from this rendered frame. Release unmasks a button held at open. */
-  pad(edges: { pressed: readonly number[]; released: readonly number[] }, at = performance.now()): void {
-    const top = this.top();
-    if (top === undefined) {
-      if (edges.pressed.includes(PAD_START) && this.hooks.inPlay() && this.pauseDialog !== null) {
-        this.open(this.pauseDialog, { heldPad: [PAD_START] }, at);
-      }
+  pad(edges: PadEdges, at = performance.now()): void {
+    if (this.hooks.capturing()) {
+      this.hooks.capturePad(edges); // capture first, exactly as the keyboard path does
       return;
     }
-    for (const b of edges.released) top.heldPad.delete(b);
+    const top = this.top();
+    if (top !== undefined) for (const b of edges.released) top.heldPad.delete(b);
     for (const b of edges.pressed) {
-      if (!this.isFresh('pad', at, b)) continue;
-      if (b === PAD_B || (b === PAD_START && top.el === this.pauseDialog)) this.back();
+      if (b === PAD_START) {
+        if (top === undefined || this.isFresh(at, b)) this.togglePause(at, [PAD_START]);
+        continue;
+      }
+      if (top === undefined || !this.isFresh(at, b)) continue;
+      if (b === PAD_B && top.dismissable) this.back();
+      // A (0) activates the focused control on its press edge: pointer-cancellation rules are
+      // about pointers, not pads. menu-navigation's move() handles the D-pad.
     }
   }
 
@@ -167,22 +250,38 @@ export class Shell {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
-    if (e.code !== 'Escape') return;
-    e.preventDefault(); // always: Esc never reaches the browser's close-request path
     if (this.hooks.capturing()) {
-      this.hooks.cancelCapture();
+      // Capture owns the keyboard: no gameplay or menu listener may see this key.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      this.hooks.captureKey(e);
       return;
     }
-    if (e.repeat) return;
+    // A held Enter/Space must not re-activate (and so arm-then-confirm) a focused button.
+    // preventDefault on the keydown blocks Enter activation (verified Chrome 152).
+    if (this.ownsInput && e.repeat && (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space')) {
+      e.preventDefault();
+      return;
+    }
+    if (e.code !== 'Escape') {
+      if (this.hooks.isPauseKey(e.code) && !e.repeat) {
+        e.preventDefault();
+        this.togglePause(e.timeStamp);
+      }
+      return;
+    }
+    e.preventDefault(); // always: Esc never reaches the browser's close-request path
     const top = this.top();
-    if (top === undefined) {
-      if (this.hooks.inPlay() && this.pauseDialog !== null) this.open(this.pauseDialog, {}, e.timeStamp);
-      return;
-    }
-    // Any screen opened a moment ago ignores Esc: covers the pause the latch opened on lost
-    // pointer lock (whose Esc the page may or may not also see) and a double-tapped Esc.
-    if (e.timeStamp - top.openedAt < LATCH_GRACE_MS) return;
-    this.back();
+    const d = escDecision({
+      capturing: false,
+      repeat: e.repeat,
+      open: this.stack.length,
+      inPlay: this.hooks.inPlay(),
+      msSinceTopOpened: top === undefined ? Infinity : e.timeStamp - top.openedAt,
+      topDismissable: top?.dismissable ?? true,
+    });
+    if (d === 'openPause' && this.pauseDialog !== null) this.open(this.pauseDialog, {}, e.timeStamp);
+    else if (d === 'back') this.back();
   }
 
   private removeAt(i: number, user: boolean): void {
@@ -190,9 +289,22 @@ export class Shell {
     if (s === undefined) return;
     this.disarm();
     if (s.el.open) s.el.close();
-    // Restore focus to whatever opened this screen, if it still exists.
+    // Restore focus to the opener; if it's gone, to the new top's default.
     if (s.opener instanceof HTMLElement && s.opener.isConnected) s.opener.focus({ preventScroll: true });
-    if (user && s.el === this.pauseDialog && this.stack.length === 0) this.hooks.onResume();
+    else {
+      const top = this.top();
+      if (top !== undefined) focusDefault(top.el);
+    }
+    this.changed();
+    if (user && s.el === this.pauseDialog && !this.simPaused) this.hooks.onResume();
+  }
+
+  private changed(): void {
+    this.hooks.onStackChange({
+      open: this.stack.length,
+      simPaused: this.simPaused,
+      topId: this.top()?.el.id ?? null,
+    });
   }
 
   private top(): Screen | undefined {
@@ -207,18 +319,20 @@ export class Shell {
   }
 }
 
-// W3C Gamepad "standard" mapping indices.
-const PAD_B = 1;
-const PAD_START = 9;
+/** Focus the screen's declared safe default (data-default), else let showModal()'s choice stand. */
+function focusDefault(el: HTMLDialogElement): void {
+  el.querySelector<HTMLElement>('[data-default]')?.focus({ preventScroll: true });
+}
 
 /**
  * Call synchronously from the title's first key/pointer handler, before any await.
- * Gamepad input is not user activation: a pad-only start may stay silent, so say so.
+ * Gamepad input is not user activation: a pad-only start stays silent, so say so at once
+ * (resume() without activation can stay pending forever, so waiting for statechange is not enough).
  */
 export function unlockOnGesture(ctx: AudioContext, onSilent: () => void): void {
-  if (ctx.state !== 'running') {
-    void ctx.resume().catch(() => undefined);
-  }
+  const activated = navigator.userActivation?.isActive ?? true;
+  if (ctx.state !== 'running') void ctx.resume().catch(() => undefined);
+  if (!activated && ctx.state !== 'running') onSilent();
   const retry = (): void => {
     if (ctx.state !== 'running') void ctx.resume().catch(() => undefined);
   };

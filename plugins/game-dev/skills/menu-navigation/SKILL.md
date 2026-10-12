@@ -134,8 +134,12 @@ All directional input goes through `move(direction)`: arrows, Tab, D-pad, stick.
   highlight follows the mouse, and the next key press continues from there.
   Skip it while the pointer is locked: there is no visible cursor (see
   **pointer-lock**).
-- **Draw the highlight from a class the navigation layer sets** (`.hl`) as well
-  as `:focus-visible`.
+- **Draw the highlight from a class (`.hl`) that follows real focus** through one
+  `focusin` listener per screen, as well as `:focus-visible`. Then game-shell's
+  focus restore, `showModal()`'s autofocus and a Tab all move it, and no stale
+  highlight is left behind.
+- **Hover doesn't take focus from a text field** (initials entry) or from a live
+  remap capture.
   - The browser's focus-visible heuristic follows the *keyboard*.
   - A focus moved by pad code after a mouse click may not show a ring.
   - ASSUMPTION: Chrome hides the ring for script focus after pointer
@@ -160,14 +164,18 @@ Tab and Space belong to the game. Menus are where Tab navigates.
 
 - **Poll once per rendered frame,** with edges (pressed this frame, not last). Never
   poll inside the sim tick: Downwash's pad couldn't unpause until polling moved.
-- **D-pad = arrows. A = activate** (`el.click()` on the focused element). **B and
-  Start go to game-shell.**
+- **D-pad = arrows. A = activate** (`el.click()` on the focused element) on its
+  **press edge**. The pointer-cancellation rules (XAG 107, WCAG 2.5.2) are about
+  pointers, not pads, and game-shell's fresh-press guard masks an A held when the
+  screen opened. **B and Start go to game-shell.**
 - **The left stick navigates past a threshold, then repeats while held.**
   *Starting values:* threshold 0.5, first repeat after 400 ms, then every 100 ms.
   Test: can a player stop on the item they meant 9 times in 10 in a 12-item list?
   If they overshoot, lengthen the repeat interval.
-- **Left/right on a focused range input** steps its value and dispatches `input`,
-  as arrow keys do natively (Downwash's `nudgeSlider`).
+- **Left/right on a focused range input** steps its value and dispatches `input`
+  *and* `change`, as arrow keys do natively. Settings saves on `change`, so a pad
+  nudge that fired only `input` would never persist. This is Downwash's
+  `nudgeSlider`.
 - **Glyphs** in the menu's footer follow the last-used device: "Ⓐ Select Ⓑ Back"
   versus "Enter Select Esc Back". See **input-bindings**.
 

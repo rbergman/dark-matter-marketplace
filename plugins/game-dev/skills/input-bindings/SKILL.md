@@ -86,6 +86,21 @@ An action has:
 This one indirection is what makes remapping, prompts, toggles and pad support
 possible without touching gameplay.
 
+**Presses reach the fixed-step sim through a latch.** Key and pad edges arrive per
+rendered frame, and the sim ticks at 60 Hz. A press is latched until a tick
+consumes it:
+- a 120 Hz frame with no tick keeps it
+- a 30 Hz frame with two ticks delivers it to the first only
+
+Holds are sampled at each tick, not latched. The latch is cleared with held input
+whenever game-shell opens a screen (`PressLatch` in the sketch).
+
+**Scope of remapping.** Gameplay actions are fully remappable. Menu navigation
+stays fixed and always available: arrows, Enter and Esc, plus the D-pad, A, B and
+Start. A remap can never strand the player in a menu. Menu actions may take
+*additional* keys. This is a deliberate, partial deviation from XAG 107's "remap
+all controls"; say so on the Controls screen.
+
 ### 2. Store `code`, show the layout label
 
 - **Bind and store `KeyboardEvent.code`** (`KeyW`), never `key` (`w`, which is
@@ -99,12 +114,16 @@ possible without touching gameplay.
 
 ### 3. Capture comes first, in the capture phase
 
-While a slot is capturing, **one** capture-phase `keydown` listener takes the next
-key, calls `preventDefault()`, and resolves the capture. The key never reaches
-gameplay or menu navigation: logarithmic captures in the capture phase so the
-bound key doesn't also fire its action.
-- **Esc cancels.** game-shell's single Esc handler checks "capturing?" first and
-  calls `cancelCapture()`; see game-shell rule 2.
+While a slot is capturing, the key goes to capture **inside game-shell's
+keyboard router**. That is the single capture-phase `keydown` on `window`, and
+"capturing?" is its first check. It calls `preventDefault()` **and
+`stopImmediatePropagation()`**, then resolves the capture.
+- `preventDefault()` alone doesn't stop other listeners. Gameplay and menu
+  listeners also ignore keys while `shell.ownsInput`.
+- Logarithmic captures in the capture phase so the bound key doesn't also fire its
+  action.
+- **Esc cancels.** It is the one key capture can't bind; see game-shell rule 2.
+- **The pad path checks capture first too** (game-shell's `pad()`).
 - **Start capture from `click`, not `pointerdown`.** Otherwise the press that opened
   the slot is captured as a mouse binding.
 - **Ignore `e.repeat`.** Holding a key as capture starts must not bind it by
@@ -114,8 +133,11 @@ bound key doesn't also fire its action.
 ### 4. Conflicts swap, with a notice and undo (D4)
 
 Binding key K to action A, where B already holds K:
-- **B takes A's old key in that slot.** A slot that was empty stays empty.
-  Nothing is silently unbound.
+- **B takes A's old key in that slot.**
+- **If that would leave B with no key at all** (A's slot was empty and K was B's
+  only key), B takes a spare from the same free-key list the loader uses, and the
+  notice says which.
+- **Nothing is ever silently unbound.**
 - **The screen names both actions and both keys,** and offers a one-step Undo that
   restores the previous map exactly.
 - **Free-horses refuses instead, naming the owner.** It's defensible, but it
@@ -130,7 +152,10 @@ Binding key K to action A, where B already holds K:
 - **Browser and OS keys the page can't or shouldn't take:**
   - F5, F11, F12
   - Ctrl/Cmd combinations
-  - Tab, while menus need it (see menu-navigation rule 5)
+- **Tab is not reserved.** Menus own input while they're open, so Tab is free for
+  play. Keep HUD buttons out of the tab order with `tabindex="-1"` (menu-navigation
+  rule 5).
+- **Pad Start:** it toggles pause and cancels a pad capture.
 
   Refuse them with the reason shown.
 - **Debug keys** used in development builds, such as Backquote (abduction-run).
@@ -174,9 +199,9 @@ Binding key K to action A, where B already holds K:
   hysteresis. *Starting values:* press at 0.5, release at 0.4 (posture B). Test:
   half-pulled triggers don't chatter.
 - **Pad remapping** captures the next button that goes from up to down in a poll.
-  Esc on the keyboard, or B held for a moment, cancels: B must stay bindable, so a
-  hold separates cancel from bind. *Starting value:* hold 600 ms (posture B; test
-  that a quick B binds and a held B cancels).
+  **Start cancels**: it's reserved. Esc on the keyboard cancels too. Every other
+  button, B included, binds on its press edge. The prompt says "Press a button…
+  (Start to cancel)" (XAG 112).
 - **Disconnect** is game-shell's: `gamepaddisconnected` feeds the auto-pause latch.
   Pads only appear after a pad button press, which is normal.
 
@@ -232,7 +257,9 @@ Each line names what the check cannot see.
       Mutation-check: remove the swap and a test must fail. *Blind to: DOM event
       order.*
 - [ ] **Real browser, real keys:** remap Jump to Space while Fire holds Space.
-      The notice names both, and Undo restores. Esc during capture cancels without
+      The notice names both, and Undo restores. Rebind Jump's *empty* second slot to
+      Fire's only key; Fire gets a spare, and the notice says so. Esc during capture
+      cancels without
       opening pause. *Blind to: other keyboard layouts unless the OS layout is
       switched.*
 - [ ] **AZERTY:** switch the OS layout. Movement stays positional, and labels read

@@ -72,11 +72,12 @@ function centre(el: HTMLElement): { x: number; y: number } {
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 
-/** Pad/keyboard step on a range input, firing `input` as native arrows do. */
+/** Pad step on a range input, firing `input` AND `change` as native arrow keys do (settings saves on change). */
 function step(el: HTMLInputElement, by: 1 | -1): void {
   if (by > 0) el.stepUp();
   else el.stepDown();
   el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 /**
@@ -84,17 +85,30 @@ function step(el: HTMLInputElement, by: 1 | -1): void {
  * the browser's focus-visible heuristic would hide it (focus moved by pad code after a click).
  */
 export function setHighlight(screen: HTMLElement, el: HTMLElement | null): void {
-  for (const old of screen.querySelectorAll('.hl')) old.classList.remove('hl');
   if (el === null) return;
-  el.classList.add('hl');
-  el.focus({ preventScroll: true });
+  el.focus({ preventScroll: true }); // wireHighlight's focusin moves the class
   el.scrollIntoView({ block: 'nearest' });
+}
+
+/**
+ * The highlight class follows real focus, whoever moved it (this file, game-shell's restore,
+ * showModal's autofocus, a Tab). One listener per screen; no other code touches `.hl`.
+ */
+export function wireHighlight(screen: HTMLElement): void {
+  screen.addEventListener('focusin', (e) => {
+    for (const old of screen.querySelectorAll('.hl')) old.classList.remove('hl');
+    if (e.target instanceof HTMLElement) e.target.classList.add('hl');
+  });
 }
 
 /** Mouse moves the same highlight; the next key continues from here. Not while pointer-locked. */
 export function wireHover(screen: HTMLElement): void {
   screen.addEventListener('pointerover', (e) => {
     if (document.pointerLockElement !== null) return;
+    // Don't steal focus from a text field (initials entry) or a live remap capture.
+    const a = document.activeElement;
+    if (a instanceof HTMLTextAreaElement || (a instanceof HTMLInputElement && a.type !== 'range')) return;
+    if (screen.dataset['capturing'] !== undefined) return;
     const target = e.target instanceof Element ? e.target.closest<HTMLElement>(FOCUSABLE) : null;
     if (target !== null && screen.contains(target)) setHighlight(screen, target);
   });

@@ -10,11 +10,17 @@ export type Tri = 'system' | 'on' | 'off';
 export interface Settings {
   version: number;
   audio: { master: number; muted: boolean; buses: Record<Bus, { level: number; muted: boolean }> };
-  fx: { motion: Tri; flash: Tri; shake: number }; // shake 0-100 (%)
+  /** shake 0-100 (%), or null = never chosen: follow the OS (0 if it asks for reduced motion). */
+  fx: { motion: Tri; flash: Tri; shake: number | null };
   display: { uiScale: number }; // 1 = 100%; XAG 101 asks for up to 2
-  bindings: unknown; // input-bindings' mergeSaved() sanitises this
+  /** keys/pad are sanitised by input-bindings' mergeSaved() in the game's glue, not here. */
+  input: { keys: unknown; pad: unknown; toggles: Record<string, boolean>; deadzone: number };
 }
 
+/**
+ * Starting values, posture B: levels 80/70/80/60 and a 0.18 deadzone. Test: on a first run, does
+ * a new player touch the mix or the stick before playing? If most do, the defaults are wrong.
+ */
 export const DEFAULTS: Settings = {
   version: VERSION,
   audio: {
@@ -22,9 +28,9 @@ export const DEFAULTS: Settings = {
     muted: false,
     buses: { music: { level: 70, muted: false }, sfx: { level: 80, muted: false }, ui: { level: 60, muted: false } },
   },
-  fx: { motion: 'system', flash: 'system', shake: 100 },
+  fx: { motion: 'system', flash: 'system', shake: null },
   display: { uiScale: 1 },
-  bindings: null,
+  input: { keys: null, pad: null, toggles: {}, deadzone: 0.18 },
 };
 
 // ---- Migrations: only for renames and changed units/meanings -------------------------------
@@ -75,12 +81,25 @@ export function sanitise(raw: Raw): Settings {
   };
   const fx = rec(raw['fx']);
   const disp = rec(raw['display']);
+  const inp = rec(raw['input']);
+  const toggles: Record<string, boolean> = {};
+  for (const [k, v] of Object.entries(rec(inp['toggles']))) if (typeof v === 'boolean') toggles[k] = v;
   return {
     version: VERSION,
     audio: { master: num(a['master'], d.audio.master, 0, 100), muted: bool(a['muted'], d.audio.muted), buses: { music: bus('music'), sfx: bus('sfx'), ui: bus('ui') } },
-    fx: { motion: tri(fx['motion']), flash: tri(fx['flash']), shake: num(fx['shake'], d.fx.shake, 0, 100) },
+    fx: {
+      motion: tri(fx['motion']),
+      flash: tri(fx['flash']),
+      shake: fx['shake'] === null ? null : typeof fx['shake'] === 'number' ? num(fx['shake'], 100, 0, 100) : d.fx.shake,
+    },
+    // uiScale floor 0.75: posture B (test: is the smallest setting still legible at the target distance?)
     display: { uiScale: num(disp['uiScale'], d.display.uiScale, 0.75, 2) },
-    bindings: raw['bindings'] ?? null,
+    input: {
+      keys: inp['keys'] ?? null,
+      pad: inp['pad'] ?? null,
+      toggles,
+      deadzone: num(inp['deadzone'], d.input.deadzone, 0, 0.5),
+    },
   };
 }
 
@@ -90,20 +109,23 @@ export interface Loaded {
   settings: Settings;
   /** False for a record written by a newer build: use it, but don't write until the player changes something. */
   writable: boolean;
+  /** The newer build's raw record, so a later write keeps the fields this build doesn't know. */
+  future: Raw | null;
 }
 
 export function load(text: string | null): Loaded {
-  if (text === null) return { settings: structuredClone(DEFAULTS), writable: true };
+  const fresh = (): Loaded => ({ settings: structuredClone(DEFAULTS), writable: true, future: null });
+  if (text === null) return fresh();
   let raw: unknown;
   try {
     raw = JSON.parse(text);
   } catch {
-    return { settings: structuredClone(DEFAULTS), writable: true };
+    return fresh();
   }
-  if (!isRec(raw)) return { settings: structuredClone(DEFAULTS), writable: true };
+  if (!isRec(raw)) return fresh();
   const v = typeof raw['version'] === 'number' ? raw['version'] : 1;
-  if (v > VERSION) return { settings: sanitise(raw), writable: false };
-  return { settings: sanitise(migrate(raw)), writable: true };
+  if (v > VERSION) return { settings: sanitise(raw), writable: false, future: raw };
+  return { settings: sanitise(migrate(raw)), writable: true, future: null };
 }
 
 export class SettingsStore {
@@ -126,7 +148,10 @@ export class SettingsStore {
     const l = load(text);
     this.settings = l.settings;
     this.writable = l.writable;
+    this.future = l.future;
   }
+
+  private readonly future: Raw | null;
 
   /** The one write path. Systems read `settings`; nothing else writes storage. */
   update(change: (s: Settings) => void): void {
@@ -138,7 +163,10 @@ export class SettingsStore {
 
   private flush(): void {
     if (!this.writable) return;
-    const text = JSON.stringify(this.settings);
+    // Over a newer build's record, keep its version and unknown fields; overwrite only what we own.
+    const text = JSON.stringify(
+      this.future === null ? this.settings : { ...this.future, ...this.settings, version: this.future['version'] },
+    );
     if (text === this.last) return; // de-duplicate writes (Downwash)
     try {
       this.storage?.setItem(this.key, text);
@@ -162,7 +190,8 @@ export interface FxGate {
 
 export function resolveFx(s: Settings, osReduce: boolean): FxGate {
   const t = (x: Tri): boolean => (x === 'system' ? osReduce : x === 'on');
-  return { reduceMotion: t(s.fx.motion), reduceFlash: t(s.fx.flash), shakeScale: s.fx.shake / 100 };
+  const shake = s.fx.shake ?? (osReduce ? 0 : 100);
+  return { reduceMotion: t(s.fx.motion), reduceFlash: t(s.fx.flash), shakeScale: shake / 100 };
 }
 
 /** Keep the gate current when the OS preference changes mid-session. Never store the OS value. */
@@ -191,6 +220,7 @@ export function makeBuses(ctx: AudioContext): { master: GainNode; bus: Record<Bu
 /** Apply levels; `duck` is game-shell's pause duck (1 in Options so levels are judged at full scale). */
 export function applyAudio(s: Settings, nodes: ReturnType<typeof makeBuses>, ctx: AudioContext, duck = 1): void {
   const t = ctx.currentTime;
+  // 0.02 s smoothing time constant: posture B (test: no click when a slider jumps 0 -> 100).
   nodes.master.gain.setTargetAtTime(s.audio.muted ? 0 : curve(s.audio.master) * duck, t, 0.02);
   for (const k of Object.keys(nodes.bus) as Bus[]) {
     const b = s.audio.buses[k];
