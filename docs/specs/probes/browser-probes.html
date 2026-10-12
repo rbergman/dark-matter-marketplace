@@ -35,7 +35,7 @@
 
   <section>
     <h2>2 · Programmatic exit, then relock without a click</h2>
-    <ol><li>Click <b>Start</b>. It locks the pointer, then the page releases it after 1 s (like a game opening its menu).</li><li>Don't click or press anything. About 7 s after Start (after the click's activation has expired, ~5 s in Chrome) the page asks for the lock again from a timer. The log shows whether activation was still live.</li></ol>
+    <ol><li>Click <b>Start</b> <b>once</b>. It locks the pointer, then the page releases it after 1 s (like a game opening its menu). Any further click or key resets the browser's activation and spoils the check.</li><li>Don't click or press anything. About 7 s after Start (after the click's activation has expired, ~5 s in Chrome) the page asks for the lock again from a timer. The log shows whether activation was still live.</li></ol>
     <button id="prog">Start</button>
   </section>
 

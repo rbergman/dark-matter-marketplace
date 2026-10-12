@@ -130,7 +130,7 @@ export class PointerLock {
   }
 
   private async request(raw: boolean): Promise<void> {
-    // async wrapper: some older engines throw synchronously instead of rejecting
+    // async wrapper: some engines throw synchronously, and Firefox 150 returns no promise (errors only via the event)
     await (raw ? this.target.requestPointerLock({ unadjustedMovement: true }) : this.target.requestPointerLock());
   }
 

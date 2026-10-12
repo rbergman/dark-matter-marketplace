@@ -78,7 +78,11 @@ The tests were mutation-checked on the in-flight guard.
   - Resuming with Esc, B or Start can't, because those aren't user activation. The
     HUD says **"Click to aim"** until the next click.
   - That distinction comes from the Pointer Lock spec's exemption for programmatic
-    exits, and isn't probed here (posture B).
+    exits. **Firefox 150 doesn't honour it:** a request with no activation after the
+    page's own `exitPointerLock()` fails with `pointerlockerror` (probe page, Bob,
+    2026-10-12). There, resuming from a key shows "Click to aim" too. **Chrome 154
+    honours it:** the same request, 6 s after the release with activation expired,
+    got the lock. Safari is unprobed (its run was spoiled by extra clicks).
 - **If lock is unavailable or refused,** the game still plays in a fallback look
   mode and says so once.
 - **Options has a "Capture mouse" toggle.** Abduction-run defaults it off in
@@ -108,16 +112,22 @@ When `want` becomes false:
 2. then call `exitPointerLock()`
 
 Then the `pointerlockchange` that follows is known to be ours and is never reported
-as a loss (Hard Deck, redshifted `0db70d39`). A programmatic exit also exempts the
-next request from the post-Esc rule, so menus opened by the game relock instantly.
+as a loss (Hard Deck, redshifted `0db70d39`). Per the spec, a programmatic exit also
+exempts the next request from the post-Esc rule, so menus the game opened can
+relock instantly where the browser honours it (Chrome 154 does, Firefox 150
+doesn't; rule 3).
 
 ### 3. Try once, then retry only while activation lasts
 
 - **When `want` becomes true, request once, whatever the context.**
   - After the game's own `exitPointerLock()`, the spec exempts the next request
-    from needing activation, so a menu the game opened relocks on resume with no
-    click.
+    from needing activation, so a menu the game opened can relock on resume with no
+    click. Firefox 150 refuses that request; the try costs nothing, and its refusal
+    falls through to the activation check and "Click to aim".
   - Only when that try is refused does activation matter.
+  - **Firefox 150's `requestPointerLock()` returns no promise.** Failure arrives
+    only as `pointerlockerror`, so listen for the event as well as the rejection
+    (the sketch does both).
 - **Every gesture handler that should recapture calls `onGesture()`
   synchronously:** a canvas click, a Resume click, Enter or Space on Resume. That
   call makes the request inside the activation.
@@ -155,8 +165,15 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
   lengthen the grace.
 - **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
   the same intent: a loss means pause, not a silent relock.
-- **Whether the page also sees the Esc keydown** that unlocked is unverified, and
-  probably browser-dependent. game-shell's Esc grace makes either ordering safe.
+- **Whether the page also sees the Esc keydown** that unlocked depends on the
+  browser. Safari 26.5 delivers it: the keydown arrives with the lock still held,
+  then `pointerlockchange` in the same millisecond. Chrome 154 and Firefox 150 don't
+  deliver it at all (probe page, run by Bob 2026-10-12). game-shell's Esc grace makes
+  either ordering safe.
+- **Safari also refuses an immediate relock** after the player's Esc: a request
+  79 ms later was rejected with `NotAllowedError` even with activation live, and a
+  click ~1.23 s later succeeded. Its refusal window between those two is
+  unmeasured. Chrome's is the 1250 ms above.
 
 ### 5. Give back a late grant
 
@@ -241,12 +258,13 @@ Each line names what the check cannot see.
       - after escaping the lock, resume with Esc: "Click to aim" shows, and a click
         relocks
       - open pause with P, then resume with Esc: the lock returns with no click
+        (in Firefox 150, "Click to aim" instead)
 
       *Blind to: browsers other than the one tested. Run once in Firefox and
       Safari by hand.*
 - [ ] **Open Options from a key during play:** the lock releases, the release isn't
       reported as a loss, and on close it relocks with no click (programmatic-exit
-      exemption).
+      exemption; Firefox 150 shows "Click to aim" instead).
 - [ ] **Alt-tab while locked:** the game pauses, and the lock isn't restored on
       return until the player clicks. *Blind to: OS-specific focus behaviour.*
 - [ ] **Deny lock** (option off, or an iframe without `allow-pointer-lock`): the
