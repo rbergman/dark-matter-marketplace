@@ -190,6 +190,10 @@ redshifted's `?capture=`, serves the team without a player-facing UI.
   Esc or B returns to pause through game-shell's optional `modeBack` hook, which the
   router consults while the stack is empty. Photo mode never adds its own Esc
   listener. Camera input goes through input-bindings' actions, so remaps apply.
+- **Photo mode ends whenever any screen opens.** P, Start or the auto-pause latch
+  (a lock loss, a blur) can open pause without Back. End photo mode from
+  `onStackChange` when the stack is no longer empty. Otherwise Resume returns to a
+  frozen sim with the HUD hidden.
 - **Filename** includes the game and a timestamp. Offer the download; never upload.
 
 **Checklist:**
@@ -197,6 +201,8 @@ redshifted's `?capture=`, serves the team without a player-facing UI.
 - [ ] The HUD is hidden in the capture but restored afterwards.
 - [ ] The camera stays in bounds.
 - [ ] Esc returns to pause with the run intact.
+- [ ] Press P, and separately blur the window, in photo mode: pause opens, and
+      Resume returns to play, not to photo mode.
 
 *Blind to: GPU-specific capture bugs; test on the target machines.*
 

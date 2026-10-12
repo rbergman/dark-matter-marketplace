@@ -111,16 +111,22 @@ export function rebind(
     let given = old;
     // Pause displaced onto a menu key would break every menu: it takes a spare instead.
     const pauseOnMenuKey = clash.action === 'pause' && old !== null && MENU_CODES.has(old);
-    // Never leave the displaced action with no key at all: give it a spare and say which.
-    if (pauseOnMenuKey || (swapped[0] === null && swapped[1] === null)) {
+    const keptOther = swapped[clash.slot === 0 ? 1 : 0];
+    if (pauseOnMenuKey && keptOther !== null) {
+      // Pause still has its other key: just empty this slot (a spare could duplicate that key).
+      swapped = withSlot(swapped, clash.slot, null);
+      given = null;
+    } else if (pauseOnMenuKey || (swapped[0] === null && swapped[1] === null)) {
+      // Never leave the displaced action with no key at all: give it a spare and say which.
       given = spareFor({ ...map, [action]: withSlot(map[action], slot, code) }, ACTIONS[action].context, clash.action);
       swapped = withSlot(swapped, clash.slot, given);
     }
     next[clash.action] = swapped;
+    const left = given ?? swapped[0] ?? swapped[1];
     notice =
-      given === null
+      left === null
         ? `${label(code)} moved from ${clash.action} to ${action}. ${clash.action} has no key left: bind one.`
-        : `${label(code)} moved from ${clash.action} to ${action}. ${clash.action} is now on ${label(given)}.`;
+        : `${label(code)} moved from ${clash.action} to ${action}. ${clash.action} is now on ${label(left)}.`;
   }
   // The same code may sit in this action's other slot: clear it so one action never holds it twice.
   const other: 0 | 1 = slot === 0 ? 1 : 0;

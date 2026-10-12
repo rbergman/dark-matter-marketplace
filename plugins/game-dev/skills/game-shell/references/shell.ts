@@ -130,9 +130,9 @@ export class Shell {
       this.requestAutoPause('blur');
     });
     document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement !== null) return;
-      if (this.ownFullscreenExit) this.ownFullscreenExit = false; // the game's own toggle: not a "stop"
-      else this.requestAutoPause('fullscreenExit');
+      const own = this.ownFullscreenExit; // the game's own toggle: not a "stop"
+      this.ownFullscreenExit = false; // cleared on every change, so nested fullscreen can't leave it stuck
+      if (document.fullscreenElement === null && !own) this.requestAutoPause('fullscreenExit');
     });
     window.addEventListener('gamepaddisconnected', () => {
       if (this.hooks.lastDeviceIsPad()) this.requestAutoPause('padLost');

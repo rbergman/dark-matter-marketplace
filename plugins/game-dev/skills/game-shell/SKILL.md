@@ -105,6 +105,11 @@ interface Screen { el: HTMLDialogElement; pausesSim: boolean; dismissable: boole
   sub-panel closing) goes through `consumeBack` on that screen's entry. The shell
   calls it before popping, for Esc and B alike. That is the only per-screen Back
   hook, and the reason no screen ever needs its own Esc listener.
+- **A full-screen mode with no stack entry** (photo mode) uses the optional
+  `modeBack` hook. The shell calls it on Esc or B while the stack is empty, before
+  opening pause. If it returns true, the mode has handled Back. The mode must also
+  end itself in `onStackChange` when any screen opens, because pause can arrive
+  from P, Start or the auto-pause latch without Back ever being pressed.
 - **Every push and pop calls one `onStackChange` hook.** That hook applies the pause
   duck, lifts it in Options, freezes view FX, and is where pointer-lock reads "a
   screen is open" as an unlock reason.
