@@ -77,16 +77,29 @@ it there"):
 - **Sources.** Every skill has a Sources block. Conventions with no source found are
   labelled UNSOURCED, not dressed up: Start opens pause, B backs out, glyphs follow
   the last device, pause on blur.
-- **Escape has one owner, game-shell, and one mechanism.**
-  - Modal screens are `<dialog>`s opened with `showModal()`. The shell listens for
-    each dialog's `cancel` event, calls `preventDefault()`, and pops its own stack.
+- **Escape has one owner, game-shell, and one mechanism.** This was verified in
+  Chrome 152 with real key presses, 2026-10-11.
+  - The shell's single **capture-phase `keydown` listener** on `window` calls
+    `preventDefault()` on Esc and pops its own stack. Cancelling the keydown
+    suppresses the browser's close request: no `cancel` fires, and the shell
+    decides.
+  - Each `<dialog>` also handles `cancel` (prevent when cancelable, route to the
+    shell's back), for close requests that arrive without a keydown, such as an
+    Android back button.
+  - Each `<dialog>` handles `close` to resync the stack if the browser closed it
+    anyway.
+  - **Rejected mechanism: relying on `cancel.preventDefault()`.** A second Esc with
+    no click in between fires a non-cancelable `cancel`. That is the close-watcher
+    anti-abuse rule, and Esc is not user activation. The browser then closes the
+    dialog behind the shell's back. Probe log: `cancel cancelable=true`, then
+    `cancel cancelable=false`, `close`.
   - Nothing else handles Esc: no global keydown pause, and no per-screen Esc
     listener.
-  - Pointer lock's Esc is consumed by the browser and reaches the shell only as
-    lock loss, through the auto-pause latch.
+  - Pointer lock's Esc is consumed by the browser and reaches the shell as lock loss,
+    through the auto-pause latch. Whether the page *also* sees that keydown is
+    unverified, so the pause that the latch opens ignores Esc during a fresh-press
+    grace. Safe either way.
   - Input-bindings reserves Esc from remapping.
-  - *Verify before slice 2:* the `cancel` event fires on Esc for a modal dialog, and
-    Chrome's cancel-twice behaviour (a second Esc force-closes) is handled.
 - **Cross-references.** At most three per skill; everything else routes through the
   map. A gate counts the cross-reference bullets per skill.
 - **No unearned reference implementations.** None is claimed for gamepad remapping,
@@ -193,8 +206,8 @@ session without re-deriving these patterns. It is measured when that game is bui
 ## Slices (one bead each, in order)
 
 1. **game-ui-patterns** guide plus routing-map rows.
-2. **game-shell**, plus `references/run-flow.md`. First verify the `<dialog>`
-   `cancel` mechanism.
+2. **game-shell**, plus `references/run-flow.md`. The Escape mechanism is verified
+   (see Invariants).
 3. **menu-navigation**
 4. **input-bindings**
 5. **settings-and-persistence**
@@ -216,7 +229,8 @@ session without re-deriving these patterns. It is measured when that game is bui
 - **D3 rewritten.** The first draft claimed WCAG 2.5.2 permits down-event activation
   when undo exists. It doesn't: undo qualifies only up-event completion. Checked
   against the W3C Understanding page.
-- **Escape mechanism pinned** to `<dialog>` `cancel`, owned by game-shell.
+- **Escape mechanism pinned** to a capture-phase `keydown` owned by game-shell.
+  The `cancel`-based first version was disproved in a browser probe.
 - **Auto-pause latch and fresh-press guard** each given a single owner.
 - **game-shell bounded:** run flow moved to a reference file, sketches to
   `references/`.

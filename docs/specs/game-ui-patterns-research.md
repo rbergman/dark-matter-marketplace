@@ -428,8 +428,21 @@ summary was seen. UNSOURCED means a convention with no source found.
 - **`prefers-reduced-motion`** (MDN): reduce means remove or replace *non-essential*
   motion. Large pans and scales are the triggers; fades are usually fine.
 - **`inert` and `<dialog>.showModal()`** (MDN): both are Baseline, and a modal goes
-  in the top layer with the rest of the page inert. The Esc `cancel` event is HTML
-  spec behaviour, not verified this session.
+  in the top layer with the rest of the page inert.
+- **Esc on a modal dialog** (HTML close requests and close watchers; MDN
+  `cancel_event`). **Verified 2026-10-11** in Chrome 152 (the built-in browser),
+  with real CDP key presses on a probe page holding two nested `showModal()`
+  dialogs.
+  - The order is `keydown`, then `cancel`, then `close`.
+  - `cancel` is cancelable only with history-action activation, and Esc doesn't
+    renew it.
+  - So a `preventDefault()` on `cancel` holds the first Esc, but the second Esc's
+    `cancel` is non-cancelable and the dialog closes.
+  - `preventDefault()` on the capture-phase **`keydown`** suppresses the close
+    request entirely: no `cancel` fires, and the page decides.
+  - Two modals opened with no user activation between them share one close-watcher
+    group, so one close request can close both. That comes from the spec summary
+    and was not probed.
 - **`KeyboardEvent.code`** (MDN):
   - `code` is the physical position; don't derive labels from it.
   - `navigator.keyboard.getLayoutMap()` gives labels (experimental).

@@ -37,6 +37,16 @@ touches one file instead of twenty.
 | Someone just reacted to playing it | **moment-capture** |
 | What should I measure once it ships? | **data-driven-design** |
 | It's dropping frames | **game-perf** |
+| What UI shell and HUD does this game need, and in what order? | **game-ui-patterns** |
+| Pause menu, Esc/Start/B, modal stack, auto-pause, title and game-over flow | **game-shell** |
+| Focus, keyboard-only and pad-only menu navigation | **menu-navigation** |
+| Key remapping, gamepad input, button prompts | **input-bindings** |
+| Options screen, audio sliders, a11y toggles, saving settings | **settings-and-persistence** |
+| Pointer lock, virtual cursor, reticle | **pointer-lock** |
+| Compass, edge arrows, minimap, toasts, score readouts | **hud-readouts** |
+| Can the player read the upgrade numbers and the difficulty curve? | **progression-legibility** |
+| How do I verify this — sims, determinism, perf, UI walkthroughs? | **game-verification** |
+| Radial menu, inventory grid, dialogue box, photo mode | **situational-ui** |
 | Setting up a new PixiJS browser game | **dm-pixi:pixi-vector-arcade** |
 
 ---
@@ -57,6 +67,10 @@ data-driven-design, accessibility-design
 **Content at volume** — generated-content-quality, game-narrative-craft,
 register skills
 
+**Shell and HUD** — game-ui-patterns → game-shell → menu-navigation,
+input-bindings, settings-and-persistence → pointer-lock, hud-readouts,
+progression-legibility → situational-ui; game-verification throughout
+
 ---
 
 ## Layer pairs
@@ -74,6 +88,12 @@ deliberate. Going to the wrong one wastes a pass.
 | player-ux | accessibility-design | Cognitive load for everyone vs. access for players who need it |
 | playtest-design | moment-capture | Structured observation vs. capturing a felt reaction verbatim |
 | simulation-first-design | mechanic-ablation | Building the instrument vs. the procedure you run on it |
+| player-ux | hud-readouts | What the player can perceive vs. how a readout is built and fed |
+| accessibility-design | settings-and-persistence | Which access options must exist vs. wiring them to every effect and saving them |
+| game-feel | hud-readouts | The feedback a hit deserves (incl. shake and flash budgets) vs. the HUD that reports it |
+| progression-systems | progression-legibility | The curve's math vs. whether the player can read it off the screen |
+| simulation-first-design | game-verification | The sim as a design instrument vs. the full verification kit and its blind spots |
+| game-shell | menu-navigation | Which screen owns input vs. how focus moves inside it |
 
 ---
 
