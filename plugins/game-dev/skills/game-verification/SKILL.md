@@ -28,7 +28,7 @@ result.
     (`just determinism`): gravelight `tools/dev-smoke.mjs`
   - production perf with p95/p99/max budgets: free-horses
     `profile-production.cjs`
-  - stress mode and per-seed determinism tests: Downwash `just perf`
+  - stress mode and per-seed determinism tests: Hard Deck `just perf`
   - staged-state geometry checks, with mutation checks recorded in `docs/ui.md`:
     timberwolf `tools/ui-check.mjs`
   - 1000-run bot comparisons against a baseline: royal-inbox `evaluate:loop`
@@ -147,7 +147,7 @@ timberwolf keeps them in `docs/ui.md`.
 ### 6. Perf in production, in real Chrome, as percentiles
 
 - **Build production, serve it on a scratch port, and drive real Chrome** with a
-  stress mode (Downwash `?stress`, volatile-state-redux `?soak`).
+  stress mode (Hard Deck `?stress`, volatile-state-redux `?soak`).
 - **Report p50, p95, p99 and max frame time,** plus long tasks and GC pauses, over
   a fixed duration. A mean hides the hitch the player feels.
 - **Budget the percentiles** (free-horses checks p95, p99 and max against a written

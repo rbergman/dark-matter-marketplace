@@ -16,11 +16,11 @@ from a feel target the designer can state, not nudged until they stop complainin
   **game-balance**'s. Bot sweeps and their blind spots are
   **simulation-first-design**'s.
 - **Corpus:**
-  - threat as distance from spawn: Downwash's `threatAt` ("missions march outward;
+  - threat as distance from spawn: Hard Deck's `threatAt` ("missions march outward;
     that is the difficulty curve")
   - a combo multiplier capped at ×3.0: abduction-run
   - hotkeyed choices with a 300 ms double-submit gate: royal-inbox
-  - a pad hold-off after the draft opens: Downwash
+  - a pad hold-off after the draft opens: Hard Deck
   - headless pacing-envelope tests: logarithmic
 - **The felt-target procedure** is this plugin's own construction, from the Numbers
   Policy and the verified/felt/assumed distinction. It is posture B throughout.
@@ -108,7 +108,7 @@ effective values, and solving a growth rate from a target ratio.
 ### 4. Threat is a learnable function
 
 - **Threat as a function of one variable the player controls or sees:**
-  - distance from spawn (Downwash's `threatAt`)
+  - distance from spawn (Hard Deck's `threatAt`)
   - time survived
   - the wave index
 
@@ -117,7 +117,7 @@ effective values, and solving a growth rate from a target ratio.
   **progression-systems**), but the player perceives bands. Change the palette,
   enemy roster or music at band edges, so a rise in threat has a cue.
 - **Show it.** A HUD number, zone tint, or map shading. In a distance-based game the
-  compass distance *is* the threat readout, which is why Downwash's missions march
+  compass distance *is* the threat readout, which is why Hard Deck's missions march
   outward.
 - **The difficulty the player feels is `threat / power`.** Plot both curves against
   the same axis (distance or time) for a typical build. The ratio should follow the
@@ -163,7 +163,7 @@ The procedure, all posture B:
   - the **fresh-press guard** belongs to game-shell (rule 4): a fire button held
     when the draft opens must be released first, so it can't pick a card.
     Royal-inbox gates double-submits at 300 ms (corpus value, `input-gate.ts`).
-    Downwash's draft relies on pad press *edges* alone.
+    Hard Deck's draft relies on pad press *edges* alone.
 - **Pause by shape:** a centred card modal pauses the sim (game-shell rule 1).
   Redshifted eases time to a freeze rather than cutting it; that's a feel choice.
   Either way, the sim isn't running at full speed behind an unread card.

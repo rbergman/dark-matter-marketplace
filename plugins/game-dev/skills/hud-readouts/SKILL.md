@@ -24,7 +24,7 @@ that player-ux has already decided the content of.
   - interpolated rendering and a throttled DOM publish: volatile-state-redux
   - shape-and-colour edge arrows that exclude the HUD dock: timberwolf
   - breadth of arrow kinds: redshifted
-  - a compact shortest-arc compass: Downwash
+  - a compact shortest-arc compass: Hard Deck
   - the tiered toast queue (`radio-queue.ts`): timberwolf
   - a threat rim instead of a widget: gravelight
 - **UNSOURCED**, chosen by the corpus and named where it applies: north-up maps
@@ -43,10 +43,10 @@ toast queue.
 | Failure | Seen in | Root cause |
 |---|---|---|
 | Markers judder on 120/144 Hz displays | timberwolf, gravelight, free-horses (read from code, not reproduced) | HUD and world read raw 60 Hz sim state; no interpolation |
-| Hit flash lasts half as long at 120 Hz | Downwash (`flashT -= 1/60` per frame) | Timer counted in frames, not seconds |
+| Hit flash lasts half as long at 120 Hz | Hard Deck (`flashT -= 1/60` per frame) | Timer counted in frames, not seconds |
 | HUD labels shake with the camera | free-horses' ui-plan warns against it | Screen-space HUD drawn inside the shaken camera container |
 | Arrow shown for a target hidden behind the HUD dock | timberwolf (fixed, `hudInset`) | On-screen test used the full viewport |
-| Toasts pile up and cover play | Downwash (uncapped timeouts), logarithmic (unbounded queue, no dedupe) | No queue, cap or tier |
+| Toasts pile up and cover play | Hard Deck (uncapped timeouts), logarithmic (unbounded queue, no dedupe) | No queue, cap or tier |
 | About 20 fix commits in one compass (survey count) | redshifted | Arrow kinds added one at a time, with no shared placement rule |
 
 ---
@@ -90,7 +90,7 @@ legible option for "danger level". Its intensity follows the flash setting (see
   `pos = lerp(prev, curr, alpha)` with `alpha = accumulator / STEP`.
   - Use the same `alpha` the world renderer used this frame, or markers slide off
     their targets.
-  - Volatile-state-redux interpolates; Downwash interpolates the camera and player.
+  - Volatile-state-redux interpolates; Hard Deck interpolates the camera and player.
 - **World markers use the world's camera transform, shake included.** Redshifted's
   `worldToHudScreen` adds shake and zoom. A marker that ignores shake slides off a
   shaking target.
@@ -108,13 +108,13 @@ legible option for "danger level". Its intensity follows the flash setting (see
 ### 3. Write the DOM only on change
 
 Keep the last string per element, and compare before writing `textContent`. That is
-Downwash's HUD and logarithmic's `setText` cache. Never `innerHTML` a readout per
+Hard Deck's HUD and logarithmic's `setText` cache. Never `innerHTML` a readout per
 frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 
 ### 4. HUD time is seconds on a pausable view clock
 
 - **Every HUD timer advances by `dt` seconds:** flash, pulse, toast hold, arrow
-  fade. Never by "one frame". Downwash's `flashT -= 1/60` halves the flash at
+  fade. Never by "one frame". Hard Deck's `flashT -= 1/60` halves the flash at
   120 Hz.
 - **The view clock stops when game-shell's stack pauses the sim.** Toasts, pulses
   and fades freeze with it. A toast that expires behind the pause menu was never
@@ -126,7 +126,7 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 - **Off-screen test:** project the target. It is "on screen" only inside the
   viewport *minus the HUD insets*.
   - Timberwolf excludes the HUD dock with `hudInset`.
-  - A margin past the **viewport** edges stops arrows flickering there. Downwash
+  - A margin past the **viewport** edges stops arrows flickering there. Hard Deck
     uses 40 px outside the viewport (corpus value, `compass.ts`).
   - **Never put the margin on an inset edge,** or a target just under the dock gets
     a marker drawn beneath it.
@@ -137,8 +137,8 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
   20 fix commits as kinds were added one at a time (survey count).
 - **Motion:**
   - Ease the angle along the *shortest arc*, or arrows spin the long way when a
-    target crosses behind (Downwash).
-  - Fade in and out (redshifted: 0.3 and 0.4 s; Downwash eases alpha), all
+    target crosses behind (Hard Deck).
+  - Fade in and out (redshifted: 0.3 and 0.4 s; Hard Deck eases alpha), all
     corpus values.
 - **Kinds:** a distinct shape per kind as well as colour (timberwolf). Cap the
   count: timberwolf shows the 5 nearest minor marks (corpus value). Urgency (a neglect
@@ -151,7 +151,7 @@ frame, and never rebuild a list that holds focus (menu-navigation rule 7).
 ### 6. Minimap and radar
 
 - **Repaint the static layer** (terrain) on a timer, or when the view moves a tile,
-  never per frame (Downwash). Draw blips per frame.
+  never per frame (Hard Deck). Draw blips per frame.
 - **North-up for maps the player plans with; rotating for a radar the player
   reacts with.** UNSOURCED convention; pick one per game and say which in Options
   if both make sense.

@@ -216,7 +216,7 @@ gate that scales them is **settings-and-persistence**'s.
   - Summing per-hit impulses beats the per-hit cap under burst damage
     (abduction-run, read from code).
 - **Choose the combine rule on purpose:**
-  - **Capped sum:** busy fights feel busy. Downwash uses `MAX_TRAUMA = 1`.
+  - **Capped sum:** busy fights feel busy. Hard Deck uses `MAX_TRAUMA = 1`.
   - **Max:** gravelight's `max(shake, hit | kill)`. One heavy hit isn't diluted.
   - **Latest qualifying event wins:** volatile-state-redux. Never stacks.
 - **Offset = `maxOffset × trauma² × noise(t)`.**
@@ -235,7 +235,7 @@ gate that scales them is **settings-and-persistence**'s.
   with `Math.random`, and a seed can't replay them.
 - **The settings gate scales the offset at render,** and trauma keeps decaying while
   scaled to 0. Toggling mid-shake then leaves no stuck offset (logarithmic).
-- **Rate-limit hit-stop.** Downwash allows one every 0.35 s (corpus value, `app.ts`). Stacked
+- **Rate-limit hit-stop.** Hard Deck allows one every 0.35 s (corpus value, `app.ts`). Stacked
   hit-stops read as the game freezing.
 
 ### Flash

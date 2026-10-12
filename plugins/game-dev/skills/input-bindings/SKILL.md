@@ -49,7 +49,7 @@ Typed sketch: `references/bindings.ts`, with pure rebind, undo and merge functio
 | Bindings follow the label, not the key position | timberwolf | Stored `e.key`, so AZERTY players get WASD in the wrong places |
 | No way back to defaults | timberwolf | No reset |
 | Pad only in help text | redshifted | Pad bindings rendered as a static guide |
-| Pad couldn't unpause | Downwash (fixed) | Polled inside the sim tick |
+| Pad couldn't unpause | Hard Deck (fixed) | Polled inside the sim tick |
 
 ---
 

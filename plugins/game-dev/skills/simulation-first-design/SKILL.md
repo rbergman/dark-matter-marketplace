@@ -206,16 +206,6 @@ product stops being tunable.
 
 ---
 
-## Cross-references
-
-- **mechanic-ablation** — the four-stage procedure for proving a mechanic affects
-  outcomes; this skill supplies the instrument, that skill supplies the method
-- **game-balance** — cost curves and dominant-strategy detection, which a sim
-  can search far faster than a playtest
-- **async-and-social** — determinism is what makes daily seeds and replays possible
-
----
-
 ## Cross-References
 
 Three tight links. Everything else routes through the map, so adding a skill

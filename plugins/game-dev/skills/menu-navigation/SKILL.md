@@ -26,7 +26,7 @@ and never behind the screen the player is looking at.
 - **Corpus mechanisms** (survey of nine Gorewood games, 2026-10-11):
   - restore to the opener and inert covered panes: free-horses `PlayMenu`
   - the Tab trap and spatial shop navigation: timberwolf
-  - per-frame pad edges and slider nudge: Downwash
+  - per-frame pad edges and slider nudge: Hard Deck
 - **Assumptions, labelled where they occur:**
   - the stick repeat timings
   - the spatial-navigation weighting
@@ -44,7 +44,7 @@ Typed sketch: `references/nav.ts`.
 | Settings screen unreachable by keyboard or pad | redshifted | Canvas-drawn panel with no focusables; a navigation helper existed and was never wired |
 | Every hotkey dead after one click on a HUD button | volatile-state-redux (read from code, not reproduced) | "Block hotkeys while a button has focus", applied to all keys |
 | Shop loses keyboard focus every second | logarithmic (read from code, not reproduced) | `innerHTML` re-render at 1 Hz while open |
-| Focus lands on the first item, not where the player came from | Downwash | Pop focuses "first item of the new top" |
+| Focus lands on the first item, not where the player came from | Hard Deck | Pop focuses "first item of the new top" |
 | Gameplay Tab fights menu Tab | free-horses (inference) | Default binding on Tab, with HUD buttons in the tab order |
 | A highlight outlives the cursor | gravelight (fixed) | Hover and keyboard tracked as two highlights |
 
@@ -164,7 +164,7 @@ Tab and Space belong to the game. Menus are where Tab navigates.
 ### 6. Pad in menus
 
 - **Poll once per rendered frame,** with edges (pressed this frame, not last). Never
-  poll inside the sim tick: Downwash's pad couldn't unpause until polling moved.
+  poll inside the sim tick: Hard Deck's pad couldn't unpause until polling moved.
 - **D-pad = arrows** (this skill). **A, B and Start go to game-shell's `pad()`**,
   where the fresh-press guard lives.
   - A clicks the focused control on its press edge. The pointer-cancellation
@@ -180,7 +180,7 @@ Tab and Space belong to the game. Menus are where Tab navigates.
   If they overshoot, lengthen the repeat interval.
 - **Left/right on a focused range input** steps its value and dispatches `input`
   *and* `change`, as arrow keys do natively. Settings saves on `change`, so a pad
-  nudge that fired only `input` would never persist. This is Downwash's
+  nudge that fired only `input` would never persist. This is Hard Deck's
   `nudgeSlider`.
 - **Glyphs** in the menu's footer follow the last-used device: "Ⓐ Select Ⓑ Back"
   versus "Enter Select Esc Back". See **input-bindings**.

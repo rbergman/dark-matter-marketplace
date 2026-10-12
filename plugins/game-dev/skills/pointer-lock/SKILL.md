@@ -28,7 +28,7 @@ running with an invisible cursor.
   `navigator.userActivation.isActive` reports it.
 - **Corpus mechanisms** (survey of nine Gorewood games, 2026-10-11):
   - a want derived each frame, a retry, a grace, and giving a late grant back:
-    Downwash (after redshifted)
+    Hard Deck (after redshifted)
   - named unlock reasons and a virtual cursor: abduction-run
   - lost lock means pause, a backoff, and a fallback look mode: logarithmic
 - **Corpus timings** (500 ms retry, 300 ms grace, 0.35–3 s backoff, 1.4 s fallback
@@ -108,7 +108,7 @@ When `want` becomes false:
 2. then call `exitPointerLock()`
 
 Then the `pointerlockchange` that follows is known to be ours and is never reported
-as a loss (Downwash, redshifted `0db70d39`). A programmatic exit also exempts the
+as a loss (Hard Deck, redshifted `0db70d39`). A programmatic exit also exempts the
 next request from the post-Esc rule, so menus opened by the game relock instantly.
 
 ### 3. Try once, then retry only while activation lasts
@@ -135,11 +135,11 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
     Resume within 1 s" step still needs a desktop Chrome.
 - **Once a request has been refused and activation has expired, stop retrying** and
   show "Click to aim". A further retry without activation can only fail.
-- **Corpus alternatives:** Downwash and redshifted retry blindly every 500 ms.
+- **Corpus alternatives:** Hard Deck and redshifted retry blindly every 500 ms.
   Logarithmic backs off from 0.35 s to 3 s. Both work because a click resets them;
   the activation check says *why* they work, and stops the pointless attempts.
 - **Handle `pointerlockerror`** on its own: schedule the next retry or show the
-  prompt. Downwash and abduction-run route it into the change handler.
+  prompt. Hard Deck and abduction-run route it into the change handler.
 
 ### 4. Lost means pause, through the shell's latch
 
@@ -150,7 +150,7 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
   ignored either: it shows "Click to aim".
   - It never auto-retries. A live activation would re-grab the mouse about 1.3 s
     after a quick, deliberate Esc.
-  - Ignoring it would leave the game running with a free cursor. Corpus value: 300 ms (Downwash `LOCK_GRACE_MS`); B for yours. Test:
+  - Ignoring it would leave the game running with a free cursor. Corpus value: 300 ms (Hard Deck `LOCK_GRACE_MS`); B for yours. Test:
   acquire-then-immediately-lose on resume doesn't open a stray pause. If it does,
   lengthen the grace.
 - **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
@@ -162,7 +162,7 @@ next request from the post-Esc rule, so menus opened by the game relock instantl
 
 A request that resolves after `want` went false (the player opened a menu
 mid-request) arrives as a lock nobody wants. On a `pointerlockchange` to locked
-with `!wanted`, call `exitPointerLock()` at once (Downwash).
+with `!wanted`, call `exitPointerLock()` at once (Hard Deck).
 
 ### 6. Raw input, fullscreen, touch
 
@@ -170,14 +170,14 @@ with `!wanted`, call `exitPointerLock()` at once (Downwash).
   acceleration.
   - On `NotSupportedError`, drop it for the session.
   - On any other rejection except `NotAllowedError`, retry once without it, for that
-    request only. That is Downwash's per-request fallback. An engine that rejects
+    request only. That is Hard Deck's per-request fallback. An engine that rejects
     the option with an odd error still locks, and a transient error doesn't cost
     raw input for good.
   - Redshifted falls back only on `NotSupportedError`. Some older engines
   throw synchronously, so wrap the request in an `async` function.
 - **Lock, then fullscreen,** in the same handler. Fullscreen consumes the
   activation.
-- **Never lock for touch.** Check `pointerType` on the gesture (Downwash).
+- **Never lock for touch.** Check `pointerType` on the gesture (Hard Deck).
 
 ### 7. Virtual cursor and reticle
 

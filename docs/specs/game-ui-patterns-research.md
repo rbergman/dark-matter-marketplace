@@ -4,7 +4,7 @@ Evidence for [game-ui-patterns.md](game-ui-patterns.md), gathered 2026-10-11. Tw
 halves: what the Gorewood corpus does (read from source, file:line), and what
 external sources say (cited). Organised by the skill each finding feeds.
 
-**Corpus surveyed** (all `~/Projects/gorewood/<repo>`): bay-raid (Downwash, Pixi 8 +
+**Corpus surveyed** (one repo each): bay-raid (Hard Deck, then named Downwash; Pixi 8 +
 DOM shell), timberwolf (Canvas2D + DOM), redshifted (Blueshifted, all-Pixi UI),
 free-horses (three.js + DOM), gravelight (Pixi, canvas-drawn menus), royal-inbox (DOM
 text game), abduction-run (R3F + DOM React), logarithmic (three.js + DOM),
@@ -285,16 +285,16 @@ From the survey agents' full reports (2026-10-11), and where marked re-read in
 source (2026-10-12). These fill in what the condensed sections above omit.
 
 **Corrections to the sections above:**
-- Downwash's 400 ms (1500 ms while typing initials) is the **game-over** pad restart
+- Hard Deck's 400 ms (1500 ms while typing initials) is the **game-over** pad restart
   hold (`ui.ts` `padRestartReady`, re-read). Its draft relies on pad edges alone,
   with no hold-off.
-- Downwash's 300 ms is the **pointer-lock loss** grace (`pointer-lock.ts`
+- Hard Deck's 300 ms is the **pointer-lock loss** grace (`pointer-lock.ts`
   `LOCK_GRACE_MS`). There is no Esc grace in `app.ts` (re-read).
 - logarithmic's HUD has a **4 Hz throttle** (`hud.ts`, re-read). The 1 Hz is the
   shop's `innerHTML` re-render.
 
 **Values re-read in source 2026-10-12:**
-- Downwash: compass `MARGIN = 40` (`compass.ts`), `HIT_STOP_GAP = 0.35` (`app.ts`)
+- Hard Deck: compass `MARGIN = 40` (`compass.ts`), `HIT_STOP_GAP = 0.35` (`app.ts`)
 - redshifted: glow on gains of 1000+ (`score-animator.ts`)
 - abduction-run: combo ×1.0 → ×3.0 (`combo.ts`)
 - logarithmic: `RESUME_KEY_GRACE_MS = 250` (`player.ts`); fallback notice at
@@ -318,13 +318,13 @@ source (2026-10-12). These fill in what the condensed sections above omit.
 - **Gravelight:**
   - `MAX_CATCHUP_STEPS` (`fixed-step.ts`)
   - bag-before-menu Esc order (`input.ts:189-198`)
-- **Downwash:**
+- **Hard Deck:**
   - P opens pause (`app.ts:164-168`)
   - first review found FX emitting under pause (`docs/reviews/gpt-review-1.md`)
 - **Logarithmic:** swallows Esc in a text field (`player.ts`)
 - **Pointer lock:**
   - abduction-run's unlock reasons include `characterPreview`
-  - redshifted commit `0db70d39` clears `wantsLock` before exit, and Downwash
+  - redshifted commit `0db70d39` clears `wantsLock` before exit, and Hard Deck
     ported the same model
 
 ---

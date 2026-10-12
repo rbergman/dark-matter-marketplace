@@ -28,7 +28,7 @@ sanitised, single record is the half that decides whether players trust it.
   - separate motion/flash/shake toggles applied to canvas effects:
     volatile-state-redux
   - a migration ladder: redshifted (`CONTROL_SETTINGS_VERSION`)
-  - field-by-field sanitise and de-duplicated writes: Downwash
+  - field-by-field sanitise and de-duplicated writes: Hard Deck
   - a strict import validator: logarithmic
   - the lesson that a version gate checking shape alone misses a unit change:
     gravelight receipts
@@ -44,7 +44,7 @@ failing storage, the motion resolution and the bus gains.
 | Failure | Seen in | Root cause |
 |---|---|---|
 | Reduced motion reaches CSS, not the canvas shake | timberwolf, gravelight; free-horses particles (read from code, not reproduced) | Setting read in one place; effects built once with the OS value |
-| Settings wiped by an update | Downwash, logarithmic, gravelight (save) | Version mismatch resets instead of migrating |
+| Settings wiped by an update | Hard Deck, logarithmic, gravelight (save) | Version mismatch resets instead of migrating |
 | Many keys, versions only in key names | timberwolf (6 keys), abduction-run (4), volatile-state-redux | No single record; a "v1" in the key orphans data rather than migrating it |
 | Two sources of truth for volume | redshifted | Audio modules write their own keys beside the panel's |
 | OS reduced-motion preference frozen at first save | free-horses (read from code, not reproduced), logarithmic | OS default written into storage as if the player chose it |
@@ -168,7 +168,7 @@ interface FxGate { reduceMotion: boolean; reduceFlash: boolean; shakeScale: numb
    - drop unknown keys
    - fall back per field, never per record
 
-   The binding map goes through input-bindings' `mergeSaved`. Downwash and
+   The binding map goes through input-bindings' `mergeSaved`. Hard Deck and
    volatile-state-redux both do this well.
 4. **A version from the future** (the player downgraded, or another tab runs a
    newer build): sanitise what you can, use it in memory, and **never write over
@@ -183,12 +183,12 @@ interface FxGate { reduceMotion: boolean; reduceFlash: boolean; shakeScale: numb
    2. write the new record
    3. remove them only after the write succeeds
 
-   Downwash still reads `bay-raid.*` as a fallback after its rename.
+   Hard Deck still reads `bay-raid.*` as a fallback after its rename.
 
 ### 6. Save = write-through, cheap, failure-tolerant
 
 - **Write when a setting changes.** Skip it if the serialised record is unchanged:
-  Downwash de-duplicates writes. Debounce slider drags, or write on `change`
+  Hard Deck de-duplicates writes. Debounce slider drags, or write on `change`
   rather than `input`.
 - **`setItem` can throw:**
   - quota exceeded

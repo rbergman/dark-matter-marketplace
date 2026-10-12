@@ -36,7 +36,7 @@ boot ──► title ──first gesture──► play ◄──resume── pau
     start a run behind it (timberwolf, `shellKeyDecision`)
 - That first handler is **the first gesture** (SKILL.md rule 5). It unlocks audio
   and optionally requests pointer lock, synchronously.
-- **Attract mode** is optional and cheap if the game has an autopilot: Downwash
+- **Attract mode** is optional and cheap if the game has an autopilot: Hard Deck
   flies its bot in a live world behind the title. Rules for it:
   - attract input is never routed to gameplay
   - any key exits to a real run on a fresh seed
@@ -61,7 +61,7 @@ boot ──► title ──first gesture──► play ◄──resume── pau
 - **The read-hold.** The screen ignores confirm until it has been readable for a
   moment. These are corpus values (Numbers Policy):
   - timberwolf holds 1100 ms (`shell-keys.ts`)
-  - Downwash holds pad restart 400 ms, or 1500 ms while typing initials
+  - Hard Deck holds pad restart 400 ms, or 1500 ms while typing initials
     (`ui.ts` `padRestartReady`)
 
   For your game they are posture B. Test: can a first-time player say what killed
@@ -81,7 +81,7 @@ boot ──► title ──first gesture──► play ◄──resume── pau
 
 ## Local high scores
 
-- **A top-10 per mode, with three-letter initials.** That is Downwash's choice and an
+- **A top-10 per mode, with three-letter initials.** That is Hard Deck's choice and an
   arcade convention, UNSOURCED. If
   the game has loadouts, keep one table per loadout and say which table the player
   is in.
@@ -97,7 +97,7 @@ boot ──► title ──first gesture──► play ◄──resume── pau
   storage failure never blocks the game-over screen. See
   **settings-and-persistence**.
 - **Remote leaderboards are out of scope here.** See **async-and-social** for
-  ghosts, daily seeds and the population-of-one problem. Downwash keeps scores
+  ghosts, daily seeds and the population-of-one problem. Hard Deck keeps scores
   local; redshifted removed its remote board.
 
 ## Restart and quit

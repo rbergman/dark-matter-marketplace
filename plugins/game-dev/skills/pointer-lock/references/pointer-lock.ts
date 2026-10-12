@@ -5,7 +5,7 @@
 export type UnlockReason = 'screen' | 'map' | 'debug' | 'preview' | 'userPref';
 
 /**
- * GRACE: corpus value, Downwash LOCK_GRACE_MS (300 ms); B here, test in SKILL.md rule 4.
+ * GRACE: corpus value, Hard Deck LOCK_GRACE_MS (300 ms); B here, test in SKILL.md rule 4.
  * RETRY: posture B. Test: escape, then click Resume at once; the lock returns within ~150 ms of the 1250 ms
  * cooldown ending. If retries flood the console, lengthen.
  */
@@ -87,7 +87,7 @@ export class PointerLock {
 
   /**
    * Raw input: NotSupportedError drops it for the session. Any other non-NotAllowed error retries
-   * once without it, for that request only (Downwash's per-request fallback), so an engine that
+   * once without it, for that request only (Hard Deck's per-request fallback), so an engine that
    * rejects the option with an odd error still locks, and a transient error doesn't cost raw input.
    */
   private attempt(raw = this.raw): void {

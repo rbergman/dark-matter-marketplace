@@ -47,7 +47,7 @@ export interface Rect {
 /**
  * Where a target at screen point (tx, ty) gets drawn. `safe` is the viewport minus HUD insets
  * (timberwolf's hudInset). `margin` widens "on screen" past the VIEWPORT edges only, so arrows
- * don't flicker there (Downwash: 40 px outside the viewport, a corpus value); it never widens an
+ * don't flicker there (Hard Deck: 40 px outside the viewport, a corpus value); it never widens an
  * inset edge, so a target under the HUD dock always gets an arrow. `behind`: 3-D projection had w < 0.
  */
 export function placeIndicator(

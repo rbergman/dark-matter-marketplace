@@ -163,7 +163,7 @@ export class SettingsStore {
   private flush(): void {
     if (!this.writable) return;
     const text = JSON.stringify(this.settings);
-    if (text === this.last) return; // de-duplicate writes (Downwash)
+    if (text === this.last) return; // de-duplicate writes (Hard Deck)
     try {
       this.storage?.setItem(this.key, text);
       this.last = text;

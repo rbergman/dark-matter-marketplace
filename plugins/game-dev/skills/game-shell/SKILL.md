@@ -32,7 +32,7 @@ Everything else in a game's UI hangs off this.
   pause; B or Esc backs out one level; the game pauses when the window loses focus.
   Console certification texts that might codify them are not public.
 - **Mechanisms** are the strongest of nine Gorewood games (survey, 2026-10-11):
-  - the modal stack and second-activation confirm: Downwash
+  - the modal stack and second-activation confirm: Hard Deck
   - the auto-pause latch: abduction-run
   - the fresh-press rules: timberwolf
   - "screen shape decides the pause": gravelight
@@ -51,11 +51,11 @@ Every corpus game built a shell, and most broke it in one of the same places:
 
 | Failure | Seen in | Root cause |
 |---|---|---|
-| One Esc closes two screens, or closes the menu it just opened | gravelight (fixed), redshifted (masked by guards), abduction-run (read from code, not reproduced); Downwash safe only by listener order | More than one listener handles Esc: a global pause hotkey plus a per-screen close, or pointer lock's Esc plus the menu's |
-| Held key acts on the new screen (death screen skipped, draft card picked mid-fire) | timberwolf (3 fix commits), redshifted, Downwash | The screen trusts the first keydown it sees |
+| One Esc closes two screens, or closes the menu it just opened | gravelight (fixed), redshifted (masked by guards), abduction-run (read from code, not reproduced); Hard Deck safe only by listener order | More than one listener handles Esc: a global pause hotkey plus a per-screen close, or pointer lock's Esc plus the menu's |
+| Held key acts on the new screen (death screen skipped, draft card picked mid-fire) | timberwolf (3 fix commits), redshifted, Hard Deck | The screen trusts the first keydown it sees |
 | Pause with no Restart or Quit, or Restart with no confirm | timberwolf, abduction-run, volatile-state-redux (no menu); redshifted (no confirm) | Pause built as a toggle, not a screen |
 | Game unpauses itself, or never pauses on alt-tab | redshifted, gravelight | Pause triggers scattered, with no single latch |
-| Pad can't unpause | Downwash (fixed) | Pad polled inside the sim tick, which stops while paused |
+| Pad can't unpause | Hard Deck (fixed) | Pad polled inside the sim tick, which stops while paused |
 | No sound after a pad-only start | every game (platform rule, not a bug) | Gamepad input is not a user-activation event |
 
 ---
@@ -66,7 +66,7 @@ What a player of 2020s games expects without being told:
 
 - **Esc, Start/Menu or P opens pause during play.** Start and P *toggle*: pressed
   with pause anywhere on the stack, they close everything down to and including
-  pause, and resume. Downwash binds P as a second key.
+  pause, and resume. Hard Deck binds P as a second key.
 - **Esc or B backs out exactly one level.** Esc on pause means Resume. Every screen
   has a visible way back as well (XAG 112). A screen with its own exits, such as the
   death screen's Restart and Title, is marked not dismissable: Esc and B do nothing
@@ -124,7 +124,7 @@ interface Screen { el: HTMLDialogElement; pausesSim: boolean; dismissable: boole
 - **The shape and the pause must agree.** A centred dialog over a live sim reads as
   a pause, and the player dies in it.
 - **Pausing freezes everything time-based in the view too:** particle emitters, HUD
-  timers, popups. Downwash's first review caught FX still emitting under pause.
+  timers, popups. Hard Deck's first review caught FX still emitting under pause.
   Wall-clock idle income is the deliberate exception (logarithmic).
 - **On resume, drop the sim accumulator.** Time spent paused must never be replayed
   as catch-up ticks.
@@ -174,7 +174,7 @@ Each dialog still listens for:
 - no per-screen close handler
 - no `UINavigation` singleton with its own copy
 
-Redshifted had exactly that copy, masked by guards. Downwash survived only through
+Redshifted had exactly that copy, masked by guards. Hard Deck survived only through
 listener registration order. Input-bindings reserves Esc so it can't be remapped
 onto an action.
 
@@ -223,11 +223,11 @@ A screen that opens while input is held must not let that input act on it.
 | Input | Guard | Corpus value |
 |---|---|---|
 | Keyboard | Ignore `e.repeat` for every shell action. A held key only repeats, and a new press has `repeat === false`. | timberwolf: this alone fixed "it auto started a new game immediately" |
-| Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Downwash holds *game-over* pad restart for 400 ms (1500 ms while typing initials) |
+| Pad | Mask every button held at open until it is released, then accept edges. Pads have no repeat flag. | Hard Deck holds *game-over* pad restart for 400 ms (1500 ms while typing initials) |
 | Mouse | A capture-phase `click` listener on each dialog drops a click whose `pointerdown` happened before `openedAt` | — |
 | Held Enter / Space | The router `preventDefault()`s repeated Enter/Space keydowns while a screen is open. Enter activates a button on keydown, and preventing that keydown blocks it (verified Chrome 152). Without this, a held Enter arms Restart, then confirms it. | — |
 | Anything, on a screen meant to be read | A read-hold after `openedAt`: the same capture-phase `click` listener drops activations inside it | timberwolf: 1100 ms death hold (corpus value) |
-| Esc on a pause the latch just opened | Grace after `openedAt` | logarithmic: 250 ms resume grace (corpus value). Downwash's 300 ms is its pointer-lock loss grace, a different guard (see **pointer-lock**). |
+| Esc on a pause the latch just opened | Grace after `openedAt` | logarithmic: 250 ms resume grace (corpus value). Hard Deck's 300 ms is its pointer-lock loss grace, a different guard (see **pointer-lock**). |
 
 **This is the same guard everywhere**: the death screen, the draft picker, a
 confirm, a pause opened by the latch. Native button activation goes through it too,
