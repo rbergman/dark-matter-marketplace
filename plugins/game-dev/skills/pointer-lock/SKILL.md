@@ -1,0 +1,229 @@
+---
+name: pointer-lock
+description: "Pointer lock in a browser game: deriving whether the mouse should be captured every frame from named unlock reasons (a menu, a map, a debug pane, a player preference), requesting it only from a user gesture, Chrome's 1250 ms refusal after the player escapes a lock, retrying while the click's activation is still live, reporting a lost lock to the pause latch, giving back a lock granted too late, falling back when raw input is unsupported, locking before fullscreen, virtual cursors, a fallback look mode when lock is denied, and where the reticle should read from. Use when adding mouse-look or mouse aiming, when menus open over a locked pointer, or when players report 'the mouse won't recapture after the menu', 'clicking does nothing for a second', 'I pressed Esc and the game kept running', 'the cursor is stuck in the window', or 'the reticle jitters'. game-shell owns pausing; this skill owns the lock."
+---
+
+# Pointer Lock
+
+**Purpose:** The mouse is captured exactly when play wants it, and released for
+every menu. It comes back on the next click, and a lost lock never leaves the game
+running with an invisible cursor.
+
+**Sources:**
+- **W3C Pointer Lock spec, and MDN `Element.requestPointerLock()`:**
+  - a request needs transient user activation
+  - failure fires `pointerlockerror`
+  - the user agent always offers an unlock gesture (Esc)
+  - after a user exit, the next request fails even with activation; a programmatic
+    `exitPointerLock()` exempts the next request
+  - `unadjustedMovement` may reject with `NotSupportedError`
+  - request lock *before* `requestFullscreen()`, because fullscreen consumes the
+    activation
+- **Chromium source:** `chrome/browser/ui/exclusive_access/pointer_lock_controller.cc`,
+  `kEffectiveUserEscapeDuration = base::Milliseconds(1250)`, on main as of
+  2026-10-11. Chrome refuses a lock request for 1250 ms after the player escapes
+  one (posture A). Other browsers: unknown, so posture B.
+- **HTML user activation:** transient activation, from a click or a non-Esc
+  keydown, expires after an implementation-defined time.
+  `navigator.userActivation.isActive` reports it.
+- **Corpus mechanisms** (survey of nine Gorewood games, 2026-10-11):
+  - a want derived each frame, a retry, a grace, and giving a late grant back:
+    Downwash (after redshifted)
+  - named unlock reasons and a virtual cursor: abduction-run
+  - lost lock means pause, a backoff, and a fallback look mode: logarithmic
+- **Corpus timings** (500 ms retry, 300 ms grace, 0.35–3 s backoff, 1.4 s fallback
+  notice) are posture C in their games.
+
+Typed sketch: `references/pointer-lock.ts`.
+
+---
+
+## The problem
+
+| Failure | Seen in | Root cause |
+|---|---|---|
+| Lock never comes back after a modal | the reason this skill exists (operator brief) | A single request after closing a menu falls inside the cooldown, or has no activation, and is never retried |
+| Our own release reported as a loss, so pause opens behind a closing menu | redshifted (fixed `0db70d39`) | `want` cleared *after* `exitPointerLock()` |
+| Lock granted after the player opened a menu | redshifted (no give-back) | A late-resolving request is kept |
+| Retry comment claims a timer that doesn't exist | abduction-run (read from code) | Lock returns only on a canvas click or a state change |
+| Esc unlocks, and the sim keeps running | redshifted (no blur pause; lock loss was the only trigger) | Lock loss not wired to one pause latch |
+
+---
+
+## The player-facing idiom
+
+- **Click the game to capture the mouse.** The title or the first click does it.
+  While locked there is no OS cursor; a reticle or virtual cursor stands in.
+- **Esc always releases.** The browser guarantees this. The game treats it as
+  "stop": it pauses, and the real cursor appears over the pause menu.
+- **Every menu releases the lock,** and the cursor is free to use it.
+- **Resuming by clicking Resume, or pressing Enter or Space on it, recaptures at
+  once.** Resuming with Esc, B or Start can't, because those aren't user
+  activation, so the HUD says **"Click to aim"** until the next click.
+- **If lock is unavailable or refused,** the game still plays in a fallback look
+  mode and says so once.
+- **Options has a "Capture mouse" toggle.** Abduction-run defaults it off in
+  Firefox after several fix commits; the cause wasn't recorded.
+
+---
+
+## The rules
+
+### 1. Derive `want` every frame, from named reasons
+
+```ts
+want = baseline && reasons.size === 0
+// baseline: in play, the "Capture mouse" option on, input is mouse (not touch)
+// reasons:  'screen' (shell.ownsInput), 'map', 'debug', 'preview', ...
+```
+
+Each owner adds and removes its own reason. Abduction-run's set includes overlay,
+debugPane, worldMap, characterPreview, briefing and userPreference. Nothing calls
+`requestPointerLock()` or `exitPointerLock()` directly except the lock module.
+game-shell's `onStackChange` sets or clears `'screen'`.
+
+### 2. Release first, then unlock
+
+When `want` becomes false:
+1. set `wanted = false`
+2. then call `exitPointerLock()`
+
+Then the `pointerlockchange` that follows is known to be ours and is never reported
+as a loss (Downwash, redshifted `0db70d39`). A programmatic exit also exempts the
+next request from the post-Esc rule, so menus opened by the game relock instantly.
+
+### 3. Request only from activation, and retry while it lasts
+
+- **Every gesture handler that should recapture calls `onGesture()`
+  synchronously:** a canvas click, a Resume click, Enter or Space on Resume. That
+  call makes the request inside the activation.
+- **The request can still fail.** The likely case: the click came within Chrome's
+  1250 ms of the player escaping. **Retry while `navigator.userActivation.isActive`
+  is true.**
+  - **Measured** (Chrome 152, 2026-10-12, posture C): the activation from one click
+    stayed live for about 5.0 s. The retry loop ran until then, then asked for a
+    click. That comfortably outlasts the 1250 ms cooldown.
+  - **Not observed:** a relock succeeding after the cooldown. The test browser (an
+    embedded Chromium) refuses pointer lock outright, so the checklist's "click
+    Resume within 1 s" step still needs a desktop Chrome.
+- **Once activation has expired, stop retrying** and show "Click to aim". A retry
+  without activation can only fail.
+- **Corpus alternatives:** Downwash and redshifted retry blindly every 500 ms.
+  Logarithmic backs off from 0.35 s to 3 s. Both work because a click resets them;
+  the activation check says *why* they work, and stops the pointless attempts.
+- **Handle `pointerlockerror`** on its own: schedule the next retry or show the
+  prompt. Downwash and abduction-run route it into the change handler.
+
+### 4. Lost means pause, through the shell's latch
+
+- **A loss** is a `pointerlockchange` to unlocked while `wanted`: Esc, focus
+  leaving, or the OS taking the pointer.
+- **Report it** with `shell.requestAutoPause('lockLost')` once the lock had been
+  held for a grace period. *Starting value:* 300 ms (Downwash, posture C). Test:
+  acquire-then-immediately-lose on resume doesn't open a stray pause.
+- **The lock module never opens pause itself.** Logarithmic's `suspended` latch has
+  the same intent: a loss means pause, not a silent relock.
+- **Whether the page also sees the Esc keydown** that unlocked is unverified, and
+  probably browser-dependent. game-shell's Esc grace makes either ordering safe.
+
+### 5. Give back a late grant
+
+A request that resolves after `want` went false (the player opened a menu
+mid-request) arrives as a lock nobody wants. On a `pointerlockchange` to locked
+with `!wanted`, call `exitPointerLock()` at once (Downwash).
+
+### 6. Raw input, fullscreen, touch
+
+- **Request `{ unadjustedMovement: true }` first.** It turns off OS mouse
+  acceleration. On any rejection other than `NotAllowedError`, retry without it.
+  Redshifted falls back only on `NotSupportedError`; Downwash falls back on
+  anything but `NotAllowedError`, which is safer across engines. Some older engines
+  throw synchronously, so wrap the request in an `async` function.
+- **Lock, then fullscreen,** in the same handler. Fullscreen consumes the
+  activation.
+- **Never lock for touch.** Check `pointerType` on the gesture (Downwash).
+
+### 7. Virtual cursor and reticle
+
+- **A virtual cursor** accumulates `movementX`/`movementY` and clamps to the
+  viewport, scaled by the sensitivity setting (abduction-run `virtualCursor.ts`).
+- **Clamp each event's delta.** ASSUMPTION: some platform and browser combinations
+  report occasional huge spikes. IMPACT: the camera snaps. VALIDATE: log the
+  largest per-event delta over a minute of play on each target OS.
+- **Draw the cursor or reticle every rendered frame from the input-space cursor,**
+  not from sim state. It responds at display rate.
+- **World-anchored aim markers** (lead indicators, lock-on brackets) read
+  **interpolated** render state; see **hud-readouts**. Reading raw sim state makes
+  them step at 60 Hz on a 120 Hz screen and look jittery.
+- **When unlocked in play** (the lock was denied), hide the virtual cursor and use
+  the real one.
+
+### 8. Fallback look mode
+
+When lock is unavailable (the option is off, the request failed, or the platform
+can't do it):
+- play with the visible cursor
+- look by cursor offset from centre, plus edge-turning
+- tell the player once, after a short delay: logarithmic shows it after 1.4 s
+  (posture C)
+
+The game must remain playable.
+
+---
+
+## Edge cases that bite
+
+- **Re-request inside the cooldown with no activation left.** For example, the
+  player escapes, then quickly presses Enter on Resume. The first request fails;
+  it is retried while activation lasts and succeeds after 1250 ms. That only works
+  if the retry loop exists (rule 3).
+- **Hover navigation while locked.** There's no visible pointer, so ignore
+  `pointerover` while locked (menu-navigation). In practice an open screen has
+  already released the lock.
+- **Two lock owners.** A debug pane or devtools panel that calls `exitPointerLock`
+  itself must instead add a reason, or it fights the derivation every frame.
+- **Keyboard Lock API** (Chromium, fullscreen only) can capture Esc, turning the
+  exit into "hold Esc" (WICG Keyboard Lock). Only use it with a visible hint;
+  holding Esc still exits.
+- **iframe embedding** (itch.io and similar): a sandboxed iframe needs the
+  `allow-pointer-lock` sandbox token, or every request fails and the fallback mode
+  is all the player gets. Check the live embed once, rather than assuming the host
+  sets it.
+
+---
+
+## Verification checklist
+
+Each line names what the check cannot see.
+
+- [ ] **Unit, the want derivation:** for each reason, `want` is false while it's
+      set, and returns when it clears. *Blind to: browser behaviour.*
+- [ ] **Real browser, real input** (CDP, not synthetic events):
+      - click to lock, press Esc: pause opens once, and the cursor is visible
+      - click Resume within 1 s: lock returns once the cooldown passes, without a
+        second click
+      - resume with Esc: "Click to aim" shows, and a click relocks
+
+      *Blind to: browsers other than the one tested. Run once in Firefox and
+      Safari by hand.*
+- [ ] **Open Options from a key during play:** the lock releases, the release isn't
+      reported as a loss, and on close plus a click it relocks instantly.
+- [ ] **Alt-tab while locked:** the game pauses, and the lock isn't restored on
+      return until the player clicks. *Blind to: OS-specific focus behaviour.*
+- [ ] **Deny lock** (option off, or an iframe without `allow-pointer-lock`): the
+      fallback mode works and the notice shows once.
+- [ ] **Reticle at 120 Hz or more:** it moves smoothly. A world-anchored marker
+      doesn't step. *Blind to: 60 Hz screens, where stepping is invisible. Test on
+      a high-refresh display.*
+
+---
+
+## Cross-References
+
+Three tight links. Everything else routes through the map, so adding a skill
+touches one file rather than twenty: `references/routing-map.md` (in
+**game-design**).
+
+- **game-shell** — The auto-pause latch a lost lock reports to, and `onStackChange` for the `'screen'` reason
+- **hud-readouts** — Interpolated render state for world-anchored aim markers
+- **input-bindings** — Sensitivity, and the last-used device that decides whether lock applies

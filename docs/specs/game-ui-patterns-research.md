@@ -463,6 +463,10 @@ summary was seen. UNSOURCED means a convention with no source found.
     Focus lands on `data-default` on open. `onStackChange` fires on every push and
     pop. On a non-dismissable death screen with a 1000 ms read-hold: Enter inside
     the hold is dropped, Esc does nothing, and Enter after the hold activates.
+- **Transient activation window** (Chrome 152 built-in browser, 2026-10-12): one
+  click kept `navigator.userActivation.isActive` true for about 5.0 s; the
+  pointer-lock retry loop stopped at 4998 ms. The built-in browser refuses pointer
+  lock entirely, so a relock after the 1250 ms cooldown wasn't observed.
 - **`KeyboardEvent.code`** (MDN):
   - `code` is the physical position; don't derive labels from it.
   - `navigator.keyboard.getLayoutMap()` gives labels (experimental).
