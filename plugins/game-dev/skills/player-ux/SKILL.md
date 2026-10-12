@@ -147,12 +147,19 @@ during action, which must be read while the game runs, is **in-play-comms**'s.
 - **Say when, not just what.** A verb that only works in a place gets a zone in the
   world, and the prompt follows the zone. ice-pirates (2026-10-12, Bob's playtest:
   the tip "doesn't say to hold it while inside the cyan ring"):
-  - **Outside the zone:** the ring around the target is dimmed, with a keyless
-    prompt: "Get inside the ring round X, then hold G".
+  - **Outside the zone:** the ring around the target is dimmed, with a prompt
+    that has no key cap: "Get inside the ring round the ${name}, then hold G to
+    board" (`hud-model.ts:146`).
   - **Inside it:** the ring turns cyan and the key-cap prompt appears, with its
     progress fill (**input-bindings** rule 11).
-  - **The ring shows from ~3× its radius,** so the player can aim for it.
+  - **The ring shows early,** once the hull gap is within 3× the boarding gap
+    (510 against 170), so the player can aim for it.
   - **Spoken coaching uses the same words.**
+  - **Both the prompt text and the coaching name the key from `prompt(action)`**
+    (**input-bindings** rule 8). ice-pirates hard-codes "G" in both, and that
+    breaks after a remap.
+  - **The zone and its prompt are a readout, not a lesson:** they show every time
+    and never fade, unlike the learned hints below (ice-pirates).
 
   Felt verdict pending.
 - **Trigger, not timeline.** A hint shows while its trigger condition holds (near a

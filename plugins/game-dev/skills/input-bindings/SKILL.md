@@ -256,20 +256,23 @@ a typical game design pattern)". ice-pirates `src/sim/hud-model.ts` and
   `hold` is null for a tap and the progress for a held verb. The key comes from
   `prompt(action)` (rule 8). ice-pirates still hard-codes "G" and "T", its own
   noted gap.
-- **Fill the cap only while the key is actually down.** The HUD asks input through
-  an injected `holding(action)` callback, so the model stays pure. A fill shown
-  while the key is up reads as "you're already doing it".
+- **Fill the cap only while the action is running:** its key is down, or it is
+  toggled on (rule 10). The HUD asks input through an injected `holding(action)`
+  callback, so the model stays pure. ice-pirates checks the key only; it has no
+  toggle yet. Its hold value is derived partly from distance, so drawing it while
+  nothing runs would show progress the player isn't making.
 - **A multi-phase hold is one bar.** ice-pirates' boarding runs 0–50% while the
   helmsman closes in (from the gap) and 50–100% for the fight on deck, so the bar
   never resets mid-hold.
-- **A simple hold timer maps directly:** `max(0, held) / needed`. ice-pirates' tow
-  timer goes negative after a release until key-up, so one hold can't trigger
-  twice; clamp it at 0 for the bar.
+- **A simple hold timer maps directly:** `max(0, held) / needed`. In ice-pirates, T
+  is both tap-to-lasso and hold-to-release, so the tow timer goes negative after a
+  release until key-up and that same hold can't start a lasso. Clamp it at 0 for
+  the bar.
 - **Quantise the fill** (ice-pirates rounds to 2% steps), and write the DOM only on
   change (hud-readouts rule 3).
-- **Offer a press-once alternative where the hold is long** (XAG 107, rule 10). A
-  tap starts the action and a second tap cancels it; that mechanism is UNSOURCED,
-  and ice-pirates doesn't offer it yet.
+- **Rule 10's Toggle applies here too** (XAG 107): in toggle mode a press starts
+  the hold-to-complete and another press cancels it, with the fill running while
+  it's on. ice-pirates doesn't offer it yet.
 - **Say *when*, not just *what*,** for a hold with a range: see **player-ux**,
   Contextual Hints.
 
