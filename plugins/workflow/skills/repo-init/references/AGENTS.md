@@ -19,6 +19,8 @@ In practice:
 
 This applies to features, refactors, infrastructure, and the codebase as a whole. When tempted to design a "proper" version up front, build the smallest working slice first and let it grow.
 
+**Simplicity is not line count.** When choosing between a dependency and writing it yourself, ask what you would unknowingly be taking responsibility for — a library's value is often accumulated edge-case knowledge (encodings, specs, security, platform quirks), and "it's only ~30 lines" or your own confidence is not evidence that cost is low.
+
 ---
 
 ## Software Engineering Practices
