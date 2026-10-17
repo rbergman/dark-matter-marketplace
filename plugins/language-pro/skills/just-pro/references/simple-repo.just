@@ -22,7 +22,7 @@ setup:
 
 # === Quality Gates ===
 
-# Full quality gates - run before commits
+# Full quality gates - run at repository-required integration/CI checkpoints
 check: fmt lint test coverage-check
     @echo "All checks passed"
 

@@ -9,6 +9,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 
 **Related skills:**
 - **just-pro** - Build system patterns and templates
+- **tauri-dev** - Mixed Rust/frontend iteration and native acceptance for Tauri projects
 - **mise** - Tool version management
 - **output-compression** - CLI output compression (RTK + tokf)
 - Timbers (`timbers init`) - Development reasoning ledger
@@ -279,7 +280,13 @@ clean:
     @echo "Add clean commands"
 ```
 
-See **just-pro** skill for language-specific recipes.
+During build setup, evaluate a meaningful `check-fast` recipe for this project.
+When useful, add low-cost typechecks and selected existing model/hook regressions;
+keep changed-file lint/format and focused behavior checks in the development loop.
+For a monorepo, compose the actual package tripwires that exist rather than making
+`check-fast` alias the full root gate or adding a passing placeholder. Preserve
+explicit repository integration/release requirements. See **just-pro** for recipes
+and **tauri-dev** for mixed Rust/frontend verification.
 
 ---
 
@@ -378,7 +385,7 @@ Write to `.claude/settings.local.json`:
 
 This wires session-start context recovery and session-end enforcement. DM plugin skills (browser-qa, evaluator, repo-init, language skills, architecture skills) are available globally from the plugin install — this file adds project-specific hooks.
 
-**Customize per-project:** Add project-specific SessionStart commands (e.g., `bd prime` if beads is initialized), adjust Stop hook timeout for heavy gate suites.
+**Customize per-project:** Add project-specific SessionStart commands (e.g., `bd prime` if beads is initialized). The example Stop hook enforces Timbers bookkeeping; the dm-work plugin separately runs an explicit `just check-fast` tripwire when present. Do not solve slow iteration by assigning full suites to every Stop event or merely raising its timeout; preserve explicit repository policy and run full integration/release gates at their required checkpoints.
 
 ---
 
@@ -476,7 +483,7 @@ Quality gates and any other custom hook content go OUTSIDE the `--- BEGIN/END BE
 # --- BEGIN BEADS INTEGRATION v1.0.x ---  (managed by bd hooks install)
 # --- END BEADS INTEGRATION v1.0.x ---
 
-# Quality gates (lint-staged, just check, etc.) — preserved across reinstalls
+# Repository-selected staged checks/bookkeeping — preserved across reinstalls
 
 # --- timbers section (managed by timbers hooks install)
 # --- end timbers section ---

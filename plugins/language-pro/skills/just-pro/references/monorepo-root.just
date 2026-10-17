@@ -40,6 +40,10 @@ setup:
 check: (go::check) (web::check)
     @echo "All checks passed"
 
+# Evaluate a root check-fast that composes actual package tripwires, where useful.
+# Choose low-cost typechecks/meaningful model or hook regressions for this repo;
+# do not alias the full check or add a passing placeholder when no tripwires exist.
+
 # === Direct Delegation Examples ===
 # For packages without their own justfile, delegate directly:
 

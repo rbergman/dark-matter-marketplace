@@ -79,7 +79,7 @@ audit-ci:
 
 # === Quality Gates ===
 
-# Run all checks (fmt, lint, tests + coverage floor) - use before commits
+# Run all checks (fmt, lint, tests + coverage floor) - use at repository-required integration/CI checkpoints
 check: fmt lint coverage-check
     @echo "All Rust checks passed"
 

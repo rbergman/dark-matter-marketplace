@@ -2,7 +2,8 @@
 
 Apply the shipped instructions to these cases during a workflow change review.
 These are behavioral review cases, not a token-savings benchmark. Hook tests run
-separately with `bash tests/test-sanity-review.sh`.
+separately with `bash tests/test-sanity-review.sh` and
+`bash tests/test-run-gates-on-stop.sh`.
 
 | Case | Input | Required outcome |
 |---|---|---|
@@ -26,6 +27,12 @@ separately with `bash tests/test-sanity-review.sh`.
 | Fable alignment | Steering contains explicit progress updates and independent tool batching. | Preserve these; verify current Fable 5.1 guidance rather than removing them as Opus-native behavior. |
 | Unknown model | The target model cannot be established or official guidance is unavailable. | Report the gap; only fix demonstrated internal contradictions/duplication, without invented model claims. |
 | Historical merge | New commits followed the most recent merge. | Review the selected merge against its first parent, not current HEAD; runtime evidence must identify the tested build. |
+
+| Tauri visual slice | Chrome padding changes; browser HMR works; no shared lifecycle/native change. | Inspect affected states and run focused checks in one engine during iteration; no automatic native rebuild or full suite per edit. Follow batch policy before integration. |
+| Tauri authority change | A frontend IPC payload and Rust filesystem permissions change together. | Broaden immediately to boundary/backend/downstream checks and real native evidence; typed mocks or browser WebKit alone cannot establish acceptance. |
+| Shared candidate | Two workers supply focused results, then their changes are combined. | One integration owner checks/reviews the combined immutable candidate; no acceptance assembled solely from separate branch results. |
+| Changed final inputs | A fixture or static asset build changes while the final browser matrix runs. | Stop and rerun affected evidence on frozen inputs. No acceptance mixing old and new artifacts. |
+| Cheap hook, strict release | No check-fast recipe exists, but a full check/release recipe does. | Stop hook does not infer the full gate; required repository integration/release checks remain blocking. |
 
 Record which version/tree was reviewed and any failing case. Passing these cases
 shows consistency of the workflow policy under these inputs, not that every
