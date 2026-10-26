@@ -6,6 +6,8 @@
 .beads/*
 !.beads/issues.jsonl
 !.beads/hooks/
+!.beads/config.yaml
+!.beads/metadata.json
 history/
 __pycache__/
 

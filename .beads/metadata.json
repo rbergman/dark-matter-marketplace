@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "dark_matter_marketplace",
+  "project_id": "57ef8259-3581-43d6-906b-52057d714915"
+}
