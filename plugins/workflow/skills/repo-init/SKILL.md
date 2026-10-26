@@ -401,10 +401,10 @@ Beads supports two sync modes. Pick one before running `bd init` for a new proje
 | `.beads/issues.jsonl` role | Passive local export (viewer, interchange, backup) — gitignored | Cross-clone transport — committed |
 | Sync commands | `bd dolt push` (after bead work) / `bd dolt pull` (after `git pull`) | Pre-commit auto-export + post-merge auto-import hooks |
 | Config | `sync.remote` set in `.beads/config.yaml`; `export.auto = false` | `export.auto = true`, `export.git-add = true` |
-| Fresh-clone onboarding | `bd bootstrap` (auto-detects `refs/dolt/data` on origin) | `bd bootstrap` (auto-detects committed JSONL) |
+| Fresh-clone onboarding | `bd bootstrap` (auto-detects `refs/dolt/data` on origin) | `bd bootstrap` (imports committed JSONL, but only if origin has no `refs/dolt/data` and there's no `.beads/backup/`: both win over it) |
 | PR noise | None — bead state never appears in branch diffs | Every bead mutation produces JSONL diff |
 
-`bd bootstrap` is the universal entry point for both modes — it auto-detects which the repo is in. Prefer it over `bd init` / `bd import` for cloning.
+`bd bootstrap` is the universal entry point for both modes. Its order is `sync.remote`, then `refs/dolt/data` on origin, then `.beads/backup/*.jsonl`, then `.beads/issues.jsonl`, so in a legacy repo a stray Dolt ref or backup wins over the committed JSONL. Run `bd bootstrap --dry-run` first: a legacy repo should plan a JSONL import. Prefer it over `bd init` / `bd import` for cloning.
 
 ### Canonical mode (recommended)
 

@@ -37,14 +37,14 @@ Identify:
 Beads has two sync modes per upstream's [`SYNC_CONCEPTS.md`](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md):
 
 - **Canonical (`refs/dolt/data`):** `bd dolt push` and `bd dolt pull` are the **primary sync commands** — load-bearing, not optional. The repo's bead state lives in `refs/dolt/data` and only propagates via these commands.
-- **Legacy (JSONL-in-git):** `bd dolt push/pull` exit 0 with an informational message when no Dolt remote is configured (per fix #3194 in 1.0.3) — safe to call but not the active sync path. The committed JSONL is.
+- **Legacy (JSONL-in-git):** `bd dolt push/pull` exit 0 with an informational message when no Dolt remote is configured (per fix #3194 in 1.0.3) — safe to call but not the active sync path. The committed JSONL is. **If a legacy repo has a Dolt remote anyway, `bd dolt push` is harmful:** it publishes `refs/dolt/data`, which a fresh clone's `bd bootstrap` restores ahead of the tracked JSONL.
 
-In both modes, `bd dolt push/pull` are safe-to-call. Under canonical mode they're load-bearing.
+Under canonical mode `bd dolt push/pull` are load-bearing. In a legacy repo they're a no-op only while no Dolt remote exists.
 
 This means:
 - **Don't add an override paragraph above the BEADS INTEGRATION block.** Earlier guidance suggested doing so for embedded+git repos. That guidance was wrong — the injection is correct on every setup.
 - **Don't treat `bd dolt push` references in injected blocks as bugs, contradictions, or stale.** They're intentional sync-or-no-op instructions.
-- **If a global `~/.claude/CLAUDE.md` says "DO NOT use bd dolt push/pull,"** surface it as a hard CONFLICT requiring user attention — not a stale-note warning. Under canonical mode that directive breaks sync entirely; under legacy mode it's just stale. Either way, the user should update or remove that global directive. Don't propagate the prohibition into the repo file.
+- **If a global `~/.claude/CLAUDE.md` says "DO NOT use bd dolt push/pull" for every repo,** surface it as a hard CONFLICT requiring user attention — not a stale-note warning. Under canonical mode that directive breaks sync entirely. **A repo-scoped ban in a legacy repo's own AGENTS.md is correct, not a conflict** (for example "never `bd dolt push` here", where the repo is JSONL-in-git): keep it.
 - **If a repo's AGENTS.md already has an override paragraph from earlier alignment runs**, flag it for removal — it's noise now, not protection.
 
 ### 3. Show the plan before editing

@@ -110,7 +110,7 @@ This repo is in beads' **JSONL mode** (bd 1.0.4): `.beads/issues.jsonl` is the o
 
 - **Auto-export:** every `bd` mutation writes `.beads/issues.jsonl` and stages it (at most once a minute); the pre-commit hook flushes it, so commits carry current state.
 - **Auto-import:** after `git pull` brings a newer `issues.jsonl`, the next `bd` command imports it.
-- **Hooks:** the shims live in `.beads/hooks/` (tracked) with `core.hooksPath` set to `.beads/hooks`, relative, so worktrees run them too. `bd hooks install --force --beads` refreshes them.
+- **Hooks:** the shims live in `.beads/hooks/` (tracked) with `core.hooksPath` set to `.beads/hooks`, relative, so a worktree runs them once its branch contains them (from a431890; merge main into older branches). `bd hooks install --force --beads` refreshes them.
 - **Never run `bd dolt push`, or add a Dolt remote, here.** A fresh clone's `bd bootstrap` restores from `refs/dolt/data` or `.beads/backup/*.jsonl` ahead of the JSONL, so either one coming back would load stale beads and then overwrite the tracked JSONL with them. `.beads/backup/` stays untracked for the same reason.
 
 ```bash
