@@ -15,3 +15,6 @@ __pycache__/
 
 # Personal Claude Code permissions (local paths)
 .claude/settings.local.json
+
+# Beads / Dolt files (added by bd init)
+.beads-credential-key
