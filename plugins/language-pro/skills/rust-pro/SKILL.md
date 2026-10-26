@@ -432,10 +432,11 @@ Mechanically enforced by the shipped config unless noted:
 4. Match exhaustively — no wildcard `_` on your own enums
 5. Suppress a lint only with `#[expect(lint, reason = "...")]` at the smallest scope
 
-**Before committing:**
-1. Run `just check` (standard for projects using just)
-2. Fallback: `cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test`
-3. Never weaken the lint config to make a gate pass — decompose or justify with `#[expect]`
+**Verification cadence:**
+1. Follow explicit repository gates. During iteration, run affected crate tests and changed-scope format/lint checks; use `just check-fast` when the repo provides it.
+2. At a coherent Rust/backend checkpoint, run the affected crate and downstream checks. Use `just check` for full integration at the repository’s required checkpoint; it is not automatically due before every commit.
+3. Without project recipes, use `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test` at the appropriate package/workspace scope. Preserve full release requirements and reuse unchanged relevant evidence.
+4. Never weaken the lint config to make a gate pass — decompose or justify with `#[expect]`. With dm-work installed, see **tauri-dev** for mixed Rust/frontend and native-shell verification.
 
 ---
 

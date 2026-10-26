@@ -121,25 +121,27 @@ check: fmt lint test coverage-check
     @echo "All checks passed"
 ```
 
-In single-package repos, `just check` can run in a pre-commit hook. In monorepos, it's too slow for pre-commit — use lint-staged in the hook and run `just check` manually or in CI.
+Follow explicit repository hook and verification policy. A small repository may choose a full pre-commit check; do not impose it on every repository. A staged format/lint or bookkeeping hook can keep commits cheap while affected package/downstream checks and full integration run at the required batch/CI checkpoint. Keep strict lint, coverage, security and release gates intact.
 
-### Fast Check (Stop Hook Gate)
+### Fast Check (Stop Hook Tripwire)
 
-The dm-work Stop hook (`run-gates-on-stop.sh`) runs quality gates after every turn. It auto-detects: `just check-fast` → `just check` → `npm run check`, in that order. If `just check` is slow (>10s), add a `check-fast` recipe that drops the slowest steps — no additional hook configuration needed.
+The dm-work Stop hook (`run-gates-on-stop.sh`) only auto-runs an explicit `just check-fast` recipe. It does not infer a full `just check`, npm, Cargo or Go gate when that recipe is absent. A project can separately configure stricter hooks; those still apply. A Stop tripwire does not establish integration acceptance.
 
-Profile first to find what's slow — usually production builds and coverage, not tests:
+Choose low-cost checks that detect likely regressions in this repository: usually typechecks and a focused set of high-value model/hook tests. Whole-repo lint, all tests, coverage and production builds need not be dependencies of the fast recipe. Profile a slow command before changing it; do not choose an arbitrary time budget that weakens required evidence.
 
 ```just
-# Full gate — pre-commit, CI
+# Full gate — integration/CI, and any explicit repository checkpoint
 check: fmt lint test coverage-check build
     @echo "All checks passed"
 
-# Fast gate — Stop hook, iterative dev (drop slow build + coverage)
-check-fast: fmt lint test
-    @echo "Fast checks passed"
+# Example fast tripwire — choose representative existing tests for this repo
+check-fast: typecheck
+    npm run test -- --run tests/document-model.test.ts
 ```
 
-**Tips:** Add `--cache` to ESLint for repeat-run speedup (~6s to ~1s). Add `.eslintcache` to `.gitignore`.
+The test selector is illustrative: use the project's runner and existing tests. Keep changed-file lint/format and focused behavior checks in the development loop even when they do not belong in the generic Stop recipe. For mixed Rust/frontend packages and native acceptance with dm-work installed, see **tauri-dev**.
+
+**Tips:** ESLint's `--cache` can help repeat runs; add `.eslintcache` to `.gitignore` when used. Cached lint results do not replace runtime evidence.
 
 ### Clean Recipe
 

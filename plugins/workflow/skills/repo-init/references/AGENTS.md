@@ -32,7 +32,9 @@ This applies to features, refactors, infrastructure, and the codebase as a whole
 - **Conventional Commits.** Use `type(scope): subject` — `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`, `perf:`, `style:`, `build:`, `ci:`. Imperative subject, ≤72 chars. Body explains *why* when the diff doesn't make it obvious.
 - **Reference beads in the body**, not the subject (`Closes bd-abc-123` / `Refs bd-abc-124`).
 
-### Quality gates per commit
+### Quality gates and checkpoints
+
+Follow this repository’s explicit policy. Use focused behavior tests and changed-scope lint/format during iteration; choose a small meaningful `just check-fast` tripwire when useful. Run affected package and downstream checks at subsystem checkpoints and the full integration gate once on the combined final application candidate before integration. Preserve native, security and release gates. Full suites are not automatically due each turn, commit or development push; do not bypass an explicit stricter hook. For Tauri/mixed Rust+frontend work, use **tauri-dev** to separate browser iteration from native acceptance.
 
 If pre-commit hooks run the required checks for the exact changed state, reuse their results. Otherwise run the missing checks. Fix failures introduced by this change and in-scope defects. Establish and track pre-existing failures; a required failing gate prevents a clean-completion claim but does not authorize unrelated remediation. Ask for a scope decision only when necessary remediation is not already authorized. Record any permitted operator-approved exception as an exception, never a pass.
 
@@ -135,7 +137,7 @@ This workflow aligns the operator as much as the agent — apply it in both dire
 
 Bucket agent-relevant actions into three tiers, and be honest about which tier each item is actually in:
 
-- **always-do** — autopilot, no ask: orientation, gates before commit, bead tracking, targeted validation.
+- **always-do** — autopilot, no ask: orientation, repository-required gates, bead tracking, targeted validation.
 - **ask-first when not already authorized** — human checkpoint: merges, pushes to shared branches, destructive or irreversible operations, material schema/contract choices, and anything the operator scoped as theirs. Honor existing authorization for the same concrete action; it does not extend to a materially different target or effect.
 - **never-do** — enforced by **hooks**, not prose. A prose "never" in this file is a request the model can drift past; a PreToolUse hook is a rule. **A never-do without an enforcing hook is an ask-first — either wire the hook or reclassify it honestly.** dm-work ships a `--no-verify` commit block; add a path-protection PreToolUse hook for repo-specific protected paths (see `dm-work:repo-init`).
 

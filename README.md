@@ -88,6 +88,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `dm-work:mise` | Skill | Dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
+| `dm-work:tauri-dev` | Skill | Tauri and mixed Rust/frontend iteration, focused checks, batch integration and native acceptance |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
@@ -218,9 +219,14 @@ such as align-steering or review. Claude-specific tools still require their host
 or an explicitly described fallback; installed files alone do not prove every
 hook or native command is supported.
 
-Workflow changes are checked against `tests/workflow-cases.md` and the mocked
-commit-hook tests (`bash tests/test-sanity-review.sh`). The mocks verify command
-and evidence handling, not live model quality or quota savings.
+The Claude Stop hook runs an explicit `just check-fast` tripwire when present;
+it does not infer a full gate when absent. Repository integration/release gates
+and explicit stricter hooks still apply. A tripwire is not acceptance evidence.
+
+Workflow changes are checked against `tests/workflow-cases.md` and mocked hook
+tests (`bash tests/test-sanity-review.sh` and `bash tests/test-run-gates-on-stop.sh`).
+The mocks verify command and evidence handling, not live model quality, native
+behavior or quota savings.
 
 ```bash
 # Add the marketplace

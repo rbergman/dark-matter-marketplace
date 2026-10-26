@@ -84,7 +84,7 @@ npm run check
 
 ### Pre-commit Hook
 
-Quality gates run via a git pre-commit hook. With beads 1.0+, hooks live in **`.beads/hooks/`** (committed to git, managed by `bd hooks install --beads`). Beads, timbers, and your quality gates all coexist in the same hook file via section markers — content outside markers is preserved across reinstalls.
+Follow explicit repository hook policy. The staged-only example below keeps commits cheap; run broader quality gates at the repository’s integration checkpoints. Small repositories may explicitly choose a full pre-commit gate. With beads 1.0+, hooks live in **`.beads/hooks/`** (committed to git, managed by `bd hooks install --beads`). Beads, timbers, and your quality gates all coexist in the same hook file via section markers — content outside markers is preserved across reinstalls.
 
 **Setup:**
 1. `bd init` (creates `.beads/hooks/` and sets `core.hooksPath = .beads/hooks`)
@@ -104,18 +104,13 @@ if [ -f .git/MERGE_HEAD ]; then
 else
   npx lint-staged
 fi
-if command -v just >/dev/null 2>&1 && [ -f justfile ]; then
-  just check
-else
-  npm run check
-fi
 
 # --- timbers section (managed by timbers hooks install)
 # ... timbers hook run pre-commit shim ...
 # --- end timbers section ---
 ```
 
-**Why this order:** Beads runs first (fast: bd's internal hook handles auto-export+stage of `.beads/issues.jsonl`). Quality gates run next (slowest, may fail — but `bd export` already happened, so beads state is captured even if gates fail and the commit aborts). Timbers runs last (post-gate, post-export).
+**Why this order:** Beads runs first (fast: bd's internal hook handles auto-export+stage of `.beads/issues.jsonl`). Staged checks run next (may fail — but beads state is already captured if the commit aborts). Timbers runs last (post-gate, post-export).
 
 **Auto-export defaults (beads 1.0+):**
 - `export.auto = true` — every `bd` mutation writes `.beads/issues.jsonl` (60s throttled)
@@ -161,7 +156,7 @@ npm pkg set lint-staged --json '{"packages/web/**/*.{ts,tsx}": ["prettier --writ
 # Or independent packages (no workspaces): install lint-staged per TS package
 ```
 
-**Pre-commit: lint-staged only, no `npm run check`.** Full quality gates across all packages are too slow for pre-commit. Run lint-staged in the hook, run full gates via `just check` or CI.
+**Pre-commit default: lint-staged only.** Preserve explicit repository policy. Run affected package and downstream checks during development and full integration gates at the required batch/CI checkpoint, rather than adding every package’s full checks to each commit.
 
 ```bash
 # .beads/hooks/pre-commit (between BEADS markers and timbers section):
@@ -234,8 +229,7 @@ just check
 
 **Pre-commit Hook** (git hook with lint-staged):
 - lint-staged formats only staged files via Prettier (no whole-repo formatting)
-- Then `npm run check` runs typecheck + lint + test
-- Blocks commits with formatting issues, type errors, lint violations, or failing tests
+- Blocks commits when the configured staged checks fail; broader typecheck, lint and test gates run at repository-defined checkpoints
 - Lives in `.beads/hooks/pre-commit` alongside beads/timbers hooks (not husky, not `.git/hooks/`)
 - `.prettierignore` must exclude `.timbers/` and `.beads/` — without this, lint-staged reformats timbers JSON during commit, but its stash/restore cycle puts the original format back in the working tree, creating perpetual `MM` diffs with no semantic content
 
@@ -386,8 +380,8 @@ See `references/integration.md` for detailed framework patterns.
 3. Handle all promise returns explicitly
 4. Add explicit return types to exported functions
 
-**Before committing:**
-1. Run `just check` (includes typecheck + lint + test + vulnerability audit)
-2. Fallback: `npm run check && npm audit --omit=dev --audit-level=high`
-3. For monorepos at repo root: `just check` or `turbo run check`
-4. Fallback: `npx eslint src/ --fix && npx tsc --noEmit && npm test`
+**Verification cadence:**
+1. Follow explicit repository gates. During iteration, use typechecks, changed-file format/lint and focused behavior tests; use `just check-fast` when provided.
+2. At a coherent subsystem checkpoint, run affected package and downstream checks. Run `just check` (or the repository’s full integration recipe) at its required checkpoint, without assuming it runs per commit.
+3. Without project recipes, use `npx tsc --noEmit`, ESLint and tests at the affected scope. Preserve vulnerability audits, full integration and release requirements; reuse unchanged relevant evidence.
+4. With dm-work installed, see **tauri-dev** for frontend/browser iteration combined with Rust and native-shell evidence.
