@@ -122,7 +122,7 @@ You own bead state. Teammates read bead context and never modify it.
 | `bd close` | Lead, after the team delivers |
 | `bd dolt push` | Lead, at session end |
 
-Check the repo's sync mode before assuming: `bd dolt remote list` (a remote means canonical mode — push `refs/dolt/data`). Legacy JSONL-in-git repos auto-flush on commit instead.
+Check the repo's sync mode before assuming: a tracked `.beads/issues.jsonl` (`git ls-files .beads/issues.jsonl`) means legacy JSONL-in-git, which auto-flushes on commit, so never `bd dolt push` there, even if `bd dolt remote list` shows a remote. Canonical mode (`sync.remote` set, JSONL untracked) pushes `refs/dolt/data`.
 
 ---
 

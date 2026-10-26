@@ -106,28 +106,24 @@ Every code change should trace back to a bead — this creates a full paper trai
 
 ### Sync
 
-Beads 0.63+ auto-syncs via git-tracked `.beads/issues.jsonl`:
+This repo is in beads' **JSONL mode** (bd 1.0.4): `.beads/issues.jsonl` is the only bead store in git, and the one source of truth. There is deliberately no Dolt remote and no `refs/dolt/data` on origin.
 
-- **Auto-flush**: Every `bd` mutation (create, close, update, etc.) automatically writes to `.beads/issues.jsonl`. No manual export needed.
-- **Auto-import**: After `git pull` brings a newer `issues.jsonl`, the next `bd` command auto-imports. No manual import needed.
-- **Pre-commit hook**: Add `git add -f .beads/issues.jsonl 2>/dev/null` to your pre-commit hook to auto-stage beads state with every commit.
+- **Auto-export:** every `bd` mutation writes `.beads/issues.jsonl` and stages it (at most once a minute); the pre-commit hook flushes it, so commits carry current state.
+- **Auto-import:** after `git pull` brings a newer `issues.jsonl`, the next `bd` command imports it.
+- **Hooks:** the shims live in `.beads/hooks/` (tracked) with `core.hooksPath` set to `.beads/hooks`, relative, so worktrees run them too. `bd hooks install --force --beads` refreshes them.
+- **Never run `bd dolt push`, or add a Dolt remote, here.** A fresh clone's `bd bootstrap` restores from `refs/dolt/data` or `.beads/backup/*.jsonl` ahead of the JSONL, so either one coming back would load stale beads and then overwrite the tracked JSONL with them. `.beads/backup/` stays untracked for the same reason.
 
-With the pre-commit hook in place, sync is fully automatic:
 ```bash
-# Session start: just pull and work
+# Session start
 git pull
 bd ready
 
-# Session end: just commit and push (hook stages issues.jsonl)
+# Session end: commit and push (the hooks stage issues.jsonl)
 git commit -m "your message"
 git push
 ```
 
-**Manual fallback** (if pre-commit hook isn't set up):
-```bash
-bd export -o .beads/issues.jsonl   # -o required! bare bd export goes to stdout
-git add -f .beads/issues.jsonl
-```
+**Check a mutation stuck:** re-read it with `bd show <id>` in a separate call. If it didn't, `bd export -o .beads/issues.jsonl` (`-o` is required: bare `bd export` goes to stdout), then `git add .beads/issues.jsonl`.
 
 ### Important Rules
 

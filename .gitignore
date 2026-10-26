@@ -5,6 +5,7 @@
 .cursor/
 .beads/*
 !.beads/issues.jsonl
+!.beads/hooks/
 history/
 __pycache__/
 

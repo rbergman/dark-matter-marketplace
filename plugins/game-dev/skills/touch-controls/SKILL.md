@@ -20,10 +20,10 @@ a second game.
     legacy touch events, with 31 tests including "releases touches on cancel (like
     incoming phone call)".
   - **free-horses**: fixed DOM pedal buttons, swipe-to-look, two-finger pinch zoom.
-  - **wreckline**: fixed sticks with `setPointerCapture`, a "HOLD TO FIRE" aim stick
+  - **an unreleased twin-stick prototype**: fixed sticks with `setPointerCapture`, a "HOLD TO FIRE" aim stick
     that fires past 0.18 deflection, and separate phone and tablet layouts.
 
-  Only **sightline** vibrates. Numbers marked *corpus value* are posture A for the
+  Only one unreleased corpus game vibrates. Numbers marked *corpus value* are posture A for the
   game that ships them and posture B for yours (Numbers Policy).
 - **Feral Interactive, "Dev Dive": Lara Croft and the Guardian of Light, mobile**
   (feralinteractive.com, read 2026-10-12): the three-stage fire stick and the three
@@ -100,14 +100,14 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
   second code path.
 - **Each control owns one `pointerId`.** A stick claims the first touch on its half
   and ignores the rest until it is released, so a third finger can't steal it
-  (Hard Deck, wreckline). Track moves and ups on `window`, not the element, so a
+  (Hard Deck, the twin-stick prototype). Track moves and ups on `window`, not the element, so a
   thumb that leaves the stick's area keeps driving it. Alternatively call
-  `setPointerCapture` (wreckline, free-horses) and then also handle
+  `setPointerCapture` (the twin-stick prototype, free-horses) and then also handle
   `lostpointercapture`.
 - **Release on `pointerup`, `pointercancel`, page hide and window blur.** A call, a
   notification or a system gesture cancels the touch, and a hidden page may never
   see the up. redshifted tests the cancel. The sketch adds hide and blur (ADDED).
-  Match the `pointerId` on release: wreckline's notes record a fix for releasing
+  Match the `pointerId` on release: the twin-stick prototype's notes record a fix for releasing
   the wrong stick.
 - **`preventDefault()` on the touch `pointerdown`** over the play surface. This
   suppresses the compatibility `mousedown`/`mouseup`, so a cannon on `mousedown`
@@ -115,16 +115,16 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
   handler that fires or requests pointer lock must check `pointerType` itself.
   Hard Deck's pointer-lock click handler carries exactly that guard (**pointer-lock**
   says the same).
-- **Never request pointer lock for touch** (wreckline skips it for
+- **Never request pointer lock for touch** (the twin-stick prototype skips it for
   `pointerType === 'touch'`; **pointer-lock** owns the rest).
 
 ### 3. The CSS that keeps the page still
 
 | Property | On | Why |
 |---|---|---|
-| `touch-action: none` | Canvas, play surface, every control | No scroll, pan or double-tap zoom under a thumb (Hard Deck, free-horses, wreckline; redshifted instead calls `preventDefault` in non-passive touch listeners) |
+| `touch-action: none` | Canvas, play surface, every control | No scroll, pan or double-tap zoom under a thumb (Hard Deck, free-horses, the twin-stick prototype; redshifted instead calls `preventDefault` in non-passive touch listeners) |
 | `user-select: none`, `-webkit-touch-callout: none` | Play surface and controls | No text selection or iOS callout on a long press (Hard Deck) |
-| `overscroll-behavior: none` | `html`, `body` | No pull-to-refresh or rubber-band (wreckline) |
+| `overscroll-behavior: none` | `html`, `body` | No pull-to-refresh or rubber-band (the twin-stick prototype) |
 | `viewport-fit=cover` plus `env(safe-area-inset-*)` | Viewport meta; control positions | Use the full screen, keep controls out of the notch and home bar (Hard Deck). Both halves are needed: free-horses uses `env()` without `viewport-fit=cover`, so its insets read zero on iPhone |
 | `touch-action: manipulation` | Menu and tap-only UIs | Kills the double-tap-zoom delay but keeps pinch zoom (timberwolf, royal-inbox) |
 
@@ -141,14 +141,14 @@ twin stick with per-pointer ownership, and release on cancel, blur and hide.
 | Shape | How it works | Corpus | Use when |
 |---|---|---|---|
 | **Floating** | The base spawns where the thumb lands, on its half of the screen; it follows a thumb dragged past the rim | Hard Deck | Action games; thumbs never miss it, and it can't run out |
-| **Fixed** | A drawn base at a set position; it activates within a radius | redshifted (activation 2× radius), wreckline | The stick's position is part of the HUD, or the screen is crowded |
+| **Fixed** | A drawn base at a set position; it activates within a radius | redshifted (activation 2× radius), the twin-stick prototype | The stick's position is part of the HUD, or the screen is crowded |
 
 - **The dead zone rescales.** Inside it the output is zero; outside, the length is
   remapped so it starts at 0 just past the edge and reaches 1 at the rim (Hard
   Deck's `stickVector`). A dead zone that just clips makes the ship lurch to 12%
   speed the moment it moves.
 - **Corpus values:** radius 60 CSS px with dead zone 0.12 (Hard Deck); radius 75
-  canvas px with dead zone 0.15 (redshifted). wreckline's drive stick has 43 px
+  canvas px with dead zone 0.15 (redshifted). The twin-stick prototype's drive stick has 43 px
   travel and a plain 0.12 gate, which clips rather than rescales.
 - **The consumer keeps the last aim.** A released or resting stick reads zero; the
   input layer keeps the last non-zero aim, so letting go doesn't snap the turret
@@ -163,7 +163,7 @@ Every scheme gives something up:
 
 | Scheme | Corpus or precedent | Cost |
 |---|---|---|
-| **Aim stick fires past a threshold** (below it, aim only) | Hard Deck (`FIRE_AT` 0.5); wreckline (0.18); Feral's shipped "three-stage" stick: faint at rest, a slight push aims, further fires, with a haptic pulse at the switch | Players must find the threshold; the cue that marks it must be felt or seen |
+| **Aim stick fires past a threshold** (below it, aim only) | Hard Deck (`FIRE_AT` 0.5); the twin-stick prototype (0.18); Feral's shipped "three-stage" stick: faint at rest, a slight push aims, further fires, with a haptic pulse at the switch | Players must find the threshold; the cue that marks it must be felt or seen |
 | **Separate hold-to-fire button** | redshifted, free-horses | Feral rejected it: players had to stop aiming to shoot |
 | **Auto-fire while aiming at a target in range** | Feral tried it; Hard Deck has proposed it as the touch default, awaiting Bob's decision | Where ammo is finite, Feral's testers kept running out. Hard Deck's cannon is unlimited, so that cost doesn't apply there. It removes the decision to shoot |
 | **Tap-and-hold on an enemy** | Feral tried it | Comfortable, ammo-safe, but lost the twin-stick feel |
@@ -172,7 +172,7 @@ Every scheme gives something up:
   scheme Feral shipped and two corpus games use. The reason is this skill's
   (UNSOURCED): it keeps aiming and firing on one thumb without removing the choice
   to fire. With unlimited ammo, auto-fire is a fair alternative. The values are
-  posture B: Hard Deck's 0.5 is a first value, wreckline uses 0.18, and Feral gives
+  posture B: Hard Deck's 0.5 is a first value, the twin-stick prototype uses 0.18, and Feral gives
   no number.
 - **Mark the threshold.** Feral used a haptic pulse. On iPhone there is no
   vibration (rule 8), so the cue must also be visual: a ring at the threshold, and
@@ -184,7 +184,7 @@ Every scheme gives something up:
 
 - **Size.** GAG's phone floor is ~0.96 cm, and it's a floor. CSS px don't map to
   physical size across phones, so check on a real one. Corpus values: 66×66 px
-  (Hard Deck), 62 px (free-horses), 44–55 px (wreckline, by layout), radius 40
+  (Hard Deck), 62 px (free-horses), 44–55 px (the twin-stick prototype, by layout), radius 40
   canvas px (redshifted).
 - **Spacing.** Close buttons need to be larger still (GAG).
 - **Few buttons.** Feral's aim was the fewest buttons in ergonomic places, with
@@ -213,17 +213,17 @@ Every scheme gives something up:
   hide the button there rather than offering one that fails. "Add to Home Screen"
   with `display: standalone` is the iPhone's way to lose the browser chrome.
 - **Portrait support is a separate layout,** not a squeezed landscape one.
-  wreckline designs both; free-horses' spec requires portrait to work or to say
+  The twin-stick prototype designs both; free-horses' spec requires portrait to work or to say
   "rotate".
 - **The camera on a phone:** see **camera-control**, "Phones break the floor rule".
-  wreckline also picks a different default camera when the pointer is coarse.
+  The twin-stick prototype also picks a different default camera when the pointer is coarse.
 
 ### 8. Audio, haptics and the shell
 
 - **Audio unlock** on the first `pointerdown`, once (Hard Deck). Safari resumes an
   audio context only inside a gesture. **game-shell** owns the unlock.
 - **Haptics never carry information alone.** `navigator.vibrate` silently does
-  nothing on iOS. Gate it behind a setting and feature detection (sightline:
+  nothing on iOS. Gate it behind a setting and feature detection (the corpus game that vibrates:
   `haptics && 'vibrate' in navigator`, on by default), and always pair it with a
   visual or audio cue.
 - **Auto-pause on hide** works as on desktop (**game-shell**). Rule 2's release on

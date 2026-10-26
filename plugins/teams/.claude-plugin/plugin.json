@@ -1,6 +1,6 @@
 {
   "name": "dm-team",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Agent Teams roles: lead coordination and teammate protocol. Experimental — requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1.",
   "author": {
     "name": "Dark Matter",
