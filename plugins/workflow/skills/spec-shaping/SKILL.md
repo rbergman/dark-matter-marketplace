@@ -86,6 +86,31 @@ Template — include only sections that carry content, never pad:
 <ordered bounded slices, each → one bead carrying its criteria>
 ```
 
+**UI specs: keep product copy and evaluator notes apart.** When the spec is for a
+screen someone will evaluate before it ships (a prototype, mock backend, sample data,
+features left inert), do not write the honesty into the product's copy ("label every
+value Sample", "show a persistent demo banner"). Specify an **annotation layer**
+instead:
+
+- It is on by default, with one visible control to turn it off.
+- Notes are anchored to elements, not stitched into them. For a few notes that are
+  obvious without pointing, a single list in the control's panel is enough.
+- All notes live in one registry, separate from the product.
+
+Then classify every disclosure the spec needs:
+
+- **Product:** the real product would say it too (an unknown shown as "Not checked").
+- **Annotation:** only the evaluator needs it (synthetic values, mocked behavior,
+  unbuilt features, rationale).
+
+Acceptance then checks both directions:
+
+- Every disclosure classified as an annotation has a note.
+- With the layer off, no demo or prototype wording is left in the product.
+
+Reviewer and evaluator briefs say that captures are taken with the layer off, and that
+labeling lives in the layer.
+
 ### 3. Decision checkpoint
 
 The lead (Astra/Fable under the operator's routing policy) owns task definition,
