@@ -105,7 +105,13 @@ mise merges config from every directory up the tree, so a `mise.toml` in a **par
 
 Run `mise trust` in that folder once. A repo's own pin for the same tool still wins, so the parent pin only fills gaps.
 
-**GUI apps and hooks don't run `mise activate`.** A desktop app's hooks see a bare PATH, so a tool resolved only through activation is missing there, or an older copy earlier on PATH wins. Point that copy at the shim (`ln -sf ~/.local/share/mise/shims/<tool> ~/.local/bin/<tool>`): shims resolve the per-folder pin from the working directory, with or without activation.
+**GUI apps and hooks don't run `mise activate`.** A desktop app's hooks see a bare PATH, so a tool resolved only through activation is missing there, or an older standalone copy earlier on PATH wins. Shims resolve the per-folder pin from the working directory with or without activation, so the fix is to route that PATH entry through the shim — but **only after every folder resolves a version** (a global `mise use -g <tool>@<ver>`, plus parent pins where needed). A shim with no version set fails with `No version is set for shim`, which breaks every hook that calls the tool. Then move the old copy aside rather than overwriting it:
+
+```bash
+mise use -g <tool>@<ver>                      # first: a version everywhere
+mv ~/.local/bin/<tool> ~/.local/bin/<tool>.pre-mise
+ln -s ~/.local/share/mise/shims/<tool> ~/.local/bin/<tool>
+```
 
 ### Example `.mise.toml`
 
