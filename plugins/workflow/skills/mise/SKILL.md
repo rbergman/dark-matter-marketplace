@@ -93,6 +93,20 @@ mise trust      # Allow repo's .mise.toml
 mise install    # Install pinned tools
 ```
 
+### Pinning a Group of Repos Without Touching Them
+
+mise merges config from every directory up the tree, so a `mise.toml` in a **parent folder** pins a tool for every repo beneath it — even repos with their own `.mise.toml` that don't mention that tool. Use it to hold a team's repos on an older CLI while your global default moves on, without committing anything to their repos:
+
+```toml
+# ~/Projects/<client>/mise.toml  (not in any repo)
+[tools]
+"github:gastownhall/beads" = "1.0.4"
+```
+
+Run `mise trust` in that folder once. A repo's own pin for the same tool still wins, so the parent pin only fills gaps.
+
+**GUI apps and hooks don't run `mise activate`.** A desktop app's hooks see a bare PATH, so a tool resolved only through activation is missing there, or an older copy earlier on PATH wins. Point that copy at the shim (`ln -sf ~/.local/share/mise/shims/<tool> ~/.local/bin/<tool>`): shims resolve the per-folder pin from the working directory, with or without activation.
+
 ### Example `.mise.toml`
 
 ```toml
