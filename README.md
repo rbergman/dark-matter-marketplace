@@ -90,7 +90,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:mise` | Skill | Dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:tauri-dev` | Skill | Tauri and mixed Rust/frontend iteration, focused checks, batch integration and native acceptance |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
-| `dm-work:output-compression` | Skill | CLI output compression via RTK (baseline) and tokf (per-project) — reduce build/test/git noise by 60-99% |
+| `dm-work:output-compression` | Skill | Keep noisy build/test/git output small at the source; optional per-project tokf filters. Explains why blanket compressors (RTK) don't pay |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
 | `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
@@ -263,7 +263,7 @@ The plugins include opinionated DX tooling that works together:
 |------|-------|---------|
 | [mise](https://mise.jdx.dev) | `dm-work:mise` | Version management for all languages/tools — replaces nvm, pyenv, goenv |
 | [just](https://just.systems) | `dm-lang:just-pro` | Command runner — consistent `just check`, `just setup` across projects |
-| [RTK](https://rtk-ai.app) + [tokf](https://tokf.net) | `dm-work:output-compression` | CLI output compression — RTK for global baseline, tokf for per-project customization |
+| [tokf](https://tokf.net) | `dm-work:output-compression` | Optional per-project output filters for repeat noisy commands |
 
 **The pattern**: Projects have a `.mise.toml` (pinned versions) and `justfile` (commands). Setup is always `just setup` → runs `mise trust && mise install` + language deps. This ensures reproducible environments without requiring devs to configure their shells.
 

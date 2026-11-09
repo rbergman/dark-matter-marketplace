@@ -1,92 +1,37 @@
 ---
 name: output-compression
-description: Reduce CLI output noise before it reaches LLM context. Use when setting up repos, troubleshooting context overflow from build/test/git output, or when Bash tool output exceeds limits. Covers RTK (zero-config baseline) and tokf (per-project customization). Either or both may be installed — the skill adapts gracefully when one is absent.
+description: Keep noisy CLI output (build, test, coverage, git) from flooding LLM context. Use when a specific command's output overflows the Bash tool limit, when gate output drowns the signal, or when someone proposes installing a blanket output compressor. Fix the noisy command at its source first; tokf per-project filters are the optional tool for repeat offenders.
 ---
 
-# CLI Output Compression for LLMs
+# Keeping CLI Output Small
 
-Build, test, and git output can consume 20-40% of context in a typical session. Output compression tools intercept CLI commands and emit only the signal, reducing noise by 60-99%.
+Fix the specific command that is noisy. Don't install a blanket compressor.
 
-Two tools serve this purpose with different trade-offs:
+## Why not a global compressor
 
-| | RTK | tokf |
-|--|-----|------|
-| **Philosophy** | Zero-config, batteries-included | Config-driven, per-project customization |
-| **Install** | `brew install rtk` | `brew install mpecan/tokf/tokf` |
-| **Setup** | `rtk init --global` | `tokf hook install` |
-| **Custom filters** | Built-in only (30+ commands) | TOML per-project + Lua scripting (61+ built-in) |
-| **Per-repo config** | No | `.tokf/filters/` committed with repo |
-| **Multi-tool support** | Claude Code, Cursor, Gemini, Codex, Copilot, etc. | Claude Code hook + CLI filter (`tokf filter < input`) |
-| **Best for** | Global baseline across all repos | Surgical filtering when defaults aren't enough |
+Paired benchmarks of RTK, the best-known transparent Bash-output compressor, found no saving in Claude Code:
 
-**Use RTK as the global baseline.** Add tokf when RTK's defaults don't handle a specific output pattern (e.g., test coverage tables overflowing Bash limits).
+- **JetBrains** (July 2026; Claude Code 2.1.201, Sonnet 5, 86 SkillsBench tasks, about 425 billed trials): **+7.6% cost** per task at low effort (p=0.004), no difference at high effort. Quality didn't change. Sessions took 13.8% more turns, and every extra turn re-reads the whole history.
+- **Quesma** (September 2026; Claude Code 2.1.220, Fable 5.0, Terminal-Bench 2.1, 1,740 attempts): **+1% cost** per task (95% CI −3% to +5%). Cached input was 94% of input tokens but only 30% of the bill.
 
-**Related skills:**
-- **repo-init** — scaffolding includes output compression setup
-- **cli-tools** — power CLI tools that complement compression
-- **just-pro** — build system integration
+**Why it doesn't pay:**
+- Claude Code's built-in Read, Grep and Glob tools bypass a Bash hook.
+- About half of agent shell commands have no filter rule.
+- Cached re-reads dominate the bill.
 
----
+JetBrains worked out the best possible saving before running anything: about 3%. A compressor's own "tokens saved" counter (often bytes ÷ 4) doesn't measure the bill. Don't install one unless new paired measurements say otherwise.
 
-## Detection and Graceful Fallback
+## Fix it at the source
 
-Before recommending or using either tool, check what's available:
+Most floods come from a handful of commands, so fix those directly:
 
-```bash
-command -v rtk &>/dev/null && echo "rtk: installed" || echo "rtk: not installed"
-command -v tokf &>/dev/null && echo "tokf: installed" || echo "tokf: not installed"
-```
+- **Quiet flags and reporters:** `vitest run --reporter=dot`, `cargo test -q`, `eslint --format unix`, `git push -q`. Don't use flags that hide warnings a gate depends on.
+- **Redirect, then read the tail:** `npm run test:coverage > /tmp/coverage.txt 2>&1; tail -5 /tmp/coverage.txt`. The full log stays readable on disk.
+- **Bake it into the recipe.** A `just` gate that prints a one-line pass and the failures only on failure helps every agent and every human. See **just-pro**.
 
-| RTK | tokf | Recommendation |
-|-----|------|----------------|
-| Installed | Installed | Both active. RTK handles baseline, tokf handles project-specific overrides. No conflict. |
-| Installed | Not installed | RTK handles everything. Suggest tokf only if a specific output isn't handled. |
-| Not installed | Installed | tokf handles everything. |
-| Neither | Neither | Suggest `brew install rtk` as the quick win. |
+## tokf: per-project filters for repeat offenders
 
-**Never fail or error if a tool is missing.** Suggest installation, don't require it.
-
----
-
-## RTK (Global Baseline)
-
-### Setup
-
-```bash
-brew install rtk
-rtk init --global      # installs PreToolUse hook, restart CC
-```
-
-That's it. RTK silently compresses output for git, test runners, linters, package managers, docker, kubectl, and more. No per-project config needed.
-
-### How it works
-
-RTK installs a PreToolUse hook that rewrites Bash commands transparently. Four compression strategies: smart filtering, grouping, truncation, deduplication.
-
-### Typical savings
-
-| Command | Reduction |
-|---------|-----------|
-| `git status` (large repo) | ~90% |
-| `npm test` (100 tests) | ~94% |
-| `cargo test` | ~98% |
-
-### Limitations
-
-- No custom filters — built-in only
-- Built-in CC tools (Read, Grep, Glob) bypass the hook
-- If a specific output pattern isn't handled well, no per-project override — use tokf
-
-### Gotchas
-
-- **`rtk lint src` breaks with positional args.** RTK rewrites/dispatches in a way that treats positional args like `src` as npm package names (npx tries to fetch them). Call `rtk lint` with no positional args and let ESLint's `files:` config handle scope. Same applies to other tools where positional directory args are optional.
-- **Binary wrapper mode**: `rtk <command>` works outside Claude Code — in justfile recipes, CI, shell scripts. See **just-pro** "Token-Efficient Recipes" for the pattern.
-
----
-
-## tokf (Per-Project Customization)
-
-Use when RTK's built-in filters don't handle a specific output, or when you need per-project filters shared across the team.
+Use tokf when one project keeps hitting the same noisy output and the source fix isn't available, for example a coverage table that overflows the Bash limit. It has not been benchmarked independently, so scope it to the commands that need it.
 
 ### Setup
 
@@ -96,9 +41,9 @@ tokf hook install                 # PreToolUse hook
 tokf skill install                # optional: agent filter authoring
 ```
 
-### Custom filter example
+**Never fail or error if tokf is missing.** Fall back to the source fixes above.
 
-For the specific problem of test coverage output exceeding Bash limits:
+### Custom filter example
 
 ```toml
 # .tokf/filters/npm/coverage.toml
@@ -144,40 +89,6 @@ tokf ls                        # List available filters
 tokf which "npm test"          # Show matching filter
 tokf eject cargo/build         # Override a built-in locally
 tokf verify                    # Test all project filters
-tokf gain                      # Token savings stats
 ```
 
----
-
-## Solving Common Problems
-
-### Test coverage exceeds Bash output limit
-
-**Symptoms:** Commit fails because `test:coverage` output exceeds the Bash tool's output limit. Gates pass when run separately.
-
-**RTK:** May handle automatically. Check: `rtk --list | grep test`
-
-**tokf:** Create a project-local filter (see coverage example above) that keeps only the summary.
-
-**Quick workaround (no tools):** `npm run test:coverage > /tmp/coverage.txt 2>&1 && tail -5 /tmp/coverage.txt`
-
-### Build output floods context
-
-**RTK:** Handles by default for most build tools.
-
-**tokf:** `tokf eject <build-tool>` and customize the `skip` patterns.
-
-### Git push/pull noise
-
-Both tools handle this out of the box.
-
----
-
-## Existing Project Setup Prompt
-
-> **Set up CLI output compression for this project.**
->
-> 1. Check what's installed: `command -v rtk` and `command -v tokf`
-> 2. If RTK installed: verify it's working (`rtk init --global` if not yet initialized)
-> 3. If specific commands still produce excessive output, install tokf and create a filter in `.tokf/filters/`
-> 4. Commit `.tokf/` so the team shares custom filters
+**Related skills:** **just-pro** (quiet gate recipes), **repo-init** (scaffolding).

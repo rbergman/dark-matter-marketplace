@@ -417,33 +417,20 @@ setup:
 
 ## Token-Efficient Recipes
 
-When RTK is installed, justfile recipes can use it as a binary wrapper to get compressed output in CI, shell scripts, and non-Claude-Code contexts — not just inside Claude Code's PreToolUse hook.
-
-The pattern: try RTK first, fall back to the raw command if RTK isn't available:
+Make gate recipes quiet on success and specific on failure, so agents and humans read the signal rather than the log. Use the tool's own quiet flags or reporters rather than a wrapping compressor (see **output-compression** for why):
 
 ```just
-# Token-efficient typecheck — compressed output when rtk is available
-typecheck:
-    #!/usr/bin/env bash
-    if command -v rtk &>/dev/null; then
-        rtk tsc --noEmit
-    else
-        tsc --noEmit
-    fi
-
-# Token-efficient test run
+# Quiet on success; full failure detail
 test:
+    vitest run --reporter=dot
+
+# Long output goes to a file; show only the tail
+coverage:
     #!/usr/bin/env bash
-    if command -v rtk &>/dev/null; then
-        rtk vitest run
-    else
-        vitest run
-    fi
+    log=$(mktemp)
+    npm run test:coverage > "$log" 2>&1 || { tail -40 "$log"; exit 1; }
+    tail -5 "$log"
 ```
-
-This works because `rtk <command>` acts as a transparent wrapper — it runs the command and filters the output through RTK's compression. The PreToolUse hook only fires inside Claude Code; the wrapper pattern gives you compression everywhere.
-
-See **output-compression** skill for RTK setup and gotchas.
 
 ---
 

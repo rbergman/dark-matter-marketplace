@@ -11,7 +11,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 - **just-pro** - Build system patterns and templates
 - **tauri-dev** - Mixed Rust/frontend iteration and native acceptance for Tauri projects
 - **mise** - Tool version management
-- **output-compression** - CLI output compression (RTK + tokf)
+- **output-compression** - Keeping noisy CLI output small (source fixes, optional tokf)
 - Timbers (`timbers init`) - Development reasoning ledger
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
@@ -303,22 +303,6 @@ Create `.mise.toml`:
 # rust = "1.83"
 # just = "latest"
 ```
-
----
-
-## Step 5.5: Output Compression (Optional)
-
-CLI output compression reduces build/test/git noise before it reaches LLM context. See **output-compression** skill for full details.
-
-```bash
-# Option 1: RTK (zero-config baseline — recommended)
-command -v rtk &>/dev/null && rtk init --global || echo "Install: brew install rtk"
-
-# Option 2: tokf (per-project customization — add when RTK isn't enough)
-command -v tokf &>/dev/null && tokf hook install || echo "Install: brew install mpecan/tokf/tokf"
-```
-
-Either or both tools can be active. RTK handles most CLI noise automatically. Add tokf with project-local `.tokf/filters/` when you need surgical filtering for specific commands.
 
 ---
 
