@@ -11,7 +11,7 @@ Scaffold a new or existing repository with standard project infrastructure.
 - **just-pro** - Build system patterns and templates
 - **tauri-dev** - Mixed Rust/frontend iteration and native acceptance for Tauri projects
 - **mise** - Tool version management
-- **output-compression** - Keeping noisy CLI output small (source fixes, optional tokf)
+- **output-compression** - Keeping noisy CLI output small at the source
 - Timbers (`timbers init`) - Development reasoning ledger
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
