@@ -428,8 +428,11 @@ test:
 coverage:
     #!/usr/bin/env bash
     log=$(mktemp)
-    npm run test:coverage > "$log" 2>&1 || { tail -40 "$log"; exit 1; }
-    tail -5 "$log"
+    if npm run test:coverage > "$log" 2>&1; then
+        tail -5 "$log"; rm -f "$log"
+    else
+        status=$?; tail -40 "$log"; echo "full log: $log"; exit "$status"
+    fi
 ```
 
 ---

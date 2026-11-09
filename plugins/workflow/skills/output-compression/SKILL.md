@@ -25,8 +25,8 @@ JetBrains worked out the best possible saving before running anything: about 3%.
 
 Most floods come from a handful of commands, so fix those directly:
 
-- **Quiet flags and reporters:** `vitest run --reporter=dot`, `cargo test -q`, `eslint --format unix`, `git push -q`. Don't use flags that hide warnings a gate depends on.
-- **Redirect, then read the tail:** `npm run test:coverage > /tmp/coverage.txt 2>&1; tail -5 /tmp/coverage.txt`. The full log stays readable on disk.
+- **Quiet flags and reporters:** `vitest run --reporter=dot`, `cargo test -q`, `git push -q`. Don't use flags that hide warnings a gate depends on.
+- **Redirect, then read the tail:** `npm run test:coverage > /tmp/coverage.txt 2>&1 && tail -5 /tmp/coverage.txt || tail -40 /tmp/coverage.txt`. Pass or fail stays visible, and the full log stays on disk. In a recipe, keep the exit code (see **just-pro**).
 - **Bake it into the recipe.** A `just` gate that prints a one-line pass and the failures only on failure helps every agent and every human. See **just-pro**.
 
 ## tokf: per-project filters for repeat offenders
