@@ -51,16 +51,6 @@ When file/function/complexity limits trigger, **extract logical sections into we
 
 If a workflow only exists as a shell snippet in a doc, it's not really a workflow yet — promote it to `just`.
 
-### Output compression: rtk and tokf
-
-When available, use `rtk` (Rust Token Killer) and `tokf` (per-project filter) to compress noisy command output before it reaches the agent's context. Both are transparent: agents call commands normally and the wrappers handle compression.
-
-- **rtk** is the global baseline (npm/git/build output → 60-90% token reduction)
-- **tokf** is per-project for repo-specific noise patterns
-- Available? Use them. Not installed? Don't block on it; the work still proceeds.
-
-See `dm-work:output-compression` for setup.
-
 ### Independent review is non-negotiable
 
 All substantive implementation work — yours or a subagent's — gets an independent review pass before close. Gates and review catch different problems; green gates don't substitute for review. The implementer owns the fixes (review identifies; the author who shipped the change remediates).
