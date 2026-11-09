@@ -14,11 +14,11 @@ dependencies = []
 
 [dependency-groups]
 dev = [
-    "pyright>=1.1.400",
+    "pyright>=1.1.414",
     "pytest>=9.0.0",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=7.0.0",
-    "ruff>=0.14.0",
+    "ruff>=0.17.0",
 ]
 
 # Required for src/ layout - tells hatch where to find the package
@@ -41,7 +41,7 @@ select = [
     "UP",     # pyupgrade
     "ARG",    # flake8-unused-arguments
     "SIM",    # flake8-simplify
-    "TCH",    # flake8-type-checking
+    "TC",     # flake8-type-checking
     "PTH",    # flake8-use-pathlib
     "RUF",    # Ruff-specific rules
 ]

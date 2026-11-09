@@ -15,9 +15,9 @@ description: Dev-tool and runtime version management with mise — the modern re
 
 | Problem | Old Way | Mise Way |
 |---------|---------|----------|
-| Node versions | nvm, fnm, volta | `mise use node@22` |
+| Node versions | nvm, fnm, volta | `mise use node@26` |
 | Python versions | pyenv, conda | `mise use python@3.12` |
-| Go versions | goenv, manual | `mise use go@1.25` |
+| Go versions | goenv, manual | `mise use go@1.27` |
 | CLI tools | Homebrew | `mise use jq ripgrep bat` |
 | Per-project versions | `.nvmrc` + `.python-version` + ... | Single `.mise.toml` |
 
@@ -68,7 +68,7 @@ direnv hook fish | source
 ### Install Tools
 
 ```bash
-mise use node@22 python@3.12 go@latest  # Current directory
+mise use node@26 python@3.12 go@latest  # Current directory
 mise use -g jq ripgrep bat              # Global (all directories)
 ```
 
@@ -80,7 +80,7 @@ mise use -g jq ripgrep bat              # Global (all directories)
 
 ```bash
 # Pin language versions
-mise use node@22 go@1.25
+mise use node@26 go@1.27
 
 # Creates .mise.toml - commit it
 git add .mise.toml
@@ -97,8 +97,8 @@ mise install    # Install pinned tools
 
 ```toml
 [tools]
-node = "22"
-go = "1.25"
+node = "26"
+go = "1.27"
 python = "3.12"
 
 # Project-specific tools
@@ -308,7 +308,7 @@ eval "$(mise activate bash)"     # Wrong - generates shell hooks
 
 ```bash
 # Install tools
-mise use node@22              # Current directory
+mise use node@26              # Current directory
 mise use -g ripgrep           # Global
 
 # Manage versions

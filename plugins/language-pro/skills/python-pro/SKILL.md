@@ -156,7 +156,7 @@ logger: Any = structlog.get_logger()
 
 ### TYPE_CHECKING Imports
 
-Ruff's TCH rules flag imports used only for type hints. Move them to a `TYPE_CHECKING` block:
+Ruff's TC (flake8-type-checking) rules flag imports used only for type hints. Move them to a `TYPE_CHECKING` block:
 
 ```python
 from __future__ import annotations  # Required for forward refs

@@ -298,9 +298,9 @@ Create `.mise.toml`:
 [tools]
 # Add tools with: mise use <tool>@<version>
 # Examples:
-# node = "22"
-# go = "1.23"
-# rust = "1.83"
+# node = "26"
+# go = "1.27"
+# rust = "1.99"
 # just = "latest"
 ```
 

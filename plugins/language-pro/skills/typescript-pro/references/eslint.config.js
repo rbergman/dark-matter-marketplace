@@ -1,15 +1,17 @@
 // TypeScript ESLint Strict Configuration Template
 // Copy to project root as eslint.config.js
-// Requires: npm install -D eslint typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs
+// Requires: npm install -D eslint typescript@~6.0 typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs
+// (typescript-eslint needs TypeScript <6.1; see SKILL.md "TypeScript 7".)
 //
 // Usage: npx eslint src/
 // Auto-fix: npx eslint src/ --fix
 
+import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
 import sonarjs from 'eslint-plugin-sonarjs';
 
-export default tseslint.config(
+export default defineConfig(
   // --- Base: Strict Type-Checked ---
   // Includes recommended + recommended-type-checked + strict rules requiring type info
   ...tseslint.configs.strictTypeChecked,
@@ -284,7 +286,7 @@ export default tseslint.config(
       '*.js',           // Ignore JS config files at root
       '*.cjs',
       '*.mjs',
-      '.worktrees/',
+      '.worktrees/',    // repo-init's AGENTS template still nests worktrees here
     ],
   },
 );
