@@ -8,7 +8,7 @@
 version: "2"
 
 run:
-  go: "1.25"
+  # Go version comes from go.mod; do not pin it here.
   modules-download-mode: readonly
 
 linters:

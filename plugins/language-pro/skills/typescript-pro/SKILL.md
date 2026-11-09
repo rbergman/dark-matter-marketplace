@@ -33,18 +33,18 @@ Senior-level TypeScript expertise for production projects. Focuses on strict typ
 
 ---
 
-## Project Setup (TypeScript 5.5+)
+## Project Setup (TypeScript 6.0)
 
 ### Version Management
 
-Pin Node version with [mise](https://mise.jdx.dev): `mise use node@22` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
+Pin Node version with [mise](https://mise.jdx.dev): `mise use node@26` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
 
 ### New Project Quick Start
 
 ```bash
 # Initialize
 npm init -y
-npm install -D typescript typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest @vitest/coverage-v8
+npm install -D eslint typescript@~6.0 typescript-eslint @eslint-community/eslint-plugin-eslint-comments eslint-plugin-sonarjs prettier lint-staged vitest @vitest/coverage-v8
 
 # Add scripts to package.json:
 npm pkg set scripts.typecheck="tsc --noEmit"
@@ -52,6 +52,8 @@ npm pkg set scripts.lint="eslint src/"
 npm pkg set scripts.test="vitest run"
 npm pkg set scripts.coverage="vitest run --coverage --coverage.thresholds.lines=70 --coverage.thresholds.functions=70 --coverage.thresholds.branches=70 --coverage.thresholds.statements=70"
 npm pkg set scripts.check="npm run typecheck && npm run lint && npm run coverage"
+
+# typescript@~6.0 is deliberate: see "TypeScript 7" below.
 
 # Configure lint-staged (formats only staged files on commit)
 npm pkg set lint-staged --json '{"*.{ts,tsx}": ["prettier --write"], "*.{json,yml,yaml}": ["prettier --write"]}'
@@ -173,6 +175,8 @@ if git diff --cached --name-only | grep -q '^packages/web/'; then
 fi
 ```
 
+**ESLint config lookup: per file.** ESLint 10 finds `eslint.config.js` by walking up from each linted file, not from the cwd, so a package's own config applies to its files even when ESLint runs from the root.
+
 **`.prettierrc`: root-level.** Prettier walks up the directory tree, so a single root config covers all TS packages. Use per-package configs only if packages need different formatting.
 
 **Required Config Files:** Copy `references/gitignore` → `.gitignore`, `references/prettierrc.json` → `.prettierrc`, then create `tsconfig.json` and `eslint.config.js` per the templates below.
@@ -236,6 +240,19 @@ just check
 ---
 
 ## Linting Configuration
+
+### TypeScript 7
+
+`typescript@latest` is 7.x, the native Go compiler. It ships no JavaScript API, and typescript-eslint's type-aware rules need one, so typescript-eslint supports TypeScript `<6.1` ([dependency versions](https://typescript-eslint.io/users/dependency-versions)). Keep `typescript` on `~6.0`. To type-check with 7 while linting on 6, alias them as Microsoft's TS 7.0 release notes describe:
+
+```json
+"devDependencies": {
+  "@typescript/native": "npm:typescript@^7.0.2",
+  "typescript": "npm:@typescript/typescript6@~6.0.2"
+}
+```
+
+`npx tsc` then runs 7, and typescript-eslint imports 6. Drop the pin when typescript-eslint supports TS 7.1+ (typescript-eslint#10940).
 
 ### eslint.config.js Template
 

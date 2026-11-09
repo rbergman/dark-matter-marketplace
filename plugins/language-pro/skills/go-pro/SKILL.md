@@ -30,18 +30,18 @@ Senior-level Go expertise for production projects. Focuses on idiomatic patterns
 
 ---
 
-## Project Setup (Go 1.25+)
+## Project Setup (Go 1.26+)
 
 ### Version Management
 
-Pin Go version with [mise](https://mise.jdx.dev): `mise use go@1.25` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
+Pin Go version with [mise](https://mise.jdx.dev): `mise use go@1.27` (creates `.mise.toml` — commit it). Team members run `mise install`. See **mise** skill for setup.
 
 ### New Project Quick Start
 
 ```bash
 # Initialize
 go mod init github.com/org/project
-go mod edit -go=1.25
+go mod edit -go=1.26   # oldest supported release; Go supports the two newest
 
 # Add toolchain dependencies (tracked in go.mod)
 go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
@@ -308,10 +308,10 @@ doctor:
     set -euo pipefail
     echo "Checking toolchain..."
 
-    # Validate Go version (requires 1.25+)
+    # Validate Go version (requires 1.26+)
     GO_VERSION=$(go version | grep -oE 'go[0-9]+\.[0-9]+' | sed 's/go//')
-    if [[ "$(printf '%s\n' "1.25" "$GO_VERSION" | sort -V | head -1)" != "1.25" ]]; then
-        echo "FAIL: Go $GO_VERSION < 1.25 required"
+    if [[ "$(printf '%s\n' "1.26" "$GO_VERSION" | sort -V | head -1)" != "1.26" ]]; then
+        echo "FAIL: Go $GO_VERSION < 1.26 required"
         exit 1
     fi
     echo "✓ Go $GO_VERSION"
