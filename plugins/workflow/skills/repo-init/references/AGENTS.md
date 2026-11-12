@@ -115,7 +115,7 @@ Agent Teams are off by default. When enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TE
 
 ### Worktrees
 
-Put worktrees outside the repo, at `<parent>/<repo>.wt/<branch>`, with the folder named for its branch: `git worktree add ../<repo>.wt/<branch> -b <branch>`, or `bd worktree create ../<repo>.wt/<branch>` for the beads-integrated workflow. Never nest them inside the repo: test runners, bundlers and file watchers crawl nested copies, and `.gitignore` does not stop them. Whoever creates a worktree removes it once its work has landed.
+Put worktrees outside the repo, at `<parent>/<repo>.wt/<branch>`, with the folder named for its branch. From the repo root: `git worktree add ../<repo>.wt/<branch> -b <branch>` (drop `-b` if the branch already exists), or `bd worktree create ../<repo>.wt/<branch> --branch <branch>` for the beads-integrated workflow. Never nest them inside the repo: test runners, bundlers and file watchers crawl nested copies, and `.gitignore` does not stop them. Whoever creates a worktree removes it once its work has landed. If the repo still has an old in-repo `.worktrees/` folder, move those worktrees out first (`git worktree move`).
 
 ### Operator alignment
 
