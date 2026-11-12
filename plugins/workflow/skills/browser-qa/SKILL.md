@@ -1,6 +1,6 @@
 ---
 name: browser-qa
-description: QA web applications using Chrome DevTools MCP. Use when testing running apps, verifying acceptance criteria against a live UI, checking for console errors, evaluating UI behavior, or running regression checks. Requires the chrome-devtools MCP server to be connected. Complements dm-work:review (code-level) with runtime verification.
+description: QA web applications using Chrome DevTools MCP. Use when testing running apps, verifying acceptance criteria against a live UI, checking for console errors, evaluating UI behavior, or running regression checks. Requires the chrome-devtools MCP server to be connected. Complements code-level review with runtime verification.
 ---
 
 # Browser QA

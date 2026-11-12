@@ -76,7 +76,7 @@ Template — include only sections that carry content, never pad:
 
 ## Acceptance criteria
 <numbered; split RUNTIME ("user can...") vs CODE ("function exists...") —
- evaluator-ready, see dm-work:evaluator>
+ each one checkable by an independent judge>
 
 ## Verification plan
 <which gates run; which external signal proves it (browser-qa, state dump,
@@ -133,8 +133,11 @@ the lead instead of silently changing the contract.
 ## After the spec
 
 - Implementation proceeds per the Disciplined Development Loop.
-- **dm-work:evaluator** judges slices against the criteria written here — write
-  criteria it can grade.
+- **Judging slices.** An independent judge checks each criterion against exact
+  evidence: the reviewed commit or build, and what was observed. Never rewrite a
+  criterion to make a failed implementation pass. A criterion that cannot be
+  tested is unresolved, not passed. After repeated failure on one criterion,
+  re-examine the approach or the check instead of repeating the loop.
 - Independent review per the standing review rule; for foundational specs, a
   cross-model pass (Codex, if installed) is recommended — a second model has
   different blind spots. Codex absent → note it once, proceed single-model.
@@ -143,6 +146,4 @@ the lead instead of silently changing the contract.
 
 ## Related skills
 
-- **dm-work:evaluator** — grades work against the acceptance criteria this spec defines
-- **dm-work:council** — deliberates a spec when the *decision itself* is contested; spec-shaping authors, council stress-tests
 - **dm-work:repo-init** — scaffolds the AGENTS.md template whose bead discipline this protocol feeds

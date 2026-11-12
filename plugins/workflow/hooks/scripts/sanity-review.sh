@@ -33,8 +33,8 @@ if ! echo "$COMMAND" | grep -qE '^\s*git\s+commit\b'; then
   exit 0
 fi
 
-# --no-verify commits are block-no-verify.sh's job (hooks in a matcher group run
-# in parallel) — don't spend a model call reviewing a commit that's being blocked
+# --no-verify commits are warn-no-verify.sh's job: the agent chose to skip hooks
+# and is asked to say why — don't spend a model call reviewing that commit
 if echo "$COMMAND" | grep -qE '\--no-verify' \
    || echo "$COMMAND" | grep -qE 'git\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*(\s|$)'; then
   exit 0
@@ -83,7 +83,7 @@ fi
 MAX_LOC=${DM_SANITY_MAX_LOC:-500}
 LOC=$(git diff --stat "$BASE_TREE" "$STAGED_TREE" -- | tail -1 | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' || echo "0")
 if [ "$LOC" -gt "$MAX_LOC" ]; then
-  jq -n --arg m "Sanity review skipped: diff exceeds ${MAX_LOC} LOC. Consider running /dm-work:review for a full review." '{systemMessage: $m}'
+  jq -n --arg m "Sanity review skipped: diff exceeds ${MAX_LOC} LOC. Consider a full /code-review instead." '{systemMessage: $m}'
   exit 0
 fi
 
@@ -221,7 +221,7 @@ if [ "$ADVISORY_MODE" = "true" ]; then
   jq -n --arg m "⚠️ ${FALLBACK_NOTE}Sanity review UNVERIFIED (advisory, circuit breaker active):
 ${FINDINGS}
 
-Circuit breaker: 2+ review rounds. This advisory does not mean the change was verified. Set DM_SKIP_SANITY=1 or run /dm-work:review for a full review." '{systemMessage: $m}'
+Circuit breaker: 2+ review rounds. This advisory does not mean the change was verified. Set DM_SKIP_SANITY=1 or run /code-review for a full review." '{systemMessage: $m}'
   exit 0
 fi
 

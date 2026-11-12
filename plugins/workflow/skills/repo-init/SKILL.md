@@ -11,7 +11,6 @@ Scaffold a new or existing repository with standard project infrastructure.
 - **just-pro** - Build system patterns and templates
 - **tauri-dev** - Mixed Rust/frontend iteration and native acceptance for Tauri projects
 - **mise** - Tool version management
-- **output-compression** - Keeping noisy CLI output small at the source
 - Timbers (`timbers init`) - Development reasoning ledger
 - **go-pro**, **rust-pro**, **typescript-pro**, **python-pro** - Language-specific setup
 
@@ -557,7 +556,7 @@ Skip if the user only has one GitHub identity.
 
 ## Step 8.8: Guardrail Hooks (Optional)
 
-The AGENTS.md template's **Guardrail tiers** section says: a never-do without an enforcing hook is an ask-first. dm-work already ships the `--no-verify` commit block globally. Offer repo-specific never-do enforcement:
+The AGENTS.md template's **Guardrail tiers** section says: a never-do without an enforcing hook is an ask-first. dm-work ships no blocking guardrail by default (its `--no-verify` hook only warns). Offer repo-specific never-do enforcement:
 
 1. Ask whether the repo has **protected paths** — directories or files agents must never edit (generated code, vendored trees, signed configs, `important/` data).
 2. If yes, add a PreToolUse path-protection hook to the repo's `.claude/settings.json`. **The `file_path` the hook receives is absolute** — match the protected directory as a path segment, never with a `^`-anchored relative pattern (that silently matches nothing):
