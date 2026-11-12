@@ -171,7 +171,6 @@ logs/
 .DS_Store
 
 # Agent working dirs
-.worktrees/
 history/
 ```
 
