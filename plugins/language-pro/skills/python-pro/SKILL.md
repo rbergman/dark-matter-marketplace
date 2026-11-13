@@ -513,5 +513,5 @@ setup-force:
 
 **Verification cadence:**
 1. Follow explicit repository gates. During iteration, run the checks for what you changed; use `just check-fast` when provided.
-2. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit.
-3. Without project recipes: `uv run ruff check --fix . && uv run ruff format .`, then `uv run pyright && uv run pytest` at the affected scope.
+2. At a coherent checkpoint, run affected and downstream checks. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit. Preserve vulnerability audits and release requirements.
+3. Without project recipes: `uv run ruff check --fix . && uv run ruff format .`, then `uv run pyright && uv run pytest`.

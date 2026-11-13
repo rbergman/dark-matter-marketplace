@@ -41,17 +41,15 @@ answered everything up front, say so and go straight to the draft.
 ### 1b. Study the best existing solutions (when they exist)
 
 For a user-facing feature, a workflow, or an algorithm with established
-solutions, write a short brief before drafting: the named references you
+solutions, write a short brief into the spec before drafting: the named references you
 studied, the patterns they share, where they differ, and what each rules out
 for this work. Research informs the spec; it does not authorize a pivot from
 the operator's goal. Skip it for internal plumbing.
 
-Size the target by the goal and the resources actually available (compute,
-data, access, budget), not by how long a human would take to build it. When the
-strongest solution is well mapped, that is the target. Rule one out for missing
-resources or open-ended discovery, and say which.
-
 ### 2. Draft the spec artifact
+
+**Size the target** by goal and resources, not human build time: a well-mapped
+strongest solution is the target, built smallest working slice first.
 
 **Home: the bead's linked plan doc is the spec.** Use `docs/specs/<slug>.md`
 only when no bead exists yet, and link it from the bead once one does. One
@@ -64,7 +62,7 @@ Template — include only sections that carry content, never pad:
 
 **Goal:** <the decision/outcome this drives — not the task restated>
 **Non-goals:** <what this deliberately does not do>
-**Would change the approach:** <the evidence that would overturn it>
+**Approach changes if:** <result or evidence that would overturn this approach>
 
 ## Invariants
 <what must stay true: contracts, architecture boundaries, data shapes>

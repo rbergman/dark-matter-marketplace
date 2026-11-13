@@ -1,7 +1,7 @@
 ---
 name: compare-options
 description: >-
-  Settle a taste or feel decision by comparing a few real options instead of steering one build round after round. Use when a layout, interaction, visual direction or wording choice is substantially a matter of taste and one attempt has not settled it; when two rounds of UI changes have passed without the operator saying it hits the mark; or when asked "which of these is better" about something only a person can judge. Do NOT use for work a test can settle, or for decisions already made: settled work gets built once.
+  Settle a taste or feel decision by comparing a few real options instead of steering one build round after round. Use when a layout, interaction, visual direction or wording choice is substantially a matter of taste: before it goes into a spec, or when one attempt has not settled it; when two rounds of UI changes have passed without the operator saying it hits the mark; or when asked "which of these is better" about something only a person can judge. Do NOT use for work a test can settle, or for decisions already made: settled work gets built once.
 ---
 
 # Compare Options
@@ -14,14 +14,15 @@ real axis, shown side by side, settle it in one sitting.
 
 1. **Write it down first.** The question, the effort limit, and what makes an
    option kept or discarded.
-2. **Make about three options**, with the current baseline as one when useful.
+2. **Make about three options** (not a quota), with the current baseline as one when useful.
    They must differ on a real axis. Rethemes of one idea resolve nothing.
 3. **Hold content and scenarios constant** across options, including the
    stress cases (longest label, empty state, worst input).
 4. **Use the cheapest fidelity that exposes the decision.** Sketches are
    enough for a layout choice. Full builds are rarely needed.
 5. **Cull before showing.** Discard options that fail the stated criteria
-   yourself. The operator picks among options that change direction or feel.
+   yourself. The operator picks among options that change direction or feel;
+   pick the rest yourself and record it.
 6. **Delete the losers and keep the lesson** in the spec or the bead. A single
    prototype that has run past its effort limit is culled the same way.
 
@@ -30,7 +31,7 @@ real axis, shown side by side, settle it in one sitting.
 - Give a recognizable situation and a goal, then let them choose their path.
 - Explain the context without giving away the answer.
 - Take confusion and aesthetic reactions as data. Do not ask them to classify it.
-- What an agent can extract from a screen is not what a user can see on it.
+- Judge each option from a rendered screenshot, not from the DOM or the source.
 
 ## Related skills
 

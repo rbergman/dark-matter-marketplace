@@ -134,7 +134,7 @@ Every significant feature must include scenarios for:
 Define these yourself and record the choice in the plan:
 
 - State machine transitions are undefined ("works from any state")
-- Camera behavior during action is undefined (how it feels stays the operator's call)
+- Camera mechanics during action are undefined (target, bounds, cuts); its feel goes to the operator
 
 Stop and clarify with the operator:
 

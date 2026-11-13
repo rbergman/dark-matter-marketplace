@@ -405,5 +405,5 @@ Go's package-level visibility makes extraction cheap — no parameter explosion 
 
 **Verification cadence:**
 1. Follow explicit repository gates. During iteration, run the checks for what you changed; use `just check-fast` when provided.
-2. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit.
-3. Without project recipes: `go tool golangci-lint run --fix && go tool golangci-lint run`, `go test -race ./...`, and `go tool govulncheck ./...` at the affected scope.
+2. At a coherent checkpoint, run affected and downstream checks. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit. Preserve vulnerability audits and release requirements.
+3. Without project recipes: `go tool golangci-lint run --fix && go tool golangci-lint run`, `go test -race ./...`, and `go tool govulncheck ./...`.

@@ -26,7 +26,7 @@ For projects outside browser-qa's scope, leave runtime criteria unresolved and n
 
 ## Prerequisites
 
-- **Chrome DevTools MCP** server connected (`chrome-devtools-mcp`; no plugin is needed)
+- **Chrome DevTools MCP** server connected (`chrome-devtools-mcp`)
 - **App running locally** — dev server started (the QA agent does NOT start the server)
 - **Acceptance criteria available** — from bead, spec, or derived from the change
 

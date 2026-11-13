@@ -49,7 +49,7 @@
     },
     {
       "name": "dm-work",
-      "description": "Workflow tools: spec shaping, repo init, browser QA, Tauri development, mise tooling, session handoff, and commit hooks",
+      "description": "Workflow tools: spec shaping, option comparison for taste decisions, repo init, browser QA, Tauri development, mise tooling, session handoff, and commit hooks",
       "author": {
         "name": "Dark Matter",
         "email": "dark-matter@example.com"

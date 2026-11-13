@@ -1,7 +1,7 @@
 {
   "name": "dm-work",
   "version": "2.2.0",
-  "description": "Workflow tools: spec shaping, repo init, browser QA, Tauri development, mise tooling, a session handoff command, and an ELI5 output style",
+  "description": "Workflow tools: spec shaping, option comparison for taste decisions, repo init, browser QA, Tauri development, mise tooling, a session handoff command, and an ELI5 output style",
   "author": {
     "name": "Dark Matter",
     "email": "dark-matter@example.com"
