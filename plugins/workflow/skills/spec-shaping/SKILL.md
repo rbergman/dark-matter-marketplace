@@ -48,7 +48,7 @@ the operator's goal. Skip it for internal plumbing.
 
 ### 2. Draft the spec artifact
 
-**Size the target** by goal and resources, not human build time: a well-mapped
+**Size the target** within the requested scope, by goal and resources, not human build time: a well-mapped
 strongest solution is the target, built smallest working slice first.
 
 **Home: the bead's linked plan doc is the spec.** Use `docs/specs/<slug>.md`
