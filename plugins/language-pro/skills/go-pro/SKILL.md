@@ -403,8 +403,7 @@ Go's package-level visibility makes extraction cheap — no parameter explosion 
 3. Use existing project abstractions over creating new ones
 4. Prefer concrete types; add generics only when pattern repeats 3+ times
 
-**Before committing:**
-1. Run `just check` (standard for projects using just)
-2. Fallback: `go tool golangci-lint run --fix && go tool golangci-lint run`
-3. Fallback: `go test -race ./...` to catch race conditions
-4. Fallback: `go tool govulncheck ./...` to catch known vulnerabilities
+**Verification cadence:**
+1. Follow explicit repository gates. During iteration, run the checks for what you changed; use `just check-fast` when provided.
+2. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit.
+3. Without project recipes: `go tool golangci-lint run --fix && go tool golangci-lint run`, `go test -race ./...`, and `go tool govulncheck ./...` at the affected scope.

@@ -92,17 +92,17 @@ The best moments layer multiple emotions simultaneously. Design for this:
 For any mechanic or feature, evaluate:
 
 ```
-Elegance = Emotional Payoff / (Player Attention Cost + Development Cost)
+Elegance = Emotional Payoff / (Player Attention Cost + Upkeep Cost)
 ```
 
 | Factor | Question |
 |--------|----------|
 | **Emotional payoff** | What does the player feel? How intensely? How often? |
 | **Attention cost** | How much must the player learn, remember, and track? |
-| **Development cost** | How much effort to build, tune, and maintain? |
+| **Upkeep cost** | How much must be tuned and kept working as the game grows? |
 
-- **High elegance:** Simple to learn, cheap to build, produces rich emotional variety
-- **Low elegance:** Complex to understand, expensive to build, produces tepid engagement
+- **High elegance:** Simple to learn, stable to tune, produces rich emotional variety
+- **Low elegance:** Complex to understand, fragile to tune, produces tepid engagement
 
 **Decision rule:** If a feature scores low on elegance, either simplify it or cut it. Complexity is a budget — spend it on what matters.
 

@@ -251,13 +251,13 @@ What to build first when you can't build everything.
 
 4. **Social systems are force multipliers.** In multiplayer or community-facing games, social systems (trading, cooperation, competition, communication) amplify every other system. But they require all other systems to function first.
 
-5. **Team size determines system count.** The number of systems you can build to equal depth is proportional to your team. Solo and small teams must ruthlessly cut systems until every remaining system is excellent. A game with three polished, interacting systems is better than a game with eight half-built ones.
+5. **Depth beats count.** Build only as many systems as you can bring to full depth: tuned, verified, and interacting. Size that by the resources you have to tune and verify them, not by headcount or calendar time. A game with three polished, interacting systems is better than a game with eight half-built ones.
 
 ### Prioritization Checklist
 
 - [ ] Core loop systems identified and built first
 - [ ] Each system in the build plan passes the Three-Gate Filter
-- [ ] System count is appropriate for team size and timeline
+- [ ] Every planned system can be brought to full depth with the resources available
 - [ ] Interaction matrix shows sufficient coupling at each development milestone
 - [ ] No system is planned that doesn't interact with a system already built or planned for the same milestone
 

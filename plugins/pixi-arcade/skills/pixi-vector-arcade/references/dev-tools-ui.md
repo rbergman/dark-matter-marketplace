@@ -190,7 +190,9 @@ When implementing dev tools and UI:
 - [ ] Each module owns its keybinds, cleans up in dispose()
 - [ ] Document all keybinds
 
-## Key Decisions to Ask
+## Key Decisions
+
+Choose from the project's context and record the choice in the plan. Ask the operator only where the answer changes what the player sees or feels.
 
 1. **UI framework**: @pixi/ui, HTML overlay, or hand-rolled?
 2. **Dev mode detection**: Vite env, custom var, or URL param?
