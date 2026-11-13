@@ -573,7 +573,7 @@ Valve source on glyph switching; Eiserloh slide content; Hodent on HUD and toast
 ## Addendum 2026-10-12: in-play comms and camera control
 
 Added for beads `d0w` and `dyw`, from two messages the ice-pirates session sent at
-Bob's request, checked against source.
+The operator's request, checked against source.
 
 **ice-pirates** (read at `a832c8a`):
 - `src/ui/comms-queue.ts`: `MAX_CARDS` 3, `MIN_SHOWN` 1.2, `BUSY_SLOW` 0.35, `OVERLAP` 0.6, `GATE`

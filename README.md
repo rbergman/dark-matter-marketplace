@@ -44,8 +44,6 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
 | dm-work | Workflow tools | `dm-work:browser-qa` |
 
-Commands use `/dm-work:command` format (e.g., `/dm-work:handoff`).
-
 ---
 
 ## Repository Structure
@@ -57,7 +55,7 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, narrative craft, sim-first, perf
 │   ├── pixi-arcade/   # dm-pixi: PixiJS 8 browser-game bootstrapping
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
-│   └── workflow/      # dm-work: spec shaping, repo init, browser QA, handoff, ELI5 output style
+│   └── workflow/      # dm-work: spec shaping, repo init, browser QA, ELI5 output style
 ├── references/        # Non-installable reference materials
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   └── lang-skill-adaptation.md  # Adapting skills + DX testing
@@ -91,7 +89,6 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
 | `dm-work:compare-options` | Skill | Settle a taste or feel decision by comparing a few real options, then cull |
 | `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
-| `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `dm-work:eli5` | Output style | "Talk to me like I'm 5" — small words, short paragraphs, 2 options max ([source](https://x.com/lydiahallie/status/2080378470111256907)) |
 
 > Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Set `autoCompactWindow` (100k–1M tokens) to make auto-compaction fire with headroom instead of at the context cliff, and `/compact <focus>` to steer what survives.
@@ -99,6 +96,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 > **Removed November 2026:** the commit-time `sanity-review` hook. Across about 7,500 commit commands it raised seven real findings, against 213 unverified notices and 106 overrides; independent review before close covers the same ground.
 
 > **Removed November 2026:** the `triage`, `merge`, `post-merge`, `review`, `council`, `spec`, `align-steering` and `align-agents` commands, the `council`, `evaluator`, `output-compression` and `workflow-commands` skills, and the `dm-team` plugin. Nine weeks of session history showed no one typing the commands and almost no agent use; the evaluator's rules moved into `spec-shaping`.
+
+> **Removed November 2026:** the `handoff` command. Current models write a complete handoff when asked, and compaction carries the rest.
 
 > **Removed August 2026:** `/dm-work:advice`, `/dm-work:devloop` and `/dm-work:beads-migrate`. Native `/goal`, `/loop` and the Disciplined Development Loop in global steering cover what devloop did; beads-migrate was interim and its repos are migrated. Recover from git history if needed.
 

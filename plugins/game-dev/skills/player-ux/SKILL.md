@@ -145,7 +145,7 @@ during action, which must be read while the game runs, is **in-play-comms**'s.
   (play time +16%, progress +40%). List the rules a player can't discover by
   experimenting; cut hints for genre idioms.
 - **Say when, not just what.** A verb that only works in a place gets a zone in the
-  world, and the prompt follows the zone. ice-pirates (2026-10-12, Bob's playtest:
+  world, and the prompt follows the zone. ice-pirates (2026-10-12, the operator's playtest:
   the tip "doesn't say to hold it while inside the cyan ring"):
   - **Outside the zone:** the ring around the target is dimmed, with a prompt
     that has no key cap: "Get inside the ring round the ${name}, then hold G to

@@ -22,7 +22,7 @@ In four projects, three had a written north star and none of the three had been 
 - TIMBERWOLF made ~15 substantive changes in one session without opening the pillars. Pillar 4 is now inverted in the shipped build.
 - O.M.E.N. ran ten measurement passes optimizing whether a decision exists, while the stated bet was emotional attachment.
 
-**In every case drift was caught by Bob or an external reviewer, never by the agent's own process.** The failure was never disagreement with the document. It was non-reading.
+**In every case drift was caught by the operator or an external reviewer, never by the agent's own process.** The failure was never disagreement with the document. It was non-reading.
 
 ---
 
@@ -61,7 +61,7 @@ That is the whole tier. Its only job is to make the document a thing that gets r
    - **DRIFTED** -- the build has moved away from the brief. State when it started and whether anyone noticed at the time.
    - **BRIEF IS WRONG** -- the build is better than the brief, or the brief encoded a bet that measurement has since refuted. State what the brief should now say.
 
-6. **If DRIFTED or BRIEF IS WRONG, stop and surface to Bob before continuing.** Do not resolve it yourself. Which of the two it is, and what to do about it, is his call.
+6. **If DRIFTED or BRIEF IS WRONG, stop and surface to the operator before continuing.** Do not resolve it yourself. Which of the two it is, and what to do about it, is his call.
 
 ---
 

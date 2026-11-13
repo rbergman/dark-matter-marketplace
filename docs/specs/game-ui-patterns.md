@@ -188,7 +188,7 @@ produces from it):
    plan, not running code.
 9. An independent review pass over the full diff, and its findings resolved.
 
-FELT (Bob's, and not checkable this session): the next game's shell lands in one
+FELT (the operator's, and not checkable this session): the next game's shell lands in one
 session without re-deriving these patterns. It is measured when that game is built.
 
 ## Verification plan
