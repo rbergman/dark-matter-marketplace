@@ -19,6 +19,8 @@ In practice:
 
 This applies to features, refactors, infrastructure, and the codebase as a whole. When tempted to design a "proper" version up front, build the smallest working slice first and let it grow.
 
+**Gall's Law sets the build order, not the target.** Pick the target by the product's goal and the resources you actually have (compute, data, access, budget), not by how long a human would take to build it. When the strongest solution is well mapped, that is the target, and the first slice is the smallest working piece of it. Rule a solution out for missing resources or open-ended discovery, and say which.
+
 **Simplicity is not line count.** When choosing between a dependency and writing it yourself, ask what you would unknowingly be taking responsibility for — a library's value is often accumulated edge-case knowledge (encodings, specs, security, platform quirks), and "it's only ~30 lines" or your own confidence is not evidence that cost is low.
 
 ---

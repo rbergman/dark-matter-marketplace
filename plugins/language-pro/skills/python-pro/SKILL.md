@@ -511,7 +511,7 @@ setup-force:
 3. Use existing project abstractions over creating new ones
 4. Prefer explicit types; use generics only when pattern repeats 3+ times
 
-**Before committing:**
-1. Run `just check` (standard for projects using just)
-2. Fallback: `uv run ruff check --fix . && uv run ruff format .`
-3. Fallback: `uv run pyright && uv run pytest`
+**Verification cadence:**
+1. Follow explicit repository gates. During iteration, run the checks for what you changed; use `just check-fast` when provided.
+2. At a coherent checkpoint, run affected and downstream checks. Run `just check` (or the repository's full integration recipe) at its required checkpoint, without assuming it runs per commit. Preserve vulnerability audits and release requirements.
+3. Without project recipes: `uv run ruff check --fix . && uv run ruff format .`, then `uv run pyright && uv run pytest`.

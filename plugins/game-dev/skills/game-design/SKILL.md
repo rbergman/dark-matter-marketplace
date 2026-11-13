@@ -129,12 +129,17 @@ Every significant feature must include scenarios for:
 
 ---
 
-## Red Flags (Stop and Clarify)
+## Red Flags
+
+Define these yourself and record the choice in the plan:
 
 - State machine transitions are undefined ("works from any state")
+- Camera mechanics during action are undefined (target, bounds, cuts); its feel goes to the operator
+
+Stop and clarify with the operator:
+
 - Multiplayer authority is unspecified
 - Economy/currency feature has no balance targets
-- Camera behavior during action is undefined
 - Feature scope is actually 3+ features in disguise
 
 ---

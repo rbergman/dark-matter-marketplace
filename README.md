@@ -89,6 +89,7 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:tauri-dev` | Skill | Tauri and mixed Rust/frontend iteration, focused checks, batch integration and native acceptance |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
+| `dm-work:compare-options` | Skill | Settle a taste or feel decision by comparing a few real options, then cull |
 | `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
 | `dm-work:eli5` | Output style | "Talk to me like I'm 5" — small words, short paragraphs, 2 options max ([source](https://x.com/lydiahallie/status/2080378470111256907)) |

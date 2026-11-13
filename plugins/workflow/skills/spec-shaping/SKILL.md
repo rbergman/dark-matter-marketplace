@@ -38,7 +38,18 @@ the work drives. Ask narrow questions that discriminate between implementations:
 Skip questions the request or the repo already answers. If the operator has
 answered everything up front, say so and go straight to the draft.
 
+### 1b. Study the best existing solutions (when they exist)
+
+For a user-facing feature, a workflow, or an algorithm with established
+solutions, write a short brief into the spec before drafting: the named references you
+studied, the patterns they share, where they differ, and what each rules out
+for this work. Research informs the spec; it does not authorize a pivot from
+the operator's goal. Skip it for internal plumbing.
+
 ### 2. Draft the spec artifact
+
+**Size the target** by goal and resources, not human build time: a well-mapped
+strongest solution is the target, built smallest working slice first.
 
 **Home: the bead's linked plan doc is the spec.** Use `docs/specs/<slug>.md`
 only when no bead exists yet, and link it from the bead once one does. One
@@ -51,6 +62,7 @@ Template — include only sections that carry content, never pad:
 
 **Goal:** <the decision/outcome this drives — not the task restated>
 **Non-goals:** <what this deliberately does not do>
+**Approach changes if:** <result or evidence that would overturn this approach>
 
 ## Invariants
 <what must stay true: contracts, architecture boundaries, data shapes>
@@ -62,11 +74,13 @@ Template — include only sections that carry content, never pad:
 
 ## Acceptance criteria
 <numbered; split RUNTIME ("user can...") vs CODE ("function exists...") —
- each one checkable by an independent judge>
+ each one checkable by an independent judge; tag each machine-checked,
+ felt (operator), or measured>
 
 ## Verification plan
 <which gates run; which external signal proves it (browser-qa, state dump,
- seed replay, API response, historical artifact); whether an independent judge runs>
+ seed replay, API response, historical artifact); whether an independent judge runs;
+ name the real entry points the checks exercise>
 
 ## Slices
 <ordered bounded slices, each → one bead carrying its criteria>
@@ -114,4 +128,5 @@ ambiguity to the lead instead of silently changing the contract.
 
 ## Related skills
 
+- **dm-work:compare-options** — settles a taste decision by comparing real options before it is written into the spec
 - **dm-work:repo-init** — scaffolds the AGENTS.md template whose bead discipline this protocol feeds

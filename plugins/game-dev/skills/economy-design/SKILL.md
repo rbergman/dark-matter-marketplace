@@ -138,7 +138,7 @@ Resources leave faster than they enter. Consequences cascade:
 
 ## Economy Simulation
 
-Model the economy in a spreadsheet before implementing it in code. Spreadsheets are cheap to iterate; code is expensive.
+Model the economy before implementing it in game code: a spreadsheet, or a small standalone simulation (see **simulation-first-design**). A model iterates faster than the game does.
 
 ### Per-Session Model
 

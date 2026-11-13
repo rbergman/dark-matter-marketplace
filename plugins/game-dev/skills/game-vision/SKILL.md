@@ -236,7 +236,7 @@ Before committing significant time to a concept, run this checklist. Failing ite
 - [ ] Do the experience pillars (3-5) create a coherent, non-contradictory vision?
 - [ ] Is the core loop independently satisfying without progression or economy?
 - [ ] Does the concept suggest natural system interactions (not forced)?
-- [ ] Can I build an MVG in a realistic timeframe for my resources?
+- [ ] Can I build an MVG with the resources available?
 - [ ] Is there a target audience? Can I describe who they are and what they play?
 - [ ] Does the concept differ meaningfully from existing games in the genre?
 - [ ] Can I articulate the genre expectations I'm conforming to and subverting?
