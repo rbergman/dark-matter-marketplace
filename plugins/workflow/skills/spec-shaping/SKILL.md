@@ -10,11 +10,6 @@ The operator's understanding is the scarce input; the spec is how it reaches the
 agent in a form that survives the session. Plans that live in conversation die
 with the context window. A spec is a durable repo artifact.
 
-Grounding: Karpathy, Sequoia Ascent 2026 — "you work with your agent to design a
-detailed spec, maybe basically the docs, and get agents to write them." His
-MenuGen failure case: agents matched Stripe/Google emails because persistent
-user IDs were never specified. The decision existed; it just wasn't in the spec.
-
 ## When
 
 - **M+ work** (per bead complexity estimate), always.
@@ -27,15 +22,6 @@ Small specs beat big ones — the recurring failure of spec-driven tooling is
 overhead exceeding return on small features. Scale the spec to the work.
 
 ## Protocol
-
-### 0. Brain-dump intake (when the request arrives as one)
-
-Operators legitimately arrive with everything at once — five threads, half
-goals, half reactions. That is intake, not a violation. Before interviewing:
-capture every distinct thread, list them back in one short block, propose which
-one this turn serves, and park the rest as beads — naming where each went. The
-spec protocol then runs on the chosen thread only. A dropped thread is a
-protocol failure; a deferred, tracked one is the protocol working.
 
 ### 1. Interview to the goal (3–6 questions, not a ceremony)
 
@@ -76,44 +62,27 @@ Template — include only sections that carry content, never pad:
 
 ## Acceptance criteria
 <numbered; split RUNTIME ("user can...") vs CODE ("function exists...") —
- evaluator-ready, see dm-work:evaluator>
+ each one checkable by an independent judge>
 
 ## Verification plan
 <which gates run; which external signal proves it (browser-qa, state dump,
- seed replay, API response, historical artifact); whether evaluator runs>
+ seed replay, API response, historical artifact); whether an independent judge runs>
 
 ## Slices
 <ordered bounded slices, each → one bead carrying its criteria>
 ```
 
-**UI specs: keep product copy and evaluator notes apart.** When the spec is for a
-screen someone will evaluate before it ships (a prototype, mock backend, sample data,
-features left inert), do not write the honesty into the product's copy ("label every
-value Sample", "show a persistent demo banner"). Specify an **annotation layer**
-instead:
-
-- It is on by default, with one visible control to turn it off.
-- Notes are anchored to elements, not stitched into them. For a few notes that are
-  obvious without pointing, a single list in the control's panel is enough.
-- All notes live in one registry, separate from the product.
-
-Then classify every disclosure the spec needs:
-
-- **Product:** the real product would say it too (an unknown shown as "Not checked").
-- **Annotation:** only the evaluator needs it (synthetic values, mocked behavior,
-  unbuilt features, rationale).
-
-Acceptance then checks both directions:
-
-- Every disclosure classified as an annotation has a note.
-- With the layer off, no demo or prototype wording is left in the product.
-
-Reviewer and evaluator briefs say that captures are taken with the layer off, and that
-labeling lives in the layer.
+**UI specs: keep product copy and evaluator notes apart.** When someone will
+evaluate the screen before it ships (a prototype, mock backend, sample data, inert
+features), do not write the honesty into the product's copy. Specify an
+**annotation layer**: on by default with one control to turn it off, notes anchored
+to elements, all notes in one registry. Acceptance checks both directions: every
+evaluator-only disclosure has a note, and with the layer off no demo or prototype
+wording is left in the product.
 
 ### 3. Decision checkpoint
 
-The lead (Astra/Fable under the operator's routing policy) owns task definition,
+The lead owns task definition,
 architecture, acceptance criteria, and verification design. Present unsettled
 decisions with their concrete consequences. Honor decisions and authority already
 given; do not ask for the same approval again. Resolve routine reversible details
@@ -126,15 +95,17 @@ tradeoffs clearly enough that the operator can judge the decision.
 
 Each slice = one bead. The bead carries its acceptance criteria and links the
 spec. Implementers (subagent, Codex, fresh session) receive the spec excerpt +
-criteria — bounded context, not conversation history. Sol/Opus can implement a
-settled slice; smaller models gather evidence. Return consequential ambiguity to
-the lead instead of silently changing the contract.
+criteria — bounded context, not conversation history. Return consequential
+ambiguity to the lead instead of silently changing the contract.
 
 ## After the spec
 
 - Implementation proceeds per the Disciplined Development Loop.
-- **dm-work:evaluator** judges slices against the criteria written here — write
-  criteria it can grade.
+- **Judging slices.** An independent judge checks each criterion against exact
+  evidence: the reviewed commit or build, and what was observed. Never rewrite a
+  criterion to make a failed implementation pass. A criterion that cannot be
+  tested is unresolved, not passed. After repeated failure on one criterion,
+  re-examine the approach or the check instead of repeating the loop.
 - Independent review per the standing review rule; for foundational specs, a
   cross-model pass (Codex, if installed) is recommended — a second model has
   different blind spots. Codex absent → note it once, proceed single-model.
@@ -143,6 +114,4 @@ the lead instead of silently changing the contract.
 
 ## Related skills
 
-- **dm-work:evaluator** — grades work against the acceptance criteria this spec defines
-- **dm-work:council** — deliberates a spec when the *decision itself* is contested; spec-shaping authors, council stress-tests
 - **dm-work:repo-init** — scaffolds the AGENTS.md template whose bead discipline this protocol feeds

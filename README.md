@@ -39,13 +39,12 @@ All components use the `dm-*` plugin prefix with semantic groupings:
 | Plugin | Prefix | Example |
 |--------|--------|---------|
 | dm-arch | Architecture patterns | `dm-arch:solid-architecture` |
-| dm-team | Agent Teams roles (opt-in) | `dm-team:lead` |
 | dm-game | Game development | `dm-game:game-design` |
 | dm-pixi | PixiJS browser games | `dm-pixi:pixi-vector-arcade` |
 | dm-lang | Language expertise | `dm-lang:typescript-pro` |
 | dm-work | Workflow tools | `dm-work:browser-qa` |
 
-Commands use `/dm-work:command` format (e.g., `/dm-work:merge`).
+Commands use `/dm-work:command` format (e.g., `/dm-work:handoff`).
 
 ---
 
@@ -58,8 +57,7 @@ dark-matter-marketplace/
 │   ├── game-dev/      # dm-game: design methodology, narrative craft, sim-first, perf
 │   ├── pixi-arcade/   # dm-pixi: PixiJS 8 browser-game bootstrapping
 │   ├── language-pro/  # dm-lang: Go, Rust, TypeScript, Python, just
-│   ├── teams/         # dm-team: lead + teammate roles for Agent Teams sessions
-│   └── workflow/      # dm-work: review, council, merge, alignment, ELI5 output style
+│   └── workflow/      # dm-work: spec shaping, repo init, browser QA, handoff, ELI5 output style
 ├── references/        # Non-installable reference materials
 │   ├── official-plugins.md  # Official Anthropic plugins guide
 │   └── lang-skill-adaptation.md  # Adapting skills + DX testing
@@ -90,24 +88,14 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 | `dm-work:mise` | Skill | Dev tool version management — replaces nvm/pyenv/goenv, direnv integration |
 | `dm-work:tauri-dev` | Skill | Tauri and mixed Rust/frontend iteration, focused checks, batch integration and native acceptance |
 | `dm-work:repo-init` | Skill | Initialize new repos with standard scaffolding — git, CLAUDE.md, justfile, mise, beads |
-| `dm-work:output-compression` | Skill | Keep noisy build/test/git output small at the source. Explains why output compressors and filter hooks (RTK, tokf) don't pay |
 | `dm-work:browser-qa` | Skill | QA web apps via Chrome DevTools MCP — navigate, click, assert, screenshot, console/network checks |
-| `dm-work:evaluator` | Skill | Grade work against bead acceptance criteria — separate judge from builder, with browser-qa integration |
 | `dm-work:spec-shaping` | Skill | Shape a durable spec before implementing — interview to the goal, decision checkpoint, slice into beads |
-| `dm-work:workflow-commands` | Skill | Expose the same DM command instructions in Codex and other hosts without Claude slash commands |
-| `/dm-work:spec` | Command | Run the spec-shaping protocol on a work item or bead |
 | `/dm-work:handoff` | Command | Write a high-fidelity session handoff for a new session to continue the workstream |
-| `/dm-work:merge` | Command | Pre-merge checklist for worktree branches — quality gates, review, beads |
-| `/dm-work:post-merge` | Command | Autonomous post-merge review and evaluation — findings become beads for next-session triage |
-| `/dm-work:review` | Command | Wraps native `/code-review` with beads creation, severity filtering, and a review-tag checkpoint |
-| `/dm-work:triage` | Command | Triage PR review comments — accept to beads, reject with reply |
-| `/dm-work:council` | Command | Convene 3-5 opposed perspectives on a decision, cross-examine, synthesize with dissent recorded |
-| `dm-work:council` | Skill | The deliberation protocol — runs on subagents by default, on teammates when Agent Teams is enabled |
 | `dm-work:eli5` | Output style | "Talk to me like I'm 5" — small words, short paragraphs, 2 options max ([source](https://x.com/lydiahallie/status/2080378470111256907)) |
-| `/dm-work:align-steering` | Command | Align steering against the selected model's current official guidance, including Astra and Fable 5.1 |
-| `/dm-work:align-agents` | Command | Align a repo's AGENTS.md with the dm-work reference template — diff/merge, never replace |
 
 > Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Set `autoCompactWindow` (100k–1M tokens) to make auto-compaction fire with headroom instead of at the context cliff, and `/compact <focus>` to steer what survives.
+
+> **Removed November 2026:** the `triage`, `merge`, `post-merge`, `review`, `council`, `spec`, `align-steering` and `align-agents` commands, the `council`, `evaluator`, `output-compression` and `workflow-commands` skills, and the `dm-team` plugin. Nine weeks of session history showed no one typing the commands and almost no agent use; the evaluator's rules moved into `spec-shaping`.
 
 > **Removed August 2026:** `/dm-work:advice`, `/dm-work:devloop` and `/dm-work:beads-migrate`. Native `/goal`, `/loop` and the Disciplined Development Loop in global steering cover what devloop did; beads-migrate was interim and its repos are migrated. Recover from git history if needed.
 
@@ -214,8 +202,7 @@ codex plugin add dm-work@dark-matter-marketplace
 Repeat the last command for the desired `dm-*` plugins. Claude uses the commands
 below, then `claude plugin update <plugin>@dark-matter-marketplace --scope user`
 for an existing user install. Start a new session after updating. Codex discovers
-the plugin's skills; use `dm-work:workflow-commands` for named command workflows
-such as align-steering or review. Claude-specific tools still require their host
+the plugin's skills. Claude-specific tools still require their host
 or an explicitly described fallback; installed files alone do not prove every
 hook or native command is supported.
 
@@ -239,7 +226,6 @@ claude plugin marketplace update dark-matter-marketplace
 claude plugin install dm-arch@dark-matter-marketplace
 claude plugin install dm-game@dark-matter-marketplace
 claude plugin install dm-lang@dark-matter-marketplace
-claude plugin install dm-team@dark-matter-marketplace
 claude plugin install dm-work@dark-matter-marketplace
 ```
 
@@ -251,7 +237,7 @@ Core ideas (see `~/.claude/CLAUDE.md` for the full Disciplined Development Loop)
 
 1. **Gall's Law** — Always grow complexity from a simple system that already works. Minimal slices first; speculative architecture last.
 2. **Quality gates remain explicit** — Fix introduced and in-scope failures. Track pre-existing blockers without silently expanding scope or calling a failing gate passed.
-3. **Delegate when useful** — Spawn subagents for parallel work or fresh context. With Agent Teams enabled, a *named* subagent launches as a teammate that can talk to its peers — worth it only when cross-examination is the point (`dm-team`). Otherwise work directly; 1M context handles most tasks.
+3. **Delegate when useful** — Spawn subagents for parallel work or fresh context. With Agent Teams enabled, a *named* subagent launches as a teammate that can talk to its peers — worth it only when cross-examination is the point. Otherwise work directly; 1M context handles most tasks.
 4. **External state via beads** — `bd` survives session boundaries; conversation context doesn't.
 5. **Review is non-negotiable** — Any substantive implementation gets an independent review pass before close; the implementer owns the fixes.
 

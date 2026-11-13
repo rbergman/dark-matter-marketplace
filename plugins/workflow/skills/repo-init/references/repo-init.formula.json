@@ -40,7 +40,7 @@
     {
       "id": "claudeignore",
       "title": "Create .claudeignore for {{lang}}",
-      "description": "Create .claudeignore with universal base (.worktrees/, *.log, .DS_Store) plus language-specific patterns. See repo-init SKILL.md for per-language templates. This is the highest-impact CC token optimization.",
+      "description": "Create .claudeignore with universal base (*.log, .DS_Store) plus language-specific patterns. See repo-init SKILL.md for per-language templates. This is the highest-impact CC token optimization.",
       "depends_on": ["git-init"]
     },
     {

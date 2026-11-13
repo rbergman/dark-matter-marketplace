@@ -1,6 +1,6 @@
 ---
 name: browser-qa
-description: QA web applications using Chrome DevTools MCP. Use when testing running apps, verifying acceptance criteria against a live UI, checking for console errors, evaluating UI behavior, or running regression checks. Requires the chrome-devtools MCP server to be connected. Complements dm-work:review (code-level) with runtime verification.
+description: QA web applications using Chrome DevTools MCP. Use when testing running apps, verifying acceptance criteria against a live UI, checking for console errors, evaluating UI behavior, or running regression checks. Requires the chrome-devtools MCP server to be connected. Complements code-level review with runtime verification.
 ---
 
 # Browser QA
@@ -14,14 +14,14 @@ This skill covers **standard web applications** testable via Chrome DevTools. It
 - **Native mobile apps** — use platform-specific QA tools (e.g., Maestro for iOS/Android).
 - **CLI tools** — use bash-based testing, not browser QA.
 
-When the evaluator encounters projects outside browser-qa's scope, it should mark runtime criteria as UNTESTABLE and note the recommended verification method.
+For projects outside browser-qa's scope, leave runtime criteria unresolved and note the recommended verification method.
 
 ## When to Use
 
 - After implementation work, before merge — verify acceptance criteria against the live app
 - Post-merge regression checks — exercise key user flows after code lands
 - Investigating visual or interaction bugs — reproduce in browser, inspect state
-- Evaluator protocol — the evaluator uses this skill to grade against sprint contracts
+- Judging a slice against its spec's acceptance criteria (see **spec-shaping**)
 - Design quality checks — screenshot and visually evaluate for AI slop patterns
 
 ## Prerequisites

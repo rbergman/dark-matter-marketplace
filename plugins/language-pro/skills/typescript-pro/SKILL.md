@@ -75,7 +75,6 @@ cat > .prettierignore << 'EOF'
 coverage/
 dist/
 node_modules/
-.worktrees/
 .timbers/
 .beads/
 EOF

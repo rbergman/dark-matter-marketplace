@@ -417,7 +417,7 @@ setup:
 
 ## Token-Efficient Recipes
 
-Make gate recipes quiet on success and specific on failure, so agents and humans read the signal rather than the log. Use the tool's own quiet flags or reporters rather than a wrapping compressor (see **output-compression** for why):
+Make gate recipes quiet on success and specific on failure, so agents and humans read the signal rather than the log. Use the tool's own quiet flags or reporters rather than a wrapping compressor (paired benchmarks found output compressors cost-neutral or worse):
 
 ```just
 # Quiet on success; full failure detail

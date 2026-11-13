@@ -286,7 +286,6 @@ export default defineConfig(
       '*.js',           // Ignore JS config files at root
       '*.cjs',
       '*.mjs',
-      '.worktrees/',    // repo-init's AGENTS template still nests worktrees here
     ],
   },
 );

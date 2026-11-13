@@ -128,7 +128,7 @@ Security best practices and guidance for code review.
 
 | Task | Official Plugin | dm-* Complement |
 |------|-----------------|-----------------|
-| Code review | native `/code-review`, feature-dev:code-reviewer | `/dm-work:review` (adds beads + review checkpoint) |
+| Code review | native `/code-review`, feature-dev:code-reviewer | - |
 | Feature development | feature-dev | `Task()` subagents for parallel delegation |
 | Code cleanup | code-simplifier | dm-lang:* for language-specific standards |
 | Plugin creation | plugin-dev | - |
@@ -143,8 +143,7 @@ With Agent Teams (experimental), some official plugin capabilities can be enhanc
 
 | Official Plugin | Enhancement with Agent Teams |
 |----------------|------------------------------|
-| `code-review` | Native `/code-review` does the reviewing; `/dm-work:review` wraps it with beads and checkpointing |
 | `feature-dev:code-architect` | Spawn as a teammate alongside implementation teammates for real-time architectural guidance |
 
 
-Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and is off by default. When enabled, any subagent given a `name` launches as a teammate. See `dm-team:lead` and `dm-team:teammate`.
+Agent Teams requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` and is off by default. When enabled, any subagent given a `name` launches as a teammate.

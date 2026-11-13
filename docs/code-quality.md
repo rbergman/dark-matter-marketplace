@@ -96,10 +96,6 @@ It's the step that most reliably catches significant issues and forces Claude to
 converge on correctness before closing a line of work.
 
 - [repo-init AGENTS.md](../plugins/workflow/skills/repo-init/references/AGENTS.md) — the loop and the "independent review is non-negotiable" rule, as scaffolded into every repo
-- [`/dm-work:review`](../plugins/workflow/commands/review.md) — parallel architecture/code/security/design reviewers on a diff
-- [`/dm-work:devloop`](../plugins/workflow/commands/devloop.md) — runs the loop (review included) as the Definition of Done for each queue item
-- [`/dm-work:merge`](../plugins/workflow/commands/merge.md) — pre-merge checklist that confirms gates + review + tracking are all complete
-- [evaluator](../plugins/workflow/skills/evaluator/SKILL.md) — grades finished work against acceptance criteria with a separate judge agent
 
 ## Where the real thing lives
 
@@ -115,7 +111,6 @@ all of the above:
 
 - [repo-init](../plugins/workflow/skills/repo-init/SKILL.md) — one pass to scaffold git, `.gitignore`, AGENTS.md, justfile, mise, beads, timbers
 - [mise](../plugins/workflow/skills/mise/SKILL.md) — reproducible tool/runtime pinning without the weight of Docker for local dev
-- [output-compression](../plugins/workflow/skills/output-compression/SKILL.md) — keep gate output from drowning the agent's context
 
 **Architecture** (`plugins/architecture/`) — what "extract by responsibility"
 should extract *toward*:
