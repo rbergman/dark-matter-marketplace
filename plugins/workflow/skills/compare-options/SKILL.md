@@ -18,8 +18,10 @@ real axis, shown side by side, settle it in one sitting.
    They must differ on a real axis. Rethemes of one idea resolve nothing.
 3. **Hold content and scenarios constant** across options, including the
    stress cases (longest label, empty state, worst input).
-4. **Use the cheapest fidelity that exposes the decision.** Sketches are
-   enough for a layout choice. Full builds are rarely needed.
+4. **Use the cheapest fidelity that exposes the decision.** A sketch settles
+   structure: what goes where. It does not settle look, density or wording.
+   For those, render the options in the real app with its real components
+   and compare them once, before the first build is called done.
 5. **Cull before showing.** Discard options that fail the stated criteria
    yourself. The operator picks among options that change direction or feel;
    pick the rest yourself and record it.
@@ -28,10 +30,14 @@ real axis, shown side by side, settle it in one sitting.
 
 ## Asking the operator to evaluate
 
+- Before making options, ask for a reference they already like. A screenshot
+  beats an adjective.
 - Give a recognizable situation and a goal, then let them choose their path.
 - Explain the context without giving away the answer.
 - Take confusion and aesthetic reactions as data. Do not ask them to classify it.
 - Judge each option from a rendered screenshot, not from the DOM or the source.
+- Show each option in the state the operator will use: real data, working
+  controls. Where a capture differs from the product, say so beside the image.
 
 ## Related skills
 
