@@ -247,7 +247,7 @@ held keys are cleared: on game-shell opening a screen, and on window blur.
 ### 11. Hold-to-complete actions show their progress on the key cap
 
 A verb that completes after a hold (hold G to board, hold T to cut a tow) must say
-how long is left. Bob, ice-pirates playtest 2026-10-12: holding a key "should show
+how long is left. The operator, ice-pirates playtest 2026-10-12: holding a key "should show
 a progress bar on the key indicator to help inform when it will be done (this is
 a typical game design pattern)". ice-pirates `src/sim/hud-model.ts` and
 `src/ui/hud.ts` (commit `08de850`) do it this way:
@@ -276,7 +276,7 @@ a typical game design pattern)". ice-pirates `src/sim/hud-model.ts` and
 - **Say *when*, not just *what*,** for a hold with a range: see **player-ux**,
   Contextual Hints.
 
-Felt verdict pending: Bob hadn't played the build yet when this was written.
+Felt verdict pending: the operator hadn't played the build yet when this was written.
 
 ---
 

@@ -165,7 +165,7 @@ Every scheme gives something up:
 |---|---|---|
 | **Aim stick fires past a threshold** (below it, aim only) | Hard Deck (`FIRE_AT` 0.5); the twin-stick prototype (0.18); Feral's shipped "three-stage" stick: faint at rest, a slight push aims, further fires, with a haptic pulse at the switch | Players must find the threshold; the cue that marks it must be felt or seen |
 | **Separate hold-to-fire button** | redshifted, free-horses | Feral rejected it: players had to stop aiming to shoot |
-| **Auto-fire while aiming at a target in range** | Feral tried it; Hard Deck has proposed it as the touch default, awaiting Bob's decision | Where ammo is finite, Feral's testers kept running out. Hard Deck's cannon is unlimited, so that cost doesn't apply there. It removes the decision to shoot |
+| **Auto-fire while aiming at a target in range** | Feral tried it; Hard Deck has proposed it as the touch default, awaiting the operator's decision | Where ammo is finite, Feral's testers kept running out. Hard Deck's cannon is unlimited, so that cost doesn't apply there. It removes the decision to shoot |
 | **Tap-and-hold on an enemy** | Feral tried it | Comfortable, ammo-safe, but lost the twin-stick feel |
 
 - **Default for a twin-stick game with finite ammo: the threshold stick.** It's the
@@ -268,7 +268,7 @@ Each line names what the check cannot see.
       scroll, zoom, selection or callout. Menus still zoom.
 - [ ] **Interrupt:** hold both sticks, trigger a notification or switch apps, come
       back: nothing held, and the game paused.
-- [ ] **Real phone, iPhone and Android** (Bob's): reach, size, the fire threshold,
+- [ ] **Real phone, iPhone and Android** (the operator's): reach, size, the fire threshold,
       the rotate card, audio on first tap. Only this check can say "done"; Hard
       Deck's mobile epic stays open for exactly this.
 

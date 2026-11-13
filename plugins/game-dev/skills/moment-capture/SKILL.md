@@ -5,7 +5,7 @@ description: "Capture the player's felt reactions to play verbatim into an appen
 
 # moment-capture
 
-**Fires when** Bob reports a felt reaction to play. Anything aesthetic, emotional, or semantic: "feels chunky", "not easy to time attacks", "there's going to be fighting to achieve a world without fighting?", "that's satisfying", "the swing follows the wrong thing", "this doesn't read right".
+**Fires when** the operator reports a felt reaction to play. Anything aesthetic, emotional, or semantic: "feels chunky", "not easy to time attacks", "there's going to be fighting to achieve a world without fighting?", "that's satisfying", "the swing follows the wrong thing", "this doesn't read right".
 
 **Does not fire on** bug reports, feature requests, or performance complaints. Those go to the tracker.
 
@@ -19,7 +19,7 @@ Hodent, *The Gamer's Brain* (2017).
 
 ## Why
 
-Across four projects, every agent independently reported the same two things: Bob's felt reactions are the one signal no instrument can produce, and he catches them in seconds where the apparatus is blind entirely. Every project acted on those reactions and then discarded them. They survive only as chat scrollback.
+Across four projects, every agent independently reported the same two things: the operator's felt reactions are the one signal no instrument can produce, and he catches them in seconds where the apparatus is blind entirely. Every project acted on those reactions and then discarded them. They survive only as chat scrollback.
 
 Second finding: all four projects retained felt reactions only as defect lists. **Positive reactions were captured nowhere.** The moments a game is actually for have no record in any repo.
 

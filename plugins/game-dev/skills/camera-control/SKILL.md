@@ -12,9 +12,9 @@ done right; **game-feel** owns punch, shake and the trauma budget.
 **Sources:**
 - **Corpus** (read 2026-10-12):
   - ice-pirates `src/view/camera.ts`, `src/app/focus.ts`, `camera.test.ts`: the pure
-    target, combat framing, the screen factor, the aim lead. Bob called the auto
+    target, combat framing, the screen factor, the aim lead. The operator called the auto
     zoom-out "a great touch" (felt, via the ice-pirates session).
-  - redshifted (shipped as BLUESHIFTED; Bob's reference for camera control)
+  - redshifted (shipped as BLUESHIFTED; the operator's reference for camera control)
     `src/rendering/camera-math.ts`, `camera.ts`, `hud/settings/settings-types.ts`,
     `camera.test.ts`: the exact spring, the settings tab, shake only at render.
   - Numbers marked *corpus value* are posture A for the game that ships them and
@@ -111,7 +111,7 @@ framing, heading mode, `view()` and the conversions, and the aim lead.
   - **Frozen while paused,** and while the pointer is outside the window
     (`pointerleave` on `document.documentElement`), **unless the last-used device is
     a pad**.
-  - **The bug this fixed** (Bob, ice-pirates playtest): the mouse left the window,
+  - **The bug this fixed** (the operator, ice-pirates playtest): the mouse left the window,
     re-entered elsewhere, and the background jumped. A review then caught that
     freezing on pointer-leave alone also froze the pad's look-ahead.
   - Under pointer lock (**pointer-lock**), the aim is the virtual cursor and never
@@ -167,7 +167,7 @@ multi-focal camera.
 
 ### 6. Heading-follow (rotate with the ship): an option, never the default
 
-UNSOURCED; posture B throughout. Neither corpus game has it, and Bob has asked for
+UNSOURCED; posture B throughout. Neither corpus game has it, and the operator has asked for
 it in ice-pirates.
 
 - **Offer it as a setting, default off.** Rotation is motion the player didn't

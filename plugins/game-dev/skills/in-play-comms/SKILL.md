@@ -20,7 +20,7 @@ If a line doesn't need all three "yes"es, use the neighbour. It is less machiner
 **Sources:**
 - **Corpus:** ice-pirates (2026-10-12): `src/ui/comms-queue.ts` (pure rules, tested),
   `src/app/engagement.ts`, `src/ui/comms.ts`, `src/sim/story/beats.ts`,
-  `src/view/teach-view.ts`. Built after Bob's first playtest, hardened through three
+  `src/view/teach-view.ts`. Built after the operator's first playtest, hardened through three
   independent reviews; each rule below names the failure it fixed. Numbers marked
   *corpus value* are posture A for ice-pirates and posture B for your game (Numbers
   Policy).
@@ -44,7 +44,7 @@ If a line doesn't need all three "yes"es, use the neighbour. It is less machiner
   them, Hello Worlds, context-sensitive tutorials even lowered the return rate
   (17.96% against 21.60% with none, Table 3). In Foldit, in-context instructions
   beat an up-front manual (play time +16%, progress +40%).
-- **Hard Deck** (its teaching spec session, 2026-10-12): Bob's choices of "repeat
+- **Hard Deck** (its teaching spec session, 2026-10-12): the operator's choices of "repeat
   until acted on" with a Replay tips option, and no dismiss input by default. These
   are design choices, not yet playtested.
 - **Teach in four beats** (Hayashida) and **telegraph floors** are
@@ -133,7 +133,7 @@ interface CommsLine { speaker: string; text: string; pri: 0 | 1 | 2; key?: strin
 - **The default needs no input:** the engagement-slowed clock, frozen while
   paused and behind modal screens such as an upgrade draft (both give `dt = 0`),
   times the player's reading-time multiplier, 1–10× (XAG 116; ADDED in the sketch).
-  Bob's stated preference for Hard Deck is no dismiss input at all; he found one
+  The operator's stated preference for Hard Deck is no dismiss input at all; he found one
   "too much hassle" (felt, not playtested).
 - **"Until dismissed" is an option, not the default:** XAG 116's alternative to a
   long duration, for players who want it. It needs a dismiss input. Under it:
@@ -228,7 +228,7 @@ Corpus values. Then:
 
 ### 8. Lesson persistence: repeat until acted on
 
-Hard Deck's design (Bob's choice, 2026-10-12; posture B until playtested):
+Hard Deck's design (the operator's choice, 2026-10-12; posture B until playtested):
 
 - **Each lesson fires once per run on its trigger (a per-run fired flag, rule 6),
   until the player performs the action it teaches.** Then a persisted learned-flag

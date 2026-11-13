@@ -79,7 +79,7 @@ The tests were mutation-checked on the in-flight guard.
     HUD says **"Click to aim"** until the next click.
   - That distinction comes from the Pointer Lock spec's exemption for programmatic
     exits. **Firefox 150 doesn't honour it:** a request with no activation after the
-    page's own `exitPointerLock()` fails with `pointerlockerror` (probe page, Bob,
+    page's own `exitPointerLock()` fails with `pointerlockerror` (probe page, the operator,
     2026-10-12). There, resuming from a key shows "Click to aim" too. **Chrome 154
     honours it:** the same request, 6 s after the release with activation expired,
     got the lock. Safari is unprobed (its run was spoiled by extra clicks).
@@ -168,7 +168,7 @@ doesn't; rule 3).
 - **Whether the page also sees the Esc keydown** that unlocked depends on the
   browser. Safari 26.5 delivers it: the keydown arrives with the lock still held,
   then `pointerlockchange` in the same millisecond. Chrome 154 and Firefox 150 don't
-  deliver it at all (probe page, run by Bob 2026-10-12). game-shell's Esc grace makes
+  deliver it at all (probe page, run by the operator 2026-10-12). game-shell's Esc grace makes
   either ordering safe.
 - **Safari also refuses an immediate relock** after the player's Esc: a request
   79 ms later was rejected with `NotAllowedError` even with activation live, and a
