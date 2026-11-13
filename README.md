@@ -95,6 +95,8 @@ Workflow tools for spec refinement, context management, and subagent delegation.
 
 > Session pause/recovery uses Claude Code's native `/rewind`, `/compact`, and `/clear`. Set `autoCompactWindow` (100k–1M tokens) to make auto-compaction fire with headroom instead of at the context cliff, and `/compact <focus>` to steer what survives.
 
+> **Removed November 2026:** the commit-time `sanity-review` hook. Across about 7,500 commit commands it raised seven real findings, against 213 unverified notices and 106 overrides; independent review before close covers the same ground.
+
 > **Removed November 2026:** the `triage`, `merge`, `post-merge`, `review`, `council`, `spec`, `align-steering` and `align-agents` commands, the `council`, `evaluator`, `output-compression` and `workflow-commands` skills, and the `dm-team` plugin. Nine weeks of session history showed no one typing the commands and almost no agent use; the evaluator's rules moved into `spec-shaping`.
 
 > **Removed August 2026:** `/dm-work:advice`, `/dm-work:devloop` and `/dm-work:beads-migrate`. Native `/goal`, `/loop` and the Disciplined Development Loop in global steering cover what devloop did; beads-migrate was interim and its repos are migrated. Recover from git history if needed.
@@ -211,7 +213,7 @@ it does not infer a full gate when absent. Repository integration/release gates
 and explicit stricter hooks still apply. A tripwire is not acceptance evidence.
 
 Workflow changes are checked against `tests/workflow-cases.md` and mocked hook
-tests (`bash tests/test-sanity-review.sh` and `bash tests/test-run-gates-on-stop.sh`).
+tests (`bash tests/test-run-gates-on-stop.sh` and `bash tests/test-warn-no-verify.sh`).
 The mocks verify command and evidence handling, not live model quality, native
 behavior or quota savings.
 

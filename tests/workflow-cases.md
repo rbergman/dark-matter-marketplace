@@ -2,8 +2,8 @@
 
 Apply the shipped instructions to these cases during a workflow change review.
 These are behavioral review cases, not a token-savings benchmark. Hook tests run
-separately with `bash tests/test-sanity-review.sh`,
-`bash tests/test-run-gates-on-stop.sh` and `bash tests/test-warn-no-verify.sh`.
+separately with `bash tests/test-run-gates-on-stop.sh` and
+`bash tests/test-warn-no-verify.sh`.
 
 | Case | Input | Required outcome |
 |---|---|---|
