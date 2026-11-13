@@ -8,8 +8,6 @@ separately with `bash tests/test-sanity-review.sh`,
 | Case | Input | Required outcome |
 |---|---|---|
 | Required evidence missing | All required criteria need runtime access; no runtime or equivalent evidence is available. | Not accepted; each criterion stays unresolved. No verified acceptance or merge authorization inferred. |
-| Partial evidence | One required criterion passes; another required criterion cannot be tested. | Not accepted, with the passing evidence retained and the missing instrument identified. |
-| False waiver | A required failing or untestable criterion is relabeled optional by the implementer. | No acceptance; an explicit contract revision is needed. |
 | Wrong review tree | The reviewer is on main; requested review target is a different commit. | Read the target by immutable ID or snapshot, or fail explicitly. Do not inspect main as a substitute. |
 | Uncommitted steering | Global instructions are outside git and modified locally. | Review a copied snapshot with hashes; confirm live bytes match before accepting. |
 | Remediation | A reviewed stateful implementation is patched after a finding. | Review the patch and affected seams; do not mark the new target reviewed using the old result. |

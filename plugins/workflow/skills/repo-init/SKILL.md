@@ -365,7 +365,7 @@ Write to `.claude/settings.local.json`:
 }
 ```
 
-This wires session-start context recovery and session-end enforcement. DM plugin skills (browser-qa, evaluator, repo-init, language skills, architecture skills) are available globally from the plugin install — this file adds project-specific hooks.
+This wires session-start context recovery and session-end enforcement. DM plugin skills (browser-qa, repo-init, language skills, architecture skills) are available globally from the plugin install — this file adds project-specific hooks.
 
 **Customize per-project:** Add project-specific SessionStart commands (e.g., `bd prime` if beads is initialized). The example Stop hook enforces Timbers bookkeeping; the dm-work plugin separately runs an explicit `just check-fast` tripwire when present. Do not solve slow iteration by assigning full suites to every Stop event or merely raising its timeout; preserve explicit repository policy and run full integration/release gates at their required checkpoints.
 
@@ -582,7 +582,7 @@ The AGENTS.md template's **Guardrail tiers** section says: a never-do without an
 
 3. **Test the hook before trusting it**: attempt one edit to a protected file and confirm it is actually blocked. A guardrail that has never fired is an assumption, not a rule.
 4. Record each protected path in the AGENTS.md **Guardrail tiers** never-do table with its enforcing hook, so prose and enforcement stay in sync.
-5. For game repos, also suggest an observability recipe (`just state-dump` or equivalent seeded/deterministic dump) — it's what makes runtime acceptance criteria evaluator-verifiable instead of UNTESTABLE (see **dm-work:evaluator**).
+5. For game repos, also suggest an observability recipe (`just state-dump` or equivalent seeded/deterministic dump) — it's what lets an independent judge verify runtime acceptance criteria instead of leaving them unresolved.
 
 Skip if the repo has no paths worth hard protection — don't scaffold speculative guardrails.
 

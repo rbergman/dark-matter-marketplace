@@ -80,7 +80,7 @@ Template — include only sections that carry content, never pad:
 
 ## Verification plan
 <which gates run; which external signal proves it (browser-qa, state dump,
- seed replay, API response, historical artifact); whether evaluator runs>
+ seed replay, API response, historical artifact); whether an independent judge runs>
 
 ## Slices
 <ordered bounded slices, each → one bead carrying its criteria>

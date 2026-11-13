@@ -10,7 +10,7 @@
 #
 # Override mechanism:
 #   If the agent disagrees with findings, it sets DM_SKIP_SANITY=1 before the next commit.
-#   The orchestrator sets this when committing work that already passed intent review + evaluator.
+#   The orchestrator sets this when committing work that already passed independent review.
 #
 # Circuit breaker:
 #   Tracks review count in /tmp/dm-sanity-count-<repo-hash>.
@@ -34,8 +34,9 @@ if ! echo "$COMMAND" | grep -qE '^\s*git\s+commit\b'; then
 fi
 
 # --no-verify commits are warn-no-verify.sh's job: the agent chose to skip hooks
-# and is asked to say why — don't spend a model call reviewing that commit
-if echo "$COMMAND" | grep -qE '\--no-verify' \
+# and is asked to say why. That commit lands without this review. Same segment
+# match as the warn hook, so a message that only mentions the flag is still reviewed
+if echo "$COMMAND" | grep -qE 'git\b[^|;&]*\b(commit|push|merge)\b[^|;&]*--no-verify' \
    || echo "$COMMAND" | grep -qE 'git\b[^|;&]*\bcommit\b[^|;&]*\s-[a-zA-Z]*n[a-zA-Z]*(\s|$)'; then
   exit 0
 fi
