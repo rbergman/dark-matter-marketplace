@@ -115,8 +115,6 @@ if "${GATE[@]}" >"$GATE_OUTPUT" 2>&1; then
   rm -f "$FAIL_FILE"
   exit 0
 else
-  # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
-  # without recording anything and let the next stop run the gate again.
   # An untrusted mise config is the operator's call, and its pinned tools can't run
   # until they trust it (shims fail the same way). Skip; never prompt `mise trust`.
   if [ "${GATE[0]}" = env ] && grep -q 'Config files in .* are not trusted' "$GATE_OUTPUT"; then
@@ -124,6 +122,8 @@ else
     exit 0
   fi
 
+  # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
+  # without recording anything and let the next stop run the gate again.
   if grep -q 'parallel golangci-lint is running' "$GATE_OUTPUT"; then
     echo "Quality gates skipped ($GATE_DESC): another golangci-lint run holds its lock." >&2
     exit 0
