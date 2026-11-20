@@ -1,6 +1,6 @@
 {
   "name": "dm-work",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Workflow tools: spec shaping, option comparison for taste decisions, repo init, browser QA, Tauri development, mise tooling, and an ELI5 output style",
   "author": {
     "name": "Dark Matter",

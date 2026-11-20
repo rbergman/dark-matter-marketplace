@@ -42,6 +42,18 @@ if ! just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check-fast'; then
   exit 0
 fi
 GATE_DESC="just check-fast"
+GATE=(just check-fast)
+
+# Run under the repo's pinned toolchain. Plain `mise exec` inserts its tools where
+# the shims sit in PATH, which can be behind Homebrew; aggressive mode puts them first.
+if command -v mise >/dev/null 2>&1; then
+  for mise_config in mise.toml .mise.toml .config/mise.toml .tool-versions; do
+    if [ -f "$mise_config" ]; then
+      GATE=(env MISE_ACTIVATE_AGGRESSIVE=1 mise exec -- just check-fast)
+      break
+    fi
+  done
+fi
 
 # Skip documentation/media-only changes. Configuration can affect behavior.
 CHANGED=$(git status --porcelain 2>/dev/null | awk '{print $NF}' \
@@ -94,21 +106,27 @@ FAIL_FILE="$PROJECT_ROOT/history/.gates-fail-state"
 GATE_OUTPUT=$(mktemp)
 trap 'rm -f "$GATE_OUTPUT"' EXIT
 
-if just check-fast >"$GATE_OUTPUT" 2>&1; then
+if "${GATE[@]}" >"$GATE_OUTPUT" 2>&1; then
   # Gates passed — record state hash so subsequent turns skip
   echo "$STATE_HASH" > "$HASH_FILE"
   rm -f "$FAIL_FILE"
   exit 0
 else
+  # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
+  # without recording anything and let the next stop run the gate again.
+  if grep -q 'parallel golangci-lint is running' "$GATE_OUTPUT"; then
+    exit 0
+  fi
+
   # Gates failed — clear pass hash so they re-run after fix attempts
   rm -f "$HASH_FILE"
 
   # Track consecutive failures on the same working tree state.
   PREV_FAIL_STATE=$(cat "$FAIL_FILE" 2>/dev/null || echo "")
   if [ "$PREV_FAIL_STATE" = "$STATE_HASH" ]; then
-    # Same state failed before — agent hasn't changed anything. Break the loop.
+    # Same state failed before — agent hasn't changed anything. Break the loop, and
+    # keep the marker so every later stop on this state is allowed too.
     echo "Quality gates still failing ($GATE_DESC) — same state as last attempt, allowing stop." >&2
-    rm -f "$FAIL_FILE"
     exit 0
   fi
 
