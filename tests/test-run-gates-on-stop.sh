@@ -22,6 +22,10 @@ mkdir -p "$TEST_DIR/mise-bin"
 cat > "$TEST_DIR/mise-bin/mise" <<'MOCK'
 #!/usr/bin/env bash
 printf 'aggressive=%s %s\n' "${MISE_ACTIVATE_AGGRESSIVE:-}" "$*" >> "$MISE_CALLS"
+if [ -n "${MISE_UNTRUSTED:-}" ]; then
+  echo 'Config files in /repo/.mise.toml are not trusted. Trust them with `mise trust`.' >&2
+  exit 1
+fi
 shift 2  # drop "exec --"
 exec "$@"
 MOCK
@@ -150,6 +154,12 @@ printf '[tools]\n' > .mise.toml
 PATH="$TEST_DIR/mise-bin:$PATH" run_hook
 [ "$STATUS" -eq 0 ] || fail 'mise-wrapped gate should pass'
 grep -qx 'aggressive=1 exec -- just check-fast' "$MISE_CALLS" || fail 'gate not run through mise exec'
+assert_calls 1
+# An untrusted config (a fresh worktree) falls back to plain just, never a block.
+reset_state
+MISE_UNTRUSTED=1 PATH="$TEST_DIR/mise-bin:$PATH" run_hook
+[ "$STATUS" -eq 0 ] || fail 'untrusted mise config must not block'
+! grep -q 'mise trust' "$TEST_DIR/stderr" || fail 'told the agent to trust the config'
 assert_calls 1
 # Without mise on PATH, the same repo falls back to plain just.
 reset_state

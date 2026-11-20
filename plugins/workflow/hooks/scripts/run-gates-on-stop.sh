@@ -46,10 +46,13 @@ GATE=(just check-fast)
 
 # Run under the repo's pinned toolchain. Plain `mise exec` inserts its tools where
 # the shims sit in PATH, which can be behind Homebrew; aggressive mode puts them first.
+# Never download a toolchain inside a timed hook: a missing version only warns.
 if command -v mise >/dev/null 2>&1; then
-  for mise_config in mise.toml .mise.toml .config/mise.toml .tool-versions; do
+  for mise_config in mise.toml .mise.toml mise.local.toml .mise.local.toml \
+      .config/mise.toml .config/mise/config.toml mise/config.toml .mise/config.toml \
+      .tool-versions; do
     if [ -f "$mise_config" ]; then
-      GATE=(env MISE_ACTIVATE_AGGRESSIVE=1 mise exec -- just check-fast)
+      GATE=(env MISE_ACTIVATE_AGGRESSIVE=1 MISE_EXEC_AUTO_INSTALL=0 mise exec -- just check-fast)
       break
     fi
   done
@@ -106,7 +109,18 @@ FAIL_FILE="$PROJECT_ROOT/history/.gates-fail-state"
 GATE_OUTPUT=$(mktemp)
 trap 'rm -f "$GATE_OUTPUT"' EXIT
 
-if "${GATE[@]}" >"$GATE_OUTPUT" 2>&1; then
+run_gate() {
+  "${GATE[@]}" >"$GATE_OUTPUT" 2>&1 && return 0
+  # An untrusted mise config (every fresh worktree) is the operator's call, not a gate
+  # failure: run the plain gate instead and never tell the agent to `mise trust`.
+  if [ "${GATE[0]}" = env ] && grep -q 'are not trusted' "$GATE_OUTPUT"; then
+    just check-fast >"$GATE_OUTPUT" 2>&1
+  else
+    return 1
+  fi
+}
+
+if run_gate; then
   # Gates passed — record state hash so subsequent turns skip
   echo "$STATE_HASH" > "$HASH_FILE"
   rm -f "$FAIL_FILE"
@@ -115,6 +129,7 @@ else
   # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
   # without recording anything and let the next stop run the gate again.
   if grep -q 'parallel golangci-lint is running' "$GATE_OUTPUT"; then
+    echo "Quality gates skipped ($GATE_DESC): another golangci-lint run holds its lock." >&2
     exit 0
   fi
 
