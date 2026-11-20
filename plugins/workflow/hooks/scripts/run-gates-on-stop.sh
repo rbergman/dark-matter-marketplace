@@ -42,6 +42,21 @@ if ! just --summary 2>/dev/null | tr ' ' '\n' | grep -qx 'check-fast'; then
   exit 0
 fi
 GATE_DESC="just check-fast"
+GATE=(just check-fast)
+
+# Run under the repo's pinned toolchain. Plain `mise exec` inserts its tools where
+# the shims sit in PATH, which can be behind Homebrew; aggressive mode puts them first.
+# Never download a toolchain inside a timed hook: a missing version only warns.
+if command -v mise >/dev/null 2>&1; then
+  for mise_config in mise.toml .mise.toml mise.local.toml .mise.local.toml \
+      .config/mise.toml .config/mise/config.toml mise/config.toml .mise/config.toml \
+      .tool-versions; do
+    if [ -f "$mise_config" ]; then
+      GATE=(env MISE_ACTIVATE_AGGRESSIVE=1 MISE_EXEC_AUTO_INSTALL=0 mise exec -- just check-fast)
+      break
+    fi
+  done
+fi
 
 # Skip documentation/media-only changes. Configuration can affect behavior.
 CHANGED=$(git status --porcelain 2>/dev/null | awk '{print $NF}' \
@@ -94,21 +109,35 @@ FAIL_FILE="$PROJECT_ROOT/history/.gates-fail-state"
 GATE_OUTPUT=$(mktemp)
 trap 'rm -f "$GATE_OUTPUT"' EXIT
 
-if just check-fast >"$GATE_OUTPUT" 2>&1; then
+if "${GATE[@]}" >"$GATE_OUTPUT" 2>&1; then
   # Gates passed — record state hash so subsequent turns skip
   echo "$STATE_HASH" > "$HASH_FILE"
   rm -f "$FAIL_FILE"
   exit 0
 else
+  # An untrusted mise config is the operator's call, and its pinned tools can't run
+  # until they trust it (shims fail the same way). Skip; never prompt `mise trust`.
+  if [ "${GATE[0]}" = env ] && grep -q 'Config files in .* are not trusted' "$GATE_OUTPUT"; then
+    echo "Quality gates skipped ($GATE_DESC): this checkout's mise config is untrusted." >&2
+    exit 0
+  fi
+
+  # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
+  # without recording anything and let the next stop run the gate again.
+  if grep -q 'parallel golangci-lint is running' "$GATE_OUTPUT"; then
+    echo "Quality gates skipped ($GATE_DESC): another golangci-lint run holds its lock." >&2
+    exit 0
+  fi
+
   # Gates failed — clear pass hash so they re-run after fix attempts
   rm -f "$HASH_FILE"
 
   # Track consecutive failures on the same working tree state.
   PREV_FAIL_STATE=$(cat "$FAIL_FILE" 2>/dev/null || echo "")
   if [ "$PREV_FAIL_STATE" = "$STATE_HASH" ]; then
-    # Same state failed before — agent hasn't changed anything. Break the loop.
+    # Same state failed before — agent hasn't changed anything. Break the loop, and
+    # keep the marker so every later stop on this state is allowed too.
     echo "Quality gates still failing ($GATE_DESC) — same state as last attempt, allowing stop." >&2
-    rm -f "$FAIL_FILE"
     exit 0
   fi
 

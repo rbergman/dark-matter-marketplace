@@ -14,9 +14,22 @@ if [ "$1" = --summary ]; then
   printf '%s\n' "$RECIPES"
 else
   printf '%s\n' "$*" >> "$CALLS"
+  [ -z "${GATE_MSG:-}" ] || printf '%s\n' "$GATE_MSG"
   exit "${GATE_STATUS:-0}"
 fi
 MOCK
+mkdir -p "$TEST_DIR/mise-bin"
+cat > "$TEST_DIR/mise-bin/mise" <<'MOCK'
+#!/usr/bin/env bash
+printf 'aggressive=%s %s\n' "${MISE_ACTIVATE_AGGRESSIVE:-}" "$*" >> "$MISE_CALLS"
+if [ -n "${MISE_UNTRUSTED:-}" ]; then
+  echo 'Config files in /repo/.mise.toml are not trusted. Trust them with `mise trust`.' >&2
+  exit 1
+fi
+shift 2  # drop "exec --"
+exec "$@"
+MOCK
+chmod +x "$TEST_DIR/mise-bin/mise"
 for tool in npm cargo go; do
   cat > "$TEST_DIR/bin/$tool" <<'MOCK'
 #!/usr/bin/env bash
@@ -114,7 +127,49 @@ run_hook
 [ "$STATUS" -eq 0 ] || fail 'repeated unchanged failure must break loop'
 grep -q 'still failing' "$TEST_DIR/stderr" || fail 'loop breaker hid failure'
 assert_calls 2
+# The loop stays broken while the state is unchanged, instead of alternating.
+run_hook
+[ "$STATUS" -eq 0 ] || fail 'third unchanged failure must not block again'
+# A new state blocks again.
+printf 'changed again\n' > app.ts
+run_hook
+[ "$STATUS" -eq 2 ] || fail 'failure on a new state must block'
+git restore app.ts
 unset GATE_STATUS
+
+# Another session holding golangci-lint's lock is a skip, not a failure or a pass.
+reset_state
+export GATE_STATUS=1 GATE_MSG='Error: parallel golangci-lint is running'
+run_hook
+[ "$STATUS" -eq 0 ] || fail 'lint lock contention must not block'
+[ ! -e history/.gates-fail-state ] && [ ! -e history/.gates-last-pass ] || fail 'lint lock recorded state'
+run_hook
+assert_calls 2
+unset GATE_STATUS GATE_MSG
+
+# A repo with a mise config runs the gate through mise, tools first in PATH.
+reset_state
+export MISE_CALLS="$TEST_DIR/mise-calls"
+printf '[tools]\n' > .mise.toml
+PATH="$TEST_DIR/mise-bin:$PATH" run_hook
+[ "$STATUS" -eq 0 ] || fail 'mise-wrapped gate should pass'
+grep -qx 'aggressive=1 exec -- just check-fast' "$MISE_CALLS" || fail 'gate not run through mise exec'
+assert_calls 1
+# An untrusted config skips without blocking, recording or prompting a trust.
+reset_state
+MISE_UNTRUSTED=1 PATH="$TEST_DIR/mise-bin:$PATH" run_hook
+[ "$STATUS" -eq 0 ] || fail 'untrusted mise config must not block'
+grep -q 'untrusted' "$TEST_DIR/stderr" || fail 'untrusted skip left no note'
+! grep -q 'mise trust' "$TEST_DIR/stderr" || fail 'told the agent to trust the config'
+[ ! -e history/.gates-fail-state ] && [ ! -e history/.gates-last-pass ] || fail 'untrusted skip recorded state'
+[ ! -e "$CALLS" ] || fail 'ran the unpinned gate'
+# Without mise on PATH, the same repo falls back to plain just.
+reset_state
+rm -f "$MISE_CALLS"
+PATH="$TEST_DIR/bin:/usr/bin:/bin" run_hook
+[ "$STATUS" -eq 0 ] && [ ! -e "$MISE_CALLS" ] || fail 'missing mise must fall back to just'
+assert_calls 1
+rm -f .mise.toml
 
 # No fast recipe means no inferred npm/Cargo/Go suite in marker-only projects.
 reset_state

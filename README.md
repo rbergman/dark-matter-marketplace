@@ -209,7 +209,10 @@ or an explicitly described fallback; installed files alone do not prove every
 hook or native command is supported.
 
 The Claude Stop hook runs an explicit `just check-fast` tripwire when present;
-it does not infer a full gate when absent. Repository integration/release gates
+it does not infer a full gate when absent. In a repo with a mise config it runs
+the tripwire through `mise exec` so the pinned toolchain comes first on `PATH`. Another
+session holding golangci-lint's lock counts as a skip, and once a failure repeats on
+an unchanged tree, later stops on that tree are allowed. Repository integration/release gates
 and explicit stricter hooks still apply. A tripwire is not acceptance evidence.
 
 Workflow changes are checked against `tests/workflow-cases.md` and mocked hook
