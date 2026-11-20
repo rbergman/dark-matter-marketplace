@@ -109,18 +109,7 @@ FAIL_FILE="$PROJECT_ROOT/history/.gates-fail-state"
 GATE_OUTPUT=$(mktemp)
 trap 'rm -f "$GATE_OUTPUT"' EXIT
 
-run_gate() {
-  "${GATE[@]}" >"$GATE_OUTPUT" 2>&1 && return 0
-  # An untrusted mise config (every fresh worktree) is the operator's call, not a gate
-  # failure: run the plain gate instead and never tell the agent to `mise trust`.
-  if [ "${GATE[0]}" = env ] && grep -q 'are not trusted' "$GATE_OUTPUT"; then
-    just check-fast >"$GATE_OUTPUT" 2>&1
-  else
-    return 1
-  fi
-}
-
-if run_gate; then
+if "${GATE[@]}" >"$GATE_OUTPUT" 2>&1; then
   # Gates passed — record state hash so subsequent turns skip
   echo "$STATE_HASH" > "$HASH_FILE"
   rm -f "$FAIL_FILE"
@@ -128,6 +117,13 @@ if run_gate; then
 else
   # Another session's golangci-lint holds its lock: this tree didn't fail, so skip
   # without recording anything and let the next stop run the gate again.
+  # An untrusted mise config is the operator's call, and its pinned tools can't run
+  # until they trust it (shims fail the same way). Skip; never prompt `mise trust`.
+  if [ "${GATE[0]}" = env ] && grep -q 'Config files in .* are not trusted' "$GATE_OUTPUT"; then
+    echo "Quality gates skipped ($GATE_DESC): this checkout's mise config is untrusted." >&2
+    exit 0
+  fi
+
   if grep -q 'parallel golangci-lint is running' "$GATE_OUTPUT"; then
     echo "Quality gates skipped ($GATE_DESC): another golangci-lint run holds its lock." >&2
     exit 0

@@ -155,12 +155,14 @@ PATH="$TEST_DIR/mise-bin:$PATH" run_hook
 [ "$STATUS" -eq 0 ] || fail 'mise-wrapped gate should pass'
 grep -qx 'aggressive=1 exec -- just check-fast' "$MISE_CALLS" || fail 'gate not run through mise exec'
 assert_calls 1
-# An untrusted config (a fresh worktree) falls back to plain just, never a block.
+# An untrusted config skips without blocking, recording or prompting a trust.
 reset_state
 MISE_UNTRUSTED=1 PATH="$TEST_DIR/mise-bin:$PATH" run_hook
 [ "$STATUS" -eq 0 ] || fail 'untrusted mise config must not block'
+grep -q 'untrusted' "$TEST_DIR/stderr" || fail 'untrusted skip left no note'
 ! grep -q 'mise trust' "$TEST_DIR/stderr" || fail 'told the agent to trust the config'
-assert_calls 1
+[ ! -e history/.gates-fail-state ] && [ ! -e history/.gates-last-pass ] || fail 'untrusted skip recorded state'
+[ ! -e "$CALLS" ] || fail 'ran the unpinned gate'
 # Without mise on PATH, the same repo falls back to plain just.
 reset_state
 rm -f "$MISE_CALLS"
